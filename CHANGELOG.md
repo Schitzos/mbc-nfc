@@ -32,6 +32,7 @@ All notable spec and design changes should be recorded here.
 - Added baseline UML/system diagrams for architecture and core role flows.
 - Added explicit GitHub repository governance task before app scaffolding so branch rules and reviewer routing are enforced early.
 - Aligned traceability with the new GitHub repository governance task and branching/release-automation requirement.
+- Added repository-level GitHub governance files for reviewer routing and branch-rule guidance.
 
 ### Documentation Updated
 

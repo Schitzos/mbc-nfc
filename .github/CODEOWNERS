@@ -1,0 +1,14 @@
+# Repository reviewer routing baseline
+#
+# Current state:
+# - Only confirmed GitHub account in this repository workflow is @Schitzos.
+# - Until dedicated GitHub users or teams exist for Demo/Release Engineer and other roles,
+#   the repository owner remains the effective required reviewer.
+#
+# Future improvement:
+# - Replace or extend these entries with real team/user ownership once GitHub teams exist.
+
+* @Schitzos
+/.github/ @Schitzos
+/specs/ @Schitzos
+/src/ @Schitzos
