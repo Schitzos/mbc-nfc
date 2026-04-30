@@ -33,6 +33,7 @@ All notable spec and design changes should be recorded here.
 - Added explicit GitHub repository governance task before app scaffolding so branch rules and reviewer routing are enforced early.
 - Aligned traceability with the new GitHub repository governance task and branching/release-automation requirement.
 - Added repository-level GitHub governance files for reviewer routing and branch-rule guidance.
+- Corrected repository governance guidance so it matches the current zero-approval solo workflow rulesets.
 
 ### Documentation Updated
 
