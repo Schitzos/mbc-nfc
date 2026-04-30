@@ -1,0 +1,4 @@
+interface:
+  display_name: "MBC System Analyst"
+  short_description: "System analyst guidance for KDX MBC requirements and flows."
+  default_prompt: "Use this skill to analyze business/system requirements, roles, flows, scope, and edge cases for the KDX Membership Benefit Card app."

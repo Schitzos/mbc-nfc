@@ -1,0 +1,4 @@
+interface:
+  display_name: "MBC NFC Native Specialist"
+  short_description: "NFC/mobile native guidance for KDX MBC."
+  default_prompt: "Use this skill to plan, implement, or troubleshoot React Native NFC read/write, Android/iOS native setup, and real-device NFC behavior for the KDX MBC app."

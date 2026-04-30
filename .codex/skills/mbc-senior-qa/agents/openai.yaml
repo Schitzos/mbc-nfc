@@ -1,0 +1,4 @@
+interface:
+  display_name: "MBC Senior QA"
+  short_description: "Senior QA guidance for the KDX MBC assessment."
+  default_prompt: "Use this skill to review requirements, test coverage, edge cases, and quality risks for the KDX Membership Benefit Card app."

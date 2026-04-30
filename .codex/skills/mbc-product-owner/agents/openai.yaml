@@ -1,0 +1,4 @@
+interface:
+  display_name: "MBC Product Owner"
+  short_description: "Product owner guidance for KDX MBC scope and acceptance."
+  default_prompt: "Use this skill to define product value, prioritize backlog, refine acceptance criteria, and make scope decisions for the KDX Membership Benefit Card app."

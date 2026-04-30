@@ -1,0 +1,4 @@
+interface:
+  display_name: "MBC Project Manager"
+  short_description: "Project management guidance for KDX MBC delivery."
+  default_prompt: "Use this skill to plan, track, prioritize, and manage delivery for the KDX Membership Benefit Card app."

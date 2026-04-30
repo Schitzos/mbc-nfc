@@ -1,0 +1,4 @@
+interface:
+  display_name: "MBC Senior React Native FE"
+  short_description: "Senior frontend guidance for the KDX MBC React Native app."
+  default_prompt: "Use this skill to implement or review React Native frontend work for the KDX Membership Benefit Card app."

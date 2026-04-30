@@ -1,0 +1,4 @@
+interface:
+  display_name: "MBC Test Automation Engineer"
+  short_description: "Automated testing guidance for KDX MBC."
+  default_prompt: "Use this skill to design or implement Jest, React Native Testing Library, mocked NFC repository, and repeatable automated tests for the KDX MBC app."

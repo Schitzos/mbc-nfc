@@ -1,0 +1,4 @@
+interface:
+  display_name: "MBC UI/UX Designer"
+  short_description: "UI/UX design guidance for KDX MBC role flows."
+  default_prompt: "Use this skill to design role-based UX, Signal UI screens, flows, states, and demo-ready interface behavior for the KDX MBC app."

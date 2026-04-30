@@ -1,0 +1,4 @@
+interface:
+  display_name: "MBC Demo Release Engineer"
+  short_description: "Demo and release guidance for KDX MBC submission."
+  default_prompt: "Use this skill to prepare demo flows, release checklist, submission package, run instructions, screenshots/video, and known limitations for the KDX MBC assessment."

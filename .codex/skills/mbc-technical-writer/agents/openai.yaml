@@ -1,0 +1,4 @@
+interface:
+  display_name: "MBC Technical Writer"
+  short_description: "Documentation and presentation guidance for KDX MBC."
+  default_prompt: "Use this skill to write or review technical/non-technical documentation and presentation material for the KDX Membership Benefit Card assessment."

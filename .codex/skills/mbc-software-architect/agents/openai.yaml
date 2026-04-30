@@ -1,0 +1,4 @@
+interface:
+  display_name: "MBC Software Architect"
+  short_description: "Software architecture guidance for the KDX MBC app."
+  default_prompt: "Use this skill to design, review, or evolve the software architecture for the KDX Membership Benefit Card React Native app."
