@@ -24,7 +24,7 @@ This document maps requirements to design sections, implementation tasks, and ve
 | Technical Writer / Presentation Specialist | T-026D, T-029, T-030, presentation brief, submission definition of done, FR-011. |
 | Test Automation Engineer | T-017, T-027, T-027A, M2/M5 release checks, NFR-008, NFR-013, NFR-014, E2E automation mapping in `E2E_TEST_CASES.md`. |
 | Senior QA | T-027, T-028, acceptance confidence, device matrix integrity, manual E2E evidence in `E2E_TEST_CASES.md`. |
-| Demo/Release Engineer | T-000, T-029, T-030, Git/repository readiness, demo readiness checklist, FR-011. |
+| Demo/Release Engineer | T-000, T-000B, T-027A, T-029, T-030, Git/repository readiness, GitHub governance, demo readiness checklist, FR-011, NFR-015. |
 
 ## Traceability Matrix
 
@@ -40,7 +40,7 @@ This document maps requirements to design sections, implementation tasks, and ve
 | FR-008 Scout Card Inspection | `DESIGN.md` Section 10 | T-016, T-017, T-025, T-026A, T-026B, T-026C | Read-only use-case test; presentation test |
 | FR-009 Transaction Logs | `DESIGN.md` Section 8 | T-009, T-012 to T-016, T-026A, T-026B, T-026C | Unit test for latest five logs |
 | FR-010 Silent Shield | `DESIGN.md` Section 9 | T-019, T-020 | Codec/security test; integrity/tamper check; generic NFC read check |
-| FR-011 Assessment Deliverables | `DESIGN.md` Section 12 | T-000, T-026D, T-029, T-030 | Repository readiness, task presentation brief, and submission package review |
+| FR-011 Assessment Deliverables | `DESIGN.md` Section 12 | T-000, T-000B, T-026D, T-029, T-030 | Repository readiness, governance readiness, task presentation brief, and submission package review |
 | FR-012 Activity Extensibility | `DESIGN.md` Sections 5, 8, 10 | T-005, T-007, T-008, T-014, T-015, T-026A, T-026B, T-026C, T-027 | Generic activity fixture test |
 | FR-013 Local Offline Ledger and Reporting | `DESIGN.md` Sections 2, 7, 8, 10 | T-017A, T-020A, T-022, T-027 | Local ledger summary test; Station reporting display test; privacy/audit verification |
 | NFR-001 Offline Support | `DESIGN.md` Sections 1, 7 | T-005 to T-020 | Airplane-mode/manual offline demo |
@@ -57,6 +57,7 @@ This document maps requirements to design sections, implementation tasks, and ve
 | NFR-012 Data separation | `DESIGN.md` Sections 1, 8 | T-017A, T-020A | Card member truth remains separate from device-local audit/reporting data |
 | NFR-013 Coverage target | `DESIGN.md` Section 11 | T-027 | Coverage report shows at least 90% automated unit/application coverage for implemented scope |
 | NFR-014 Static quality gate | `DESIGN.md` Section 11 | T-027A | SonarCloud analysis and passing quality gate |
+| NFR-015 Branching and release automation | `DESIGN.md` Section 11 | T-000, T-000B, T-027A, T-030 | Branch protection, reviewer routing, and `main`-triggered release automation review |
 
 ## Coverage Rules
 

@@ -32,6 +32,8 @@ Scope:
 
 - Git repository initialization.
 - Branch strategy for `feature/*`, `develop`, and `main`.
+- GitHub branch protection / repository governance for `develop` and `main`.
+- `CODEOWNERS` or equivalent reviewer-routing guidance.
 - Git commit-message convention.
 - React Native-ready `.gitignore`.
 - README with setup, run, NFC hardware, mock/demo, and known limitation notes.
@@ -42,6 +44,8 @@ Exit criteria:
 - Repository has a clean baseline or a documented reason why commit is deferred.
 - Demo/Release Engineer confirms GitHub/GitLab submission path is clear.
 - Branch promotion rules are documented and understood before feature work starts.
+- GitHub review and branch-protection rules are configured before normal feature PR/MR flow begins.
+- The team understands which required checks are enforced now and which are deferred until CI is available.
 - Commit-message convention is documented before team commits begin.
 - Security Pentester confirms no local secrets, raw NFC payloads, dependency folders, or build artifacts are staged.
 - Project Manager confirms M1 can start from the repository baseline.

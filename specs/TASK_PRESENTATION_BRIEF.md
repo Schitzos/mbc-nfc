@@ -16,6 +16,7 @@ This brief explains each project task in a simple format that can be reused for 
 | Task | Purpose | Owner | Output | Presentation Value |
 | --- | --- | --- | --- | --- |
 | T-000 Git Repository Baseline | Make the project safe and ready for GitHub/GitLab submission. | Demo/Release Engineer | Git repo, `.gitignore`, README, clean baseline. | Shows the project is reviewable and submission-ready from the start. |
+| T-000B GitHub Repository Governance | Enforce branch, review, and approval rules before feature delivery starts. | Demo/Release Engineer / Project Manager / Product Owner | Branch protection, reviewer routing, CODEOWNERS or equivalent guidance. | Shows the team delivery process is controlled by GitHub rules, not only by memory. |
 | T-001 React Native TypeScript Project | Create the mobile app foundation. | Senior React Native FE | React Native CLI app with TypeScript, Jest, base folders. | Shows the implementation starts from a maintainable mobile foundation. |
 | T-002 Core Dependencies | Install required libraries for navigation, NFC, state, and tests. | Senior React Native FE | Working dependency setup. | Shows the app has the tools needed for NFC role flows. |
 

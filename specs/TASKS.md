@@ -92,6 +92,37 @@ Acceptance:
 - Security Pentester confirms no sensitive local files are included.
 - Demo/Release Engineer confirms repository is ready to become the submission source of truth.
 
+### T-000B Configure GitHub Repository Governance
+
+Owner:
+
+- Demo/Release Engineer
+- Project Manager
+- Product Owner
+
+Coverage:
+
+- FR-011 Assessment Deliverables
+- NFR-015 Branching and release automation
+
+Tasks:
+
+- Configure branch protection or repository rules for `develop` and `main`.
+- Require pull request or merge request flow for protected branches.
+- Configure approval rules so direct feature delivery does not bypass review.
+- Set merge ownership expectation so Demo/Release Engineer reviews and controls merges into `develop`.
+- Configure `main` so promotion remains controlled by the Project Owner.
+- Add `CODEOWNERS` or an equivalent reviewer-mapping strategy for the repository.
+- Document which required checks are active now and which are deferred until CI exists.
+
+Acceptance:
+
+- GitHub repository governance is configured before normal feature delivery begins.
+- `develop` and `main` are protected by documented review rules.
+- Reviewer ownership is documented and not left to informal practice only.
+- `CODEOWNERS` or equivalent reviewer-routing guidance exists.
+- The team knows which checks are already enforced and which will be added later in `T-027A`.
+
 ### T-001 Create React Native TypeScript Project
 
 Owner:

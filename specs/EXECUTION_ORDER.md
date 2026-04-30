@@ -33,13 +33,14 @@ Order:
 
 1. `T-000A` Create UML and System Design Diagrams
 2. `T-000` Set Up Git Repository and Submission Baseline
-3. `T-001` Create React Native TypeScript Project
-4. `T-002` Install Core Dependencies
+3. `T-000B` Configure GitHub Repository Governance
+4. `T-001` Create React Native TypeScript Project
+5. `T-002` Install Core Dependencies
 
 Expected outcome:
 
 - Core UML/system diagrams are ready for team alignment and presentation use.
-- Repo baseline and branch workflow are ready.
+- Repo baseline, branch workflow, and GitHub governance are ready.
 - App skeleton runs.
 - Core libraries, tests, coverage output, and analysis prerequisites exist.
 

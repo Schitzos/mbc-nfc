@@ -30,6 +30,8 @@ All notable spec and design changes should be recorded here.
 - Added Git commit convention and Husky changed-file lint/commit-message enforcement requirements.
 - Tightened agent operating rules so active-task control, co-owner behavior, and anti-ambiguity escalation are explicit.
 - Added baseline UML/system diagrams for architecture and core role flows.
+- Added explicit GitHub repository governance task before app scaffolding so branch rules and reviewer routing are enforced early.
+- Aligned traceability with the new GitHub repository governance task and branching/release-automation requirement.
 
 ### Documentation Updated
 
