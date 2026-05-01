@@ -1,5 +1,6 @@
 import { RegisterMemberCardUseCase } from '../register-member-card.use-case';
 import type { MbcCardRepository } from '../../../domain/repositories/mbc-card-repository';
+import type { LocalLedgerRepository } from '../../../domain/repositories/local-ledger-repository';
 import { CardRepositoryError } from '../../../domain/errors/card-repository-error';
 
 function createCardRepository(
@@ -17,6 +18,16 @@ function createCardRepository(
       ),
     writeCard: jest.fn().mockResolvedValue(undefined),
     cancel: jest.fn().mockResolvedValue(undefined),
+    ...overrides,
+  };
+}
+
+function createLedgerRepository(
+  overrides?: Partial<LocalLedgerRepository>,
+): LocalLedgerRepository {
+  return {
+    append: jest.fn().mockResolvedValue(undefined),
+    getStationSummary: jest.fn(),
     ...overrides,
   };
 }
@@ -59,5 +70,24 @@ describe('RegisterMemberCardUseCase', () => {
     expect(result.success).toBe(false);
     expect(result.message).toContain('already registered');
     expect(cardRepository.writeCard).not.toHaveBeenCalled();
+  });
+
+  it('appends a local ledger record after successful registration when configured', async () => {
+    const cardRepository = createCardRepository();
+    const ledgerRepository = createLedgerRepository();
+    const useCase = new RegisterMemberCardUseCase(
+      cardRepository,
+      ledgerRepository,
+    );
+
+    const result = await useCase.execute();
+
+    expect(result.success).toBe(true);
+    expect(ledgerRepository.append).toHaveBeenCalledWith(
+      expect.objectContaining({
+        role: 'STATION',
+        action: 'REGISTER',
+      }),
+    );
   });
 });

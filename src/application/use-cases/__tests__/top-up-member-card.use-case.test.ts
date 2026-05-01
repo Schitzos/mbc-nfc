@@ -1,5 +1,6 @@
 import { TopUpMemberCardUseCase } from '../top-up-member-card.use-case';
 import type { MbcCardRepository } from '../../../domain/repositories/mbc-card-repository';
+import type { LocalLedgerRepository } from '../../../domain/repositories/local-ledger-repository';
 
 function createCardRepository(
   overrides?: Partial<MbcCardRepository>,
@@ -17,6 +18,16 @@ function createCardRepository(
     }),
     writeCard: jest.fn().mockResolvedValue(undefined),
     cancel: jest.fn().mockResolvedValue(undefined),
+    ...overrides,
+  };
+}
+
+function createLedgerRepository(
+  overrides?: Partial<LocalLedgerRepository>,
+): LocalLedgerRepository {
+  return {
+    append: jest.fn().mockResolvedValue(undefined),
+    getStationSummary: jest.fn(),
     ...overrides,
   };
 }
@@ -48,6 +59,25 @@ describe('TopUpMemberCardUseCase', () => {
             nominal: 50000,
           }),
         ],
+      }),
+    );
+  });
+
+  it('writes a local ledger entry after successful top-up when configured', async () => {
+    const ledgerRepository = createLedgerRepository();
+    const useCase = new TopUpMemberCardUseCase(
+      createCardRepository(),
+      ledgerRepository,
+    );
+
+    const result = await useCase.execute({ amount: 50000 });
+
+    expect(result.success).toBe(true);
+    expect(ledgerRepository.append).toHaveBeenCalledWith(
+      expect.objectContaining({
+        role: 'STATION',
+        action: 'TOP_UP',
+        amount: 50000,
       }),
     );
   });

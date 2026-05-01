@@ -8,6 +8,8 @@ import type { RoleActionResultDto } from '../dto/role-action-result-dto';
 import { toCardSummaryDto } from '../dto/card-summary-mapper';
 import { CardRepositoryError } from '../../domain/errors/card-repository-error';
 import { createRandomId } from '../../shared/utils/create-random-id';
+import type { LocalLedgerRepository } from '../../domain/repositories/local-ledger-repository';
+import { maskMemberReference } from '../../shared/utils/mask-member-reference';
 
 function createInitialCard(): MbcCard {
   const occurredAt = new Date().toISOString();
@@ -35,7 +37,10 @@ function createInitialCard(): MbcCard {
 }
 
 export class RegisterMemberCardUseCase {
-  constructor(private readonly cardRepository: MbcCardRepository) {}
+  constructor(
+    private readonly cardRepository: MbcCardRepository,
+    private readonly localLedgerRepository?: LocalLedgerRepository,
+  ) {}
 
   async execute(): Promise<RoleActionResultDto> {
     const registerState = await this.validateInitialCardState();
@@ -51,10 +56,27 @@ export class RegisterMemberCardUseCase {
     const card = createInitialCard();
     await this.cardRepository.writeCard(card);
 
+    let message = 'Member card registered successfully.';
+
+    if (this.localLedgerRepository) {
+      try {
+        await this.localLedgerRepository.append({
+          id: createRandomId('LEDGER'),
+          role: 'STATION',
+          action: 'REGISTER',
+          maskedMemberReference: maskMemberReference(card.member.memberId),
+          occurredAt: new Date().toISOString(),
+        });
+      } catch {
+        message =
+          'Member card registered, but the local audit ledger could not be updated.';
+      }
+    }
+
     return {
       success: true,
       role: 'STATION',
-      message: 'Member card registered successfully.',
+      message,
       card: toCardSummaryDto(card),
     };
   }
