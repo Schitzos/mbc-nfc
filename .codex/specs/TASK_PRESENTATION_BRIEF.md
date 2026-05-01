@@ -98,7 +98,7 @@ This brief explains each project task in a simple format that can be reused for 
 
 ## Current Readiness Notes
 
-- Specs are ready for mock-first hands-on development.
+- Phases 0 to 6 are already implemented in the app and merged through `develop`.
+- Phase 7 focuses on quality gates: stronger automated coverage, SonarCloud preparation, GitHub Actions, and presentation-ready verification notes.
 - Real NFC hardware/card details remain TBD and are tracked in `DEVICE_TEST_MATRIX.md` and `RISKS.md`.
-- Figma hi-fi V2 polish is pending because of the Figma MCP tool-call limit, but the task and acceptance criteria are documented.
-- Git setup should start with T-000 before implementation begins.
+- Figma hi-fi refinement is still pending, but the current Signal-based implementation is usable for mock-first demo flows.
