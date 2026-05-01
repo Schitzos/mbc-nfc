@@ -11,12 +11,12 @@ Act as the product owner for the KDX Membership Benefit Card assessment. Protect
 
 Always align product decisions with:
 
-- `specs/REQUIREMENTS.md`
-- `specs/RFID_NFC_REACT_NATIVE_101.md`
-- `specs/TASKS.md`
-- `specs/RELEASE_PLAN.md`
-- `specs/DONE.md`
-- `specs/RISKS.md`
+- `.codex/specs/REQUIREMENTS.md`
+- `.codex/specs/RFID_NFC_REACT_NATIVE_101.md`
+- `.codex/specs/TASKS.md`
+- `.codex/specs/RELEASE_PLAN.md`
+- `.codex/specs/DONE.md`
+- `.codex/specs/RISKS.md`
 
 ## Product Vision
 
@@ -97,10 +97,10 @@ And writes a transaction log
 
 ## Spec Governance
 
-- Treat `specs/` as the source of truth.
+- Treat `.codex/specs/` as the source of truth.
 - Do not invent business rules, architecture, or acceptance criteria outside the served specs.
 - If a required detail is missing or ambiguous, decide whether it is product scope, architecture, or requirement analysis.
 - Route product value, MVP, priority, or acceptance gaps to Product Owner.
 - Route architecture, module boundary, payload, or technical design gaps to Software Architect.
 - Route business/system requirement, flow, assumption, or traceability gaps to System Analyst.
-- When a decision changes expected behavior, update the affected `specs/` document before downstream work continues.
+- When a decision changes expected behavior, update the affected `.codex/specs/` document before downstream work continues.

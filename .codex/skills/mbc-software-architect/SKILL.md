@@ -11,12 +11,12 @@ Act as a senior software architect for the KDX Membership Benefit Card app. Desi
 
 Always align with:
 
-- `specs/DESIGN.md`
-- `specs/REQUIREMENTS.md`
-- `specs/DECISIONS.md`
-- `specs/SECURITY.md`
-- `specs/TASKS.md`
-- `specs/TEST_PLAN.md`
+- `.codex/specs/DESIGN.md`
+- `.codex/specs/REQUIREMENTS.md`
+- `.codex/specs/DECISIONS.md`
+- `.codex/specs/SECURITY.md`
+- `.codex/specs/TASKS.md`
+- `.codex/specs/TEST_PLAN.md`
 
 ## Architecture Principles
 
@@ -72,9 +72,9 @@ Presentation:
 
 1. Identify the quality attribute affected: offline, integrity, privacy, testability, portability, or usability.
 2. Choose the smallest architecture decision that satisfies the requirement.
-3. Record meaningful decisions in `specs/DECISIONS.md`.
-4. Keep implementation tasks in `specs/TASKS.md` aligned.
-5. Add verification points to `specs/TEST_PLAN.md`.
+3. Record meaningful decisions in `.codex/specs/DECISIONS.md`.
+4. Keep implementation tasks in `.codex/specs/TASKS.md` aligned.
+5. Add verification points to `.codex/specs/TEST_PLAN.md`.
 
 ## Guardrails
 
@@ -97,9 +97,9 @@ Presentation:
 
 ## Spec Governance
 
-- Treat `specs/` as the source of truth.
+- Treat `.codex/specs/` as the source of truth.
 - Do not invent product scope or business rules; raise those to Product Owner.
 - Do not reinterpret unclear requirements silently; raise those to System Analyst.
 - Own architecture decisions, module boundaries, domain model, payload strategy, and technical constraints.
-- When architecture changes, update `specs/DESIGN.md`, `specs/DECISIONS.md`, `specs/TASKS.md`, and `specs/TEST_PLAN.md` as needed.
+- When architecture changes, update `.codex/specs/DESIGN.md`, `.codex/specs/DECISIONS.md`, `.codex/specs/TASKS.md`, and `.codex/specs/TEST_PLAN.md` as needed.
 - If a downstream role lacks architecture guidance, serve the missing design before implementation continues.

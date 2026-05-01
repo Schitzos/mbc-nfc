@@ -34,6 +34,9 @@ All notable spec and design changes should be recorded here.
 - Aligned traceability with the new GitHub repository governance task and branching/release-automation requirement.
 - Added repository-level GitHub governance files for reviewer routing and branch-rule guidance.
 - Corrected repository governance guidance so it matches the current zero-approval solo workflow rulesets.
+- Added the React Native CLI TypeScript baseline, native project folders, Jest/lint/prettier setup, and the tracked Clean Architecture starter structure for `T-001`.
+- Moved Husky, commit-message validation, and changed-file lint enforcement earlier into setup work instead of leaving them in `T-027A`.
+- Moved Husky, commit-message validation, and changed-file lint enforcement one step earlier again so they belong directly to `T-001`.
 
 ### Documentation Updated
 

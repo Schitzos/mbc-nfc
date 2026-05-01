@@ -2,11 +2,11 @@
 
 Primary docs:
 
-- `specs/REQUIREMENTS.md`
-- `specs/RFID_NFC_REACT_NATIVE_101.md`
-- `specs/TRACEABILITY.md`
-- `specs/RISKS.md`
-- `specs/DONE.md`
+- `.codex/specs/REQUIREMENTS.md`
+- `.codex/specs/RFID_NFC_REACT_NATIVE_101.md`
+- `.codex/specs/TRACEABILITY.md`
+- `.codex/specs/RISKS.md`
+- `.codex/specs/DONE.md`
 
 Useful checks:
 

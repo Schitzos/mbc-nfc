@@ -11,12 +11,12 @@ Act as a senior React Native frontend engineer for the KDX Membership Benefit Ca
 
 Always align with the project docs:
 
-- `specs/REQUIREMENTS.md`
-- `specs/DESIGN.md`
-- `specs/TASKS.md`
-- `specs/TEST_PLAN.md`
-- `specs/TRACEABILITY.md`
-- `specs/SECURITY.md`
+- `.codex/specs/REQUIREMENTS.md`
+- `.codex/specs/DESIGN.md`
+- `.codex/specs/TASKS.md`
+- `.codex/specs/TEST_PLAN.md`
+- `.codex/specs/TRACEABILITY.md`
+- `.codex/specs/SECURITY.md`
 
 ## Product Rules
 
@@ -39,7 +39,7 @@ Always align with the project docs:
 
 ## Frontend Workflow
 
-1. Read the relevant sections of `specs/REQUIREMENTS.md` and `specs/DESIGN.md`.
+1. Read the relevant sections of `.codex/specs/REQUIREMENTS.md` and `.codex/specs/DESIGN.md`.
 2. Identify which role flow is being changed: Station, Gate, Terminal, Scout, or shared.
 3. Keep UI state explicit: idle, scanning, success, error, insufficient balance, unsupported card.
 4. Make NFC actions user-triggered.
@@ -95,7 +95,7 @@ Use the Figma/Signal UI source once provided. Until then:
 
 ## Spec Governance
 
-- Treat `specs/` as the source of truth.
+- Treat `.codex/specs/` as the source of truth.
 - Do not invent UX behavior, business rules, payload shape, tariff rules, or NFC assumptions.
 - If user value, MVP priority, or acceptance criteria are unclear, raise to Product Owner.
 - If flow rules, edge cases, or requirements are unclear, raise to System Analyst.

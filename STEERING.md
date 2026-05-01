@@ -30,7 +30,7 @@ If a project-specific requirement conflicts with this file, the project-specific
 
 Every project should define a source-of-truth area, for example:
 
-- `specs/`
+- `.codex/specs/`
 - `docs/`
 - `architecture/`
 
@@ -300,7 +300,7 @@ To reuse this file in another project:
 Recommended pattern:
 
 - keep this file generic
-- keep project-specific rules in `specs/` or `docs/`
+- keep project-specific rules in `.codex/specs/` or `docs/`
 
 ## 16. Suggested Companion Files
 
@@ -308,12 +308,12 @@ If starting a new project, pair this file with:
 
 - `README.md`
 - `CHANGELOG.md`
-- `specs/REQUIREMENTS.md`
-- `specs/DESIGN.md`
-- `specs/TASKS.md`
-- `specs/EXECUTION_ORDER.md`
-- `specs/TEST_PLAN.md`
-- `specs/DONE.md`
+- `.codex/specs/REQUIREMENTS.md`
+- `.codex/specs/DESIGN.md`
+- `.codex/specs/TASKS.md`
+- `.codex/specs/EXECUTION_ORDER.md`
+- `.codex/specs/TEST_PLAN.md`
+- `.codex/specs/DONE.md`
 
 ## 17. Short Default Rule Set
 

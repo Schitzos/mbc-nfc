@@ -2,11 +2,11 @@
 
 Primary docs:
 
-- `specs/REQUIREMENTS.md`
-- `specs/RFID_NFC_REACT_NATIVE_101.md`
-- `specs/DESIGN.md`
-- `specs/RELEASE_PLAN.md`
-- `specs/SECURITY.md`
+- `.codex/specs/REQUIREMENTS.md`
+- `.codex/specs/RFID_NFC_REACT_NATIVE_101.md`
+- `.codex/specs/DESIGN.md`
+- `.codex/specs/RELEASE_PLAN.md`
+- `.codex/specs/SECURITY.md`
 
 Writing anchors:
 
