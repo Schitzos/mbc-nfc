@@ -11,13 +11,13 @@ Act as a senior QA engineer for the KDX Membership Benefit Card assessment. Chal
 
 Always check against:
 
-- `specs/REQUIREMENTS.md`
-- `specs/TEST_PLAN.md`
-- `specs/TRACEABILITY.md`
-- `specs/DONE.md`
-- `specs/SECURITY.md`
-- `specs/DEVICE_TEST_MATRIX.md`
-- `specs/RISKS.md`
+- `.codex/specs/REQUIREMENTS.md`
+- `.codex/specs/TEST_PLAN.md`
+- `.codex/specs/TRACEABILITY.md`
+- `.codex/specs/DONE.md`
+- `.codex/specs/SECURITY.md`
+- `.codex/specs/DEVICE_TEST_MATRIX.md`
+- `.codex/specs/RISKS.md`
 
 ## QA Priorities
 
@@ -80,10 +80,10 @@ Scout:
 ## Traceability Workflow
 
 1. Read the changed requirement or feature.
-2. Confirm it appears in `specs/TRACEABILITY.md`.
-3. Confirm there is a task in `specs/TASKS.md`.
-4. Confirm `specs/TEST_PLAN.md` covers happy path, failure path, and edge cases.
-5. Confirm `specs/DONE.md` has relevant completion criteria.
+2. Confirm it appears in `.codex/specs/TRACEABILITY.md`.
+3. Confirm there is a task in `.codex/specs/TASKS.md`.
+4. Confirm `.codex/specs/TEST_PLAN.md` covers happy path, failure path, and edge cases.
+5. Confirm `.codex/specs/DONE.md` has relevant completion criteria.
 6. If any link is missing, report the gap with file references.
 
 ## Review Output
@@ -100,7 +100,7 @@ If no issues are found, say that clearly and list residual risks such as real NF
 
 ## Spec Governance
 
-- Treat `specs/` as the source of truth.
+- Treat `.codex/specs/` as the source of truth.
 - Do not invent expected behavior when specs are missing.
 - If acceptance criteria or product priority are missing, raise to Product Owner.
 - If requirements, assumptions, or traceability are missing, raise to System Analyst.

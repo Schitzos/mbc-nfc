@@ -10,8 +10,10 @@ pnpm-debug.log*
 
 # React Native / Metro
 .expo/
+.bundle/
 .metro-health-check*
 metro.config.local.*
+*.jsbundle
 
 # Coverage / test output
 coverage/
@@ -24,20 +26,26 @@ test-results/
 .eslintcache
 
 # iOS
+build/
+DerivedData/
 ios/build/
 ios/Pods/
 ios/.xcode.env.local
 *.xcworkspace/xcuserdata/
 *.xcuserdatad/
 *.xcuserstate
+*.ipa
 
 # Android
 android/.gradle/
 android/app/build/
 android/build/
 android/local.properties
+.cxx/
+.kotlin/
 *.keystore
 *.jks
+*.hprof
 
 # IDE / editor
 .idea/
@@ -57,4 +65,13 @@ GoogleService-Info.plist
 tmp/
 temp/
 *.tmp
+
+# Ruby / CocoaPods
+vendor/bundle/
+
+# fastlane
+**/fastlane/report.xml
+**/fastlane/Preview.html
+**/fastlane/screenshots
+**/fastlane/test_output
 

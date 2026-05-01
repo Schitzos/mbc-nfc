@@ -14,7 +14,7 @@ The project already contains:
 - release, testing, security, and presentation planning
 - initial Signal-oriented presentation theme artifacts under `src/`
 
-Implementation will follow the execution sequence in `specs/EXECUTION_ORDER.md`.
+Implementation will follow the execution sequence in `.codex/specs/EXECUTION_ORDER.md`.
 
 ## Product Summary
 
@@ -83,15 +83,15 @@ chore: initialize repository baseline
 
 Recommended reading order for the project owner:
 
-- `specs/PROJECT_OWNER_READING_ORDER.md`
+- `.codex/specs/PROJECT_OWNER_READING_ORDER.md`
 
 Main execution documents:
 
-- `specs/REQUIREMENTS.md`
-- `specs/DESIGN.md`
-- `specs/TASKS.md`
-- `specs/EXECUTION_ORDER.md`
-- `specs/AGENT_OPERATING_PROTOCOL.md`
+- `.codex/specs/REQUIREMENTS.md`
+- `.codex/specs/DESIGN.md`
+- `.codex/specs/TASKS.md`
+- `.codex/specs/EXECUTION_ORDER.md`
+- `.codex/specs/AGENT_OPERATING_PROTOCOL.md`
 
 ## Local Development Setup
 
@@ -152,4 +152,3 @@ When GitHub or GitLab is ready:
 5. configure protected-branch rules
 6. configure SonarCloud and GitHub Actions secrets
 7. configure app distribution credentials
-

@@ -2,11 +2,11 @@
 
 Primary docs:
 
-- `specs/DESIGN.md`
-- `specs/DECISIONS.md`
-- `specs/SECURITY.md`
-- `specs/TASKS.md`
-- `specs/TEST_PLAN.md`
+- `.codex/specs/DESIGN.md`
+- `.codex/specs/DECISIONS.md`
+- `.codex/specs/SECURITY.md`
+- `.codex/specs/TASKS.md`
+- `.codex/specs/TEST_PLAN.md`
 
 Architecture anchors:
 

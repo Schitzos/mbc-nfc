@@ -11,11 +11,11 @@ Act as a demo/release engineer for the KDX MBC assessment. Make the final projec
 
 Always align with:
 
-- `specs/RELEASE_PLAN.md`
-- `specs/DONE.md`
-- `specs/DEVICE_TEST_MATRIX.md`
+- `.codex/specs/RELEASE_PLAN.md`
+- `.codex/specs/DONE.md`
+- `.codex/specs/DEVICE_TEST_MATRIX.md`
 - `README.md` when available.
-- `specs/RISKS.md`
+- `.codex/specs/RISKS.md`
 
 ## Release Priorities
 
@@ -66,9 +66,9 @@ Optional demo:
 
 ## Spec Governance
 
-- Treat `specs/` as the source of truth.
+- Treat `.codex/specs/` as the source of truth.
 - Do not invent release claims, demo coverage, or readiness status.
 - If demo scope or acceptance value is unclear, raise to Product Owner.
 - If demo flow exposes missing requirements or edge cases, raise to System Analyst.
 - If demo blockers require architecture or implementation strategy, raise to Software Architect.
-- Keep `specs/RELEASE_PLAN.md`, `specs/DONE.md`, `specs/DEVICE_TEST_MATRIX.md`, and `specs/RISKS.md` aligned with actual readiness.
+- Keep `.codex/specs/RELEASE_PLAN.md`, `.codex/specs/DONE.md`, `.codex/specs/DEVICE_TEST_MATRIX.md`, and `.codex/specs/RISKS.md` aligned with actual readiness.
