@@ -3,7 +3,6 @@ import { Text, View } from 'react-native';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import type { RootStackParamList } from '../../app/navigation';
 import { roleOptions } from '../config/role-options';
-import { SignalButton } from '../components/SignalButton';
 import { SignalOptionCard } from '../components/SignalOptionCard';
 import { useAppStore } from '../stores/app-store';
 
@@ -17,9 +16,9 @@ export function RoleSwitcherScreen({ navigation }: Props): React.JSX.Element {
   const activeRole =
     roleOptions.find(role => role.key === selectedRole) ?? roleOptions[0];
 
-  const handleOpenRole = () => {
-    setSelectedRole(activeRole.key);
-    navigation?.navigate?.(activeRole.key);
+  const handleSelectRole = (roleKey: (typeof roleOptions)[number]['key']) => {
+    setSelectedRole(roleKey);
+    navigation?.navigate?.(roleKey);
   };
 
   return (
@@ -59,8 +58,8 @@ export function RoleSwitcherScreen({ navigation }: Props): React.JSX.Element {
             Choose workspace
           </Text>
           <Text className="mt-2 text-base leading-6 text-muted">
-            Pick the role you want to operate, then open its screen. This keeps
-            role switching explicit and the current mode easy to confirm.
+            Pick the role you want to operate. The app will open that workspace
+            immediately so there is no extra step before the real NFC flow.
           </Text>
 
           <View className="mt-5 gap-3">
@@ -72,17 +71,10 @@ export function RoleSwitcherScreen({ navigation }: Props): React.JSX.Element {
                   key={role.key}
                   title={role.label}
                   state={isActive ? 'selected' : 'default'}
-                  onPress={() => setSelectedRole(role.key)}
+                  onPress={() => handleSelectRole(role.key)}
                 />
               );
             })}
-          </View>
-
-          <View className="mt-5">
-            <SignalButton
-              label={`Open ${activeRole.label}`}
-              onPress={handleOpenRole}
-            />
           </View>
 
           <Text className="mt-4 text-sm leading-5 text-muted">

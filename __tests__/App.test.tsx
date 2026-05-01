@@ -16,14 +16,15 @@ test('renders the role switcher baseline screen', () => {
 
   expect(screen.getByText('KDX Membership Benefit Card')).toBeTruthy();
   expect(screen.getAllByText('Station').length).toBeGreaterThan(0);
-  expect(screen.getByText('Open Station')).toBeTruthy();
+  expect(screen.getByText('Choose workspace')).toBeTruthy();
 });
 
-test('updates the active role before opening a workspace', () => {
-  render(<RoleSwitcherScreen />);
+test('navigates immediately when a role is selected', () => {
+  const navigate = jest.fn();
+  render(<RoleSwitcherScreen navigation={{ navigate } as never} />);
 
   fireEvent.press(screen.getByText('Scout'));
 
   expect(screen.getByText('Active role')).toBeTruthy();
-  expect(screen.getByText('Open Scout')).toBeTruthy();
+  expect(navigate).toHaveBeenCalledWith('scout');
 });
