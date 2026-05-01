@@ -57,6 +57,10 @@ export function RoleSwitcherScreen({ navigation }: Props): React.JSX.Element {
                   if (role.key === 'terminal') {
                     navigation?.navigate?.('terminal');
                   }
+
+                  if (role.key === 'scout') {
+                    navigation?.navigate?.('scout');
+                  }
                 }}
               >
                 <Text
@@ -71,8 +75,8 @@ export function RoleSwitcherScreen({ navigation }: Props): React.JSX.Element {
           })}
         </View>
         <Text className="mt-5 text-sm leading-5 text-muted">
-          Station, Gate, and Terminal are ready for the current demo path. Scout
-          will be wired in the next execution phase.
+          Station, Gate, Terminal, and Scout are ready for the current demo
+          path.
         </Text>
       </View>
     </View>
