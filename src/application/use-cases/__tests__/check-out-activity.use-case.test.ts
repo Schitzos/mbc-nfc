@@ -1,5 +1,6 @@
 import { CheckOutActivityUseCase } from '../check-out-activity.use-case';
 import type { MbcCardRepository } from '../../../domain/repositories/mbc-card-repository';
+import type { LocalLedgerRepository } from '../../../domain/repositories/local-ledger-repository';
 import type {
   ActivityTariffRule,
   MbcCard,
@@ -25,6 +26,16 @@ function createCheckedInCard(overrides?: Partial<MbcCard>): MbcCard {
       checkedInAt: '2026-05-01T08:00:00.000Z',
     },
     transactionLogs: [],
+    ...overrides,
+  };
+}
+
+function createLedgerRepository(
+  overrides?: Partial<LocalLedgerRepository>,
+): LocalLedgerRepository {
+  return {
+    append: jest.fn().mockResolvedValue(undefined),
+    getStationSummary: jest.fn(),
     ...overrides,
   };
 }
@@ -99,5 +110,27 @@ describe('CheckOutActivityUseCase', () => {
     expect(cardRepository.writeCard).not.toHaveBeenCalled();
     expect(insufficientCard.visitStatus).toBe('CHECKED_IN');
     expect(insufficientCard.activeSession).toBeDefined();
+  });
+
+  it('appends a local ledger entry after successful checkout when configured', async () => {
+    const ledgerRepository = createLedgerRepository();
+    const useCase = new CheckOutActivityUseCase(
+      createCardRepository(),
+      ledgerRepository,
+    );
+
+    const result = await useCase.execute({
+      tariffRule: parkingRule,
+      checkedOutAt: '2026-05-01T09:05:01.000Z',
+    });
+
+    expect(result.success).toBe(true);
+    expect(ledgerRepository.append).toHaveBeenCalledWith(
+      expect.objectContaining({
+        role: 'TERMINAL',
+        action: 'CHECK_OUT',
+        amount: 4000,
+      }),
+    );
   });
 });

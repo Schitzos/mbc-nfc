@@ -11,6 +11,8 @@ import {
 import { createRandomId } from '../../shared/utils/create-random-id';
 import type { RoleActionResultDto } from '../dto/role-action-result-dto';
 import { toCardSummaryDto } from '../dto/card-summary-mapper';
+import type { LocalLedgerRepository } from '../../domain/repositories/local-ledger-repository';
+import { maskMemberReference } from '../../shared/utils/mask-member-reference';
 
 export type CheckOutActivityRequest = {
   tariffRule: ActivityTariffRule;
@@ -18,7 +20,10 @@ export type CheckOutActivityRequest = {
 };
 
 export class CheckOutActivityUseCase {
-  constructor(private readonly cardRepository: MbcCardRepository) {}
+  constructor(
+    private readonly cardRepository: MbcCardRepository,
+    private readonly localLedgerRepository?: LocalLedgerRepository,
+  ) {}
 
   async execute({
     tariffRule,
@@ -60,10 +65,31 @@ export class CheckOutActivityUseCase {
 
       await this.cardRepository.writeCard(updatedCard);
 
+      let message = 'Card checked out successfully.';
+
+      if (this.localLedgerRepository) {
+        try {
+          await this.localLedgerRepository.append({
+            id: createRandomId('LEDGER'),
+            role: 'TERMINAL',
+            action: 'CHECK_OUT',
+            maskedMemberReference: maskMemberReference(
+              updatedCard.member.memberId,
+            ),
+            activityType: tariffRule.activityType,
+            amount: tariffResult.chargedAmount,
+            occurredAt,
+          });
+        } catch {
+          message =
+            'Card checked out successfully, but the local audit ledger could not be updated.';
+        }
+      }
+
       return {
         success: true,
         role: 'TERMINAL',
-        message: 'Card checked out successfully.',
+        message,
         chargedHours: tariffResult.chargedHours,
         chargedAmount: tariffResult.chargedAmount,
         card: toCardSummaryDto(updatedCard),
