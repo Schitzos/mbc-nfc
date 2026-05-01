@@ -13,7 +13,8 @@
     "start": "react-native start",
     "test": "jest --watchman=false",
     "test:ci": "jest --watchman=false --runInBand --coverage --ci --reporters=default --reporters=jest-junit",
-    "test:coverage": "jest --watchman=false --runInBand --coverage"
+    "test:coverage": "jest --watchman=false --runInBand --coverage",
+    "test:quality": "jest --watchman=false --runInBand --coverage --ci --reporters=default --reporters=jest-junit"
   },
   "jest-junit": {
     "outputDirectory": "test-results/junit",

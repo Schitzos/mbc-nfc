@@ -1,6 +1,7 @@
 import { CheckOutActivityUseCase } from '../check-out-activity.use-case';
 import type { MbcCardRepository } from '../../../domain/repositories/mbc-card-repository';
 import type { LocalLedgerRepository } from '../../../domain/repositories/local-ledger-repository';
+import { CardRepositoryError } from '../../../domain/errors/card-repository-error';
 import type {
   ActivityTariffRule,
   MbcCard,
@@ -132,5 +133,58 @@ describe('CheckOutActivityUseCase', () => {
         amount: 4000,
       }),
     );
+  });
+
+  it('returns a warning when checkout succeeds but local ledger append fails', async () => {
+    const ledgerRepository = createLedgerRepository({
+      append: jest.fn().mockRejectedValue(new Error('ledger unavailable')),
+    });
+    const useCase = new CheckOutActivityUseCase(
+      createCardRepository(),
+      ledgerRepository,
+    );
+
+    const result = await useCase.execute({
+      tariffRule: parkingRule,
+      checkedOutAt: '2026-05-01T09:05:01.000Z',
+    });
+
+    expect(result.success).toBe(true);
+    expect(result.message).toContain('local audit ledger could not be updated');
+  });
+
+  it('surfaces repository errors safely during checkout', async () => {
+    const useCase = new CheckOutActivityUseCase(
+      createCardRepository({
+        readCard: jest
+          .fn()
+          .mockRejectedValue(
+            new CardRepositoryError(
+              'UNREGISTERED_CARD',
+              'Card is not registered yet. Register it first at Station.',
+            ),
+          ),
+      }),
+    );
+
+    const result = await useCase.execute({
+      tariffRule: parkingRule,
+      checkedOutAt: '2026-05-01T09:05:01.000Z',
+    });
+
+    expect(result.success).toBe(false);
+    expect(result.message).toContain('Register it first at Station');
+  });
+
+  it('returns a non-balance domain validation error when checkout timestamp is invalid', async () => {
+    const useCase = new CheckOutActivityUseCase(createCardRepository());
+
+    const result = await useCase.execute({
+      tariffRule: parkingRule,
+      checkedOutAt: 'not-a-real-date',
+    });
+
+    expect(result.success).toBe(false);
+    expect(result.message).toContain('valid ISO date strings');
   });
 });
