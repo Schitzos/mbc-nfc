@@ -1,5 +1,7 @@
 import React from 'react';
 import { Pressable, Text, View } from 'react-native';
+import type { NativeStackScreenProps } from '@react-navigation/native-stack';
+import type { RootStackParamList } from '../../app/navigation';
 import { useAppStore } from '../stores/app-store';
 
 const roles = [
@@ -9,7 +11,11 @@ const roles = [
   { key: 'scout', label: 'Scout' },
 ] as const;
 
-export function RoleSwitcherScreen(): React.JSX.Element {
+type Props = Partial<
+  NativeStackScreenProps<RootStackParamList, 'roleSwitcher'>
+>;
+
+export function RoleSwitcherScreen({ navigation }: Props): React.JSX.Element {
   const selectedRole = useAppStore(state => state.selectedRole);
   const setSelectedRole = useAppStore(state => state.setSelectedRole);
 
@@ -37,7 +43,13 @@ export function RoleSwitcherScreen(): React.JSX.Element {
                     ? 'border-accent bg-accent'
                     : 'border-slate-200 bg-slate-100'
                 }`}
-                onPress={() => setSelectedRole(role.key)}
+                onPress={() => {
+                  setSelectedRole(role.key);
+
+                  if (role.key === 'station') {
+                    navigation?.navigate?.('station');
+                  }
+                }}
               >
                 <Text
                   className={`text-sm font-semibold ${
@@ -50,6 +62,10 @@ export function RoleSwitcherScreen(): React.JSX.Element {
             );
           })}
         </View>
+        <Text className="mt-5 text-sm leading-5 text-muted">
+          Station is ready for the Phase 2 demo path. Gate, Terminal, and Scout
+          will be wired in the next execution phases.
+        </Text>
       </View>
     </View>
   );
