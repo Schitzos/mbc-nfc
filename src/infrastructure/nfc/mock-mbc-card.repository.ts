@@ -9,6 +9,8 @@ export type MockCardScenario =
   | 'normal'
   | 'low-balance'
   | 'checked-in'
+  | 'checked-in-generic'
+  | 'checked-in-low-balance'
   | 'unregistered'
   | 'tampered';
 
@@ -86,6 +88,26 @@ const scenarioSeedMap: Record<MockCardScenario, MockCardState> = {
       cardId: 'CARD-CHECKED-IN-001',
       memberId: 'MEM-CHECKED-IN-001',
       balance: 12000,
+      visitStatus: 'CHECKED_IN',
+    }),
+  },
+  'checked-in-generic': {
+    kind: 'registered',
+    card: createRegisteredCard({
+      cardId: 'CARD-CHECKED-IN-GENERIC-001',
+      memberId: 'MEM-CHECKED-IN-GENERIC-001',
+      balance: 12000,
+      visitStatus: 'CHECKED_IN',
+      activityType: 'GENERIC',
+      activityId: 'co-working',
+    }),
+  },
+  'checked-in-low-balance': {
+    kind: 'registered',
+    card: createRegisteredCard({
+      cardId: 'CARD-CHECKED-IN-LOW-001',
+      memberId: 'MEM-CHECKED-IN-LOW-001',
+      balance: 1000,
       visitStatus: 'CHECKED_IN',
     }),
   },
