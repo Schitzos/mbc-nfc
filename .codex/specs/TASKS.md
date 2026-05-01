@@ -894,13 +894,13 @@ Tasks:
 - Maintain `.codex/specs/E2E_TEST_CASES.md` with detailed end-to-end cases in standard format.
 - Attach screenshot evidence path for each executed E2E case.
 - Map automated test cases to implementation suites and CI jobs.
-- Keep automated unit/application coverage at or above 90% for the implemented scope.
+- Keep automated unit-test coverage at or above 90% for the whole executable repository source.
 
 Acceptance:
 
 - `.codex/specs/E2E_TEST_CASES.md` exists and covers Station, Gate, Terminal, Scout, security, and generic activity tariff flows.
 - Each case includes objective, preconditions, steps, expected result, owner, status, and evidence field.
-- Coverage report shows at least 90% automated coverage for the implemented unit/application scope.
+- Coverage report shows at least 90% automated coverage for the whole executable repository source.
 - Senior QA and Test Automation Engineer both confirm ownership split and execution approach.
 
 ### T-027A Integrate SonarCloud Quality Analysis

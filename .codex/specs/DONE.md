@@ -74,7 +74,7 @@ A security-sensitive feature is done when:
 
 A quality-sensitive delivery is done when:
 
-- Automated unit/application coverage for the implemented scope is at least 90%.
+- Automated unit-test coverage across the whole executable repository source is at least 90%.
 - SonarCloud analysis is configured and reports coverage.
 - SonarCloud quality gate passes, or any temporary exception is explicitly documented.
 - `npm audit` reports 0 known vulnerabilities after dependency changes.

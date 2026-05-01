@@ -155,7 +155,7 @@ Purpose:
 You should use this file to answer:
 
 - How will we test the app?
-- How do we reach the 90% target?
+- How do we reach the repository-wide 90% target?
 - How is SonarCloud used?
 
 ### 10. `E2E_TEST_CASES.md`
