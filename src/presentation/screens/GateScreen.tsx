@@ -8,6 +8,8 @@ import type { RoleActionResultDto } from '../../application/dto/role-action-resu
 import type { BenefitActivityType } from '../../domain/entities/mbc-card';
 import type { MockCardScenario } from '../../infrastructure/nfc/mock-mbc-card.repository';
 import { SignalButton } from '../components/SignalButton';
+import { SignalStatusBanner } from '../components/SignalStatusBanner';
+import { SignalSurfaceCard } from '../components/SignalSurfaceCard';
 import { SignalTextField } from '../components/SignalTextField';
 import { useAppStore } from '../stores/app-store';
 
@@ -94,7 +96,7 @@ export function GateScreen({ navigation }: Props): React.JSX.Element {
   return (
     <ScrollView className="flex-1 bg-background px-6 py-6">
       <View className="gap-4">
-        <View className="rounded-3xl bg-white p-5 shadow-sm">
+        <SignalSurfaceCard>
           <View className="flex-row items-start justify-between gap-4">
             <View className="flex-1">
               <Text className="text-3xl font-bold text-foreground">Gate</Text>
@@ -113,36 +115,25 @@ export function GateScreen({ navigation }: Props): React.JSX.Element {
               </Text>
             </Pressable>
           </View>
-        </View>
+        </SignalSurfaceCard>
 
-        <View className="rounded-3xl border border-blue-200 bg-blue-50 p-5">
-          <Text className="text-sm font-semibold uppercase tracking-wide text-blue-700">
-            Real NFC status
-          </Text>
-          <Text className="mt-2 text-2xl font-bold text-foreground">
-            {nfcStatus?.title ?? 'Checking device NFC'}
-          </Text>
-          <Text className="mt-2 text-base leading-6 text-muted">
-            {nfcStatus?.message ??
-              'The app is checking whether the current device can support real card operations.'}
-          </Text>
-          <View className="mt-3 gap-2">
-            {(nfcStatus?.guidance ?? []).map(item => (
-              <Text key={item} className="text-sm leading-5 text-muted">
-                • {item}
-              </Text>
-            ))}
-          </View>
-        </View>
+        <SignalStatusBanner
+          tone="info"
+          eyebrow="Real NFC status"
+          title={nfcStatus?.title ?? 'Checking device NFC'}
+          body={
+            nfcStatus?.message ??
+            'The app is checking whether the current device can support real card operations.'
+          }
+          items={nfcStatus?.guidance ?? []}
+        />
 
-        <View className="rounded-3xl border border-amber-200 bg-amber-50 p-5">
-          <Text className="text-sm font-semibold uppercase tracking-wide text-amber-700">
-            Mock demo mode
-          </Text>
-          <Text className="mt-2 text-base leading-6 text-muted">
-            Gate currently runs on the mock card repository so we can validate
-            activity sequencing before real NFC read and write integration.
-          </Text>
+        <SignalStatusBanner
+          tone="warning"
+          eyebrow="Mock demo mode"
+          title="Fixture-backed Gate flow"
+          body="Gate currently runs on the mock card repository so we can validate activity sequencing before real NFC read and write integration."
+        >
           <View className="mt-4 flex-row flex-wrap gap-3">
             {mockScenarios.map(option => {
               const active = option.key === selectedScenario;
@@ -173,7 +164,7 @@ export function GateScreen({ navigation }: Props): React.JSX.Element {
               );
             })}
           </View>
-        </View>
+        </SignalStatusBanner>
 
         <View className="rounded-3xl bg-white p-5 shadow-sm">
           <Text className="text-2xl font-bold text-foreground">
