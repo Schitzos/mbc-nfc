@@ -171,10 +171,12 @@ Tasks:
 - Install chosen state library, either Zustand or React Context setup.
 - Install test utilities.
 - Prepare coverage reporting and SonarCloud-compatible analysis outputs.
+- Run `npm audit` after dependency changes and resolve findings until the result is 0 known vulnerabilities.
 
 Acceptance:
 
 - Project builds after dependency installation.
+- `npm audit` reports 0 known vulnerabilities after the dependency set is updated.
 
 ## 2. Platform NFC Configuration
 
@@ -917,6 +919,7 @@ Tasks:
 - Configure SonarCloud project settings for the repository.
 - Publish coverage data from automated tests in a SonarCloud-compatible format.
 - Ensure static analysis covers maintainability, reliability, and security findings for the submitted codebase.
+- Keep `npm audit` at 0 known vulnerabilities after dependency updates in the repository pipeline.
 - Add Husky hooks for commit-message validation and lint checks on changed files only.
 - Use a changed-file strategy such as `lint-staged` for lint enforcement.
 - Enforce the chosen Git commit convention through commit-message checks.
@@ -930,6 +933,7 @@ Acceptance:
 - SonarCloud analysis runs against the project.
 - Coverage data is visible in SonarCloud.
 - Configured quality gate passes for the submitted codebase or any temporary exceptions are explicitly documented and approved.
+- `npm audit` reports 0 known vulnerabilities for the shipped dependency set.
 - Husky is prepared to enforce commit-message convention and lint checks for changed files only.
 - GitHub Actions is prepared so `main` merge is the controlled publish trigger for APK distribution.
 

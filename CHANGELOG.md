@@ -37,6 +37,9 @@ All notable spec and design changes should be recorded here.
 - Added the React Native CLI TypeScript baseline, native project folders, Jest/lint/prettier setup, and the tracked Clean Architecture starter structure for `T-001`.
 - Moved Husky, commit-message validation, and changed-file lint enforcement earlier into setup work instead of leaving them in `T-027A`.
 - Moved Husky, commit-message validation, and changed-file lint enforcement one step earlier again so they belong directly to `T-001`.
+- Added `T-002` core runtime dependencies: NFC manager, React Navigation, Zustand, NativeWind/Tailwind, SQLite ledger support, and CI-friendly coverage/JUnit test outputs.
+- Added a minimal navigation/provider/store baseline and verified iOS pods plus Android `assembleDebug` after dependency installation.
+- Added an `npm audit` zero-vulnerability rule for dependency changes and upgraded the React Native CLI toolchain so the current dependency set reports 0 known vulnerabilities.
 
 ### Documentation Updated
 
