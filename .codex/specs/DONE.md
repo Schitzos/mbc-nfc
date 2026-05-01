@@ -77,6 +77,7 @@ A quality-sensitive delivery is done when:
 - Automated unit/application coverage for the implemented scope is at least 90%.
 - SonarCloud analysis is configured and reports coverage.
 - SonarCloud quality gate passes, or any temporary exception is explicitly documented.
+- `npm audit` reports 0 known vulnerabilities after dependency changes.
 - Git commit-message convention is enforced.
 - Changed-file lint checks are enforced through Husky or equivalent Git hooks.
 - GitHub Actions release automation is documented so merging to `main` can publish the APK to app distribution.

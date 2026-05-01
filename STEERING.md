@@ -203,6 +203,7 @@ Recommended quality gates before release:
 - project builds successfully
 - tests pass
 - coverage target is met or exceptions are documented
+- `npm audit` reports 0 known vulnerabilities
 - static analysis passes
 - required documentation is updated
 - no known critical security issue remains unresolved
@@ -222,6 +223,7 @@ Recommended minimum security posture:
 - validate untrusted inputs
 - document prototype-only shortcuts honestly
 - isolate security-sensitive logic from presentation code when possible
+- after adding or changing packages, run `npm audit` and keep the result at 0 known vulnerabilities
 
 If the project handles identity, money, or privileged actions:
 

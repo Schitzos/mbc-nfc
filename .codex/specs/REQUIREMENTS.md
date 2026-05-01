@@ -291,6 +291,7 @@ Acceptance criteria:
 | NFR-013 | Coverage target                  | Unit and application automated coverage should reach at least 90% for the implemented scope.                                                                             |
 | NFR-014 | Static quality gate              | The project should integrate with SonarCloud and target a passing quality gate with strong maintainability, reliability, and security ratings.                           |
 | NFR-015 | Branching and release automation | The project shall use feature branches with controlled promotion to `develop` and `main`, and merging to `main` shall trigger automated APK app-distribution publishing. |
+| NFR-016 | Dependency vulnerability gate    | After installing or changing libraries, `npm audit` shall report 0 known vulnerabilities before the task is considered done.                                             |
 
 ## 9. Security Requirements
 
@@ -339,6 +340,7 @@ Acceptance criteria:
 - Station can show a local offline summary for audit/reporting on that device.
 - Automated unit/application coverage for the implemented scope reaches at least 90%.
 - SonarCloud analysis passes the configured quality gate for the submitted codebase.
+- `npm audit` reports 0 known vulnerabilities after dependency changes.
 - App works offline for all core flows.
 - App follows the documented architecture, quality, and security baseline.
 - App applies the Signal UI design system direction.

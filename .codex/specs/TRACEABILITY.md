@@ -17,14 +17,14 @@ This document maps requirements to design sections, implementation tasks, and ve
 
 ## Delivery Role Coverage
 
-| Role                                       | Covered In                                                                                                                   |
-| ------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------- |
-| UI/UX Designer                             | T-021 to T-026C, M3/M5 release checks, NFR-004, NFR-010.                                                                     |
-| NFC/Mobile Native Specialist               | T-003, T-004, T-018, T-028, M4 release checks, NFR-006.                                                                      |
-| Technical Writer / Presentation Specialist | T-026D, T-029, T-030, presentation brief, submission definition of done, FR-011.                                             |
-| Test Automation Engineer                   | T-017, T-027, T-027A, M2/M5 release checks, NFR-008, NFR-013, NFR-014, E2E automation mapping in `E2E_TEST_CASES.md`.        |
-| Senior QA                                  | T-027, T-028, acceptance confidence, device matrix integrity, manual E2E evidence in `E2E_TEST_CASES.md`.                    |
-| Demo/Release Engineer                      | T-000, T-000B, T-027A, T-029, T-030, Git/repository readiness, GitHub governance, demo readiness checklist, FR-011, NFR-015. |
+| Role                                       | Covered In                                                                                                                            |
+| ------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------- |
+| UI/UX Designer                             | T-021 to T-026C, M3/M5 release checks, NFR-004, NFR-010.                                                                              |
+| NFC/Mobile Native Specialist               | T-003, T-004, T-018, T-028, M4 release checks, NFR-006.                                                                               |
+| Technical Writer / Presentation Specialist | T-026D, T-029, T-030, presentation brief, submission definition of done, FR-011.                                                      |
+| Test Automation Engineer                   | T-017, T-027, T-027A, M2/M5 release checks, NFR-008, NFR-013, NFR-014, NFR-016, E2E automation mapping in `E2E_TEST_CASES.md`.        |
+| Senior QA                                  | T-027, T-028, acceptance confidence, device matrix integrity, manual E2E evidence in `E2E_TEST_CASES.md`.                             |
+| Demo/Release Engineer                      | T-000, T-000B, T-027A, T-029, T-030, Git/repository readiness, GitHub governance, demo readiness checklist, FR-011, NFR-015, NFR-016. |
 
 ## Traceability Matrix
 
@@ -58,6 +58,7 @@ This document maps requirements to design sections, implementation tasks, and ve
 | NFR-013 Coverage target                   | `DESIGN.md` Section 11           | T-027                                                            | Coverage report shows at least 90% automated unit/application coverage for implemented scope       |
 | NFR-014 Static quality gate               | `DESIGN.md` Section 11           | T-027A                                                           | SonarCloud analysis and passing quality gate                                                       |
 | NFR-015 Branching and release automation  | `DESIGN.md` Section 11           | T-000, T-000B, T-027A, T-030                                     | Branch protection, reviewer routing, and `main`-triggered release automation review                |
+| NFR-016 Dependency vulnerability gate     | `DESIGN.md` Section 11           | T-002, T-027A, T-030                                             | `npm audit` reports 0 known vulnerabilities after dependency changes and for the release candidate |
 
 ## Coverage Rules
 

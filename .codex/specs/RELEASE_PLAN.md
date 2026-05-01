@@ -157,6 +157,7 @@ Exit criteria:
 - GitHub/GitLab repository package is ready for submission.
 - APK distribution packaging or tester installation instructions are ready.
 - SonarCloud quality gate passes and coverage is visible in analysis output.
+- `npm audit` reports 0 known vulnerabilities for the release candidate.
 - Commit-message and changed-file lint enforcement are active for team delivery.
 - Merge to `main` is the documented trigger for APK distribution publishing.
 - Senior QA confirms acceptance flow coverage.
@@ -179,6 +180,7 @@ Exit criteria:
 - Insufficient balance tested.
 - Scout inspection tested.
 - Generic NFC read test confirms sensitive fields are not plain text.
+- `npm audit` output is clean with 0 known vulnerabilities.
 - Image or short video demo captured.
 - Presentation covers UI/UX design, software design, construction, quality, deployment, and security.
 - Known limitations ready to explain.

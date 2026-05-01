@@ -298,6 +298,7 @@ Signal UI adoption is documented in `.codex/specs/SIGNAL_UI_GUIDE.md`. Role scre
 - Domain and application logic should be written for high automated testability.
 - The implemented scope should target at least 90% automated coverage across unit and application layers.
 - SonarCloud should analyze the repository with coverage input, lint/test results where applicable, and a passing quality gate before submission.
+- Dependency changes should be followed by `npm audit`, and the working dependency set should remain at 0 known vulnerabilities.
 - Coverage and static-analysis targets should not encourage shallow tests; critical balance, status, tariff, codec, and ledger paths must be meaningfully asserted.
 
 ## 12. Assessment Deliverables
