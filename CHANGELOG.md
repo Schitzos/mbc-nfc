@@ -40,6 +40,8 @@ All notable spec and design changes should be recorded here.
 - Added `T-002` core runtime dependencies: NFC manager, React Navigation, Zustand, NativeWind/Tailwind, SQLite ledger support, and CI-friendly coverage/JUnit test outputs.
 - Added a minimal navigation/provider/store baseline and verified iOS pods plus Android `assembleDebug` after dependency installation.
 - Added an `npm audit` zero-vulnerability rule for dependency changes and upgraded the React Native CLI toolchain so the current dependency set reports 0 known vulnerabilities.
+- Clarified that Demo/Release Engineer owns confirming `npm audit` stays at 0 known vulnerabilities whenever a task adds or changes libraries.
+- Added iOS NFC entitlement and usage description plus Android NFC permission/feature declarations for platform NFC configuration.
 
 ### Documentation Updated
 

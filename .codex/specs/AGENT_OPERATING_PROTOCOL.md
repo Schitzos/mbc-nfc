@@ -40,20 +40,20 @@ The receiving owner must update or request updates to the relevant `.codex/specs
 
 ## 3. Agent Responsibilities
 
-| Agent                                      | Responsibility                                                                                                                                      |
-| ------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Product Owner                              | MVP scope, product value, acceptance criteria, and scope decisions.                                                                                 |
-| Project Manager                            | Milestones, task sequencing, delivery tracking, blockers, and readiness.                                                                            |
-| System Analyst                             | Requirements, flows, assumptions, edge cases, and traceability.                                                                                     |
-| Software Architect                         | Architecture, domain boundaries, payload strategy, and technical decisions.                                                                         |
-| Senior React Native FE                     | React Native implementation, role screens, state management, UI integration, and feature-branch delivery into `develop`.                            |
-| UI/UX Designer                             | Signal UI alignment, role UX, screen states, and usability.                                                                                         |
-| NFC/Mobile Native Specialist               | Android/iOS NFC setup, card/tag behavior, and native lifecycle.                                                                                     |
-| Test Automation Engineer                   | Automated tests, mocked repository coverage, and CI-friendly regression.                                                                            |
-| Senior QA                                  | Manual QA, acceptance validation, edge cases, and release confidence.                                                                               |
-| Security Pentester                         | Silent Shield, tamper handling, NFC payload abuse cases, and privacy checks.                                                                        |
-| Technical Writer / Presentation Specialist | README, docs, demo script, assumptions, limitations, and presentation.                                                                              |
-| Demo/Release Engineer                      | Demo flow, capture, run instructions, known limitations, GitHub Actions distribution pipeline, merge review into `develop`, and submission package. |
+| Agent                                      | Responsibility                                                                                                                                                                                              |
+| ------------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Product Owner                              | MVP scope, product value, acceptance criteria, and scope decisions.                                                                                                                                         |
+| Project Manager                            | Milestones, task sequencing, delivery tracking, blockers, and readiness.                                                                                                                                    |
+| System Analyst                             | Requirements, flows, assumptions, edge cases, and traceability.                                                                                                                                             |
+| Software Architect                         | Architecture, domain boundaries, payload strategy, and technical decisions.                                                                                                                                 |
+| Senior React Native FE                     | React Native implementation, role screens, state management, UI integration, and feature-branch delivery into `develop`.                                                                                    |
+| UI/UX Designer                             | Signal UI alignment, role UX, screen states, and usability.                                                                                                                                                 |
+| NFC/Mobile Native Specialist               | Android/iOS NFC setup, card/tag behavior, and native lifecycle.                                                                                                                                             |
+| Test Automation Engineer                   | Automated tests, mocked repository coverage, and CI-friendly regression.                                                                                                                                    |
+| Senior QA                                  | Manual QA, acceptance validation, edge cases, and release confidence.                                                                                                                                       |
+| Security Pentester                         | Silent Shield, tamper handling, NFC payload abuse cases, and privacy checks.                                                                                                                                |
+| Technical Writer / Presentation Specialist | README, docs, demo script, assumptions, limitations, and presentation.                                                                                                                                      |
+| Demo/Release Engineer                      | Demo flow, capture, run instructions, known limitations, GitHub Actions distribution pipeline, merge review into `develop`, submission package, and dependency audit enforcement for newly added libraries. |
 
 ## 4. Work Rule
 
@@ -108,6 +108,7 @@ Minimum agent self-check before claiming a task is clear:
 - Demo/Release Engineer prepares the promotion merge request from `develop` to `main`.
 - Project Owner performs the final merge into `main`.
 - Merging into `main` must trigger GitHub Actions to build and publish the APK to app distribution.
+- When a task adds or changes libraries, Demo/Release Engineer must confirm `npm audit` reports 0 known vulnerabilities before the branch is treated as ready.
 
 ## 7. Anti-Ambiguity Rule
 
