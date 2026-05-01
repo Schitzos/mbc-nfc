@@ -1,5 +1,6 @@
 import { open } from '@op-engineering/op-sqlite';
 import { CheckNfcAvailabilityUseCase } from '../application/use-cases/check-nfc-availability-use-case';
+import { CheckInActivityUseCase } from '../application/use-cases/check-in-activity.use-case';
 import { GetStationLedgerSummaryUseCase } from '../application/use-cases/get-station-ledger-summary.use-case';
 import { RegisterMemberCardUseCase } from '../application/use-cases/register-member-card.use-case';
 import { TopUpMemberCardUseCase } from '../application/use-cases/top-up-member-card.use-case';
@@ -67,6 +68,17 @@ export const appContainer = {
       getStationLedgerSummaryUseCase: new GetStationLedgerSummaryUseCase(
         ledgerRepository,
       ),
+      mockRepository,
+    };
+  },
+  getGateServices() {
+    const mockRepository = getMockCardRepository();
+
+    return {
+      checkNfcAvailabilityUseCase: new CheckNfcAvailabilityUseCase(
+        getDeviceNfcStatusRepository(),
+      ),
+      checkInActivityUseCase: new CheckInActivityUseCase(mockRepository),
       mockRepository,
     };
   },
