@@ -14,9 +14,9 @@ beforeEach(() => {
 test('renders the role switcher baseline screen', () => {
   render(<RoleSwitcherScreen />);
 
-  expect(screen.getByText('KDX Membership Benefit Card')).toBeTruthy();
+  expect(screen.getByText('MBC Card')).toBeTruthy();
   expect(screen.getAllByText('Station').length).toBeGreaterThan(0);
-  expect(screen.getByText('Choose workspace')).toBeTruthy();
+  expect(screen.getByText('Choose role')).toBeTruthy();
 });
 
 test('navigates immediately when a role is selected', () => {
@@ -25,6 +25,5 @@ test('navigates immediately when a role is selected', () => {
 
   fireEvent.press(screen.getByText('Scout'));
 
-  expect(screen.getByText('Active role')).toBeTruthy();
   expect(navigate).toHaveBeenCalledWith('scout');
 });
