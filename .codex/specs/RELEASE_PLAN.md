@@ -93,8 +93,8 @@ Exit criteria:
 - Latest five logs are retained.
 - Local ledger summary works offline on the device.
 - Station/Gate/Terminal/Scout use cases can run without real NFC hardware.
-- Test Automation Engineer confirms automated domain/use-case coverage.
-- Automated unit/application coverage reaches at least 90% for implemented scope.
+- Test Automation Engineer confirms automated repository-wide unit-test coverage for executable source files.
+- Automated unit-test coverage reaches at least 90% for the whole executable repository source.
 - Senior QA and Test Automation Engineer confirm `E2E_TEST_CASES.md` is updated with current status and evidence references.
 - System Analyst confirms business/system requirements remain traceable.
 

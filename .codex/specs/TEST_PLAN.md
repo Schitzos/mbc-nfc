@@ -30,7 +30,7 @@ Both Senior QA and Test Automation Engineer must maintain detailed E2E case docu
 
 Quality targets:
 
-- Automated unit/application coverage target for the implemented scope is at least 90%.
+- Automated unit-test coverage target across the whole executable repository source is at least 90%.
 - Coverage results should be exported in a format that can be consumed by SonarCloud.
 
 ## 4. Unit Test Scope
@@ -59,7 +59,7 @@ Required cases:
 
 Coverage expectation:
 
-- Domain and application suites should be expanded until the implemented scope reaches at least 90% automated coverage.
+- The test suite should be expanded until the whole executable repository source reaches at least 90% automated coverage.
 
 ## 5. Application Test Scope
 
@@ -166,6 +166,6 @@ Must test:
 - Station, Gate, Terminal, and Scout flows are demo-ready.
 - Silent Shield security checklist passes for prototype scope.
 - Local SQLite ledger is validated for reporting/audit behavior.
-- Coverage report meets the documented 90% target for implemented unit/application scope.
+- Coverage report meets the documented 90% target for the whole executable repository source.
 - SonarCloud analysis passes the configured quality gate.
 - Demo capture, documentation, and presentation material are ready.

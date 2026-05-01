@@ -1,6 +1,7 @@
 import { TopUpMemberCardUseCase } from '../top-up-member-card.use-case';
 import type { MbcCardRepository } from '../../../domain/repositories/mbc-card-repository';
 import type { LocalLedgerRepository } from '../../../domain/repositories/local-ledger-repository';
+import { CardRepositoryError } from '../../../domain/errors/card-repository-error';
 
 function createCardRepository(
   overrides?: Partial<MbcCardRepository>,
@@ -80,5 +81,40 @@ describe('TopUpMemberCardUseCase', () => {
         amount: 50000,
       }),
     );
+  });
+
+  it('returns a warning message when card top-up succeeds but ledger append fails', async () => {
+    const ledgerRepository = createLedgerRepository({
+      append: jest.fn().mockRejectedValue(new Error('ledger unavailable')),
+    });
+    const useCase = new TopUpMemberCardUseCase(
+      createCardRepository(),
+      ledgerRepository,
+    );
+
+    const result = await useCase.execute({ amount: 50000 });
+
+    expect(result.success).toBe(true);
+    expect(result.message).toContain('local audit ledger could not be updated');
+  });
+
+  it('surfaces repository read failures safely', async () => {
+    const useCase = new TopUpMemberCardUseCase(
+      createCardRepository({
+        readCard: jest
+          .fn()
+          .mockRejectedValue(
+            new CardRepositoryError(
+              'UNREGISTERED_CARD',
+              'Card is not registered yet. Register it first at Station.',
+            ),
+          ),
+      }),
+    );
+
+    const result = await useCase.execute({ amount: 50000 });
+
+    expect(result.success).toBe(false);
+    expect(result.message).toContain('Register it first at Station');
   });
 });

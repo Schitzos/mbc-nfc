@@ -274,24 +274,24 @@ Acceptance criteria:
 
 ## 8. Non-Functional Requirements
 
-| ID      | Category                         | Requirement                                                                                                                                                              |
-| ------- | -------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| NFR-001 | Offline support                  | Core flows work without internet or external API.                                                                                                                        |
-| NFR-002 | Integrity                        | Card state prevents invalid sequential actions.                                                                                                                          |
-| NFR-003 | Reliability                      | NFC read/write sessions are cleaned up after success, cancel, timeout, or error.                                                                                         |
-| NFR-004 | Usability                        | Station UI is simple enough for cooperative staff.                                                                                                                       |
-| NFR-005 | Maintainability                  | Business rules are independent from React Native and NFC library details.                                                                                                |
-| NFR-006 | Portability                      | Shared NFC flow handles iOS and Android differences where possible.                                                                                                      |
-| NFR-007 | Privacy                          | Sensitive member identity and balance are protected.                                                                                                                     |
-| NFR-008 | Testability                      | Activity tariff, card state, logs, and encoding rules are testable without hardware.                                                                                     |
-| NFR-009 | Quality                          | Working frontend app must not crash during demo flows.                                                                                                                   |
-| NFR-010 | UI system                        | The frontend applies the Signal UI design system direction required by the brief.                                                                                        |
-| NFR-011 | Device clarity                   | The app clearly communicates that real card operations require NFC hardware and shows actionable guidance when NFC is unavailable or disabled.                           |
-| NFR-012 | Data separation                  | NFC card member state and local device audit/reporting data remain clearly separated.                                                                                    |
-| NFR-013 | Coverage target                  | Unit and application automated coverage should reach at least 90% for the implemented scope.                                                                             |
-| NFR-014 | Static quality gate              | The project should integrate with SonarCloud and target a passing quality gate with strong maintainability, reliability, and security ratings.                           |
-| NFR-015 | Branching and release automation | The project shall use feature branches with controlled promotion to `develop` and `main`, and merging to `main` shall trigger automated APK app-distribution publishing. |
-| NFR-016 | Dependency vulnerability gate    | After installing or changing libraries, `npm audit` shall report 0 known vulnerabilities before the task is considered done.                                             |
+| ID      | Category                         | Requirement                                                                                                                                                                 |
+| ------- | -------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| NFR-001 | Offline support                  | Core flows work without internet or external API.                                                                                                                           |
+| NFR-002 | Integrity                        | Card state prevents invalid sequential actions.                                                                                                                             |
+| NFR-003 | Reliability                      | NFC read/write sessions are cleaned up after success, cancel, timeout, or error.                                                                                            |
+| NFR-004 | Usability                        | Station UI is simple enough for cooperative staff.                                                                                                                          |
+| NFR-005 | Maintainability                  | Business rules are independent from React Native and NFC library details.                                                                                                   |
+| NFR-006 | Portability                      | Shared NFC flow handles iOS and Android differences where possible.                                                                                                         |
+| NFR-007 | Privacy                          | Sensitive member identity and balance are protected.                                                                                                                        |
+| NFR-008 | Testability                      | Activity tariff, card state, logs, and encoding rules are testable without hardware.                                                                                        |
+| NFR-009 | Quality                          | Working frontend app must not crash during demo flows.                                                                                                                      |
+| NFR-010 | UI system                        | The frontend applies the Signal UI design system direction required by the brief.                                                                                           |
+| NFR-011 | Device clarity                   | The app clearly communicates that real card operations require NFC hardware and shows actionable guidance when NFC is unavailable or disabled.                              |
+| NFR-012 | Data separation                  | NFC card member state and local device audit/reporting data remain clearly separated.                                                                                       |
+| NFR-013 | Coverage target                  | Automated unit-test coverage should reach at least 90% across the whole executable repository source, excluding only pure type-only contract files and generated artifacts. |
+| NFR-014 | Static quality gate              | The project should integrate with SonarCloud and target a passing quality gate with strong maintainability, reliability, and security ratings.                              |
+| NFR-015 | Branching and release automation | The project shall use feature branches with controlled promotion to `develop` and `main`, and merging to `main` shall trigger automated APK app-distribution publishing.    |
+| NFR-016 | Dependency vulnerability gate    | After installing or changing libraries, `npm audit` shall report 0 known vulnerabilities before the task is considered done.                                                |
 
 ## 9. Security Requirements
 
@@ -338,7 +338,7 @@ Acceptance criteria:
 - Sequential loop prevents double check-in and double check-out.
 - Sensitive identity and balance are not readable as plain NFC text.
 - Station can show a local offline summary for audit/reporting on that device.
-- Automated unit/application coverage for the implemented scope reaches at least 90%.
+- Automated unit-test coverage across the whole executable repository source reaches at least 90%.
 - SonarCloud analysis passes the configured quality gate for the submitted codebase.
 - `npm audit` reports 0 known vulnerabilities after dependency changes.
 - App works offline for all core flows.

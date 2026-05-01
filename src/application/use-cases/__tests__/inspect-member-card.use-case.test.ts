@@ -1,6 +1,7 @@
 import { InspectMemberCardUseCase } from '../inspect-member-card.use-case';
 import type { MbcCardRepository } from '../../../domain/repositories/mbc-card-repository';
 import type { MbcCard } from '../../../domain/entities/mbc-card';
+import { CardRepositoryError } from '../../../domain/errors/card-repository-error';
 
 function createCard(overrides?: Partial<MbcCard>): MbcCard {
   return {
@@ -60,6 +61,27 @@ describe('InspectMemberCardUseCase', () => {
     await expect(useCase.execute()).rejects.toThrow(
       'Card read failed unexpectedly',
     );
+    expect(repository.writeCard).not.toHaveBeenCalled();
+  });
+
+  it('returns card repository failures safely for scout inspection', async () => {
+    const repository = createRepository({
+      readCard: jest
+        .fn()
+        .mockRejectedValue(
+          new CardRepositoryError(
+            'UNREGISTERED_CARD',
+            'Card is not registered yet. Register it first at Station.',
+          ),
+        ),
+    });
+    const useCase = new InspectMemberCardUseCase(repository);
+
+    const result = await useCase.execute();
+
+    expect(result.success).toBe(false);
+    expect(result.role).toBe('SCOUT');
+    expect(result.message).toContain('Register it first at Station');
     expect(repository.writeCard).not.toHaveBeenCalled();
   });
 });
