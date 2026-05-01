@@ -1,10 +1,10 @@
 import React from 'react';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import { GateScreen } from '../presentation/screens/GateScreen';
-import { RoleSwitcherScreen } from '../presentation/screens/RoleSwitcherScreen';
-import { ScoutScreen } from '../presentation/screens/ScoutScreen';
-import { StationScreen } from '../presentation/screens/StationScreen';
-import { TerminalScreen } from '../presentation/screens/TerminalScreen';
+import { GateScreen } from '../presentation/screens/Gate';
+import { RoleSwitcherScreen } from '../presentation/screens/RoleSwitcher';
+import { ScoutScreen } from '../presentation/screens/Scout';
+import { StationScreen } from '../presentation/screens/Station';
+import { TerminalScreen } from '../presentation/screens/Terminal';
 
 export type RootStackParamList = {
   roleSwitcher: undefined;
