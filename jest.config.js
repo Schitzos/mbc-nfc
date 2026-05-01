@@ -1,10 +1,8 @@
 module.exports = {
   preset: '@react-native/jest-preset',
   collectCoverageFrom: [
-    'src/application/**/*.ts',
-    'src/domain/services/**/*.ts',
-    'src/domain/errors/**/*.ts',
-    'src/shared/utils/**/*.ts',
+    'App.tsx',
+    'src/**/*.{ts,tsx}',
     '!src/**/__tests__/**',
     '!src/**/.gitkeep',
     '!src/**/*.d.ts',
@@ -12,6 +10,10 @@ module.exports = {
     '!src/application/dto/check-nfc-availability-result-dto.ts',
     '!src/application/dto/role-action-result-dto.ts',
     '!src/application/dto/station-ledger-summary-dto.ts',
+    '!src/domain/entities/mbc-card.ts',
+    '!src/domain/repositories/local-ledger-repository.ts',
+    '!src/domain/repositories/mbc-card-repository.ts',
+    '!src/shared/types/**',
   ],
   coverageDirectory: 'coverage',
   coverageReporters: ['text', 'lcov', 'cobertura'],
