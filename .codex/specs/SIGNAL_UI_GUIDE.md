@@ -2,6 +2,8 @@
 
 ## 1. Source
 
+Alignment note: Signal UI is required for the visual direction, but exact token extraction remains a design-hardening dependency. MVP implementation may use the documented Signal-inspired tokens/components here, while final polish should not be claimed complete until Figma access/tokens are resolved.
+
 Signal UI is the required design system direction for the KDX Membership Benefit Card app.
 
 Figma file:

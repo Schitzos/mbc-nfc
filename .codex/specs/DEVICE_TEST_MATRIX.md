@@ -31,12 +31,12 @@ Supporting roles:
 
 ## 4. Compatibility Matrix
 
-| Device          | Card     | Read | Write | Register | Top-Up | Activity Check-In | Activity Checkout | Scout | Notes |
-| --------------- | -------- | ---- | ----- | -------- | ------ | ----------------- | ----------------- | ----- | ----- |
-| DEV-ANDROID-001 | CARD-001 | TBD  | TBD   | TBD      | TBD    | TBD               | TBD               | TBD   | TBD   |
-| DEV-ANDROID-001 | CARD-002 | TBD  | TBD   | TBD      | TBD    | TBD               | TBD               | TBD   | TBD   |
-| DEV-IOS-001     | CARD-001 | TBD  | TBD   | TBD      | TBD    | TBD               | TBD               | TBD   | TBD   |
-| DEV-IOS-001     | CARD-002 | TBD  | TBD   | TBD      | TBD    | TBD               | TBD               | TBD   | TBD   |
+| Device          | Card     | Read | Write | Register | Top-Up | Parking Check-In | Parking Checkout | Scout | Notes |
+| --------------- | -------- | ---- | ----- | -------- | ------ | ---------------- | ---------------- | ----- | ----- |
+| DEV-ANDROID-001 | CARD-001 | TBD  | TBD   | TBD      | TBD    | TBD              | TBD              | TBD   | TBD   |
+| DEV-ANDROID-001 | CARD-002 | TBD  | TBD   | TBD      | TBD    | TBD              | TBD              | TBD   | TBD   |
+| DEV-IOS-001     | CARD-001 | TBD  | TBD   | TBD      | TBD    | TBD              | TBD              | TBD   | TBD   |
+| DEV-IOS-001     | CARD-002 | TBD  | TBD   | TBD      | TBD    | TBD              | TBD              | TBD   | TBD   |
 
 ## 5. Test Cases
 
@@ -48,9 +48,9 @@ Supporting roles:
 | DTM-002B | NFC disabled                 | Android/iOS where detectable               | None     | App asks user to enable NFC before scan/read/write                                     | TBD    |
 | DTM-003  | Station registration         | Android                                    | CARD-001 | Registered MBC payload written                                                         | TBD    |
 | DTM-004  | Station top-up               | Android                                    | CARD-001 | Balance increases                                                                      | TBD    |
-| DTM-005  | Gate activity check-in       | Android                                    | CARD-001 | Activity status becomes checked in                                                     | TBD    |
+| DTM-005  | Gate parking check-in        | Android                                    | CARD-001 | Parking status becomes checked in                                                      | TBD    |
 | DTM-006  | Gate simulation mode         | Android                                    | CARD-001 | Past entry time stored                                                                 | TBD    |
-| DTM-007  | Terminal activity checkout   | Android                                    | CARD-001 | Fee deducted and status cleared                                                        | TBD    |
+| DTM-007  | Terminal parking checkout    | Android                                    | CARD-001 | Fee deducted and status cleared                                                        | TBD    |
 | DTM-008  | Insufficient balance         | Android                                    | CARD-002 | Top-up guidance shown                                                                  | TBD    |
 | DTM-009  | Scout inspect                | Android                                    | CARD-001 | Balance, status, logs shown                                                            | TBD    |
 | DTM-010  | Silent Shield                | Any                                        | CARD-001 | Sensitive fields not plain in generic NFC app                                          | TBD    |

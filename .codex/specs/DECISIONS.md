@@ -87,7 +87,7 @@ The brief requires data privacy so sensitive data cannot be read plainly by othe
 Consequences:
 
 - Codec validation and failure handling are required.
-- Production needs stronger key management than a frontend demo can provide.
+- Assessment implementation must use authenticated encryption and secure key configuration; real cooperative production still needs fleet key management and rotation.
 
 ## ADR-006 Use Rp 2.000 Started-Hour Tariff for Parking Demo Activity
 
@@ -95,7 +95,7 @@ Status: Accepted
 
 Decision:
 
-The parking demo activity checkout fee is Rp 2.000 per started hour, rounded up.
+The required parking MVP checkout fee defaults to Rp 2.000 per started hour, rounded up.
 
 Reason:
 
@@ -103,7 +103,7 @@ This is an explicit technical constraint in the assessment brief. Other cooperat
 
 Consequences:
 
-- Activity tariff calculator must use ceiling-hour behavior for the parking demo.
+- Parking tariff calculator must use ceiling-hour behavior for the required parking MVP.
 - Unit tests must cover partial-hour examples.
 
 ## ADR-007 Keep Guest Flow Out of Scope
@@ -186,7 +186,7 @@ Status: Accepted
 
 Decision:
 
-Model Gate and Terminal behavior as a reusable member activity session flow, with parking as the first configured demo activity.
+Model Gate and Terminal behavior as a reusable member activity session flow, with parking as the only MVP activity.
 
 Reason:
 
@@ -293,3 +293,66 @@ Consequences:
 - Demo/Release Engineer prepares the promotion merge request from `develop` to `main`.
 - Project Owner performs the final merge to `main`.
 - GitHub Actions on `main` must run the distribution publish pipeline.
+
+## ADR-017 Standardize NFC Payload v1, Production-Grade Silent Shield, And Ledger Boundary
+
+Status: Accepted
+
+Decision:
+
+Use the compact NFC Card Payload v1 schema and Silent Shield v1 rules defined in `.codex/specs/CARD_DATA_SECURITY_LEDGER_SPEC.md`.
+
+The NFC card remains the operational source of truth for member balance and check-in/activity state. SQLite is used only as a device-local reporting and audit ledger for transactions processed by the current app/device.
+
+Silent Shield v1 uses HMAC-SHA256 over a canonical payload without `sig`, stores the Base64Url signature in `sig`, encrypts the signed payload with AES-256-GCM or equivalent authenticated encryption, stores only a protected `mbc1` envelope on NFC, increments `ctr` after each successful card-state write, and rejects invalid decrypt/authentication/signature failures as tampered/corrupted cards.
+
+Reason:
+
+The previous documents described card payload, Silent Shield, and local ledger behavior at a high level. A precise schema and signing rule prevents implementation drift, reduces Codex guessing, and keeps Station/Gate/Terminal/Scout behavior consistent.
+
+Consequences:
+
+- Card codec, domain validation, tests, and UI DTOs must follow Payload v1.
+- HMAC provides explicit integrity validation while authenticated encryption provides confidentiality; plain JSON, Base64-only, and weak obfuscation are not allowed.
+- SQLite reporting totals are device-local, not global cooperative totals.
+- Ledger write failure after successful card write is a reporting/audit warning, not a rollback of the member operation.
+
+## ADR-019 Support Local Offline Tariff Management
+
+Decision:
+
+The parking tariff must be editable locally by authorized Station/Admin staff because the app runs offline and the APK may already be built when operational tariff changes happen. The default MVP tariff remains Rp 2.000 per started hour, but the active tariff is read from local device storage instead of being hardcoded in checkout logic.
+
+Reasoning:
+
+Build-time config is too rigid for an offline deployed APK. A backend or remote config would violate the offline requirement. Local tariff settings allow values such as Rp 3.000 per started hour without rebuilding or requiring internet access.
+
+Consequences:
+
+- Add a `TariffSettingsRepository` backed by SQLite or secure local storage.
+- Seed the default active tariff as Rp 2.000 per started hour.
+- Gate check-in must read the active tariff and lock a compact tariff snapshot on the card. Terminal checkout must display and use the card-stored tariff snapshot before deduction.
+- Only authorized Station/Admin staff can update tariff.
+- Tariff updates are per-device; all active offline devices must be manually configured to the same tariff.
+- Future enhancement may use a signed Tariff Config NFC card to distribute tariff offline.
+
+## ADR-020 Lock Tariff at Check-In
+
+### Status
+
+Accepted
+
+### Context
+
+The app is offline and allows authorized staff to change the active parking tariff locally after the APK has been built. A member may already be checked in when the tariff changes from Rp 2.000/hour to Rp 3.000/hour.
+
+### Decision
+
+The tariff used for checkout is locked at successful Gate check-in. Gate writes a compact tariff snapshot into the NFC card active visit state. Terminal checkout calculates the fee using that snapshot, not the current local tariff setting.
+
+### Consequences
+
+- Members already checked in are not unexpectedly charged a newer tariff.
+- Local tariff changes affect only new check-ins.
+- The NFC card active visit payload grows slightly, so payload capacity validation remains mandatory.
+- Legacy/demo checked-in cards without snapshot require a visible warning before fallback.

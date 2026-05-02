@@ -2,7 +2,7 @@
 
 ## 1. Release Strategy
 
-The prototype should be released in milestones. Each milestone must satisfy its exit criteria before moving to the next.
+The assessment app should be released in milestones. Each milestone must satisfy its exit criteria before moving to the next.
 
 Agent coordination and escalation follow `.codex/specs/AGENT_OPERATING_PROTOCOL.md`.
 Feature-based day-to-day implementation order is documented in `.codex/specs/EXECUTION_ORDER.md`.
@@ -87,7 +87,7 @@ Scope:
 
 Exit criteria:
 
-- Rp 2.000 started-hour tariff works for the parking demo activity.
+- Rp 2.000 started-hour tariff works for the required parking MVP.
 - Activity tariff and state logic are not hardcoded only to parking.
 - Double check-in/out are rejected.
 - Latest five logs are retained.
@@ -105,8 +105,8 @@ Scope:
 - Station registration.
 - Station top-up.
 - Station local ledger summary.
-- Gate activity check-in and simulation mode.
-- Terminal activity checkout and insufficient balance handling.
+- Gate parking check-in and simulation mode.
+- Terminal parking checkout and insufficient balance handling.
 - Scout inspection.
 
 Exit criteria:
@@ -131,7 +131,7 @@ Exit criteria:
 - Sensitive fields are not plainly readable.
 - NFC cleanup works after cancel/error.
 - NFC/Mobile Native Specialist records device/card behavior.
-- Security Pentester confirms Silent Shield and tamper checks for prototype scope.
+- Security Pentester confirms Silent Shield authenticated encryption, tamper checks, and generic NFC reader validation.
 
 ### M5 UI and Demo Hardening
 
@@ -174,7 +174,7 @@ Exit criteria:
 - APK distribution path prepared for tester/reviewer installation.
 - Station registration tested.
 - Station top-up tested.
-- Gate activity check-in tested.
+- Gate parking check-in tested.
 - Gate simulation mode tested.
 - Terminal checkout tested.
 - Insufficient balance tested.
@@ -185,14 +185,28 @@ Exit criteria:
 - Presentation covers UI/UX design, software design, construction, quality, deployment, and security.
 - Known limitations ready to explain.
 
-## 5. Production Readiness Gap
+## 5. Remaining Production Readiness Gap
 
-The prototype is not production-ready until these are added:
+The assessment build must implement production-grade NFC payload confidentiality/integrity. A real cooperative production rollout still needs:
 
-- Production-grade key management.
+- Fleet-grade key provisioning and rotation.
 - Strong card authenticity verification.
 - Backend audit and reconciliation.
 - Operator authentication.
 - Corrupted/lost card recovery.
 - Privacy and retention policy.
 - Release signing and CI/CD.
+
+## Release Quality Gate Addendum
+
+Before any feature branch is merged into `develop`:
+
+- Changed-file unit-test policy must pass.
+- Relevant focused tests must pass.
+- Coverage must remain at least 90% for executable source, or the branch must add tests to restore it.
+- Any test exception must be approved by the Software Architect and documented in the merge request/task result.
+
+Before final release/submission:
+
+- Full coverage report must show at least 90% executable-source unit coverage.
+- SonarCloud or equivalent CI quality evidence should include the coverage result when available.
