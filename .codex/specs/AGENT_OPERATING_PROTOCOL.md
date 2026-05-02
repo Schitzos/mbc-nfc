@@ -94,7 +94,7 @@ Minimum agent self-check before claiming a task is clear:
 - One app, four roles: Station, Gate, Terminal, Scout.
 - NFC card is the offline source of truth.
 - Device-local SQLite ledger is allowed only for offline reporting and audit, not as member-state truth.
-- Parking is the required MVP activity; future/non-parking activities are architectural extension only.
+- Parking is the required MVP activity, not the full future product boundary.
 - Guest flow remains out of scope.
 - Scout is read-only.
 - Silent Shield protects identity and balance from plain NFC reads and includes tamper/integrity validation.
@@ -133,3 +133,27 @@ For every implementation task, the task result must include:
 - Test commands run.
 - Coverage status or exact reason coverage could not be run.
 - Any approved exception.
+
+## QA Screenshot Evidence Protocol
+
+Senior QA must validate each feature PR before merge using an Android simulator/device and attach screenshot evidence.
+
+Senior Frontend Engineer should not consider a feature ready for merge until:
+
+- relevant automated tests pass,
+- changed-file unit-test obligations are satisfied,
+- QA evidence is attached or an approved exception is recorded.
+
+The final project handoff must include QA use-case testing evidence with screenshots proving the delivered app satisfies the requirements.
+
+## Firebase App Distribution Protocol
+
+Demo/Release Engineer owns the GitHub Actions workflow that publishes Android builds to Firebase App Distribution.
+
+Required behavior:
+
+- controlled push/merge to `main` triggers the workflow,
+- workflow builds Android release APK/AAB,
+- workflow uploads the build to Firebase App Distribution,
+- secrets and tester group configuration are documented,
+- failures are visible in GitHub Actions logs.

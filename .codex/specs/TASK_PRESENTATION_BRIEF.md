@@ -62,18 +62,18 @@ This brief explains each project task in a simple format that can be reused for 
 
 ## Presentation Layer
 
-| Task                              | Purpose                                                   | Owner                                     | Output                                                                     | Presentation Value                                             |
-| --------------------------------- | --------------------------------------------------------- | ----------------------------------------- | -------------------------------------------------------------------------- | -------------------------------------------------------------- |
-| T-021 Role Switcher               | Let one app play four roles.                              | Senior React Native FE / UI UX Designer   | Station, Gate, Terminal, Scout selection.                                  | Shows the assessment runs as one multi-role app.               |
-| T-022 Station Screen              | Register, top up, and review local device-side summaries. | Senior React Native FE / UI UX Designer   | Registration, top-up, ledger summary, NFC action, result states.           | Shows cooperative staff workflow plus offline reporting value. |
-| T-023 Gate Screen                 | Check in members to parking.                              | Senior React Native FE / UI UX Designer   | Parking activity indicator, check-in, simulation, result states.           | Shows entry flow and demo-friendly simulation.                 |
-| T-024 Terminal Screen             | Check out using card-stored tariff snapshot.              | Senior React Native FE / UI UX Designer   | Snapshot-based fee summary, balance result, insufficient balance guidance. | Shows fair exit flow and fee calculation.                      |
-| T-025 Scout Screen                | Inspect card safely.                                      | Senior React Native FE / UI UX Designer   | Read-only summary, balance, status, latest logs.                           | Shows members can inspect card state without mutation.         |
-| T-026 Signal UI Direction         | Apply the selected design system.                         | UI UX Designer / Senior React Native FE   | Signal tokens, components, and role screen styling.                        | Shows the app follows the required Signal UI direction.        |
-| T-026A Low-Fi E2E Figma Flow      | Map all screens and edge cases before coding UI.          | UI UX Designer / Project Manager          | Low-fi Figma flow.                                                         | Shows the complete user journey is designed first.             |
-| T-026B Hi-Fi Figma Screens        | Provide implementation-ready visual guidance.             | UI UX Designer / FE / System Analyst      | Hi-fi mobile screens and validation board.                                 | Shows what the final demo should look like.                    |
-| T-026C Hi-Fi Polish and Visual QA | Fix spacing, buttons, icons, and overlap issues.          | UI UX Designer / FE / PO / SA / Architect | Hi-fi V2 polish plan and updated Figma when available.                     | Shows design quality is reviewed before implementation.        |
-| T-026D Task Presentation Brief    | Keep task explanations ready for slides.                  | Technical Writer / Project Manager        | This presentation brief.                                                   | Shows progress can be explained clearly to stakeholders.       |
+| Task                              | Purpose                                                   | Owner                                     | Output                                                           | Presentation Value                                             |
+| --------------------------------- | --------------------------------------------------------- | ----------------------------------------- | ---------------------------------------------------------------- | -------------------------------------------------------------- |
+| T-021 Role Switcher               | Let one app play four roles.                              | Senior React Native FE / UI UX Designer   | Station, Gate, Terminal, Scout selection.                        | Shows the assessment runs as one multi-role app.               |
+| T-022 Station Screen              | Register, top up, and review local device-side summaries. | Senior React Native FE / UI UX Designer   | Registration, top-up, ledger summary, NFC action, result states. | Shows cooperative staff workflow plus offline reporting value. |
+| T-023 Gate Screen                 | Check in members to parking.                              | Senior React Native FE / UI UX Designer   | Parking activity indicator, check-in, simulation, result states. | Shows entry flow and demo-friendly simulation.                 |
+| T-024 Terminal Screen             | Check out and deduct balance.                             | Senior React Native FE / UI UX Designer   | Fee summary, balance result, insufficient balance guidance.      | Shows exit flow and fee calculation.                           |
+| T-025 Scout Screen                | Inspect card safely.                                      | Senior React Native FE / UI UX Designer   | Read-only summary, balance, status, latest logs.                 | Shows members can inspect card state without mutation.         |
+| T-026 Signal UI Direction         | Apply the selected design system.                         | UI UX Designer / Senior React Native FE   | Signal tokens, components, and role screen styling.              | Shows the app follows the required Signal UI direction.        |
+| T-026A Low-Fi E2E Figma Flow      | Map all screens and edge cases before coding UI.          | UI UX Designer / Project Manager          | Low-fi Figma flow.                                               | Shows the complete user journey is designed first.             |
+| T-026B Hi-Fi Figma Screens        | Provide implementation-ready visual guidance.             | UI UX Designer / FE / System Analyst      | Hi-fi mobile screens and validation board.                       | Shows what the final demo should look like.                    |
+| T-026C Hi-Fi Polish and Visual QA | Fix spacing, buttons, icons, and overlap issues.          | UI UX Designer / FE / PO / SA / Architect | Hi-fi V2 polish plan and updated Figma when available.           | Shows design quality is reviewed before implementation.        |
+| T-026D Task Presentation Brief    | Keep task explanations ready for slides.                  | Technical Writer / Project Manager        | This presentation brief.                                         | Shows progress can be explained clearly to stakeholders.       |
 
 ## Verification And Demo
 
@@ -106,3 +106,10 @@ This brief explains each project task in a simple format that can be reused for 
 ## Software Quality Improvement Note
 
 The implementation plan now requires every changed executable source file to have a created or updated unit test. The project quality gate is at least 90% automated unit-test coverage for executable source. This is an architecture-driven quality improvement beyond the original PDF requirement and should be mentioned in the software quality section of the presentation.
+
+## Release and QA Evidence Addendum
+
+| Task                                                      | Presentation value                                                                             |
+| --------------------------------------------------------- | ---------------------------------------------------------------------------------------------- |
+| T-027B Configure GitHub Actions Firebase App Distribution | Shows the project has a controlled APK delivery path from `main` to Firebase App Distribution. |
+| T-027C Enforce Feature PR QA Screenshot Evidence          | Shows each feature is checked by QA before merge and final delivery has screenshot proof.      |

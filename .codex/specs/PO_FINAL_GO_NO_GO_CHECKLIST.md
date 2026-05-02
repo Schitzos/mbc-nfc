@@ -63,19 +63,19 @@ Last PO review status for the current merged specification bundle.
 
 ## 5. Implementation Readiness Checklist
 
-| Check                                                 | Status      | Notes                                                                                                                                                                                     |
-| ----------------------------------------------------- | ----------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Domain logic can be implemented now                   | PASS        | Mock-first implementation can begin.                                                                                                                                                      |
-| UI screens can be implemented now                     | PASS        | Role screens and user flows are specified.                                                                                                                                                |
-| SQLite ledger can be implemented now                  | PASS        | Local-device scope and events are defined.                                                                                                                                                |
-| Parking tariff can be implemented now                 | PASS        | Default Rp 2.000 per started hour is clear, and active tariff is now local-device configurable for post-APK changes.                                                                      |
-| Local tariff management can be implemented now        | PASS        | Authorized Station/Admin staff can update active tariff locally; Gate locks the active tariff snapshot at check-in, and Terminal displays/uses the card-stored snapshot before deduction. |
-| Mock NFC/card repository can be implemented now       | PASS        | Required for development before hardware.                                                                                                                                                 |
-| Production-grade Silent Shield can be implemented now | CONDITIONAL | Requires library/key-handling selection during implementation.                                                                                                                            |
-| Real NFC read/write can be implemented now            | CONDITIONAL | Requires target device/card/tag decisions.                                                                                                                                                |
-| Payload capacity can be finalized now                 | NOT READY   | Card/tag model and writable capacity are still TBD.                                                                                                                                       |
-| iOS NFC behavior can be finalized now                 | NOT READY   | iOS support decision/device behavior is still TBD.                                                                                                                                        |
-| Final demo evidence can be finalized now              | NOT READY   | Needs real device, card, security, and UI evidence.                                                                                                                                       |
+| Check                                                 | Status      | Notes                                                                                                                                                                                             |
+| ----------------------------------------------------- | ----------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Domain logic can be implemented now                   | PASS        | Mock-first implementation can begin.                                                                                                                                                              |
+| UI screens can be implemented now                     | PASS        | Role screens and user flows are specified.                                                                                                                                                        |
+| SQLite ledger can be implemented now                  | PASS        | Local-device scope and events are defined.                                                                                                                                                        |
+| Parking tariff can be implemented now                 | PASS        | Default Rp 2.000 per started hour is clear, and active tariff is now local-device configurable for post-APK changes.                                                                              |
+| Local tariff management can be implemented now        | PASS        | Authorized Station/Admin staff can update active tariff locally; Gate snapshots the active tariff at check-in; Terminal displays and uses the card-stored visit tariff snapshot before deduction. |
+| Mock NFC/card repository can be implemented now       | PASS        | Required for development before hardware.                                                                                                                                                         |
+| Production-grade Silent Shield can be implemented now | CONDITIONAL | Requires library/key-handling selection during implementation.                                                                                                                                    |
+| Real NFC read/write can be implemented now            | CONDITIONAL | Requires target device/card/tag decisions.                                                                                                                                                        |
+| Payload capacity can be finalized now                 | NOT READY   | Card/tag model and writable capacity are still TBD.                                                                                                                                               |
+| iOS NFC behavior can be finalized now                 | NOT READY   | iOS support decision/device behavior is still TBD.                                                                                                                                                |
+| Final demo evidence can be finalized now              | NOT READY   | Needs real device, card, security, and UI evidence.                                                                                                                                               |
 
 ## 6. Final Submission Blockers
 
@@ -127,3 +127,13 @@ Before Codex/dev feature work is considered complete:
 - [ ] Feature branch result includes changed source files, changed test files, commands run, and coverage status.
 
 Final assessment submission remains **NO-GO** if the 90% coverage gate is not met or if major feature changes lack matching tests.
+
+## QA Evidence and Firebase Release Gate
+
+- [ ] Every feature PR has Senior QA Android simulator/device screenshot evidence or an approved exception.
+- [ ] Final QA use-case testing evidence package exists.
+- [ ] Final QA screenshots prove Station, Gate, Terminal, Scout, tariff snapshot, and important rejected flows.
+- [ ] GitHub Actions workflow for Firebase App Distribution exists.
+- [ ] Push/merge to `main` builds Android release artifact.
+- [ ] Build is uploaded to Firebase App Distribution or blocker/deferral is documented.
+- [ ] Firebase App ID, service account/token, signing configuration, tester group, and release notes behavior are documented.

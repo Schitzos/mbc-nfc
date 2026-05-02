@@ -110,7 +110,7 @@ Required cases:
 - Gate check-in appends a local ledger audit row with amount `0`.
 - Gate simulation mode writes past timestamp and rejects future timestamp.
 - Station/Admin can update local active tariff without APK rebuild.
-- Terminal checkout reads the card-stored tariff snapshot, displays it before deduction, deducts correct parking fee, and clears status.
+- Gate check-in reads active tariff from local tariff repository and stores a card tariff snapshot. Terminal checkout reads the card-stored snapshot, displays it before deduction, deducts correct parking fee, and clears status.
 - Terminal checkout rejects invalid duration/time before deduction.
 - Terminal insufficient balance returns top-up guidance and keeps checked-in status.
 - Insufficient-balance recovery works after Station top-up and Terminal retry.
@@ -130,7 +130,7 @@ Must test:
 - Station local tariff setting is admin-only and validates positive tariff amount.
 - Station local ledger summary panel displays local totals clearly.
 - Gate simulation mode indicator.
-- Terminal tariff snapshot, fee, and insufficient balance display.
+- Terminal visit tariff snapshot, fee, and insufficient balance display.
 - Terminal missing card/scan timeout recovery guidance.
 - Scout one-tap balance, status, and transaction log display.
 - NFC loading, success, and error states.
@@ -222,3 +222,21 @@ Must test:
 | TARIFF-SNAPSHOT-004 | Terminal       | Checked-in legacy/demo card has no tariff snapshot                                   | App shows `TARIFF_SNAPSHOT_MISSING`; fallback to current tariff is allowed only with warning. |
 | TARIFF-SNAPSHOT-005 | Security/Codec | Tariff snapshot is modified outside the app                                          | Silent Shield validation rejects the tampered card.                                           |
 | TARIFF-SNAPSHOT-006 | Capacity       | Snapshot pushes protected payload over selected card capacity                        | Write is blocked with `CARD_CAPACITY_INSUFFICIENT`.                                           |
+
+## QA Screenshot Evidence Gate
+
+Every feature PR must include Senior QA validation evidence before merge unless an approved exception is documented.
+
+Minimum PR evidence:
+
+- Task/feature ID.
+- Branch/build identifier.
+- Android simulator/device name and OS/API level.
+- Scenario tested.
+- Screenshots proving the feature behavior.
+- Pass/fail result.
+- Defects and retest screenshots if applicable.
+
+Final QA must provide a use-case testing evidence package with screenshots proving the project satisfies the required parking MVP flows.
+
+Refer to `QA_EVIDENCE_POLICY.md` for the detailed evidence policy.

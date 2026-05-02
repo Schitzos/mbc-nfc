@@ -89,7 +89,7 @@ Consequences:
 - Codec validation and failure handling are required.
 - Assessment implementation must use authenticated encryption and secure key configuration; real cooperative production still needs fleet key management and rotation.
 
-## ADR-006 Use Rp 2.000 Started-Hour Tariff for Parking Demo Activity
+## ADR-006 Use Rp 2.000 Started-Hour Tariff for Parking MVP
 
 Status: Accepted
 
@@ -186,7 +186,7 @@ Status: Accepted
 
 Decision:
 
-Model Gate and Terminal behavior as a reusable member activity session flow, with parking as the only MVP activity.
+Model Gate and Terminal behavior as a reusable member activity session flow, with parking as the only required MVP activity.
 
 Reason:
 
@@ -321,7 +321,7 @@ Consequences:
 
 Decision:
 
-The parking tariff must be editable locally by authorized Station/Admin staff because the app runs offline and the APK may already be built when operational tariff changes happen. The default MVP tariff remains Rp 2.000 per started hour, but the active tariff is read from local device storage instead of being hardcoded in checkout logic.
+The parking tariff must be editable locally by authorized Station/Admin staff because the app runs offline and the APK may already be built when operational tariff changes happen. The default MVP tariff remains Rp 2.000 per started hour, and Gate reads the active tariff from local device storage at check-in instead of relying on hidden hardcoded tariff logic.
 
 Reasoning:
 
@@ -331,7 +331,7 @@ Consequences:
 
 - Add a `TariffSettingsRepository` backed by SQLite or secure local storage.
 - Seed the default active tariff as Rp 2.000 per started hour.
-- Gate check-in must read the active tariff and lock a compact tariff snapshot on the card. Terminal checkout must display and use the card-stored tariff snapshot before deduction.
+- Gate check-in must read the current local active tariff and store a compact tariff snapshot on the card. Terminal checkout must display and use the card-stored visit tariff snapshot before deduction.
 - Only authorized Station/Admin staff can update tariff.
 - Tariff updates are per-device; all active offline devices must be manually configured to the same tariff.
 - Future enhancement may use a signed Tariff Config NFC card to distribute tariff offline.
@@ -356,3 +356,19 @@ The tariff used for checkout is locked at successful Gate check-in. Gate writes 
 - Local tariff changes affect only new check-ins.
 - The NFC card active visit payload grows slightly, so payload capacity validation remains mandatory.
 - Legacy/demo checked-in cards without snapshot require a visible warning before fallback.
+
+## ADR-021 Firebase App Distribution as Android Release Channel
+
+Decision: Controlled push/merge to `main` must trigger GitHub Actions to build the Android release artifact and distribute it through Firebase App Distribution.
+
+Reason: The team needs a repeatable release path for testers and assessment review without manual APK sharing.
+
+Impact: Demo/Release Engineer must document GitHub secrets, signing setup, Firebase app ID, tester group, and workflow failure behavior.
+
+## ADR-022 QA Screenshot Evidence Before Feature Merge
+
+Decision: Senior QA must validate each feature on Android simulator/device and attach screenshot evidence before the feature PR is merged, unless an approved exception is recorded.
+
+Reason: The project needs visible proof that delivered features match the requirements, not only automated test results.
+
+Impact: Feature delivery includes both automated tests and QA evidence. Final delivery requires a use-case evidence package with screenshots.

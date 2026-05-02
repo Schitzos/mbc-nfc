@@ -106,14 +106,14 @@ This protects fairness and prevents users who already tapped in from being charg
 
 # 6. UX and Operational Safety Improvements
 
-| Improvement                   | Not explicitly in original PDF                                           | Why we added it                                       | Current treatment                                                          |
-| ----------------------------- | ------------------------------------------------------------------------ | ----------------------------------------------------- | -------------------------------------------------------------------------- |
-| Clear active tariff display   | PDF says Terminal calculates/deducts, not that tariff must be displayed  | Helps operator/member verify charge before deduction  | Terminal shows tariff, duration, and fee before write/deduction            |
-| Device time visibility        | PDF requires simulation mode but not clock validation                    | Offline fee calculation depends on local device clock | Gate/Terminal should show current device time; invalid duration rejected   |
-| Invalid duration handling     | PDF says simulation supports past time, but not future/wrong clock cases | Prevents negative duration and wrong fee              | Checkout rejects if exit time is earlier than entry time                   |
-| Keep-card-near-phone behavior | PDF does not describe NFC UX                                             | Prevents incomplete write due to early card removal   | App should not show success until write-readback verification passes       |
-| Unsupported card handling     | PDF assumes NFC card, but not unknown card behavior                      | Prevents crash on random NFC tags/cards               | Show clear unsupported/invalid card error                                  |
-| Low balance recovery flow     | PDF says top-up if saldo kurang, but not exact state behavior            | Ensures member can top up while still checked in      | Top-up must not clear active visit; checkout succeeds after enough balance |
+| Improvement                   | Not explicitly in original PDF                                           | Why we added it                                       | Current treatment                                                                          |
+| ----------------------------- | ------------------------------------------------------------------------ | ----------------------------------------------------- | ------------------------------------------------------------------------------------------ |
+| Clear active tariff display   | PDF says Terminal calculates/deducts, not that tariff must be displayed  | Helps operator/member verify charge before deduction  | Terminal shows card-stored visit tariff snapshot, duration, and fee before write/deduction |
+| Device time visibility        | PDF requires simulation mode but not clock validation                    | Offline fee calculation depends on local device clock | Gate/Terminal should show current device time; invalid duration rejected                   |
+| Invalid duration handling     | PDF says simulation supports past time, but not future/wrong clock cases | Prevents negative duration and wrong fee              | Checkout rejects if exit time is earlier than entry time                                   |
+| Keep-card-near-phone behavior | PDF does not describe NFC UX                                             | Prevents incomplete write due to early card removal   | App should not show success until write-readback verification passes                       |
+| Unsupported card handling     | PDF assumes NFC card, but not unknown card behavior                      | Prevents crash on random NFC tags/cards               | Show clear unsupported/invalid card error                                                  |
+| Low balance recovery flow     | PDF says top-up if saldo kurang, but not exact state behavior            | Ensures member can top up while still checked in      | Top-up must not clear active visit; checkout succeeds after enough balance                 |
 
 ---
 

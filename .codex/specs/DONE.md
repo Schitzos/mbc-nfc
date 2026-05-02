@@ -113,3 +113,13 @@ Submission is done when:
 - Presentation covers UI/UX design, software design, software construction, software quality, software deployment, and software security.
 - Demo/Release Engineer confirms APK distribution path, run instructions, demo capture, and known limitations are ready.
 - Product Owner confirms the submitted scope matches MVP acceptance.
+
+## QA Evidence Definition of Done
+
+A feature is not done until Senior QA has validated the changed feature on Android simulator/device and attached screenshot evidence, unless the PM/Software Architect approves and records an exception.
+
+Final project delivery is not done until Senior QA provides a use-case testing evidence package with screenshots proving the required parking MVP flows work.
+
+## Firebase Distribution Definition of Done
+
+Release automation is not done until push/merge to `main` triggers GitHub Actions and publishes the Android build to Firebase App Distribution, or a documented blocker/deferral is approved.

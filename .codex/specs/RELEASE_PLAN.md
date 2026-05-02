@@ -7,7 +7,32 @@ The assessment app should be released in milestones. Each milestone must satisfy
 Agent coordination and escalation follow `.codex/specs/AGENT_OPERATING_PROTOCOL.md`.
 Feature-based day-to-day implementation order is documented in `.codex/specs/EXECUTION_ORDER.md`.
 
-## 2. Delivery Roles
+## 2. Release Automation Channel
+
+The official Android delivery channel is Firebase App Distribution.
+
+Required release automation:
+
+- Push/merge to `main` triggers GitHub Actions.
+- GitHub Actions builds the Android release APK/AAB.
+- GitHub Actions uploads the build to Firebase App Distribution.
+- Required GitHub secrets must be documented by the Demo/Release Engineer.
+- Workflow failure must be visible in GitHub Actions logs.
+
+Feature branches and `develop` are for implementation and integration. Only controlled promotion to `main` should trigger Firebase App Distribution publishing.
+
+## 3. Feature PR QA Evidence Gate
+
+Before a feature PR is merged, Senior QA must validate the changed feature on Android simulator/device and attach screenshot evidence according to `QA_EVIDENCE_POLICY.md`.
+
+A feature is not release-ready without:
+
+- passing relevant automated tests,
+- preserved 90% unit coverage,
+- QA screenshot evidence or approved exception,
+- no unresolved blocker defects.
+
+## 4. Delivery Roles
 
 | Role                                       | Release Responsibility                                                                                                                                                                                      |
 | ------------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -210,3 +235,9 @@ Before final release/submission:
 
 - Full coverage report must show at least 90% executable-source unit coverage.
 - SonarCloud or equivalent CI quality evidence should include the coverage result when available.
+
+## Final Release Evidence Requirement
+
+Before final submission, Senior QA must provide a use-case testing evidence package with screenshots proving that the delivered app satisfies the parking MVP requirements.
+
+The final release package must include Firebase App Distribution notes, QA screenshot evidence, demo captures, known limitations, and final GO/NO-GO status.

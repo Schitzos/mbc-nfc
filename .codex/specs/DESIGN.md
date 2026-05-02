@@ -372,7 +372,7 @@ Before any real card operation, the presentation layer checks NFC availability t
 - Station also shows a simple local ledger summary for that device, such as top-up total and checkout total.
 - Station/Admin settings allow authorized local tariff update and show the active tariff version/update time.
 - Gate: default parking indicator, check-in action, simulation time control limited to past timestamps, current device time display, NFC write action, status result.
-- Terminal: checkout action, active tariff display, duration/fee summary, insufficient balance guidance, current device time display, NFC write action, status result.
+- Terminal: checkout action, card-stored visit tariff snapshot display, duration/fee summary, insufficient balance guidance, current device time display, NFC write action, status result.
 - Scout: one-tap read-only card summary, balance, visit status, last five logs.
 
 The UI should apply the Signal UI design system direction, stay simple and direct, and be usable by cooperative staff. Avoid unnecessary dashboard complexity.
