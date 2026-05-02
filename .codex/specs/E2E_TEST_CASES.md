@@ -36,6 +36,7 @@ Use this format for every test case:
 - Store screenshots under `.codex/specs/test-evidence/` with this structure:
   - `.codex/specs/test-evidence/manual/<role>/`
   - `.codex/specs/test-evidence/automation/<suite>/`
+- Latest consolidated sweep bundle should be created during final QA execution under `.codex/specs/test-evidence/<YYYY-MM-DD>-sweep/README.md`.
 - Every executed case must include at least one evidence reference in the `Evidence` field.
 
 ## 4. Detailed End-to-End Test Cases
@@ -178,20 +179,20 @@ Use this format for every test case:
 
 ### E2E-TERM-001 Check-Out Success (Parking Tariff)
 
-| Field           | Value                                                                                                                                                                             |
-| --------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Test Case ID    | E2E-TERM-001                                                                                                                                                                      |
-| Feature         | Terminal - Check Out                                                                                                                                                              |
-| Objective       | Ensure checkout deducts correct parking started-hour fee and clears status.                                                                                                       |
-| Preconditions   | Card checked-in with known start time and sufficient balance.                                                                                                                     |
-| Test Data       | Start time such that duration is 1h 5m 1s.                                                                                                                                        |
-| Steps           | 1. Open Terminal. 2. Tap checkout action. 3. Tap checked-in card.                                                                                                                 |
-| Expected Result | Terminal shows active tariff before deduction; fee charged as 2 started hours using active tariff (`Rp 4.000` by default); balance reduced; checked-in status cleared; log added. |
-| Priority        | High                                                                                                                                                                              |
-| Type            | Both                                                                                                                                                                              |
-| Owner           | Senior QA + Test Automation Engineer                                                                                                                                              |
-| Status          | Not Run                                                                                                                                                                           |
-| Evidence        | `.codex/specs/test-evidence/manual/terminal/E2E-TERM-001_03_pass_fee.png`                                                                                                         |
+| Field           | Value                                                                                                                                                                                                         |
+| --------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Test Case ID    | E2E-TERM-001                                                                                                                                                                                                  |
+| Feature         | Terminal - Check Out                                                                                                                                                                                          |
+| Objective       | Ensure checkout deducts correct parking started-hour fee and clears status.                                                                                                                                   |
+| Preconditions   | Card checked-in with known start time and sufficient balance.                                                                                                                                                 |
+| Test Data       | Start time such that duration is 1h 5m 1s.                                                                                                                                                                    |
+| Steps           | 1. Open Terminal. 2. Tap checkout action. 3. Tap checked-in card.                                                                                                                                             |
+| Expected Result | Terminal shows the card-stored visit tariff snapshot before deduction; fee charged as 2 started hours using the card snapshot (`Rp 4.000` by default); balance reduced; checked-in status cleared; log added. |
+| Priority        | High                                                                                                                                                                                                          |
+| Type            | Both                                                                                                                                                                                                          |
+| Owner           | Senior QA + Test Automation Engineer                                                                                                                                                                          |
+| Status          | Not Run                                                                                                                                                                                                       |
+| Evidence        | `.codex/specs/test-evidence/manual/terminal/E2E-TERM-001_03_pass_fee.png`                                                                                                                                     |
 
 ### E2E-TERM-002 Check-Out Insufficient Balance
 
@@ -229,20 +230,20 @@ Use this format for every test case:
 
 ### E2E-TARIFF-001 Local Admin Tariff Change Without APK Rebuild
 
-| Field           | Value                                                                                                                                                      |
-| --------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Test Case ID    | E2E-TARIFF-001                                                                                                                                             |
-| Feature         | Station/Admin - Local Tariff Management                                                                                                                    |
-| Objective       | Ensure authorized staff can update the active parking tariff locally and Terminal checkout uses the updated tariff without backend/API or APK rebuild.     |
-| Preconditions   | App installed; default active tariff is Rp 2.000 per started hour; authorized Station/Admin access is available.                                           |
-| Test Data       | New tariff: Rp 3.000 per started hour; checked-in card with enough balance.                                                                                |
-| Steps           | 1. Open Station/Admin tariff setting. 2. Change tariff to Rp 3.000. 3. Open Terminal. 4. Checkout a card with 1h 5m 1s duration. 5. Inspect result/log.    |
-| Expected Result | Tariff update is saved locally; Terminal shows active tariff Rp 3.000/hour before deduction; checkout charges Rp 6.000; card and local ledger are updated. |
-| Priority        | High                                                                                                                                                       |
-| Type            | Both                                                                                                                                                       |
-| Owner           | Senior QA + Test Automation Engineer                                                                                                                       |
-| Status          | Not Run                                                                                                                                                    |
-| Evidence        | `.codex/specs/test-evidence/manual/tariff/E2E-TARIFF-001_01_pass_local_tariff.png`                                                                         |
+| Field           | Value                                                                                                                                                                                                                          |
+| --------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Test Case ID    | E2E-TARIFF-001                                                                                                                                                                                                                 |
+| Feature         | Station/Admin - Local Tariff Management                                                                                                                                                                                        |
+| Objective       | Ensure authorized staff can update the active parking tariff locally and new check-ins use the updated tariff without backend/API or APK rebuild.                                                                              |
+| Preconditions   | App installed; default active tariff is Rp 2.000 per started hour; authorized Station/Admin access is available.                                                                                                               |
+| Test Data       | New tariff: Rp 3.000 per started hour; registered card with enough balance.                                                                                                                                                    |
+| Steps           | 1. Open Station/Admin tariff setting. 2. Change tariff to Rp 3.000. 3. Gate check-in a registered card. 4. Terminal checkout after 1h 5m 1s. 5. Inspect result/log.                                                            |
+| Expected Result | Tariff update is saved locally; a new Gate check-in stores Rp 3.000/hour as the card tariff snapshot; Terminal shows that card-stored snapshot before deduction; checkout charges Rp 6.000; card and local ledger are updated. |
+| Priority        | High                                                                                                                                                                                                                           |
+| Type            | Both                                                                                                                                                                                                                           |
+| Owner           | Senior QA + Test Automation Engineer                                                                                                                                                                                           |
+| Status          | Not Run                                                                                                                                                                                                                        |
+| Evidence        | `.codex/specs/test-evidence/manual/tariff/E2E-TARIFF-001_01_pass_local_tariff.png`                                                                                                                                             |
 
 ### E2E-TARIFF-002 Unauthorized Tariff Change Blocked
 
@@ -421,3 +422,17 @@ Additional Must coverage added: E2E-REG-003, E2E-TERM-004, E2E-NFC-001, and E2E-
 | Preconditions   | Card has active check-in but no tariff snapshot.                                                                                                  |
 | Steps           | Terminal attempts checkout.                                                                                                                       |
 | Expected Result | Terminal shows `TARIFF_SNAPSHOT_MISSING` warning. Fallback to current local tariff is allowed only after the warning is visible before deduction. |
+
+## E2E Screenshot Evidence Requirement
+
+For final delivery, Senior QA must capture Android simulator/device screenshots for the main E2E scenarios and include them in the final QA evidence package.
+
+Screenshots must prove:
+
+- Station registration/top-up.
+- Gate check-in with tariff snapshot.
+- Terminal checkout using card-stored tariff snapshot.
+- Scout read-only inspection.
+- Important rejected flows such as double check-in, no active visit, insufficient balance, invalid duration, or unauthorized tariff update when applicable.
+
+Screenshots should not expose secrets, raw encrypted payloads, private keys, or sensitive debug dumps.

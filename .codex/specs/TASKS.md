@@ -1,325 +1,384 @@
-# KDX Membership Benefit Card — Codex Task Plan
+# KDX Membership Benefit Card — Codex Task Plan Lite
 
-Task details for Codex/dev execution. `EXECUTION_ORDER.md` defines the official phase sequence.
+Purpose: compact, Codex-friendly task cards. Execute task order from `EXECUTION_ORDER.md`. Use detailed docs only when the task references them.
 
-## 0. Codex Operating Rules
-
-1. Build **parking MVP only**. Do not build non-parking runtime flows.
-2. Keep extension seams through tariff/activity/domain interfaces.
-3. NFC card is source of truth for balance, active visit, tariff snapshot, and latest 5 card logs.
-4. SQLite is device-local audit/reporting plus local tariff setting only.
-5. Silent Shield requires production-grade authenticated encryption/integrity.
-6. Every successful NFC/card write needs post-write readback verification before success.
-7. Tariff is locally editable by authorized Station/Admin staff.
-8. Gate locks tariff at check-in by writing a compact tariff snapshot to the card.
-9. Terminal calculates checkout fee from the card-stored tariff snapshot, not current local tariff.
-10. For every changed executable source file, create/update the nearest unit test and preserve ≥90% coverage.
-11. Work one task only. Change only files needed for that task. Return changed files, tests, commands, coverage, and limitations.
-
-## 1. Source-of-Truth Hierarchy
+## Source-of-Truth Order
 
 1. `REQUIREMENTS.md` — business behavior.
-2. `CARD_DATA_SECURITY_LEDGER_SPEC.md` — NFC payload, Silent Shield, card logs, tariff snapshot, SQLite ledger.
-3. `SECURITY.md` — security rules.
-4. `DESIGN.md` — architecture and boundaries.
-5. `UNIT_TEST_COVERAGE_POLICY.md` — changed-file unit tests and 90% coverage.
-6. `EXECUTION_ORDER.md` — task sequence.
-7. `TEST_PLAN.md` / `E2E_TEST_CASES.md` — validation.
+2. `CARD_DATA_SECURITY_LEDGER_SPEC.md` — NFC/card/tariff snapshot/SQLite behavior.
+3. `SECURITY.md` — Silent Shield and secrets.
+4. `DESIGN.md` — architecture boundaries.
+5. `UNIT_TEST_COVERAGE_POLICY.md` — changed-file tests and 90% coverage.
+6. `QA_EVIDENCE_POLICY.md` / `TEST_PLAN.md` — QA proof and validation.
+7. `EXECUTION_ORDER.md` — official PM sequence.
 
-If this file conflicts with those docs, follow the higher-priority source doc and patch `TASKS.md` later.
+## Codex Rules
 
-## 2. Compact Codex Prompt Template
+- Work on one task ID only.
+- Build parking MVP only; no non-parking runtime flow.
+- Keep future extension possible through interfaces.
+- NFC card is source of truth; SQLite is local audit/reporting and local tariff settings only.
+- Tariff is locally editable but locked on card at Gate check-in.
+- Terminal checkout uses card-stored tariff snapshot, not current local tariff.
+- Verify every successful card write by readback.
+- For every changed executable source file, create/update unit tests.
+- Keep executable-source coverage >=90% or document approved exception.
+
+## Compact Codex Prompt
 
 ```txt
-Read `.codex/specs/TASKS.md` task <TASK_ID> and its source docs.
-Implement only <TASK_ID> for parking MVP.
-Do not add non-MVP/non-parking flows.
-Preserve NFC card as source of truth and SQLite as local audit/tariff storage only.
-For every changed source file, create/update nearest unit test and keep coverage >=90%.
-Run focused tests/coverage when practical; otherwise explain exact blocker.
-Return changed files, test files, commands run, coverage status, and limitations.
+Implement only <TASK_ID> from TASKS.md.
+Read referenced docs only as needed.
+Do not add non-MVP scope.
+For every changed source file, create/update unit tests.
+Keep coverage >=90%.
+Run focused tests; if unable, explain why and list local commands.
+Return changed files, test files, commands run, coverage status, and risks.
 ```
 
-## Phase 0 — Baseline, Governance, and Platform Readiness
+---
 
-### T-000A — Create UML and System Design Diagrams
+## Phase 0 — Project Control
 
-Owner: Software Architect, System Analyst, Technical Writer
-Do: create/update component, use-case, sequence, and activity diagrams for Station, Gate, Terminal, Scout, local ledger, Silent Shield, and tap-in/tap-out.
-Done: diagrams match parking MVP and are usable for review/presentation.
+### T-000A — UML and System Diagrams
 
-### T-000 — Set Up Git Repository and Submission Baseline
+Owner: Architect / SA / Writer  
+Refs: `UML_SYSTEM_DIAGRAMS.md`, `DESIGN.md`  
+Do: Create/update component, use-case, sequence, and activity diagrams for Station, Gate, Terminal, Scout, NFC, Silent Shield, SQLite, tariff snapshot.  
+Done: Diagrams match parking MVP and are presentation-ready.
 
-Owner: Demo/Release Engineer, PM, Security
-Do: initialize Git if needed; add `.gitignore`; add/update `README.md` with setup, run, mock mode, NFC requirements, known limitations, submission notes; document branch rules `feature/* → develop → main`; document commit convention; verify no secrets/build artifacts/raw NFC dumps are staged.
-Done: repo baseline is clean or deferred with reason; README/rules exist.
+### T-000 — Repository Baseline
 
-### T-000B — Configure Repository Governance
+Owner: Release Engineer / PM  
+Refs: `RELEASE_PLAN.md`, `SECURITY.md`  
+Do: Verify Git, `.gitignore`, README, branch rules, commit convention, and no secrets/artifacts/raw NFC dumps staged.  
+Done: Clean baseline and setup notes exist.
 
-Owner: Demo/Release Engineer, PM, PO
-Do: configure branch protection for `develop`/`main` when remote exists; require PR/MR review; add `CODEOWNERS` or reviewer mapping; document manual fallback until CI.
-Done: governance rules or fallback instructions are documented.
+### T-000B — Repository Governance
 
-### T-001 — Create React Native TypeScript Project
+Owner: Release Engineer / PM / PO  
+Refs: `RELEASE_PLAN.md`, `AGENT_OPERATING_PROTOCOL.md`  
+Do: Configure or document branch protection, PR review, reviewer/CODEOWNERS mapping, and deferred CI checks.  
+Done: Merge rules are clear.
 
-Owner: Senior React Native FE
-Do: create RN CLI TypeScript app; configure Jest, lint, format, Husky, lint-staged, commit-message validation; add `DESIGN.md` folder structure.
-Done: skeleton launches; baseline tests run; hooks configured.
+### T-000C — Unit Test Coverage Gate
 
-### T-002 — Install Core Dependencies
+Owner: Test Automation / Release Engineer / Architect  
+Refs: `UNIT_TEST_COVERAGE_POLICY.md`  
+Do: Configure Jest/coverage scripts, 90% threshold for executable `src/**`, and changed-file unit-test rule.  
+Done: Coverage command works or deferral is documented.
 
-Owner: Senior React Native FE
-Do: install NFC, SQLite, navigation, state, testing, crypto/security, and coverage dependencies; prefer real-device compatible libraries; run audit and document exceptions.
-Done: project builds; dependency choices documented; audit clean or exceptions documented.
+---
 
-### T-000C — Configure Unit Test and Coverage Gate
+## Phase 1 — App Foundation
 
-Owner: Test Automation Engineer, Demo/Release Engineer, Software Architect
-Depends on: T-001, T-002
-Do: add/verify `npm run test:coverage`; collect coverage for executable `src/**`; set 90% threshold; reference `UNIT_TEST_COVERAGE_POLICY.md` in contribution/PR workflow; configure CI failure when available.
-Done: unit and coverage commands work; 90% threshold is configured; policy is referenced.
+### T-001 — React Native TypeScript Project
 
-### T-003 — Configure iOS NFC
+Owner: Senior RN FE  
+Refs: `DESIGN.md`  
+Do: Create RN CLI TypeScript app, base folder structure, Jest, lint/format, and hooks if feasible.  
+Done: App launches and baseline tests run.
 
-Owner: NFC/Mobile Native Specialist
-Do: enable NFC capability/usage description; document iOS read/write limits; test real NFC-capable iPhone if available.
-Done: iOS NFC tested or explicitly deferred in `DEVICE_TEST_MATRIX.md`.
+### T-002 — Core Dependencies
 
-### T-004 — Configure Android NFC
+Owner: Senior RN FE  
+Refs: `DESIGN.md`, `SECURITY.md`, `RFID_NFC_REACT_NATIVE_101.md`  
+Do: Install NFC, SQLite, navigation, state, test, crypto, and coverage dependencies; document audit exceptions.  
+Done: Project builds with selected dependencies.
 
-Owner: NFC/Mobile Native Specialist
-Do: add Android NFC permission/hardware feature; verify NFC availability and card detection on real Android NFC device.
-Done: Android can detect NFC support and scan supported card.
+---
 
-## Phase 1 — Core Business Foundation
+## Phase 2 — Platform NFC Setup
 
-### T-005 — Create MBC Domain Entities
+### T-003 — iOS NFC Configuration
 
-Owner: Software Architect
-Do: create `MbcCard`, `MemberProfile`, `TransactionLog`, `ActivitySession`, `ParkingTariffRule`, `TariffSnapshot`, visit status, and parking activity type; keep future activity extension possible through interfaces.
-Done: domain types compile with no React Native, SQLite, or NFC imports.
+Owner: NFC/Mobile Specialist  
+Refs: `DEVICE_TEST_MATRIX.md`, `RFID_NFC_REACT_NATIVE_101.md`  
+Do: Enable iOS NFC capability/usage description where supported; document limitations/test status.  
+Done: iOS NFC status is recorded honestly.
 
-### T-006 — Create Repository Interfaces
+### T-004 — Android NFC Configuration
 
-Owner: Software Architect
-Do: create `MbcCardRepository` read/write/cancel/availability contract plus ledger and tariff setting contracts.
-Done: use cases depend on interfaces, not concrete NFC/SQLite implementations.
+Owner: NFC/Mobile Specialist  
+Refs: `DEVICE_TEST_MATRIX.md`, `RFID_NFC_REACT_NATIVE_101.md`  
+Do: Add Android NFC permission/feature config and verify NFC availability/card detection when hardware exists.  
+Done: Android NFC detection works or limitation is documented.
 
-### T-007 — Create Parking Tariff Calculator
+---
 
-Owner: Senior React Native FE, Test Automation Engineer
-Do: calculate fee from supplied tariff rule/snapshot; default Rp2.000/started hour; round partial hours up; reject zero/negative duration; no hardcoded `2000` in Terminal; no non-parking tariff implementation.
-Tests: 1h→Rp2.000; 1h5m1s→Rp4.000; zero/negative rejects; Rp3.000 snapshot calculates correctly.
-Done: isolated tariff logic with tests.
+## Phase 3 — Domain Layer
 
-### T-008 — Create Activity State Policy
+### T-005 — MBC Domain Entities
 
-Owner: Software Architect, Test Automation Engineer
-Do: allow check-in only from `NOT_CHECKED_IN`; checkout only from `CHECKED_IN`; reject double check-in/out, second active activity, invalid duration, insufficient balance; insufficient balance must not mutate card state.
-Done: state-transition tests cover valid/invalid flows.
+Owner: Architect  
+Refs: `DESIGN.md`, `CARD_DATA_SECURITY_LEDGER_SPEC.md`  
+Do: Create card, member, visit, transaction, tariff rule/snapshot, status, and parking activity types independent from RN/NFC/SQLite.  
+Done: Domain compiles and supports parking MVP only.
 
-### T-009 — Create Transaction Log Policy
+### T-006 — Repository Interfaces
 
-Owner: Software Architect
-Do: add card logs for register/top-up/check-in/checkout; keep latest 5 newest-first logs.
-Done: sixth log drops oldest and count remains 5.
+Owner: Architect  
+Refs: `DESIGN.md`  
+Do: Create card, ledger, and tariff settings repository interfaces; use cases depend on interfaces only.  
+Done: Mock/real implementations can be swapped.
 
-### T-010 — Create DTOs
+### T-007 — Parking Tariff Calculator
 
-Owner: Senior React Native FE
-Do: create presentation-safe DTOs (`CardSummaryDto`, `RoleActionResultDto`, status/error DTOs); avoid raw protected payload/domain leakage.
-Done: screens can render from DTOs only.
+Owner: Senior RN FE / Test Automation  
+Refs: `REQUIREMENTS.md`, `CARD_DATA_SECURITY_LEDGER_SPEC.md`  
+Do: Calculate fee from supplied tariff snapshot/rule using started-hour rounding; reject zero/negative duration; test Rp2.000 and Rp3.000 rates.  
+Done: Isolated tests cover rounding, invalid duration, and rate changes.
 
-### T-011 — Create Check NFC Availability Use Case
+### T-008 — Activity State Policy
 
-Owner: Senior React Native FE, NFC Specialist
-Do: return supported, unsupported, disabled, unavailable, timeout, and mock/demo states with user guidance.
-Done: UI can show clear NFC readiness messages.
+Owner: Architect / Test Automation  
+Refs: `EDGE_CASES.md`  
+Do: Enforce valid check-in/checkout transitions and reject double tap, second active visit, invalid duration, insufficient balance.  
+Done: State-transition tests cover valid and invalid flows.
 
-## Phase 2 — Station Feature
+### T-009 — Card Transaction Log Policy
 
-### T-012 — Register Member Card Use Case
+Owner: Architect  
+Refs: `CARD_DATA_SECURITY_LEDGER_SPEC.md`  
+Do: Add card logs for register/top-up/check-in/checkout and keep latest five in defined order.  
+Done: Sixth log drops oldest and count stays five.
 
-Owner: Senior React Native FE
-Do: validate unregistered/safe card; reject existing valid MBC overwrite; generate internal member ID; create initial balance/status/logs; write+readback; append local ledger after verified write.
-Done: valid protected card is created without typed member ID; overwrite rejected.
+---
 
-### T-013 — Top-Up Member Card Use Case
+## Phase 4 — Application Use Cases
 
-Owner: Senior React Native FE
-Do: read/validate card; validate positive amount; increase balance; add top-up card log; write+readback; append ledger after verified write; preserve active visit/tariff snapshot if checked in.
-Done: top-up works for normal and checked-in cards without clearing active visit.
+### T-010 — Presentation DTOs
 
-### T-017 — Implement Mock Card Repository
+Owner: Senior RN FE  
+Refs: `DESIGN.md`  
+Do: Create safe DTOs for card summary, role result, errors, and statuses; do not expose raw payloads.  
+Done: UI can render from DTOs only.
 
-Owner: Senior React Native FE, Test Automation Engineer
-Do: implement mock `MbcCardRepository` for dev/demo; include fixtures: unregistered, registered, low balance, checked-in with snapshot, legacy checked-in without snapshot, tampered, capacity-risk.
-Done: all role flows run before real NFC hardware.
+### T-011 — NFC Availability Use Case
 
-### T-017A — Implement Local SQLite Ledger Repository
+Owner: Senior RN FE / NFC Specialist  
+Refs: `RFID_NFC_REACT_NATIVE_101.md`  
+Do: Return supported/unsupported/disabled/unavailable/timeout/mock states with user guidance.  
+Done: Screens can show clear NFC readiness messages.
 
-Owner: Senior React Native FE, Software Architect
-Do: store register/top-up/check-in/checkout local entries; separate schema from card payload; never override card state; mask member references.
-Done: Station shows current-device/current-installation transaction count and income summary; repository is testable.
+### T-012 — Register Card Use Case
 
-### T-017B — Implement Local Tariff Settings Repository
+Owner: Senior RN FE  
+Refs: `REQUIREMENTS.md`, `CARD_DATA_SECURITY_LEDGER_SPEC.md`, `SECURITY.md`  
+Do: Reject existing MBC overwrite, generate member ID, initialize balance/status/log, write protected card, verify readback, then append ledger.  
+Done: Registration creates valid protected card and rejects overwrite.
 
-Owner: Senior React Native FE, Software Architect
-Do: store active parking tariff locally in SQLite/secure storage; seed Rp2.000, `IDR`, `CEIL_TO_STARTED_HOUR`; store version, updated time, updated-by role/reference; validate positive IDR amount; return `TARIFF_NOT_CONFIGURED` when invalid/missing.
-Done: authorized Station/Admin can update tariff without APK rebuild; value persists; UI/docs state device-local/manual sync limitation.
+### T-013 — Top-Up Use Case
 
-### T-017C — Implement Tariff Snapshot at Check-In
+Owner: Senior RN FE  
+Refs: `EDGE_CASES.md`, `CARD_DATA_SECURITY_LEDGER_SPEC.md`  
+Do: Validate card/amount, increase balance, add top-up log, preserve active visit/snapshot, verify write, append ledger.  
+Done: Top-up works for normal and checked-in cards.
 
-Owner: Senior React Native FE, Software Architect, NFC Specialist
-Depends on: T-007, T-014, T-017B, T-019, T-020
-Do: store compact snapshot in card active visit during check-in: rate/hour, tariff version, currency/rounding if payload budget allows; protect inside Silent Shield; ensure Terminal uses snapshot; allow legacy fallback only with visible warning; re-check payload size.
-Done: user checked in at Rp2.000 is charged Rp2.000 after tariff changes to Rp3.000; new check-ins use Rp3.000; capacity guard works.
+### T-014 — Gate Check-In Use Case
 
-### T-020A — Integrate Ledger Writes Into Role Flows
+Owner: Senior RN FE  
+Refs: `REQUIREMENTS.md`, `EDGE_CASES.md`, `CARD_DATA_SECURITY_LEDGER_SPEC.md`  
+Do: Read card/local tariff, reject invalid state/future simulation time, write entry timestamp + parking activity + tariff snapshot, verify readback, append CHECKIN amount `0`.  
+Done: Check-in locks tariff snapshot and rejects invalid check-in.
 
-Owner: Senior React Native FE, Software Architect
-Do: append ledger only after successful write-readback; cover register/top-up/check-in amount `0`/checkout; if ledger write fails after card success, show explicit warning and keep card as source of truth.
-Done: local reports include successful operations from this device only; ledger failure is testable.
+### T-015 — Terminal Check-Out Use Case
 
-### T-022 — Build Station Screen
+Owner: Senior RN FE  
+Refs: `EDGE_CASES.md`, `CARD_DATA_SECURITY_LEDGER_SPEC.md`  
+Do: Read checked-in card, calculate duration and fee from card-stored snapshot, warn on legacy fallback, reject insufficient balance without mutation, deduct/clear/log/write/verify/append ledger.  
+Done: Users keep check-in tariff even after local tariff changes.
 
-Owner: Senior React Native FE, UI/UX Designer
-Do: implement register, top-up, authorized tariff setting, local ledger summary, active tariff display, NFC states, result states; do not require typed member ID.
-Done: Station supports register/top-up/tariff update/local report; non-admin cannot change tariff.
+### T-016 — Scout Inspect Use Case
 
-## Phase 3 — Gate Feature
+Owner: Senior RN FE  
+Refs: `REQUIREMENTS.md`, `SECURITY.md`  
+Do: Read card and show masked member ref, balance, status, tariff snapshot, latest logs; never write.  
+Done: Scout is read-only.
 
-### T-014 — Check-In Activity Use Case
+---
 
-Owner: Senior React Native FE
-Do: read/validate card; read current local active parking tariff; validate tariff; support optional past simulation timestamp only; set checked-in status/timestamp/parking activity/tariff snapshot; add check-in log; write+readback; append ledger amount `0`.
-Done: check-in locks tariff snapshot; repeated check-in/future timestamp rejected.
+## Phase 5 — Infrastructure
 
-### T-023 — Build Gate Screen
+### T-017 — Mock Card Repository
 
-Owner: Senior React Native FE, UI/UX Designer
-Do: implement parking check-in, optional past-time simulation, current device time, active tariff display, and result/error states; show tariff to be locked before write.
-Done: Gate writes timestamp and tariff snapshot; future simulation timestamp rejected.
+Owner: Senior RN FE / Test Automation  
+Refs: `DESIGN.md`, `EDGE_CASES.md`  
+Do: Implement mock card repository with fixtures for unregistered, registered, low balance, checked-in with/without snapshot, tampered, oversized.  
+Done: All role flows run without real NFC.
 
-## Phase 4 — Terminal Feature
+### T-017A — SQLite Ledger Repository
 
-### T-015 — Check-Out Activity Use Case
+Owner: Senior RN FE / Architect  
+Refs: `CARD_DATA_SECURITY_LEDGER_SPEC.md`  
+Do: Store local register/top-up/check-in/checkout entries separately from card state; mask sensitive refs; never override card state.  
+Done: Station shows current-device transaction count/income.
 
-Owner: Senior React Native FE
-Do: read/validate card; calculate duration; calculate fee from card-stored tariff snapshot; for legacy missing snapshot, allow current local tariff fallback only after visible warning; validate balance; deduct, clear active visit, add checkout log; write+readback; append ledger.
-Done: checkout uses check-in tariff; insufficient balance keeps checked-in state; legacy fallback is explicit/testable.
+### T-017B — Local Tariff Settings Repository
 
-### T-024 — Build Terminal Screen
+Owner: Senior RN FE / Architect  
+Refs: `EDGE_CASES.md`, `CARD_DATA_SECURITY_LEDGER_SPEC.md`  
+Do: Store active parking tariff locally, seed Rp2.000 IDR started-hour rule, track version metadata, validate positive IDR tariff.  
+Done: Authorized Station/Admin can change tariff without APK rebuild.
 
-Owner: Senior React Native FE, UI/UX Designer
-Do: implement checkout; display card-stored tariff snapshot before deduction; optionally display current local tariff as reference only; show duration, charged hours, fee, balance impact, remaining balance, insufficient balance guidance, scan recovery, and legacy warning.
-Done: fee source is unambiguous; missing/invalid snapshot follows spec.
+### T-017C — Tariff Snapshot at Check-In
 
-## Phase 5 — Scout Feature
+Owner: Senior RN FE / Architect / NFC Specialist  
+Refs: `EDGE_CASES.md`, `CARD_DATA_SECURITY_LEDGER_SPEC.md`  
+Do: Store compact tariff snapshot in card active visit, enforce Terminal snapshot usage, test legacy fallback and payload capacity.  
+Done: Rp2.000 check-in remains Rp2.000 after tariff changes to Rp3.000.
 
-### T-016 — Inspect Member Card Use Case
+### T-018 — Real NFC Card Repository
 
-Owner: Senior React Native FE
-Do: read card and return masked member reference, balance, status, tariff snapshot if checked in, and latest logs; never write card.
-Done: Scout read-only behavior is preserved.
+Owner: NFC/Mobile Specialist  
+Refs: `RFID_NFC_REACT_NATIVE_101.md`, `CARD_DATA_SECURITY_LEDGER_SPEC.md`  
+Do: Implement NFC read/write/cancel/session cleanup, handle errors, and verify writes by readback.  
+Done: Supported cards read/write safely on tested devices.
 
-### T-025 — Build Scout Screen
+### T-019 — MBC Card Codec
 
-Owner: Senior React Native FE, UI/UX Designer
-Do: implement one-tap read-only inspection with masked member reference, balance, visit status, tariff snapshot, and last five logs; no write CTA.
+Owner: Architect / Security  
+Refs: `CARD_DATA_SECURITY_LEDGER_SPEC.md`  
+Do: Implement payload v1 validation/codec, validate core fields/logs/snapshot/counter, enforce size guard.  
+Done: Tests cover valid, invalid, legacy, oversized, unsupported version.
+
+### T-020 — Silent Shield
+
+Owner: Security / Architect  
+Refs: `SECURITY.md`, `CARD_DATA_SECURITY_LEDGER_SPEC.md`  
+Do: Canonicalize, HMAC-sign, AEAD-encrypt, store opaque `mbc1`, keep secrets out of repo, reject tamper, redact logs.  
+Done: Generic NFC reader cannot plainly read identity, balance, status, tariff, or logs.
+
+### T-020A — Ledger Flow Integration
+
+Owner: Senior RN FE / Architect  
+Refs: `CARD_DATA_SECURITY_LEDGER_SPEC.md`  
+Do: Append ledger only after card write-readback for register/top-up/check-in/checkout; warn if ledger fails after card success.  
+Done: Local reports reflect successful operations on this device only.
+
+---
+
+## Phase 6 — Presentation Layer
+
+### T-021 — Role Switcher
+
+Owner: Senior RN FE / UI Designer  
+Refs: `DESIGN.md`  
+Do: Implement Station, Gate, Terminal, Scout switching with isolated role state.  
+Done: Switching roles does not corrupt flow state.
+
+### T-022 — Station Screen
+
+Owner: Senior RN FE / UI Designer  
+Refs: `REQUIREMENTS.md`, `EDGE_CASES.md`  
+Do: Implement register, top-up, admin tariff setting, local ledger summary, active tariff display, and auth path for tariff change.  
+Done: Station supports register/top-up/tariff update/local report safely.
+
+### T-023 — Gate Screen
+
+Owner: Senior RN FE / UI Designer  
+Refs: `REQUIREMENTS.md`, `EDGE_CASES.md`  
+Do: Implement check-in, optional past simulation, current time, active tariff display, and tariff-to-be-locked confirmation.  
+Done: Gate writes timestamp and tariff snapshot clearly.
+
+### T-024 — Terminal Screen
+
+Owner: Senior RN FE / UI Designer  
+Refs: `EDGE_CASES.md`, `CARD_DATA_SECURITY_LEDGER_SPEC.md`  
+Do: Implement checkout UI with card-stored tariff snapshot, duration, charged hours, fee, balance impact, insufficient-balance guidance, legacy warning.  
+Done: Fee source is unambiguous and follows snapshot rule.
+
+### T-025 — Scout Screen
+
+Owner: Senior RN FE / UI Designer  
+Refs: `REQUIREMENTS.md`, `SECURITY.md`  
+Do: Implement one-tap read-only inspection with masked member ref, balance, visit status, tariff snapshot, latest five logs.  
 Done: Scout never mutates card.
 
-## Phase 6 — Shared App Experience
+### T-026 — Signal UI Direction
 
-### T-021 — Build Role Switcher
+Owner: UI Designer / Senior RN FE  
+Refs: `SIGNAL_UI_GUIDE.md`  
+Do: Apply Signal UI guidance and isolated theme tokens; keep provisional tokens replaceable.  
+Done: Main screens are consistent, readable, demo-ready.
 
-Owner: Senior React Native FE, UI/UX Designer
-Do: allow switching Station/Gate/Terminal/Scout with isolated role state.
-Done: role switching does not corrupt card/screen state.
+### T-026A — Low-Fi E2E Figma Flow
 
-### T-026 — Apply Signal UI Direction
+Owner: UI Designer / PM  
+Refs: `SIGNAL_UI_GUIDE.md`, `E2E_TEST_CASES.md`  
+Do: Create/update low-fi flow for role selection, all roles, happy path, and key errors.  
+Done: FE and QA understand the MVP journey.
 
-Owner: UI/UX Designer, Senior React Native FE
-Do: apply `SIGNAL_UI_GUIDE.md`; isolate theme tokens in `src/presentation/theme/`; keep provisional tokens replaceable.
-Done: main role screens are consistent, readable, and demo-ready.
+### T-026B — Hi-Fi Screens
 
-## Phase 7 — Quality and Verification
+Owner: UI Designer / Senior RN FE / SA  
+Refs: `SIGNAL_UI_GUIDE.md`  
+Do: Create/update hi-fi role and NFC/error screens; remove typed member ID; document component/token mapping.  
+Done: FE can implement without new product decisions.
+
+### T-026C — Visual Polish
+
+Owner: UI Designer / Senior RN FE / PO / SA / Architect  
+Refs: `SIGNAL_UI_GUIDE.md`  
+Do: Polish spacing, buttons, badges, bottom sheets, icons, hierarchy; do not add scope.  
+Done: Screens are clean and demo-ready.
+
+---
+
+## Phase 7 — Quality, Release, and Submission
+
+### T-026D — Presentation Task Brief
+
+Owner: Writer / PM  
+Refs: `TASK_PRESENTATION_BRIEF.md`, `EXECUTION_ORDER.md`  
+Do: Keep task brief aligned with current order, owner, output, and presentation value.  
+Done: Brief matches task file and execution order.
 
 ### T-027 — Unit and Use-Case Tests
 
-Owner: Test Automation Engineer, Senior React Native FE
-Depends on: T-005 to T-026
-Do: add/update tests for every changed executable source file; cover domain, tariff, state policy, logs, use cases, repositories, codec, Silent Shield helpers, and presentation behavior; include tariff settings/snapshot and NFC error/capacity/readback cases; run focused tests and full coverage before merge/phase completion.
-Done: changed-file test rule satisfied; executable-source coverage ≥90%; exceptions approved by Software Architect.
+Owner: Test Automation / Senior RN FE  
+Refs: `UNIT_TEST_COVERAGE_POLICY.md`, `TEST_PLAN.md`  
+Do: Test changed executable files and cover domain, tariff, state/log policy, use cases, repos, codec, Silent Shield, presentation, NFC edge cases.  
+Done: Changed-file rule is met and full executable-source coverage is >=90%.
 
-### T-027A — Integrate SonarCloud Quality Analysis
+### T-027A — SonarCloud / CI Quality Analysis
 
-Owner: Test Automation Engineer, Demo/Release Engineer
-Do: configure SonarCloud/static analysis when repo access exists; publish coverage format; add CI workflow for tests, audit, build where feasible; document secrets/deferred checks.
-Done: quality gate runs or manual/deferred plan is documented.
+Owner: Test Automation / Release Engineer  
+Refs: `RELEASE_PLAN.md`, `UNIT_TEST_COVERAGE_POLICY.md`  
+Do: Configure tests, coverage publication, static analysis, audit, and build in CI where feasible; document deferred checks.  
+Done: Quality gate runs or manual/deferred plan is documented.
 
-### T-026D — Maintain Presentation-Friendly Task Brief
+### T-027B — Firebase App Distribution Pipeline
 
-Owner: Technical Writer, PM
-Do: keep `TASK_PRESENTATION_BRIEF.md` aligned with task order/scope.
-Done: brief matches `TASKS.md` and `EXECUTION_ORDER.md`.
+Owner: Release Engineer  
+Refs: `RELEASE_PLAN.md`, `DONE.md`  
+Do: Configure GitHub Actions on `main` to build Android release artifact and upload to Firebase App Distribution with secrets/tester notes documented.  
+Done: `main` trigger distributes build or has documented dry-run evidence.
 
-## Phase 8 — Real NFC Integration
+### T-027C — QA Screenshot Evidence Gate
 
-### T-018 — Implement NFC Card Repository
-
-Owner: NFC/Mobile Native Specialist
-Do: implement real NFC read/write/cancel/session cleanup; handle cancel, timeout, unsupported card, malformed payload, IO errors; verify write by readback before success.
-Done: real NFC repository safely reads/writes supported cards and cleans sessions.
-
-### T-019 — Implement MBC Card Codec
-
-Owner: Software Architect, Security
-Do: implement card payload v1 from `CARD_DATA_SECURITY_LEDGER_SPEC.md`; validate version, required fields, balance, status, active visit, tariff snapshot, counter, latest-five logs; enforce payload capacity; fail safely on malformed/unsupported data.
-Done: codec tests cover valid, invalid, legacy, oversized, unsupported version payloads.
-
-### T-020 — Implement Silent Shield
-
-Owner: Security, Software Architect
-Do: canonicalize stable payload; HMAC-SHA256; AES-256-GCM/equivalent authenticated encryption; store only opaque `mbc1` envelope; load secrets from secure config; never commit real keys; verify auth before role action; redact sensitive logs/errors; verify generic NFC reader cannot read identity, balance, status, tariff snapshot, or transaction values plainly.
-Done: tamper blocks operations; no real secrets committed; sensitive NFC data is not plain-readable.
+Owner: Senior QA / PM  
+Refs: `QA_EVIDENCE_POLICY.md`, `TEST_PLAN.md`, `E2E_TEST_CASES.md`  
+Do: Require QA validation before feature PR merge and final use-case screenshot evidence pack.  
+Done: PR/final delivery has screenshots and QA result notes.
 
 ### T-028 — Device Tests
 
-Owner: NFC Specialist, Senior QA
-Do: test Android NFC first; test iOS if available/supported; record device, OS, card/tag type, capacity, read/write result, and limitations in `DEVICE_TEST_MATRIX.md`.
-Done: real-device evidence is recorded honestly.
-
-## Phase 9 — Design Hardening
-
-### T-026A — Create Low-Fi E2E Figma Flow
-
-Owner: UI/UX Designer, PM
-Do: create/update low-fi mobile flow for role selection, Station, Gate, Terminal, Scout, happy path, and major errors; keep parking as only MVP activity.
-Done: flow is understandable for FE and QA.
-
-### T-026B — Create Hi-Fi Implementation-Ready Figma Screens
-
-Owner: UI/UX Designer, Senior React Native FE, System Analyst
-Do: create/update hi-fi screens for all roles and NFC/error states; remove typed member ID; document component/token mapping.
-Done: FE can implement screens without new product decisions.
-
-### T-026C — Polish Hi-Fi Spacing, Icons, and Visual QA
-
-Owner: UI/UX Designer, Senior React Native FE, PO, SA, Architect
-Do: fix spacing, borders, buttons, badges, bottom sheets, icons, hierarchy; confirm polish adds no scope.
-Done: screens are visually clean and demo-ready.
-
-## Phase 10 — Demo and Submission
+Owner: NFC Specialist / Senior QA  
+Refs: `DEVICE_TEST_MATRIX.md`, `RFID_NFC_REACT_NATIVE_101.md`  
+Do: Test Android NFC first, iOS if available; record device, OS, card/tag, capacity, read/write result, limitations.  
+Done: Real-device evidence is recorded honestly.
 
 ### T-029 — Demo Capture
 
-Owner: Demo/Release Engineer, Technical Writer, UI/UX Designer
-Do: capture Station/Gate/Terminal/Scout flows; include tariff-change snapshot scenario if possible; prepare APK/reviewer distribution notes.
-Done: demo evidence supports assessment submission.
+Owner: Release Engineer / Writer / UI Designer  
+Refs: `E2E_TEST_CASES.md`, `PO_FINAL_GO_NO_GO_CHECKLIST.md`  
+Do: Capture Station, Gate, Terminal, Scout, tariff-change snapshot scenario, and Firebase reviewer notes.  
+Done: Demo evidence supports assessment submission.
 
-### T-030 — Prepare Submission Package
+### T-030 — Submission Package
 
-Owner: Demo/Release Engineer, Technical Writer, PM
-Do: confirm repo, docs, tests, demo evidence, APK distribution notes, known limitations, presentation sections, branch/publish workflow, and parking-MVP scope.
-Done: package is ready for final PO GO/NO-GO review.
+Owner: Release Engineer / Writer / PM  
+Refs: `PO_FINAL_GO_NO_GO_CHECKLIST.md`, `RELEASE_PLAN.md`  
+Do: Confirm repository, docs, tests, QA evidence, demo evidence, Firebase notes, known limitations, and parking MVP scope.  
+Done: Package is ready for final PO GO/NO-GO review.

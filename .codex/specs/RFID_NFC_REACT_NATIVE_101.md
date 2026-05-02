@@ -96,8 +96,8 @@ Authorized admin/station staff can update the active parking tariff locally, for
 Rules:
 
 - Only authorized admin/station staff may update tariff.
-- Terminal and Gate must read tariff from the local tariff repository.
-- The active tariff must be displayed clearly before check-in/checkout-sensitive actions.
+- Gate must read tariff from the local tariff repository at check-in. Terminal must use the card-stored tariff snapshot for checkout, except for documented legacy/demo fallback.
+- Gate must display the current local active tariff before check-in. Terminal must display the card-stored visit tariff snapshot before checkout deduction.
 - Changing tariff on one offline device does not update other devices automatically.
 - All active offline devices must be manually configured with the same tariff before operation.
 

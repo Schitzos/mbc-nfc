@@ -428,7 +428,7 @@ Additional required validation tests:
 - Checkout rejects invalid duration/time before balance deduction.
 - Gate snapshots the active local tariff at check-in; Terminal calculates checkout fee from the card visit tariff snapshot.
 - Authorized Station/Admin tariff update stores a new local active tariff without APK rebuild.
-- Terminal displays active tariff before deduction.
+- Terminal displays the card-stored visit tariff snapshot before deduction.
 - Insufficient balance recovery works: top-up while checked-in, then checkout succeeds.
 - Gate simulation rejects future timestamps.
 - Early card removal or failed readback returns `WRITE_VERIFY_FAILED` and does not show success.

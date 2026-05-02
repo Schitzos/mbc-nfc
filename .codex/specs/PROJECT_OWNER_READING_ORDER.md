@@ -14,7 +14,8 @@ If you only want the shortest important reading flow, read these first:
 4. `EXECUTION_ORDER.md`
 5. `TASKS.md`
 6. `RELEASE_PLAN.md`
-7. `DONE.md`
+7. `QA_EVIDENCE_POLICY.md`
+8. `DONE.md`
 
 That path is enough to understand:
 
@@ -332,3 +333,13 @@ If you find a mismatch, raise it before implementation continues.
 Read `.codex/specs/UNIT_TEST_COVERAGE_POLICY.md` before implementation begins and before each phase exit review.
 
 The Project Manager should verify this policy together with `EXECUTION_ORDER.md`, `TASKS.md`, `TEST_PLAN.md`, and `DONE.md`.
+
+### QA Evidence Policy Addendum
+
+Read `QA_EVIDENCE_POLICY.md` before release planning and before final GO/NO-GO.
+
+Purpose:
+
+- confirm feature PR screenshot evidence expectations,
+- confirm final QA use-case evidence package expectations,
+- confirm QA proof required before final delivery.

@@ -128,7 +128,7 @@ When a role flow requires local reporting/audit:
 - MVP may use a simple admin PIN or equivalent local authorization for assessment, but it must be documented as demo-level unless stronger authentication is implemented.
 - Do not store admin PINs or local authorization secrets in plain text.
 - Every tariff change should record version, updatedAt, and updatedBy role/reference in local storage and/or local ledger.
-- Terminal must display active tariff before deduction to reduce risk from incorrectly configured offline devices.
+- Terminal must display the card-stored visit tariff snapshot before deduction. Station/Admin settings must display the current local active tariff so staff can detect incorrectly configured offline devices before new check-ins.
 - Because the app is offline, tariff consistency across multiple devices is an operational process, not automatic security enforcement.
 
 ## 9. Security Checklist

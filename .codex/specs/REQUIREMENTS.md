@@ -27,23 +27,23 @@ The PDF uses member parking as the concrete required assessment scenario. Parkin
 
 ## 3. System Requirements
 
-| ID     | System Requirement                                                                                                                                                                                                |
-| ------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| SR-001 | The system shall be one frontend app that can switch between Station, Gate, Terminal, and Scout roles.                                                                                                            |
-| SR-002 | The system shall read and write NFC card data without requiring backend API access.                                                                                                                               |
-| SR-003 | The system shall validate card payload version, structure, integrity, balance, status, and timestamps.                                                                                                            |
-| SR-004 | The system shall reject unregistered, unsupported, malformed, or tampered cards.                                                                                                                                  |
-| SR-005 | The system shall prevent double check-in and double check-out for the active activity.                                                                                                                            |
-| SR-006 | The system shall implement parking as the required MVP activity and may keep activity context configurable for future extension.                                                                                  |
-| SR-007 | The system shall keep the latest five transaction logs on card.                                                                                                                                                   |
-| SR-008 | The system shall protect card confidentiality and integrity with Silent Shield production-grade authenticated encryption plus integrity validation, preventing direct plain NFC exposure of identity and balance. |
-| SR-009 | The system shall show clear top-up guidance when balance is insufficient.                                                                                                                                         |
-| SR-010 | The system shall provide a read-only Scout mode for one-tap member inspection.                                                                                                                                    |
-| SR-011 | The system shall require an NFC-capable device with NFC enabled for real card scan, read, and write operations.                                                                                                   |
-| SR-012 | The system shall clearly inform users when NFC is required, unsupported, disabled, scanning, cancelled, or timed out.                                                                                             |
-| SR-013 | The system shall maintain a local offline SQLite ledger for audit/reporting without replacing the NFC card as member-state authority.                                                                             |
-| SR-014 | The system shall maintain a local active parking tariff setting that defaults to Rp 2.000 per started hour and can be changed by authorized Station/Admin staff without backend access or APK rebuild.            |
-| SR-015 | The Terminal shall always resolve fee calculation from the local active tariff repository, show the active tariff before deduction, and never use a hidden magic-number tariff inside checkout logic.             |
+| ID     | System Requirement                                                                                                                                                                                                                                                                                                            |
+| ------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| SR-001 | The system shall be one frontend app that can switch between Station, Gate, Terminal, and Scout roles.                                                                                                                                                                                                                        |
+| SR-002 | The system shall read and write NFC card data without requiring backend API access.                                                                                                                                                                                                                                           |
+| SR-003 | The system shall validate card payload version, structure, integrity, balance, status, and timestamps.                                                                                                                                                                                                                        |
+| SR-004 | The system shall reject unregistered, unsupported, malformed, or tampered cards.                                                                                                                                                                                                                                              |
+| SR-005 | The system shall prevent double check-in and double check-out for the active activity.                                                                                                                                                                                                                                        |
+| SR-006 | The system shall implement parking as the required MVP activity and may keep activity context configurable for future extension.                                                                                                                                                                                              |
+| SR-007 | The system shall keep the latest five transaction logs on card.                                                                                                                                                                                                                                                               |
+| SR-008 | The system shall protect card confidentiality and integrity with Silent Shield production-grade authenticated encryption plus integrity validation, preventing direct plain NFC exposure of identity and balance.                                                                                                             |
+| SR-009 | The system shall show clear top-up guidance when balance is insufficient.                                                                                                                                                                                                                                                     |
+| SR-010 | The system shall provide a read-only Scout mode for one-tap member inspection.                                                                                                                                                                                                                                                |
+| SR-011 | The system shall require an NFC-capable device with NFC enabled for real card scan, read, and write operations.                                                                                                                                                                                                               |
+| SR-012 | The system shall clearly inform users when NFC is required, unsupported, disabled, scanning, cancelled, or timed out.                                                                                                                                                                                                         |
+| SR-013 | The system shall maintain a local offline SQLite ledger for audit/reporting without replacing the NFC card as member-state authority.                                                                                                                                                                                         |
+| SR-014 | The system shall maintain a local active parking tariff setting that defaults to Rp 2.000 per started hour and can be changed by authorized Station/Admin staff without backend access or APK rebuild.                                                                                                                        |
+| SR-015 | The Gate shall resolve the active tariff from local tariff storage at check-in and write a compact tariff snapshot to the card. The Terminal shall resolve fee calculation from the card-stored visit tariff snapshot, show that snapshot before deduction, and never use a hidden magic-number tariff inside checkout logic. |
 
 ## 4. Scope
 
@@ -63,7 +63,7 @@ The PDF uses member parking as the concrete required assessment scenario. Parkin
 - Activity check-in timestamp writing.
 - Activity check-out duration calculation.
 - Member benefit fee deduction.
-- Parking activity as the required MVP path, with future activity extension kept architectural only.
+- Parking activity as the required MVP activity, with configurable activity context treated as future-friendly design support.
 - Sequential flow integrity, with no double check-in or double check-out.
 - Simulation mode at The Gate to set entry time in the past for testing.
 - Last five transaction logs stored on card.
@@ -196,8 +196,8 @@ Acceptance criteria:
 - App calculates duration from entry timestamp to exit timestamp.
 - App rejects checkout with `INVALID_TIME` / `INVALID_DURATION` when exit time is not after entry time.
 - For the parking MVP, the default tariff is Rp 2.000 per started hour.
-- The active tariff must be read from local tariff storage, not hardcoded directly inside checkout logic.
-- Terminal must display the active tariff before deduction so the operator can detect a wrongly configured offline device.
+- The active tariff must be read from local tariff storage at Gate check-in and stored as a card tariff snapshot; tariff values must not be hardcoded directly inside fee calculation logic.
+- Terminal must display the card-stored visit tariff snapshot before deduction; Station/Admin settings must display the current local active tariff so operators can detect wrongly configured offline devices before new check-ins.
 - Example: 1 hour 5 minutes 1 second is charged as 2 hours.
 - App deducts fee from card balance when balance is sufficient.
 - App clears visit status after successful checkout.
@@ -272,7 +272,7 @@ Acceptance criteria:
 - Parking is the required MVP and assessment acceptance path.
 - Card state stores the active activity identifier/type, with `PARKING` as the required initial value.
 - Tariff calculation accepts an activity tariff rule, but only the parking tariff is required for MVP.
-- Domain names and use cases may use reusable activity wording, but non-parking activities must not delay or replace the parking demo.
+- Domain names and use cases may use reusable activity wording, but non-parking activities must not delay or replace the required parking MVP.
 
 ### FR-013 Local Offline Ledger and Reporting
 
@@ -409,7 +409,7 @@ Acceptance criteria:
 - Station can top up a card.
 - Gate can check in a card to an activity.
 - Gate can simulate past entry time.
-- Terminal can check out a card, calculate activity duration, use the card-stored tariff snapshot from check-in, show the fee source before deduction, and deduct balance.
+- Terminal can check out a card, calculate activity duration, read the card-stored visit tariff snapshot captured at check-in, show it before deduction, and deduct balance.
 - Terminal clearly blocks checkout if balance is insufficient.
 - Scout can read balance, status, and last five logs.
 - Sequential loop prevents double check-in and double check-out.
@@ -426,7 +426,7 @@ Acceptance criteria:
 - Repository, demo capture, documentation, and presentation are ready for submission.
 - Check-in/check-out logic is modeled for reusable member activities, not only parking.
 - Authorized Station/Admin staff can update the local active parking tariff without rebuilding the APK.
-- Terminal checkout displays the card-stored tariff snapshot before deduction. The current local tariff may be shown only as a reference.
+- Terminal checkout displays the card-stored visit tariff snapshot before deduction.
 - Gate and Terminal display current device time and reject invalid/future simulation timing.
 
 ## 12. Product Owner Alignment Notes
@@ -439,3 +439,17 @@ Acceptance criteria:
 - Chosen NFC tag/card capacity must be validated before claiming real-card support.
 - Local tariff management is required for offline operation after APK release; all active offline devices must be manually configured to the same tariff.
 - Device time correctness is an operational dependency and must be visible in Gate/Terminal flows.
+
+## Additional Delivery Requirements
+
+### NFR-020 Feature PR QA Evidence Gate
+
+Before a feature PR is merged, Senior QA must validate the changed feature on Android simulator/device and attach screenshot evidence showing the feature behavior and relevant error state.
+
+### NFR-021 Final QA Use-Case Evidence Package
+
+Before final delivery, Senior QA must provide a use-case testing evidence package with screenshots proving the delivered parking MVP satisfies the requirements.
+
+### NFR-022 Firebase App Distribution Release Automation
+
+The Demo/Release Engineer must configure GitHub Actions so controlled push/merge to `main` builds the Android release artifact and distributes it through Firebase App Distribution.

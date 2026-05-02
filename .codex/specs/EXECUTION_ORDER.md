@@ -9,6 +9,7 @@ Use it together with:
 - `.codex/specs/TASKS.md` for the full task inventory, owners, and acceptance.
 - `.codex/specs/RELEASE_PLAN.md` for milestone readiness.
 - `.codex/specs/UNIT_TEST_COVERAGE_POLICY.md` for changed-file unit-test and 90% coverage rules.
+- `.codex/specs/QA_EVIDENCE_POLICY.md` for feature PR screenshot evidence and final QA proof.
 
 Rule:
 
@@ -21,6 +22,7 @@ Rule:
 - Each implementation task must include matching unit-test updates for changed executable source files.
 - Complete one task at a time.
 - After each task finishes, stop and confirm with the user before moving to the next task.
+- Senior QA validates each feature PR with Android simulator/device screenshots before merge.
 - Technical Writer / Presentation Specialist documents task completion and important delivery notes as work progresses.
 
 ## 3. Execution Sequence
@@ -66,11 +68,11 @@ Goal:
 Order:
 
 1. `T-005` Create MBC Domain Entities
-2. `T-006` Create Repository Interfaces
-3. `T-007` Create Parking Tariff Calculator
+2. `T-006` Create MBC Repository Interface
+3. `T-007` Create Activity Tariff Calculator
 4. `T-008` Create Activity State Policy
 5. `T-009` Create Transaction Log Policy
-6. `T-010` Create DTOs
+6. `T-010` Create Card DTOs
 7. `T-011` Create Check NFC Availability Use Case
 
 Expected outcome:
@@ -122,12 +124,12 @@ Goal:
 Order:
 
 1. `T-015` Create Check-Out Activity Use Case
-2. Confirm checkout uses the card-stored tariff snapshot created by `T-014` / `T-017C`
+2. Confirm checkout reads the active tariff from `T-017B → T-017C` local tariff settings
 3. `T-024` Build Terminal Screen
 
 Expected outcome:
 
-- Terminal can display the card-stored tariff snapshot, calculate fee from that snapshot, deduct balance, and handle insufficient balance safely.
+- Terminal can display the card-stored visit tariff snapshot, calculate fee from that snapshot, deduct balance, and handle insufficient balance safely.
 
 ### Phase 5 Scout Feature
 
@@ -169,13 +171,16 @@ Order:
 
 1. `T-027` Unit and Use-Case Tests
 2. `T-027A` Integrate SonarCloud Quality Analysis
-3. `T-026D` Maintain Presentation-Friendly Task Brief
+3. `T-027B` Configure GitHub Actions Firebase App Distribution
+4. `T-027C` Enforce Feature PR QA Screenshot Evidence
+5. `T-026D` Maintain Presentation-Friendly Task Brief
 
 Expected outcome:
 
 - Automated coverage reaches the target.
 - SonarCloud quality gate is integrated.
-- GitHub Actions is prepared so `main` can publish the APK to app distribution.
+- GitHub Actions is prepared so `main` publishes the APK to Firebase App Distribution.
+- Feature PRs have QA screenshot evidence or approved exceptions.
 - Presentation-friendly task documentation stays current.
 
 ### Phase 8 Real NFC Integration
@@ -260,7 +265,7 @@ Usually blocked or limited:
 
 - Remote/repository sharing steps inside `T-000`
 - Final SonarCloud repository wiring in `T-027A`
-- Final GitHub Actions publish workflow in `T-027A`
+- Final GitHub Actions Firebase App Distribution workflow in `T-027B`
 - Final submission packaging in `T-030`
 
 ## 5. Execution Rule For This Thread
