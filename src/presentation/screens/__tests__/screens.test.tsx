@@ -171,11 +171,12 @@ describe('role screens', () => {
     await waitFor(() =>
       expect(mockCheckNfcAvailabilityUseCase.execute).toHaveBeenCalled(),
     );
-    fireEvent.press(screen.getByText('Tap Mock Card to Register'));
+    fireEvent.press(screen.getByText('Tap NFC Card to Register'));
     await waitFor(() =>
       expect(mockRegisterMemberCardUseCase.execute).toHaveBeenCalled(),
     );
-    fireEvent.press(screen.getByText('Tap Mock Card to Top Up'));
+    fireEvent.press(screen.getByText('Switch to Top Up'));
+    fireEvent.press(screen.getByText('Tap NFC Card to Top Up'));
 
     await waitFor(() => {
       (expect(mockTopUpMemberCardUseCase.execute).toHaveBeenCalled(),
@@ -193,7 +194,7 @@ describe('role screens', () => {
       expect(mockGetStationLedgerSummaryUseCase.execute).toHaveBeenCalled(),
     );
 
-    fireEvent.press(screen.getAllByText('Back')[0]);
+    fireEvent.press(screen.getByText('Station'));
     expect(navigation.goBack).toHaveBeenCalled();
   });
 
@@ -202,14 +203,35 @@ describe('role screens', () => {
     await waitFor(() =>
       expect(mockCheckNfcAvailabilityUseCase.execute).toHaveBeenCalled(),
     );
-    fireEvent.press(screen.getByText('Tampered'));
-    expect(setScenario).toHaveBeenCalledWith('tampered');
-    fireEvent.press(screen.getByText('Tap Mock Card to Check In'));
+    fireEvent.press(screen.getByText('Tap Card to Check In'));
     await waitFor(() =>
       expect(mockCheckInActivityUseCase.execute).toHaveBeenCalled(),
     );
-    fireEvent.press(screen.getByText('Back'));
+    fireEvent.press(screen.getByText('Gate'));
     expect(navigation.goBack).toHaveBeenCalled();
+  });
+
+  it('shows Gate blocked state for failed check-in', async () => {
+    mockCheckInActivityUseCase.execute.mockResolvedValueOnce({
+      success: false,
+      role: 'GATE',
+      message: 'Already checked in',
+    });
+
+    render(<GateScreen navigation={navigation} />);
+    await waitFor(() =>
+      expect(mockCheckNfcAvailabilityUseCase.execute).toHaveBeenCalled(),
+    );
+
+    fireEvent.press(screen.getByText('Already checked in'));
+    expect(setScenario).toHaveBeenCalledWith('checked-in');
+
+    fireEvent.press(screen.getByText('Tap Card to Check In'));
+    await waitFor(() =>
+      expect(mockCheckInActivityUseCase.execute).toHaveBeenCalled(),
+    );
+    expect(screen.getByText('Blocked')).toBeTruthy();
+    expect(screen.getByText('Recovery guidance')).toBeTruthy();
   });
 
   it('runs Terminal checkout flow', async () => {
@@ -219,12 +241,31 @@ describe('role screens', () => {
     );
     fireEvent.press(screen.getByText('Checked-in parking card'));
     expect(setScenario).toHaveBeenCalledWith('checked-in');
-    fireEvent.press(screen.getByText('Tap Mock Card to Check Out'));
+    fireEvent.press(screen.getByText('Tap Card to Check Out'));
     await waitFor(() =>
       expect(mockCheckOutActivityUseCase.execute).toHaveBeenCalled(),
     );
-    fireEvent.press(screen.getByText('Back'));
+    fireEvent.press(screen.getByText('Terminal'));
     expect(navigation.goBack).toHaveBeenCalled();
+  });
+
+  it('shows Terminal insufficient-balance guidance', async () => {
+    mockCheckOutActivityUseCase.execute.mockResolvedValueOnce({
+      success: false,
+      role: 'TERMINAL',
+      message: 'Insufficient balance for checkout',
+    });
+
+    render(<TerminalScreen navigation={navigation} />);
+    await waitFor(() =>
+      expect(mockCheckNfcAvailabilityUseCase.execute).toHaveBeenCalled(),
+    );
+    fireEvent.press(screen.getByText('Tap Card to Check Out'));
+    await waitFor(() =>
+      expect(mockCheckOutActivityUseCase.execute).toHaveBeenCalled(),
+    );
+    expect(screen.getByText('Insufficient balance')).toBeTruthy();
+    expect(screen.getByText('Go to Station Top Up')).toBeTruthy();
   });
 
   it('runs Scout inspection flow', async () => {
@@ -234,11 +275,11 @@ describe('role screens', () => {
     );
     fireEvent.press(screen.getByText('Unregistered'));
     expect(setScenario).toHaveBeenCalledWith('unregistered');
-    fireEvent.press(screen.getByText('Tap Mock Card to Inspect'));
+    fireEvent.press(screen.getByText('Tap Card to Inspect'));
     await waitFor(() =>
       expect(mockInspectMemberCardUseCase.execute).toHaveBeenCalled(),
     );
-    fireEvent.press(screen.getByText('Back'));
+    fireEvent.press(screen.getByText('Scout'));
     expect(navigation.goBack).toHaveBeenCalled();
   });
 });
