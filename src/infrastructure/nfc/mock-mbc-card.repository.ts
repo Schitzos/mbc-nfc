@@ -35,6 +35,9 @@ function createRegisteredCard(params: {
   activityId?: string;
   checkedInAt?: string;
 }): MbcCard {
+  const twoHoursAgoIso = new Date(
+    Date.now() - 2 * 60 * 60 * 1000,
+  ).toISOString();
   return {
     version: 1,
     cardId: params.cardId,
@@ -49,7 +52,7 @@ function createRegisteredCard(params: {
         ? {
             activityId: params.activityId ?? 'parking-main-gate',
             activityType: params.activityType ?? 'PARKING',
-            checkedInAt: params.checkedInAt ?? '2026-05-01T08:00:00.000Z',
+            checkedInAt: params.checkedInAt ?? twoHoursAgoIso,
           }
         : undefined,
     transactionLogs: [],
@@ -65,64 +68,78 @@ function cloneCard(card: MbcCard): MbcCard {
   };
 }
 
-const scenarioSeedMap: Record<MockCardScenario, MockCardState> = {
-  normal: {
-    kind: 'registered',
-    card: createRegisteredCard({
-      cardId: 'CARD-NORMAL-001',
-      memberId: 'MEM-NORMAL-001',
-      balance: 50000,
-    }),
-  },
-  'low-balance': {
-    kind: 'registered',
-    card: createRegisteredCard({
-      cardId: 'CARD-LOW-001',
-      memberId: 'MEM-LOW-001',
-      balance: 1000,
-    }),
-  },
-  'checked-in': {
-    kind: 'registered',
-    card: createRegisteredCard({
-      cardId: 'CARD-CHECKED-IN-001',
-      memberId: 'MEM-CHECKED-IN-001',
-      balance: 12000,
-      visitStatus: 'CHECKED_IN',
-    }),
-  },
-  'checked-in-generic': {
-    kind: 'registered',
-    card: createRegisteredCard({
-      cardId: 'CARD-CHECKED-IN-GENERIC-001',
-      memberId: 'MEM-CHECKED-IN-GENERIC-001',
-      balance: 12000,
-      visitStatus: 'CHECKED_IN',
-      activityType: 'GENERIC',
-      activityId: 'co-working',
-    }),
-  },
-  'checked-in-low-balance': {
-    kind: 'registered',
-    card: createRegisteredCard({
-      cardId: 'CARD-CHECKED-IN-LOW-001',
-      memberId: 'MEM-CHECKED-IN-LOW-001',
-      balance: 1000,
-      visitStatus: 'CHECKED_IN',
-    }),
-  },
-  unregistered: {
-    kind: 'unregistered',
-  },
-  tampered: {
-    kind: 'tampered',
-  },
-};
+function createScenarioState(scenario: MockCardScenario): MockCardState {
+  switch (scenario) {
+    case 'normal':
+      return {
+        kind: 'registered',
+        card: createRegisteredCard({
+          cardId: 'CARD-NORMAL-001',
+          memberId: 'MEM-NORMAL-001',
+          balance: 50000,
+        }),
+      };
+    case 'low-balance':
+      return {
+        kind: 'registered',
+        card: createRegisteredCard({
+          cardId: 'CARD-LOW-001',
+          memberId: 'MEM-LOW-001',
+          balance: 1000,
+        }),
+      };
+    case 'checked-in':
+      return {
+        kind: 'registered',
+        card: createRegisteredCard({
+          cardId: 'CARD-CHECKED-IN-001',
+          memberId: 'MEM-CHECKED-IN-001',
+          balance: 12000,
+          visitStatus: 'CHECKED_IN',
+        }),
+      };
+    case 'checked-in-generic':
+      return {
+        kind: 'registered',
+        card: createRegisteredCard({
+          cardId: 'CARD-CHECKED-IN-GENERIC-001',
+          memberId: 'MEM-CHECKED-IN-GENERIC-001',
+          balance: 12000,
+          visitStatus: 'CHECKED_IN',
+          activityType: 'GENERIC',
+          activityId: 'co-working',
+        }),
+      };
+    case 'checked-in-low-balance':
+      return {
+        kind: 'registered',
+        card: createRegisteredCard({
+          cardId: 'CARD-CHECKED-IN-LOW-001',
+          memberId: 'MEM-CHECKED-IN-LOW-001',
+          balance: 1000,
+          visitStatus: 'CHECKED_IN',
+        }),
+      };
+    case 'unregistered':
+      return { kind: 'unregistered' };
+    case 'tampered':
+      return { kind: 'tampered' };
+    default:
+      return {
+        kind: 'registered',
+        card: createRegisteredCard({
+          cardId: 'CARD-NORMAL-001',
+          memberId: 'MEM-NORMAL-001',
+          balance: 50000,
+        }),
+      };
+  }
+}
 
 export class MockMbcCardRepository implements MbcCardRepository {
   private scenario: MockCardScenario = 'normal';
 
-  private state: MockCardState = scenarioSeedMap.normal;
+  private state: MockCardState = createScenarioState('normal');
 
   async isSupported(): Promise<boolean> {
     return true;
@@ -159,11 +176,7 @@ export class MockMbcCardRepository implements MbcCardRepository {
 
   setScenario(scenario: MockCardScenario): void {
     this.scenario = scenario;
-    const seed = scenarioSeedMap[scenario];
-    this.state =
-      seed.kind === 'registered'
-        ? { kind: 'registered', card: cloneCard(seed.card) }
-        : seed;
+    this.state = createScenarioState(scenario);
   }
 
   getScenario(): MockCardScenario {

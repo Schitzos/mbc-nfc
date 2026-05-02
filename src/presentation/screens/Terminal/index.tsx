@@ -93,6 +93,9 @@ export function TerminalScreen({ navigation }: Props): React.JSX.Element {
     !latestResult.success &&
     latestResult.message.toLowerCase().includes('insufficient'),
   );
+  const genericFailure = Boolean(
+    latestResult && !latestResult.success && !insufficient,
+  );
   const success = Boolean(latestResult?.success);
   const subtitle = success
     ? 'Checkout completed'
@@ -197,6 +200,21 @@ export function TerminalScreen({ navigation }: Props): React.JSX.Element {
               label="Go to Station Top Up"
               onPress={() => navigation.navigate('station')}
             />
+          </View>
+        ) : null}
+
+        {genericFailure && latestResult ? (
+          <View className="rounded-xl border border-red-400 bg-[#FFECEC] p-3">
+            <Text className="text-xs font-semibold uppercase text-red-700">
+              Card cannot be processed
+            </Text>
+            <Text className="mt-1 text-sm font-semibold text-red-900">
+              {latestResult.message}
+            </Text>
+            <Text className="mt-1 text-xs text-red-800">
+              Use a valid checked-in card or send member to Station for recovery
+              support.
+            </Text>
           </View>
         ) : null}
 

@@ -79,6 +79,21 @@ export function ScoutScreen({ navigation }: Props): React.JSX.Element {
           }}
         />
 
+        {latestResult && !latestResult.success ? (
+          <View className="rounded-xl border border-red-400 bg-[#FFECEC] p-3">
+            <Text className="text-xs font-semibold uppercase text-red-700">
+              Card cannot be processed
+            </Text>
+            <Text className="mt-1 text-sm font-semibold text-red-900">
+              {latestResult.message}
+            </Text>
+            <Text className="mt-1 text-xs text-red-800">
+              Use another valid registered card or contact Station for manual
+              recovery guidance.
+            </Text>
+          </View>
+        ) : null}
+
         {latestResult?.card ? (
           <View className="rounded-xl border border-[#2A8BFF] bg-[#EAF4FF] p-3">
             <Text className="text-base font-bold text-foreground">
