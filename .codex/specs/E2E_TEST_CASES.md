@@ -36,6 +36,7 @@ Use this format for every test case:
 - Store screenshots under `.codex/specs/test-evidence/` with this structure:
   - `.codex/specs/test-evidence/manual/<role>/`
   - `.codex/specs/test-evidence/automation/<suite>/`
+- Latest consolidated sweep bundle: `.codex/specs/test-evidence/2026-05-02-sweep/README.md`
 - Every executed case must include at least one evidence reference in the `Evidence` field.
 
 ## 4. Detailed End-to-End Test Cases
