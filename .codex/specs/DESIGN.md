@@ -94,6 +94,28 @@ src/
     hooks/
       useMbcCardScan.ts
     screens/
+      RoleSwitcher/
+        index.tsx
+        fragments/
+          AppHeaderCard.tsx
+          RoleOptionList.tsx
+      Station/
+        index.tsx
+        fragments/
+          StationHeader.tsx
+      Gate/
+        index.tsx
+        fragments/
+          GateHeader.tsx
+          GateResultState.tsx
+      Terminal/
+        index.tsx
+        fragments/
+          TerminalHeader.tsx
+      Scout/
+        index.tsx
+        fragments/
+          ScoutHeader.tsx
       RoleSwitcherScreen.tsx
       StationScreen.tsx
       GateScreen.tsx

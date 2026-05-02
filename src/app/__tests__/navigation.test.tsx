@@ -2,19 +2,19 @@ import React from 'react';
 import { render, screen } from '@testing-library/react-native';
 import { AppNavigator } from '../navigation';
 
-jest.mock('../../presentation/screens/GateScreen', () => ({
+jest.mock('../../presentation/screens/Gate', () => ({
   GateScreen: () => null,
 }));
-jest.mock('../../presentation/screens/RoleSwitcherScreen', () => ({
+jest.mock('../../presentation/screens/RoleSwitcher', () => ({
   RoleSwitcherScreen: () => null,
 }));
-jest.mock('../../presentation/screens/ScoutScreen', () => ({
+jest.mock('../../presentation/screens/Scout', () => ({
   ScoutScreen: () => null,
 }));
-jest.mock('../../presentation/screens/StationScreen', () => ({
+jest.mock('../../presentation/screens/Station', () => ({
   StationScreen: () => null,
 }));
-jest.mock('../../presentation/screens/TerminalScreen', () => ({
+jest.mock('../../presentation/screens/Terminal', () => ({
   TerminalScreen: () => null,
 }));
 

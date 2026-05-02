@@ -1,11 +1,23 @@
-import React, { ReactNode } from 'react';
-import { Pressable, PressableProps, StyleProp, StyleSheet, Text, View, ViewStyle } from 'react-native';
+import React, { ReactNode, useState } from 'react';
+import {
+  Pressable,
+  PressableProps,
+  StyleProp,
+  StyleSheet,
+  Text,
+  View,
+  ViewStyle,
+} from 'react-native';
 import { componentTokens } from '../theme/components';
 import { typography } from '../theme/typography';
 
-export type SignalOptionCardState = keyof typeof componentTokens.optionCard.states;
+export type SignalOptionCardState =
+  keyof typeof componentTokens.optionCard.states;
 
-export type SignalOptionCardProps = Omit<PressableProps, 'style' | 'children'> & {
+export type SignalOptionCardProps = Omit<
+  PressableProps,
+  'style' | 'children'
+> & {
   title: string;
   state?: SignalOptionCardState;
   trailingIcon?: ReactNode;
@@ -20,13 +32,17 @@ export function SignalOptionCard({
   style,
   ...pressableProps
 }: SignalOptionCardProps) {
-  const stateToken = componentTokens.optionCard.states[disabled ? 'disabled' : state];
+  const [pressed, setPressed] = useState(false);
+  const stateToken =
+    componentTokens.optionCard.states[disabled ? 'disabled' : state];
 
   return (
     <Pressable
       accessibilityRole="button"
       disabled={disabled}
-      style={({ pressed }) => [
+      onPressIn={() => setPressed(true)}
+      onPressOut={() => setPressed(false)}
+      style={[
         styles.base,
         {
           backgroundColor: stateToken.backgroundColor,
@@ -38,7 +54,10 @@ export function SignalOptionCard({
       {...pressableProps}
     >
       <View style={styles.content}>
-        <Text numberOfLines={1} style={[styles.title, { color: stateToken.textColor }]}>
+        <Text
+          numberOfLines={1}
+          style={[styles.title, { color: stateToken.textColor }]}
+        >
           {title}
         </Text>
         {trailingIcon}
@@ -67,4 +86,3 @@ const styles = StyleSheet.create({
     flexShrink: 1,
   },
 });
-
