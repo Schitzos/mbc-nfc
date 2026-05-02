@@ -60,14 +60,30 @@ You should use this file to answer:
 - Why NFC card as source of truth?
 - Why SQLite for offline reporting?
 
-### 3. `DESIGN.md`
+### 3. `CARD_DATA_SECURITY_LEDGER_SPEC.md`
+
+Read this fourth.
+
+Purpose:
+
+- confirm NFC Card Payload v1
+- confirm Silent Shield HMAC behavior
+- confirm SQLite is device-local reporting/audit only
+
+You should use this file to answer:
+
+- What exact data is written to NFC?
+- How is tampering detected?
+- What is SQLite allowed to decide?
+
+### 4. `DESIGN.md`
 
 Read this third.
 
 Purpose:
 
 - understand how requirements are translated into architecture
-- review app layers, repositories, use cases, and ledger boundaries
+- review app layers, repositories, use cases, card payload schema, Silent Shield behavior, and ledger boundaries
 
 You should use this file to answer:
 
@@ -260,9 +276,9 @@ You should use this file to answer:
 - How should the team work?
 - Which document drives execution order?
 
-### 18. `CHANGELOG.md`
+### 18. External `CHANGELOG.md`
 
-Read this last.
+Read this last if it is provided outside the archive.
 
 Purpose:
 
@@ -310,3 +326,9 @@ If a document seems to conflict with another document, use this priority order:
 6. supporting documents
 
 If you find a mismatch, raise it before implementation continues.
+
+## Added Quality Reading
+
+Read `.codex/specs/UNIT_TEST_COVERAGE_POLICY.md` before implementation begins and before each phase exit review.
+
+The Project Manager should verify this policy together with `EXECUTION_ORDER.md`, `TASKS.md`, `TEST_PLAN.md`, and `DONE.md`.

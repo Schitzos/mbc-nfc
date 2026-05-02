@@ -14,10 +14,12 @@ Primary specs:
 - `.codex/specs/TEST_PLAN.md`
 - `.codex/specs/TRACEABILITY.md`
 - `.codex/specs/SECURITY.md`
+- `.codex/specs/CARD_DATA_SECURITY_LEDGER_SPEC.md`
 - `.codex/specs/RISKS.md`
 - `.codex/specs/DONE.md`
 - `.codex/specs/RELEASE_PLAN.md`
 - `.codex/specs/DEVICE_TEST_MATRIX.md`
+- `.codex/specs/UNIT_TEST_COVERAGE_POLICY.md`
 
 Agents must not invent product behavior, architecture, acceptance criteria, security claims, release status, or test obligations that are not supported by the specs.
 
@@ -92,12 +94,16 @@ Minimum agent self-check before claiming a task is clear:
 - One app, four roles: Station, Gate, Terminal, Scout.
 - NFC card is the offline source of truth.
 - Device-local SQLite ledger is allowed only for offline reporting and audit, not as member-state truth.
-- Parking is the first demo activity, not the full product boundary.
+- Parking is the required MVP activity; future/non-parking activities are architectural extension only.
 - Guest flow remains out of scope.
 - Scout is read-only.
 - Silent Shield protects identity and balance from plain NFC reads and includes tamper/integrity validation.
 - Mock card repository must support progress before real NFC hardware is available.
+- Registration must reject already registered valid MBC cards.
+- Real NFC writes must include capacity guard and post-write readback verification.
 - Real NFC findings must be recorded in `.codex/specs/DEVICE_TEST_MATRIX.md`.
+- Every changed executable source file must have a created or updated unit test unless an approved exception is documented.
+- Feature work must preserve at least 90% automated unit-test coverage for executable source.
 
 ## 6. Branching and Promotion Rule
 
@@ -115,3 +121,15 @@ Minimum agent self-check before claiming a task is clear:
 - If a task seems to imply a missing rule, the agent must escalate instead of filling the gap with assumption.
 - If `TASKS.md` and `EXECUTION_ORDER.md` seem to conflict, follow `EXECUTION_ORDER.md` for sequence and `TASKS.md` for scope/acceptance.
 - If a support document conflicts with `REQUIREMENTS.md`, `DECISIONS.md`, or `DESIGN.md`, escalate before implementation continues.
+
+## 8. Test Obligation Rule
+
+Senior React Native FE and Codex implementation agents must treat tests as part of the feature, not as a later cleanup task.
+
+For every implementation task, the task result must include:
+
+- Changed source files.
+- Created/updated test files.
+- Test commands run.
+- Coverage status or exact reason coverage could not be run.
+- Any approved exception.

@@ -179,20 +179,20 @@ Use this format for every test case:
 
 ### E2E-TERM-001 Check-Out Success (Parking Tariff)
 
-| Field           | Value                                                                                               |
-| --------------- | --------------------------------------------------------------------------------------------------- |
-| Test Case ID    | E2E-TERM-001                                                                                        |
-| Feature         | Terminal - Check Out                                                                                |
-| Objective       | Ensure checkout deducts correct parking started-hour fee and clears status.                         |
-| Preconditions   | Card checked-in with known start time and sufficient balance.                                       |
-| Test Data       | Start time such that duration is 1h 5m 1s.                                                          |
-| Steps           | 1. Open Terminal. 2. Tap checkout action. 3. Tap checked-in card.                                   |
-| Expected Result | Fee charged as 2 started hours (`Rp 4.000`); balance reduced; checked-in status cleared; log added. |
-| Priority        | High                                                                                                |
-| Type            | Both                                                                                                |
-| Owner           | Senior QA + Test Automation Engineer                                                                |
-| Status          | Not Run                                                                                             |
-| Evidence        | `.codex/specs/test-evidence/manual/terminal/E2E-TERM-001_03_pass_fee.png`                           |
+| Field           | Value                                                                                                                                                                             |
+| --------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Test Case ID    | E2E-TERM-001                                                                                                                                                                      |
+| Feature         | Terminal - Check Out                                                                                                                                                              |
+| Objective       | Ensure checkout deducts correct parking started-hour fee and clears status.                                                                                                       |
+| Preconditions   | Card checked-in with known start time and sufficient balance.                                                                                                                     |
+| Test Data       | Start time such that duration is 1h 5m 1s.                                                                                                                                        |
+| Steps           | 1. Open Terminal. 2. Tap checkout action. 3. Tap checked-in card.                                                                                                                 |
+| Expected Result | Terminal shows active tariff before deduction; fee charged as 2 started hours using active tariff (`Rp 4.000` by default); balance reduced; checked-in status cleared; log added. |
+| Priority        | High                                                                                                                                                                              |
+| Type            | Both                                                                                                                                                                              |
+| Owner           | Senior QA + Test Automation Engineer                                                                                                                                              |
+| Status          | Not Run                                                                                                                                                                           |
+| Evidence        | `.codex/specs/test-evidence/manual/terminal/E2E-TERM-001_03_pass_fee.png`                                                                                                         |
 
 ### E2E-TERM-002 Check-Out Insufficient Balance
 
@@ -228,6 +228,40 @@ Use this format for every test case:
 | Status          | Not Run                                                                                            |
 | Evidence        | `.codex/specs/test-evidence/manual/terminal/E2E-TERM-003_02_pass_timeout.png`                      |
 
+### E2E-TARIFF-001 Local Admin Tariff Change Without APK Rebuild
+
+| Field           | Value                                                                                                                                                      |
+| --------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Test Case ID    | E2E-TARIFF-001                                                                                                                                             |
+| Feature         | Station/Admin - Local Tariff Management                                                                                                                    |
+| Objective       | Ensure authorized staff can update the active parking tariff locally and Terminal checkout uses the updated tariff without backend/API or APK rebuild.     |
+| Preconditions   | App installed; default active tariff is Rp 2.000 per started hour; authorized Station/Admin access is available.                                           |
+| Test Data       | New tariff: Rp 3.000 per started hour; checked-in card with enough balance.                                                                                |
+| Steps           | 1. Open Station/Admin tariff setting. 2. Change tariff to Rp 3.000. 3. Open Terminal. 4. Checkout a card with 1h 5m 1s duration. 5. Inspect result/log.    |
+| Expected Result | Tariff update is saved locally; Terminal shows active tariff Rp 3.000/hour before deduction; checkout charges Rp 6.000; card and local ledger are updated. |
+| Priority        | High                                                                                                                                                       |
+| Type            | Both                                                                                                                                                       |
+| Owner           | Senior QA + Test Automation Engineer                                                                                                                       |
+| Status          | Not Run                                                                                                                                                    |
+| Evidence        | `.codex/specs/test-evidence/manual/tariff/E2E-TARIFF-001_01_pass_local_tariff.png`                                                                         |
+
+### E2E-TARIFF-002 Unauthorized Tariff Change Blocked
+
+| Field           | Value                                                                                                             |
+| --------------- | ----------------------------------------------------------------------------------------------------------------- |
+| Test Case ID    | E2E-TARIFF-002                                                                                                    |
+| Feature         | Station/Admin - Local Tariff Authorization                                                                        |
+| Objective       | Ensure non-admin roles cannot change the active local tariff.                                                     |
+| Preconditions   | App installed; user is in Gate, Terminal, or Scout role without admin authorization.                              |
+| Test Data       | Attempted tariff value: Rp 3.000.                                                                                 |
+| Steps           | 1. Open a non-admin role. 2. Attempt to access or perform tariff update.                                          |
+| Expected Result | Tariff update is unavailable or rejected with `TARIFF_UPDATE_UNAUTHORIZED`; existing active tariff remains valid. |
+| Priority        | Medium                                                                                                            |
+| Type            | Both                                                                                                              |
+| Owner           | Senior QA + Test Automation Engineer                                                                              |
+| Status          | Not Run                                                                                                           |
+| Evidence        | `.codex/specs/test-evidence/manual/tariff/E2E-TARIFF-002_01_pass_unauthorized.png`                                |
+
 ### E2E-SCOUT-001 One-Tap Read-Only Inspect
 
 | Field           | Value                                                                                       |
@@ -262,28 +296,95 @@ Use this format for every test case:
 | Status          | Not Run                                                                                 |
 | Evidence        | `.codex/specs/test-evidence/manual/security/E2E-SEC-001_01_pass_tamper.png`             |
 
-### E2E-ACT-001 Generic Activity Tariff (Non-Parking)
+### E2E-EXT-001 Extension Readiness Design Check (Optional / Non-MVP)
 
-| Field           | Value                                                                                      |
-| --------------- | ------------------------------------------------------------------------------------------ |
-| Test Case ID    | E2E-ACT-001                                                                                |
-| Feature         | Activity Extensibility                                                                     |
-| Objective       | Ensure non-parking activity can use a different tariff rule.                               |
-| Preconditions   | Generic activity fixture available with distinct hourly tariff.                            |
-| Test Data       | Activity type: `co-working`; tariff fixture: `Rp 3.000/hour`.                              |
-| Steps           | 1. Check in with generic activity. 2. Wait or simulate duration. 3. Check out in Terminal. |
-| Expected Result | Fee follows generic activity tariff fixture, not parking tariff constant.                  |
-| Priority        | High                                                                                       |
-| Type            | Both                                                                                       |
-| Owner           | Senior QA + Test Automation Engineer                                                       |
-| Status          | Not Run                                                                                    |
-| Evidence        | `.codex/specs/test-evidence/manual/activity/E2E-ACT-001_03_pass_generic_tariff.png`        |
+| Field           | Value                                                                                                                                             |
+| --------------- | ------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Test Case ID    | E2E-EXT-001                                                                                                                                       |
+| Feature         | Future Activity Extension Readiness                                                                                                               |
+| Objective       | Confirm the implementation is not hardcoded in a way that prevents future non-parking activity support.                                           |
+| Preconditions   | Parking MVP is already implemented and passing.                                                                                                   |
+| Test Data       | No non-parking runtime fixture is required for MVP.                                                                                               |
+| Steps           | 1. Review domain boundaries. 2. Confirm tariff logic is isolated. 3. Confirm activity constants are not scattered across UI, NFC, and repository. |
+| Expected Result | Parking remains the only required activity, while future activities can be added by extending tariff/activity configuration and UI options.       |
+| Priority        | Optional                                                                                                                                          |
+| Type            | Design Review                                                                                                                                     |
+| Owner           | Software Architect + Senior QA                                                                                                                    |
+| Status          | Not Run                                                                                                                                           |
+| Evidence        | `.codex/specs/test-evidence/manual/extension/E2E-EXT-001_01_design_review.md`                                                                     |
+
+### E2E-REG-003 Reject Registration Over Existing MBC Card
+
+| Field           | Value                                                                                                               |
+| --------------- | ------------------------------------------------------------------------------------------------------------------- |
+| Feature         | Station Registration                                                                                                |
+| Objective       | Prevent accidental overwrite of a valid registered MBC card.                                                        |
+| Preconditions   | A valid MBC card is already registered.                                                                             |
+| Test Data       | Existing card with valid Silent Shield signature.                                                                   |
+| Steps           | 1. Open Station. 2. Choose register card. 3. Tap the already registered card.                                       |
+| Expected Result | App rejects registration with `ALREADY_REGISTERED_CARD` and does not mutate card balance, status, counter, or logs. |
+| Priority        | Must                                                                                                                |
+| Type            | Manual + automated use-case test                                                                                    |
+| Owner           | Senior QA / Test Automation Engineer                                                                                |
+| Status          | Not Run                                                                                                             |
+| Evidence        | TBD                                                                                                                 |
+
+### E2E-TERM-004 Insufficient Balance Recovery After Top-Up
+
+| Field           | Value                                                                                                                                                        |
+| --------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Feature         | Terminal / Station Recovery                                                                                                                                  |
+| Objective       | Confirm low-balance checkout can recover through Station top-up without losing checked-in state.                                                             |
+| Preconditions   | Card is checked in and balance is below calculated parking fee.                                                                                              |
+| Test Data       | Entry time far enough in past to exceed current balance.                                                                                                     |
+| Steps           | 1. Attempt Terminal checkout. 2. Confirm insufficient balance. 3. Go to Station and top up enough balance. 4. Return to Terminal and checkout again.         |
+| Expected Result | First checkout does not deduct or clear state. Station top-up succeeds while card remains checked in. Second checkout deducts correct fee and clears status. |
+| Priority        | Must                                                                                                                                                         |
+| Type            | Manual + automated use-case test                                                                                                                             |
+| Owner           | Senior QA / Test Automation Engineer                                                                                                                         |
+| Status          | Not Run                                                                                                                                                      |
+| Evidence        | TBD                                                                                                                                                          |
+
+### E2E-NFC-001 Capacity Guard and Write Verification
+
+| Field           | Value                                                                                                                                        |
+| --------------- | -------------------------------------------------------------------------------------------------------------------------------------------- |
+| Feature         | Real NFC Write Safety                                                                                                                        |
+| Objective       | Confirm selected NFC tag/card capacity and post-write readback are enforced.                                                                 |
+| Preconditions   | Real or mocked NFC repository available.                                                                                                     |
+| Test Data       | One payload that fits selected capacity and one oversized payload.                                                                           |
+| Steps           | 1. Attempt write with valid payload. 2. Confirm readback verifies expected counter/state/signature. 3. Attempt write with oversized payload. |
+| Expected Result | Valid write succeeds only after readback verification. Oversized payload is rejected with `CARD_CAPACITY_INSUFFICIENT`.                      |
+| Priority        | Must                                                                                                                                         |
+| Type            | Manual device test + automated repository test                                                                                               |
+| Owner           | NFC/Mobile Native Specialist / Senior QA                                                                                                     |
+| Status          | Not Run                                                                                                                                      |
+| Evidence        | TBD                                                                                                                                          |
+
+### E2E-TIME-001 Invalid Checkout Time Rejection
+
+| Field           | Value                                                                                                         |
+| --------------- | ------------------------------------------------------------------------------------------------------------- |
+| Feature         | Terminal Checkout                                                                                             |
+| Objective       | Prevent invalid duration and fee calculation.                                                                 |
+| Preconditions   | Card is checked in.                                                                                           |
+| Test Data       | Exit timestamp equal to or before check-in timestamp.                                                         |
+| Steps           | 1. Check in a card. 2. Attempt checkout using invalid exit timestamp.                                         |
+| Expected Result | Checkout is rejected with `INVALID_TIME` / `INVALID_DURATION`; balance and checked-in state remain unchanged. |
+| Priority        | Must                                                                                                          |
+| Type            | Manual + automated use-case test                                                                              |
+| Owner           | Senior QA / Test Automation Engineer                                                                          |
+| Status          | Not Run                                                                                                       |
+| Evidence        | TBD                                                                                                           |
 
 ## 5. Coverage Summary
+
+Additional Must coverage added: E2E-REG-003, E2E-TERM-004, E2E-NFC-001, and E2E-TIME-001.
 
 - Station: `E2E-REG-001` to `E2E-TOP-002`
 - Gate: `E2E-GATE-001` to `E2E-GATE-003`
 - Terminal: `E2E-TERM-001` to `E2E-TERM-003`
+- Local tariff management: `E2E-TARIFF-001` to `E2E-TARIFF-002`
 - Scout: `E2E-SCOUT-001`
 - Security: `E2E-SEC-001`
 - Reusable activity tariff: `E2E-ACT-001`
@@ -293,3 +394,31 @@ Use this format for every test case:
 - Senior QA updates `Status` and manual evidence paths after each run.
 - Test Automation Engineer links each automated scenario to test file names and CI job references.
 - Project Manager reviews weekly progress using pass/fail/block counts and missing evidence list.
+
+## E2E-TARIFF-003 Existing Checked-In Member Keeps Check-In Tariff
+
+| Field           | Description                                                                                                            |
+| --------------- | ---------------------------------------------------------------------------------------------------------------------- |
+| Objective       | Ensure a tariff change after check-in does not affect an already checked-in member.                                    |
+| Preconditions   | Active local tariff is Rp 2.000/hour. Card is registered and has enough balance.                                       |
+| Steps           | 1. Gate checks in member. 2. Admin changes local active tariff to Rp 3.000/hour. 3. Terminal checks out the same card. |
+| Expected Result | Terminal displays and charges the card using the Rp 2.000/hour tariff snapshot captured at check-in.                   |
+| Notes           | Local tariff change applies only to future check-ins.                                                                  |
+
+## E2E-TARIFF-004 New Member Uses Updated Tariff After Change
+
+| Field           | Description                                                                                    |
+| --------------- | ---------------------------------------------------------------------------------------------- |
+| Objective       | Ensure new check-ins after a tariff change use the updated tariff.                             |
+| Preconditions   | Admin has changed local active tariff to Rp 3.000/hour. Card is registered and not checked in. |
+| Steps           | 1. Gate checks in member. 2. Terminal checks out the card.                                     |
+| Expected Result | Card active visit stores Rp 3.000/hour snapshot and Terminal charges using Rp 3.000/hour.      |
+
+## E2E-TARIFF-005 Legacy Missing Snapshot Warning
+
+| Field           | Description                                                                                                                                       |
+| --------------- | ------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Objective       | Ensure checkout is deterministic when a legacy/demo checked-in card lacks a tariff snapshot.                                                      |
+| Preconditions   | Card has active check-in but no tariff snapshot.                                                                                                  |
+| Steps           | Terminal attempts checkout.                                                                                                                       |
+| Expected Result | Terminal shows `TARIFF_SNAPSHOT_MISSING` warning. Fallback to current local tariff is allowed only after the warning is visible before deduction. |

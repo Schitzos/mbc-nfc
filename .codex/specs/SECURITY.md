@@ -23,19 +23,36 @@ Security focus:
 
 ## 3. Silent Shield
 
-Silent Shield means generic NFC reader apps should not be able to read identity and balance directly.
+Silent Shield is defined in `.codex/specs/CARD_DATA_SECURITY_LEDGER_SPEC.md` and is the authority for card payload protection.
 
-Prototype controls:
+Security decision for this build:
 
-- Encode/encrypt sensitive fields.
-- Add payload version.
-- Add integrity validation.
-- Decode only through the app codec.
-- Redact sensitive values in logs and errors.
+```text
+Production-grade assessment mode is required.
+Do not implement Base64-only, plain JSON, or weak reversible obfuscation.
+```
 
-Production note:
+Required behavior:
 
-Frontend-only secrets are not production-grade. A real deployment needs stronger key management, secure elements or secure backend validation, and operational key rotation.
+- The logical payload includes schema version, compact member/card fields, parking check-in state, latest five transactions, write counter, and signature.
+- The logical payload is canonicalized with stable key ordering.
+- The payload is signed with HMAC-SHA256 using a signing key that is separate from the encryption key.
+- The signed logical payload is encrypted using authenticated encryption, preferably AES-256-GCM.
+- The NFC card stores only the protected Silent Shield envelope, for example an `mbc1` envelope containing version, key ID, IV/nonce, ciphertext, and authentication tag.
+- Every card read must decrypt and verify integrity before any Station, Gate, Terminal, or Scout action is allowed.
+- Generic NFC apps must not reveal member identity, balance, parking status details, or transaction amounts as readable fields.
+- Any decrypt/authentication/HMAC failure means the card is tampered/corrupted and must be rejected.
+- Keys must not be committed to the repository. Use secure configuration placeholders and platform secure storage where available.
+
+Failure message:
+
+```text
+Card data is invalid or modified. Please go to Station.
+```
+
+Assessment security note:
+
+This project should be implemented in production-grade assessment mode for NFC payload confidentiality and integrity. Remaining real-world production hardening, such as backend reconciliation, operator authentication, remote key rotation, and fleet key provisioning, is tracked separately and must not be falsely claimed as complete.
 
 ## 4. Data Handling
 
@@ -51,7 +68,15 @@ Frontend-only secrets are not production-grade. A real deployment needs stronger
 | Top-up amount           | Validate positive amount                                                                   | Allowed without identity                   |
 | Local ledger entry      | Store audit/reporting fields only                                                          | Prefer masked reference over full identity |
 
-## 5. Secure Logging
+## 5. Local Ledger Report Scope
+
+Local ledger report scope:
+
+- SQLite reports are current-device/current-installation only.
+- UI and documentation must not present local summaries as global cooperative totals.
+- Ledger rows must use masked/short member references where possible.
+
+## 6. Secure Logging
 
 Requirements:
 
@@ -62,7 +87,7 @@ Requirements:
 - Never log encryption or signing secrets.
 - Disable verbose NFC logs in release builds.
 
-## 6. Card Integrity
+## 7. Card Integrity
 
 Every card read must validate:
 
@@ -88,7 +113,25 @@ When a role flow requires local reporting/audit:
 - Local ledger write outcome is handled explicitly.
 - Ledger write failure must not silently appear as successful reporting.
 
-## 7. Security Checklist
+## 7A. Tariff Snapshot Security
+
+- The active visit tariff snapshot affects the amount deducted from member balance and must be protected by Silent Shield.
+- Snapshot fields such as rate and version must be encrypted/authenticated with the rest of the card payload.
+- Generic NFC tools must not be able to edit the stored tariff snapshot without causing card authentication failure.
+- Terminal must reject tampered snapshots with `CARD_TAMPERED` / authentication failure.
+- Terminal may only fallback when the snapshot is genuinely absent due to legacy/demo data, not when snapshot verification fails.
+
+## 8. Local Tariff Security
+
+- Local tariff setting is operationally sensitive because it affects member charges.
+- Only authorized Station/Admin staff may update active tariff.
+- MVP may use a simple admin PIN or equivalent local authorization for assessment, but it must be documented as demo-level unless stronger authentication is implemented.
+- Do not store admin PINs or local authorization secrets in plain text.
+- Every tariff change should record version, updatedAt, and updatedBy role/reference in local storage and/or local ledger.
+- Terminal must display active tariff before deduction to reduce risk from incorrectly configured offline devices.
+- Because the app is offline, tariff consistency across multiple devices is an operational process, not automatic security enforcement.
+
+## 9. Security Checklist
 
 - Sensitive fields are not plain text on card.
 - Internal member ID is generated by the system and is not typed by staff.
@@ -100,15 +143,17 @@ When a role flow requires local reporting/audit:
 - Logs redact identity, balance, and raw payloads.
 - Scout is read-only.
 - NFC sessions are cleaned up after all outcomes.
-- Demo secrets are documented as prototype-only.
+- Assessment/demo secrets are not committed to the repository and are loaded through secure configuration.
+- Tariff update authorization secrets are not stored in plain text.
+- Unauthorized roles cannot change active tariff.
 
-## 8. Production Security Gaps
+## 10. Remaining Production Hardening
 
-Before production:
+The NFC payload confidentiality/integrity requirement is production-grade for assessment. Before a real cooperative production rollout, still add:
 
-- Add real key management.
-- Add backend audit and reconciliation.
-- Add stronger card authenticity verification.
-- Add operator authentication.
-- Add app integrity protections.
-- Add privacy policy and data retention rules.
+- Fleet-grade key provisioning and rotation.
+- Backend audit and reconciliation.
+- Stronger physical card authenticity verification.
+- Operator authentication and authorization.
+- App integrity protections.
+- Privacy policy, retention rules, and incident response.

@@ -29,13 +29,13 @@ This brief explains each project task in a simple format that can be reused for 
 
 ## Domain Layer
 
-| Task                         | Purpose                                      | Owner                                             | Output                                                                   | Presentation Value                                               |
-| ---------------------------- | -------------------------------------------- | ------------------------------------------------- | ------------------------------------------------------------------------ | ---------------------------------------------------------------- |
-| T-005 Domain Entities        | Define the core MBC data model.              | Software Architect                                | Card, member, activity session, tariff, log types.                       | Shows the card stores identity, balance, status, and logs.       |
-| T-006 Repository Interface   | Hide NFC details behind a clean contract.    | Software Architect                                | `MbcCardRepository` interface.                                           | Shows business logic can work with mock or real NFC.             |
-| T-007 Tariff Calculator      | Calculate member activity fees correctly.    | Senior React Native FE / Test Automation Engineer | Rp 2.000 started-hour parking rule plus generic tariff support.          | Shows parking is a demo activity, not a hardcoded product limit. |
-| T-008 Activity State Policy  | Prevent invalid check-in/check-out behavior. | Software Architect / Test Automation Engineer     | State rules for check-in, checkout, double action, insufficient balance. | Shows balance/status integrity is protected.                     |
-| T-009 Transaction Log Policy | Keep recent card history compact.            | Software Architect                                | Latest-five transaction log rule.                                        | Shows the NFC card keeps useful history within limited memory.   |
+| Task                         | Purpose                                      | Owner                                             | Output                                                                   | Presentation Value                                                     |
+| ---------------------------- | -------------------------------------------- | ------------------------------------------------- | ------------------------------------------------------------------------ | ---------------------------------------------------------------------- |
+| T-005 Domain Entities        | Define the core MBC data model.              | Software Architect                                | Card, member, activity session, tariff, log types.                       | Shows the card stores identity, balance, status, and logs.             |
+| T-006 Repository Interface   | Hide NFC details behind a clean contract.    | Software Architect                                | `MbcCardRepository` interface.                                           | Shows business logic can work with mock or real NFC.                   |
+| T-007 Tariff Calculator      | Calculate member parking fees correctly.     | Senior React Native FE / Test Automation Engineer | Rp 2.000 started-hour parking rule with isolated tariff logic.           | Shows the required parking MVP works while remaining extendable later. |
+| T-008 Activity State Policy  | Prevent invalid check-in/check-out behavior. | Software Architect / Test Automation Engineer     | State rules for check-in, checkout, double action, insufficient balance. | Shows balance/status integrity is protected.                           |
+| T-009 Transaction Log Policy | Keep recent card history compact.            | Software Architect                                | Latest-five transaction log rule.                                        | Shows the NFC card keeps useful history within limited memory.         |
 
 ## Application Layer
 
@@ -45,8 +45,8 @@ This brief explains each project task in a simple format that can be reused for 
 | T-011 NFC Availability Use Case | Tell the UI whether real NFC actions can run. | Senior React Native FE / NFC Specialist | Supported, unsupported, disabled guidance.                     | Shows users are informed that real card operations need NFC.  |
 | T-012 Register Member Card      | Create a valid member card.                   | Senior React Native FE                  | Generated member ID, initial card state, register log.         | Shows staff does not type member ID; the system generates it. |
 | T-013 Top-Up Member Card        | Add balance safely.                           | Senior React Native FE                  | Positive top-up validation, balance update, top-up log.        | Shows cooperative staff can manage member balance offline.    |
-| T-014 Check-In Activity         | Start an activity session.                    | Senior React Native FE                  | Activity ID/type, entry time, checked-in status, log.          | Shows Gate writes member entry state to the card.             |
-| T-015 Check-Out Activity        | End activity and deduct fee.                  | Senior React Native FE                  | Duration, charged hours, fee, balance deduction, status clear. | Shows Terminal calculates fee and updates card state.         |
+| T-014 Parking Check-In          | Start the parking session.                    | Senior React Native FE                  | Parking activity type, entry time, checked-in status, log.     | Shows Gate writes member entry state to the card.             |
+| T-015 Parking Check-Out         | End the parking session and deduct fee.       | Senior React Native FE                  | Duration, charged hours, fee, balance deduction, status clear. | Shows Terminal calculates fee and updates card state.         |
 | T-016 Inspect Member Card       | Read card without modifying it.               | Senior React Native FE                  | Balance, status, and latest logs.                              | Shows Scout is one-tap and read-only.                         |
 
 ## Infrastructure Layer
@@ -62,18 +62,18 @@ This brief explains each project task in a simple format that can be reused for 
 
 ## Presentation Layer
 
-| Task                              | Purpose                                                   | Owner                                     | Output                                                           | Presentation Value                                             |
-| --------------------------------- | --------------------------------------------------------- | ----------------------------------------- | ---------------------------------------------------------------- | -------------------------------------------------------------- |
-| T-021 Role Switcher               | Let one app play four roles.                              | Senior React Native FE / UI UX Designer   | Station, Gate, Terminal, Scout selection.                        | Shows the assessment runs as one multi-role app.               |
-| T-022 Station Screen              | Register, top up, and review local device-side summaries. | Senior React Native FE / UI UX Designer   | Registration, top-up, ledger summary, NFC action, result states. | Shows cooperative staff workflow plus offline reporting value. |
-| T-023 Gate Screen                 | Check in members to activities.                           | Senior React Native FE / UI UX Designer   | Activity selector, check-in, simulation, result states.          | Shows entry flow and demo-friendly simulation.                 |
-| T-024 Terminal Screen             | Check out and deduct balance.                             | Senior React Native FE / UI UX Designer   | Fee summary, balance result, insufficient balance guidance.      | Shows exit flow and fee calculation.                           |
-| T-025 Scout Screen                | Inspect card safely.                                      | Senior React Native FE / UI UX Designer   | Read-only summary, balance, status, latest logs.                 | Shows members can inspect card state without mutation.         |
-| T-026 Signal UI Direction         | Apply the selected design system.                         | UI UX Designer / Senior React Native FE   | Signal tokens, components, and role screen styling.              | Shows the app follows the required Signal UI direction.        |
-| T-026A Low-Fi E2E Figma Flow      | Map all screens and edge cases before coding UI.          | UI UX Designer / Project Manager          | Low-fi Figma flow.                                               | Shows the complete user journey is designed first.             |
-| T-026B Hi-Fi Figma Screens        | Provide implementation-ready visual guidance.             | UI UX Designer / FE / System Analyst      | Hi-fi mobile screens and validation board.                       | Shows what the final demo should look like.                    |
-| T-026C Hi-Fi Polish and Visual QA | Fix spacing, buttons, icons, and overlap issues.          | UI UX Designer / FE / PO / SA / Architect | Hi-fi V2 polish plan and updated Figma when available.           | Shows design quality is reviewed before implementation.        |
-| T-026D Task Presentation Brief    | Keep task explanations ready for slides.                  | Technical Writer / Project Manager        | This presentation brief.                                         | Shows progress can be explained clearly to stakeholders.       |
+| Task                              | Purpose                                                   | Owner                                     | Output                                                                     | Presentation Value                                             |
+| --------------------------------- | --------------------------------------------------------- | ----------------------------------------- | -------------------------------------------------------------------------- | -------------------------------------------------------------- |
+| T-021 Role Switcher               | Let one app play four roles.                              | Senior React Native FE / UI UX Designer   | Station, Gate, Terminal, Scout selection.                                  | Shows the assessment runs as one multi-role app.               |
+| T-022 Station Screen              | Register, top up, and review local device-side summaries. | Senior React Native FE / UI UX Designer   | Registration, top-up, ledger summary, NFC action, result states.           | Shows cooperative staff workflow plus offline reporting value. |
+| T-023 Gate Screen                 | Check in members to parking.                              | Senior React Native FE / UI UX Designer   | Parking activity indicator, check-in, simulation, result states.           | Shows entry flow and demo-friendly simulation.                 |
+| T-024 Terminal Screen             | Check out using card-stored tariff snapshot.              | Senior React Native FE / UI UX Designer   | Snapshot-based fee summary, balance result, insufficient balance guidance. | Shows fair exit flow and fee calculation.                      |
+| T-025 Scout Screen                | Inspect card safely.                                      | Senior React Native FE / UI UX Designer   | Read-only summary, balance, status, latest logs.                           | Shows members can inspect card state without mutation.         |
+| T-026 Signal UI Direction         | Apply the selected design system.                         | UI UX Designer / Senior React Native FE   | Signal tokens, components, and role screen styling.                        | Shows the app follows the required Signal UI direction.        |
+| T-026A Low-Fi E2E Figma Flow      | Map all screens and edge cases before coding UI.          | UI UX Designer / Project Manager          | Low-fi Figma flow.                                                         | Shows the complete user journey is designed first.             |
+| T-026B Hi-Fi Figma Screens        | Provide implementation-ready visual guidance.             | UI UX Designer / FE / System Analyst      | Hi-fi mobile screens and validation board.                                 | Shows what the final demo should look like.                    |
+| T-026C Hi-Fi Polish and Visual QA | Fix spacing, buttons, icons, and overlap issues.          | UI UX Designer / FE / PO / SA / Architect | Hi-fi V2 polish plan and updated Figma when available.                     | Shows design quality is reviewed before implementation.        |
+| T-026D Task Presentation Brief    | Keep task explanations ready for slides.                  | Technical Writer / Project Manager        | This presentation brief.                                                   | Shows progress can be explained clearly to stakeholders.       |
 
 ## Verification And Demo
 
@@ -102,3 +102,7 @@ This brief explains each project task in a simple format that can be reused for 
 - Phase 7 focuses on quality gates: stronger automated coverage, SonarCloud preparation, GitHub Actions, and presentation-ready verification notes.
 - Real NFC hardware/card details remain TBD and are tracked in `DEVICE_TEST_MATRIX.md` and `RISKS.md`.
 - Figma hi-fi refinement is still pending, but the current Signal-based implementation is usable for mock-first demo flows.
+
+## Software Quality Improvement Note
+
+The implementation plan now requires every changed executable source file to have a created or updated unit test. The project quality gate is at least 90% automated unit-test coverage for executable source. This is an architecture-driven quality improvement beyond the original PDF requirement and should be mentioned in the software quality section of the presentation.

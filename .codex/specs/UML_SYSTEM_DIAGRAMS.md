@@ -6,9 +6,9 @@ Scope reflected here:
 
 - one app with four roles: Station, Gate, Terminal, Scout
 - NFC card as member-state source of truth
-- local SQLite ledger as device-local reporting and audit store
+- local SQLite ledger as current-device/current-installation reporting and audit store
 - Android-first real NFC validation
-- parking as the first configured activity, with reusable activity flow design
+- parking as the only MVP activity, with reusable activity flow design for future extension
 
 ## 1. Component Diagram
 
@@ -37,10 +37,10 @@ flowchart LR
   Admin --> UC2["Top Up Balance"]
   Admin --> UC3["View Station Ledger Summary"]
 
-  GateOp["Gate Operator"] --> UC4["Check In Activity"]
+  GateOp["Gate Operator"] --> UC4["Check In Parking"]
   GateOp --> UC5["Run Simulation Mode"]
 
-  TerminalOp["Terminal Operator"] --> UC6["Check Out Activity"]
+  TerminalOp["Terminal Operator"] --> UC6["Check Out Parking"]
   TerminalOp --> UC7["Handle Insufficient Balance"]
 
   Member["Member / Scout User"] --> UC8["Inspect Card"]
@@ -114,6 +114,7 @@ sequenceDiagram
   participant UI as Gate Screen
   participant CheckIn as Check In Use Case
   participant CardRepo as MbcCardRepository
+  participant Ledger as LocalLedgerRepository
   participant Card as NFC Card
 
   Operator->>UI: Tap card to check in
@@ -127,6 +128,8 @@ sequenceDiagram
   CheckIn->>CardRepo: writeCard(updatedCard)
   CardRepo->>Card: write updated payload
   Card-->>CardRepo: success
+  CheckIn->>Ledger: append(checkin audit entry amount 0)
+  Ledger-->>CheckIn: success
   CheckIn-->>UI: success result
   UI-->>Operator: show checked-in status
 ```
@@ -203,7 +206,7 @@ sequenceDiagram
   Ledger-->>UseCase: success
 ```
 
-## 9. Activity Diagram: Main Tap-In / Tap-Out Flow
+## 9. Activity Diagram: Main Parking Tap-In / Tap-Out Flow
 
 ```mermaid
 flowchart TD

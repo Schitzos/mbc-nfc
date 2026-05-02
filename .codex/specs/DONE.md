@@ -9,9 +9,9 @@ A task is done when:
 - Implementation follows `DESIGN.md`.
 - Code stays within the intended Clean Architecture layer.
 - Domain/application code does not import React Native or `react-native-nfc-manager`.
-- Relevant tests are added or updated.
+- Every changed executable source file has a created or updated unit test, unless an approved exception is documented.
 - Tests pass locally.
-- Coverage target is checked when the task affects tested scope.
+- Relevant focused tests and coverage checks are run when the task affects executable source.
 - Errors are handled safely.
 - Security implications are checked.
 - Documentation is updated when behavior changes.
@@ -44,7 +44,7 @@ An MBC role flow is done when:
 - Scout can inspect balance, status, and latest logs without modifying card data.
 - Scout inspection works with one NFC tap.
 - Transaction logs keep only the latest five records.
-- Activity flow is reusable beyond the parking demo scenario.
+- Parking MVP flow is implemented with clean boundaries so future non-parking activities can be added later without changing card/source-of-truth principles.
 
 ## NFC Feature Definition of Done
 
@@ -74,6 +74,9 @@ A security-sensitive feature is done when:
 
 A quality-sensitive delivery is done when:
 
+- Changed-file unit-test rule passes for all feature branches.
+- Every approved test exception includes reason, impacted file, owner, and follow-up.
+
 - Automated unit-test coverage across the whole executable repository source is at least 90%.
 - SonarCloud analysis is configured and reports coverage.
 - SonarCloud quality gate passes, or any temporary exception is explicitly documented.
@@ -91,7 +94,7 @@ Documentation is done when:
 - Risk changes are recorded in `RISKS.md`.
 - User-facing assumptions are explicit.
 - Technical Writer / Presentation Specialist has reviewed technical and non-technical clarity.
-- `CHANGELOG.md` includes the update.
+- External `CHANGELOG.md` includes the update when the changelog is maintained outside the archive.
 
 ## Submission Definition of Done
 

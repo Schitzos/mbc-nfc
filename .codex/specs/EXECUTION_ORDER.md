@@ -8,6 +8,7 @@ Use it together with:
 
 - `.codex/specs/TASKS.md` for the full task inventory, owners, and acceptance.
 - `.codex/specs/RELEASE_PLAN.md` for milestone readiness.
+- `.codex/specs/UNIT_TEST_COVERAGE_POLICY.md` for changed-file unit-test and 90% coverage rules.
 
 Rule:
 
@@ -17,6 +18,7 @@ Rule:
 ## 2. Working Mode
 
 - Work feature by feature, not layer by layer.
+- Each implementation task must include matching unit-test updates for changed executable source files.
 - Complete one task at a time.
 - After each task finishes, stop and confirm with the user before moving to the next task.
 - Technical Writer / Presentation Specialist documents task completion and important delivery notes as work progresses.
@@ -36,13 +38,16 @@ Order:
 3. `T-000B` Configure GitHub Repository Governance
 4. `T-001` Create React Native TypeScript Project
 5. `T-002` Install Core Dependencies
+6. `T-000C` Configure Unit Test and Coverage Gate
+7. `T-003` Configure iOS NFC
+8. `T-004` Configure Android NFC
 
 Expected outcome:
 
 - Core UML/system diagrams are ready for team alignment and presentation use.
 - Repo baseline, branch workflow, and GitHub governance are ready.
 - App skeleton runs.
-- Core libraries, tests, local Git hooks, coverage output, and analysis prerequisites exist.
+- Core libraries, tests, local Git hooks, coverage output, analysis prerequisites, and platform NFC configuration are prepared.
 
 Branch rule for all later phases:
 
@@ -61,11 +66,11 @@ Goal:
 Order:
 
 1. `T-005` Create MBC Domain Entities
-2. `T-006` Create MBC Repository Interface
-3. `T-007` Create Activity Tariff Calculator
+2. `T-006` Create Repository Interfaces
+3. `T-007` Create Parking Tariff Calculator
 4. `T-008` Create Activity State Policy
 5. `T-009` Create Transaction Log Policy
-6. `T-010` Create Card DTOs
+6. `T-010` Create DTOs
 7. `T-011` Create Check NFC Availability Use Case
 
 Expected outcome:
@@ -77,7 +82,7 @@ Expected outcome:
 
 Goal:
 
-- Deliver the first usable admin feature: register, top up, and local reporting.
+- Deliver the first usable admin feature: register, top up, local tariff management, and local reporting.
 
 Order:
 
@@ -85,12 +90,13 @@ Order:
 2. `T-013` Create Top-Up Member Card Use Case
 3. `T-017` Implement Mock Card Repository
 4. `T-017A` Implement Local SQLite Ledger Repository
-5. `T-020A` Integrate Ledger Writes Into Role Flows
-6. `T-022` Build Station Screen
+5. `T-017B → T-017C` Implement Local Tariff Settings Repository
+6. `T-020A` Integrate Ledger Writes Into Role Flows
+7. `T-022` Build Station Screen
 
 Expected outcome:
 
-- Station can register cards, top up balances, and show local device-side reporting using mock data before real NFC hardware is available.
+- Station can register cards, top up balances, manage active local parking tariff, and show local device-side reporting using mock data before real NFC hardware is available.
 
 ### Phase 3 Gate Feature
 
@@ -105,7 +111,7 @@ Order:
 
 Expected outcome:
 
-- Gate can check members into the parking demo activity and support simulation mode.
+- Gate can check members into the required parking MVP activity and support simulation mode.
 
 ### Phase 4 Terminal Feature
 
@@ -116,11 +122,12 @@ Goal:
 Order:
 
 1. `T-015` Create Check-Out Activity Use Case
-2. `T-024` Build Terminal Screen
+2. Confirm checkout uses the card-stored tariff snapshot created by `T-014` / `T-017C`
+3. `T-024` Build Terminal Screen
 
 Expected outcome:
 
-- Terminal can calculate fee, deduct balance, and handle insufficient balance safely.
+- Terminal can display the card-stored tariff snapshot, calculate fee from that snapshot, deduct balance, and handle insufficient balance safely.
 
 ### Phase 5 Scout Feature
 
@@ -265,3 +272,17 @@ For this project thread:
 3. Update docs if the task changes project truth.
 4. Report the result.
 5. Wait for user confirmation before moving to the next task.
+
+## Tariff Snapshot Execution Note
+
+`T-017C Implement Tariff Snapshot at Check-In` must be completed after local tariff settings and before final Terminal checkout E2E validation. Gate writes the snapshot; Terminal consumes it.
+
+## Phase Exit Quality Gate
+
+Before a phase is considered complete:
+
+- All changed executable source files in the phase must have created or updated unit tests.
+- Focused tests for changed files must pass.
+- Full unit coverage must remain at least 90% for executable repository source.
+- Any exception must be documented and approved by the Software Architect.
+- The Project Manager should not move to the next phase until the quality gate is satisfied or explicitly waived.
