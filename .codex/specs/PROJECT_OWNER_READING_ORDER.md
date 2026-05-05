@@ -61,14 +61,14 @@ You should use this file to answer:
 - Why NFC card as source of truth?
 - Why SQLite for offline reporting?
 
-### 3. `CARD_DATA_SECURITY_LEDGER_SPEC.md`
+### 3. `CARD_DATA_SECURITY_LEDGER_SPEC.md` and `NTAG215_COMPACT_PAYLOAD_GUIDE.md`
 
 Read this fourth.
 
 Purpose:
 
 - confirm NFC Card Payload v1
-- confirm Silent Shield HMAC behavior
+- confirm Silent Shield AES-256-GCM/authenticated encryption behavior
 - confirm SQLite is device-local reporting/audit only
 
 You should use this file to answer:

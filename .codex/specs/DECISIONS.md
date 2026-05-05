@@ -65,7 +65,7 @@ Use domain, application, infrastructure, and presentation layers.
 
 Reason:
 
-Activity tariff calculation, visit state, transaction log trimming, and card encoding rules should be testable without React Native or NFC hardware.
+Parking tariff calculation, visit state, transaction log trimming, and card encoding rules should be testable without React Native or NFC hardware.
 
 Consequences:
 
@@ -99,7 +99,7 @@ The required parking MVP checkout fee defaults to Rp 2.000 per started hour, rou
 
 Reason:
 
-This is an explicit technical constraint in the assessment brief. Other cooperative activities should be able to define their own tariff rules later.
+This is an explicit technical constraint in the assessment brief. Other cooperative activities and runtime rate changes are outside MVP.
 
 Consequences:
 
@@ -195,7 +195,7 @@ MBC development scope should support any cooperative activity that needs tap-in/
 Consequences:
 
 - Card state stores active activity ID/type, not a parking-only session.
-- Tariff calculation accepts activity rules.
+- Tariff calculation uses the fixed parking MVP rule: Rp 2.000 per started hour.
 - Future cooperative activities can reuse the same Station, Gate, Terminal, and Scout foundations.
 
 ## ADR-012 Require NFC-Capable Device for Real Card Operations
@@ -317,47 +317,7 @@ Consequences:
 - SQLite reporting totals are device-local, not global cooperative totals.
 - Ledger write failure after successful card write is a reporting/audit warning, not a rollback of the member operation.
 
-## ADR-019 Support Local Offline Tariff Management
-
-Decision:
-
-The parking tariff must be editable locally by authorized Station/Admin staff because the app runs offline and the APK may already be built when operational tariff changes happen. The default MVP tariff remains Rp 2.000 per started hour, and Gate reads the active tariff from local device storage at check-in instead of relying on hidden hardcoded tariff logic.
-
-Reasoning:
-
-Build-time config is too rigid for an offline deployed APK. A backend or remote config would violate the offline requirement. Local tariff settings allow values such as Rp 3.000 per started hour without rebuilding or requiring internet access.
-
-Consequences:
-
-- Add a `TariffSettingsRepository` backed by SQLite or secure local storage.
-- Seed the default active tariff as Rp 2.000 per started hour.
-- Gate check-in must read the current local active tariff and store a compact tariff snapshot on the card. Terminal checkout must display and use the card-stored visit tariff snapshot before deduction.
-- Only authorized Station/Admin staff can update tariff.
-- Tariff updates are per-device; all active offline devices must be manually configured to the same tariff.
-- Future enhancement may use a signed Tariff Config NFC card to distribute tariff offline.
-
-## ADR-020 Lock Tariff at Check-In
-
-### Status
-
-Accepted
-
-### Context
-
-The app is offline and allows authorized staff to change the active parking tariff locally after the APK has been built. A member may already be checked in when the tariff changes from Rp 2.000/hour to Rp 3.000/hour.
-
-### Decision
-
-The tariff used for checkout is locked at successful Gate check-in. Gate writes a compact tariff snapshot into the NFC card active visit state. Terminal checkout calculates the fee using that snapshot, not the current local tariff setting.
-
-### Consequences
-
-- Members already checked in are not unexpectedly charged a newer tariff.
-- Local tariff changes affect only new check-ins.
-- The NFC card active visit payload grows slightly, so payload capacity validation remains mandatory.
-- Legacy/demo checked-in cards without snapshot require a visible warning before fallback.
-
-## ADR-021 Firebase App Distribution as Android Release Channel
+## ADR-021 Firebase App Distribution as Android Release Channel## ADR-021 Firebase App Distribution as Android Release Channel
 
 Decision: Controlled push/merge to `main` must trigger GitHub Actions to build the Android release artifact and distribute it through Firebase App Distribution.
 
@@ -372,3 +332,20 @@ Decision: Senior QA must validate each feature on Android simulator/device and a
 Reason: The project needs visible proof that delivered features match the requirements, not only automated test results.
 
 Impact: Feature delivery includes both automated tests and QA evidence. Final delivery requires a use-case evidence package with screenshots.
+
+## ADR-019 Keep Runtime Rate Changes Out of MVP
+
+### Status
+
+Accepted
+
+### Context
+
+The original PDF defines the MVP parking tariff as Rp 2.000 per started hour. Previous non-MVP pricing alternatives were considered, but the current product decision is to focus only on the required MVP.
+
+### Decision
+
+### Consequences
+
+- MVP stays closer to the original requirement.
+- Codex has less scope and fewer edge cases.

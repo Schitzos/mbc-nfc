@@ -16,7 +16,7 @@ Layer responsibilities:
 
 | Layer          | Responsibility                                                                          | Must Not Contain                           |
 | -------------- | --------------------------------------------------------------------------------------- | ------------------------------------------ |
-| Domain         | MBC entities, activity tariff rules, card state policy, transaction log policy          | React components, NFC library calls        |
+| Domain         | MBC entities, parking tariff rule, card state policy, transaction log policy            | React components, NFC library calls        |
 | Application    | Role use cases such as register, top-up, activity check-in, activity check-out, inspect | UI rendering, native module details        |
 | Infrastructure | NFC reader/writer, card payload codec, shield/encryption, logging                       | Business decisions                         |
 | Presentation   | Role switcher, screens, forms, status displays                                          | Direct NFC library calls or payload crypto |
@@ -54,7 +54,6 @@ src/
     repositories/
       mbc-card.repository.ts
       local-ledger.repository.ts
-      tariff-settings.repository.ts
     services/
       activity-tariff-calculator.ts
       activity-state-policy.ts
@@ -139,12 +138,12 @@ The design follows package cohesion principles:
 | Principle                 | Project Application                                                                                           |
 | ------------------------- | ------------------------------------------------------------------------------------------------------------- |
 | Reuse/Release Equivalency | Reusable card codec, parking tariff, and state policy are isolated from UI so they can be versioned together. |
-| Common Closure            | Code that changes for the same reason stays together, such as tariff logic or card payload encoding.          |
+| Common Closure            | Code that changes for the same reason stays together, such as fixed tariff logic or card payload encoding.    |
 | Common Reuse              | Station, Gate, Terminal, and Scout use only the modules they need through focused use cases and contracts.    |
 
 ## 5. Domain Model
 
-MVP domain scope: `PARKING` is the only required benefit activity for this assessment. The design should remain extendable through isolated tariff rules and activity definitions, but Codex must not implement a second non-parking flow unless a future requirement explicitly adds it.
+MVP domain scope: `PARKING` is the only required benefit activity for this assessment. The design should remain extendable through isolated tariff rule and activity definitions, but Codex must not implement a second non-parking flow unless a future requirement explicitly adds it.
 
 ```ts
 export type VisitStatus = 'NOT_CHECKED_IN' | 'CHECKED_IN';
@@ -252,11 +251,8 @@ export interface LocalLedgerRepository {
   getStationSummary(): Promise<StationLedgerSummaryDto>;
 }
 
-export interface TariffSettingsRepository {
-  getActiveParkingTariff(): Promise<ParkingTariffSetting>;
-  updateActiveParkingTariff(
-    input: UpdateParkingTariffInput,
-  ): Promise<ParkingTariffSetting>;
+export interface ParkingTariffRule {
+  calculateFee(input: { checkInAt: string; checkOutAt: string }): number;
 }
 ```
 
@@ -270,38 +266,15 @@ export interface TariffSettingsRepository {
 - Normal Station, Gate, Terminal, and Scout screens should not show the full internal `memberId`.
 - A masked or short member reference may be shown only when useful for support, recovery, or transaction traceability.
 
-### Activity Tariff
+### Parking Tariff
 
-- Parking MVP default fee is Rp 2.000 per started hour.
-- Gate check-in must resolve the current active tariff from a local tariff repository so already-built APKs can support operational tariff changes without rebuild.
-- Gate check-in must write a compact tariff snapshot into the card active visit state.
-- Terminal checkout must calculate the fee using the tariff snapshot stored on the card, not the current local active tariff.
-- The tariff calculator must not contain a hidden `2000` magic number inside checkout logic.
-- Terminal checkout must display the visit tariff snapshot before deduction.
-- Other cooperative activities can provide their own tariff rule later, but non-parking runtime flow is not part of MVP.
-- Duration is rounded up.
-- Zero or negative duration is invalid for checkout.
+- Parking MVP fee is fixed at Rp 2.000 per started hour.
+- Duration is rounded up to the next started hour.
+- Keep the rate in one isolated tariff module/constant; do not scatter `2000` magic numbers across screens.
+- Terminal checkout displays tariff, charged hours, and fee before deduction.
+- Runtime rate editing, tariff schedules, and non-parking tariff fixtures are out of MVP scope.
 
-### Local Tariff Setting
-
-- Store the active parking tariff locally using SQLite or secure local storage.
-- Seed default active tariff as Rp 2.000 per started hour.
-- Authorized Station/Admin staff may update the local active tariff, for example to Rp 3.000 per started hour, without rebuilding the APK.
-- Local tariff setting must include rate, currency, rounding mode, version, updatedAt, and updatedBy role/reference.
-- Offline tariff updates are per-device only; changing one device does not update other devices.
-- All active offline devices must be manually configured with the same tariff before operation.
-- Future enhancement may support a signed Tariff Config NFC card for offline distribution.
-- Local active tariff changes apply only to new check-ins; existing checked-in cards keep their card-stored tariff snapshot until checkout.
-
-### Tariff Snapshot at Check-In
-
-- Active visit state must include a compact tariff snapshot captured at Gate check-in.
-- Suggested fields: `tariffRatePerStartedHour`, `tariffVersion`, and `roundingMode` when not globally fixed.
-- Terminal checkout must not recalculate using whatever tariff is currently configured on the device if a valid snapshot exists on the card.
-- This protects members already checked in from later local tariff changes.
-- If the card lacks a snapshot due to legacy/demo data, Terminal may fallback to current local tariff only with a visible warning.
-
-### Registration Safety
+### Registration Safety### Registration Safety
 
 - Station registration must reject a valid already registered MBC card with `ALREADY_REGISTERED_CARD`.
 - MVP does not include overwrite/reset. Adding reset requires a new explicit requirement and audit trail.
@@ -334,10 +307,10 @@ export interface TariffSettingsRepository {
 
 ### NFC Capacity and Write Verification
 
-- Selected NFC tag/card writable capacity must be documented before real-card support is claimed.
-- The encoded protected payload length must be checked before write.
+- NTAG215 is the MVP target tag and its writable capacity must be documented before real-card support is claimed.
+- The encoded protected payload length must be checked before every NTAG215 write.
 - If payload exceeds capacity, return `CARD_CAPACITY_INSUFFICIENT` and do not show success.
-- After every real NFC write, the repository must read the card back, decode it, verify Silent Shield signature, and confirm expected counter/state.
+- After every real NFC write, the repository must read the card back, decode it, verify Silent Shield authentication, and confirm expected counter/state.
 - If readback verification fails, return `WRITE_VERIFY_FAILED`.
 - If the card is removed too early and the readback cannot confirm expected counter/state, do not show success.
 
@@ -347,16 +320,17 @@ Silent Shield must be implemented in production-grade assessment mode, because a
 
 Design rules:
 
-- Logical card payload remains a compact domain object for tests and business logic.
+- Logical card payload remains a compact domain object for tests and business logic. Use compact NFC DTOs for NTAG215 writes.
 - NFC storage must be a protected `mbc1` envelope, not direct JSON.
-- Sign canonical logical payload with HMAC-SHA256.
-- Encrypt the signed payload using AES-256-GCM or equivalent authenticated encryption.
-- Use separate encryption and signing keys derived from secure configuration.
+- Canonicalize the compact logical payload.
+- Encrypt/authenticate it using AES-256-GCM or equivalent authenticated encryption.
+- Optional HMAC may be added only as defense-in-depth if capacity allows and keys are separated.
+- Use secure encryption keys from secure configuration. Optional HMAC may use a separate MAC key if implemented.
 - Do not commit real keys or secrets.
 - Keep crypto, codec, and key-loading logic inside infrastructure.
 - Generic NFC readers must not reveal member identity, balance, parking status details, or transaction values.
-- Any decrypt/authentication/signature failure maps to `CARD_TAMPERED`.
-- After every real NFC write, read back and verify decrypted payload, HMAC, counter, and expected state.
+- Any decrypt/authentication failure maps to `CARD_TAMPERED`.
+- After every real NFC write, read back and verify decrypt/authentication result, counter, and expected state.
 
 For the first implementation round, Android is the primary real-card target. iOS behavior must be validated later on a real device and documented without assuming full parity.
 
@@ -368,11 +342,9 @@ The app starts with role selection and then shows the active role surface.
 
 Before any real card operation, the presentation layer checks NFC availability through the application use case. If NFC is unsupported or disabled, the role screen must show a clear message that real MBC card scan/read/write requires an NFC-capable device with NFC enabled. Mock or simulation mode may remain available for development/demo, but it must be visually distinct from real NFC operation.
 
-- Station: registration form, top-up form, admin tariff setting, NFC write action, latest result.
 - Station also shows a simple local ledger summary for that device, such as top-up total and checkout total.
-- Station/Admin settings allow authorized local tariff update and show the active tariff version/update time.
 - Gate: default parking indicator, check-in action, simulation time control limited to past timestamps, current device time display, NFC write action, status result.
-- Terminal: checkout action, card-stored visit tariff snapshot display, duration/fee summary, insufficient balance guidance, current device time display, NFC write action, status result.
+- Terminal: checkout action, fixed tariff display, duration/fee summary, insufficient balance guidance, current device time display, NFC write action, status result.
 - Scout: one-tap read-only card summary, balance, visit status, last five logs.
 
 The UI should apply the Signal UI design system direction, stay simple and direct, and be usable by cooperative staff. Avoid unnecessary dashboard complexity.
@@ -396,3 +368,16 @@ The implementation should be shaped so the final submission can include:
 - Image capture or short video demo.
 - Technical and non-technical documentation.
 - Presentation covering UI/UX design, software design, software construction, software quality, software deployment, and software security.
+
+## NTAG215 Compact Payload Design
+
+The architecture must separate readable domain models from compact NFC DTOs. Screens and use cases may use readable names, but the NFC repository must normalize card state into the compact NTAG215 payload before Silent Shield protection.
+
+Compact rules:
+
+- no display name/profile/debug data on card;
+- no tariff-management fields on card for fixed-tariff MVP;
+- active visit uses compact state and ISO timestamp when capacity allows;
+- latest 5 card transactions use tuple records;
+- binary Silent Shield envelope is preferred over Base64 text on NTAG215;
+- write is blocked with `CARD_CAPACITY_INSUFFICIENT` if protected payload does not fit.

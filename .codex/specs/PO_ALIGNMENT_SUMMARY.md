@@ -42,4 +42,4 @@ This bundle has been aligned against `KDX#1 - Membership Benefit Card (MBC).pdf`
 
 ## Current PO Scope Decision
 
-Generic/non-parking activity is not part of MVP implementation or acceptance testing. The code must remain extendable by keeping tariff rules, activity definitions, use cases, and UI options isolated, but Codex must build and test parking only for this delivery.
+Generic/non-parking activity is not part of MVP implementation or acceptance testing. The code must remain extendable by keeping tariff rule, activity definitions, use cases, and UI options isolated, but Codex must build and test parking only for this delivery.

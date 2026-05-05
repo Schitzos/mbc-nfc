@@ -9,7 +9,7 @@
 
 This project is a frontend mobile assessment for KDX Chapter 1: Membership Benefit Card (MBC). The app demonstrates how an NFC card can become a portable cooperative membership card for areas where internet connectivity is unstable.
 
-Instead of relying on a central database for every transaction, the card carries the important member state: identity, balance, active parking visit status, tariff snapshot for the active visit, and recent transaction history. The mobile app reads and writes that card data directly through NFC. A separate device-local SQLite ledger may store offline reporting and audit history for the current device, but it does not replace the card as member-state truth.
+Instead of relying on a central database for every transaction, the card carries the important member state: identity, balance, active parking visit status and recent transaction history. The mobile app reads and writes that card data directly through NFC. A separate device-local SQLite ledger may store offline reporting and audit history for the current device, but it does not replace the card as member-state truth.
 
 The PDF gives parking as the concrete member benefit scenario. For MVP, this project implements **parking only**. The code should still be structured with clean extension seams so future cooperative activities can reuse similar tap-in/tap-out patterns later, but generic/non-parking activities are not MVP deliverables and must not block parking acceptance.
 
@@ -19,18 +19,12 @@ For this project, the NFC implementation must follow these decisions:
 
 1. Parking is the only MVP activity.
 2. Generic/non-parking activity support is a future extension only, not MVP.
-3. NFC card is the source of truth for member identity, balance, active parking visit, active visit tariff snapshot, and last five card transaction logs.
+3. NFC card is the source of truth for member identity, balance, active parking visit and last five card transaction logs.
 4. SQLite is only a local device reporting/audit ledger. It is not the global member-state source of truth.
-5. The default parking tariff is Rp2.000 per started hour.
-6. The active tariff must be locally editable by authorized admin/station staff without rebuilding the APK.
-7. The active tariff must be stored locally on-device using SQLite or secure local storage.
-8. Tariff must be locked at successful Gate check-in by storing a compact tariff snapshot on the NFC card active visit state.
-9. Terminal checkout must calculate fee from the card-stored tariff snapshot, not from the current local tariff setting.
-10. Local tariff changes affect only new check-ins. Members already checked in keep their check-in tariff until checkout.
-11. Silent Shield must use production-grade protection: authenticated encryption/integrity validation, not plain JSON, Base64-only encoding, or weak obfuscation.
-12. Every successful NFC write must be verified using readback before showing success.
-13. Card payload size must be validated against the selected NFC tag/card capacity.
-14. All operational offline devices must be manually configured with the same active tariff before operation.
+5. The MVP parking tariff is fixed at Rp2.000 per started hour.
+6. Silent Shield must use production-grade protection: authenticated encryption/integrity validation, not plain JSON, Base64-only encoding, or weak obfuscation.
+7. Every successful NFC write must be verified using readback before showing success.
+8. Card payload size must be validated against the selected NFC tag/card capacity.
 
 ## 3. Core Idea
 
@@ -38,8 +32,8 @@ The app has one codebase with four operational roles:
 
 | Role         | Purpose                                                                                       |
 | ------------ | --------------------------------------------------------------------------------------------- |
-| The Station  | Admin registration, member balance top-up, and authorized local tariff management.            |
-| The Gate     | Parking entry point that writes check-in timestamp and tariff snapshot to card.               |
+| The Station  | Admin registration and member balance top-up.                                                 |
+| The Gate     | Parking entry point that writes check-in timestamp to card.                                   |
 | The Terminal | Parking exit point that calculates duration, deducts balance, and clears active visit status. |
 | The Scout    | Member self-service view for card balance, status, and history.                               |
 
@@ -50,7 +44,7 @@ Phones do not read every RFID card. Most phones can read NFC/HF RFID cards at 13
 Prototype target:
 
 - NFC Forum compatible tags.
-- Writable NFC tags/cards with enough memory for structured and protected MBC payload.
+- NTAG215 writable NFC tags/cards for MVP validation.
 - ISO 14443 compatible tags where supported.
 - NDEF-compatible cards where practical.
 
@@ -58,11 +52,11 @@ The implementation should isolate card parsing and card writing so the payload f
 
 Before final real-device demo, the team must confirm:
 
-- Exact NFC card/tag type.
-- Writable memory capacity.
-- Whether the protected payload fits the selected tag/card.
-- Android read/write behavior.
-- iOS support or explicit deferral.
+- MVP target NFC tag: NTAG215.
+- NTAG215 usable capacity and actual form factor/vendor must be recorded.
+- Whether the protected compact payload fits NTAG215.
+- Android read/write behavior as the MVP target.
+- iOS is explicitly deferred or best-effort/read-only unless validated later.
 
 ## 5. Goals From Assessment Brief
 
@@ -71,7 +65,7 @@ Before final real-device demo, the team must confirm:
 - State management: manage parking check-in/check-out flow inside limited card memory.
 - Data privacy: protect sensitive identity and balance from plain reading by other NFC apps.
 
-The first real-device validation target is Android. iOS validation stays in scope, but it should be documented from real-device results instead of assumed parity.
+Android is the MVP real-device NFC read/write target. iOS NFC write support is out of MVP and should be documented as deferred or best-effort/read-only unless validated later from real-device results.
 
 ## 6. Main Flows
 
@@ -87,35 +81,7 @@ Admin reads the card, inputs top-up amount, updates balance on card, appends a t
 
 Top-up must not clear an active parking visit. If a member is checked in and has insufficient balance, Station top-up should allow the member to return to Terminal and complete checkout.
 
-### Station/Admin Local Tariff Setting
-
-Because the app is offline and the APK may already be built, tariff cannot rely only on build-time config or backend remote config.
-
-Authorized admin/station staff can update the active parking tariff locally, for example from Rp2.000/hour to Rp3.000/hour. The active tariff is stored locally on-device using SQLite or secure local storage.
-
-Rules:
-
-- Only authorized admin/station staff may update tariff.
-- Gate must read tariff from the local tariff repository at check-in. Terminal must use the card-stored tariff snapshot for checkout, except for documented legacy/demo fallback.
-- Gate must display the current local active tariff before check-in. Terminal must display the card-stored visit tariff snapshot before checkout deduction.
-- Changing tariff on one offline device does not update other devices automatically.
-- All active offline devices must be manually configured with the same tariff before operation.
-
-Future enhancement may use a signed Tariff Config NFC card to distribute tariff changes offline.
-
 ### Gate Check-In
-
-Gate operator taps the card. If the member is not currently checked in, the app writes parking activity ID, entry timestamp, checked-in status, and a compact tariff snapshot from the local active tariff.
-
-The tariff snapshot should include at least:
-
-```txt
-ratePerStartedHour
-tariffVersion
-roundingMode
-```
-
-This locks the checkout tariff for that active visit.
 
 ### Gate Simulation Mode
 
@@ -125,11 +91,7 @@ Simulation mode must not create a future check-in time. If checkout time is earl
 
 ### Terminal Check-Out
 
-Terminal operator taps the card. The app calculates parking duration, rounds up to the next started hour, charges using the tariff snapshot stored on the card, deducts balance, clears active visit status, appends a transaction log, and records the completed transaction in the local ledger for reporting/audit.
-
-Terminal must not use the current local active tariff for an already checked-in card. It must use the card-stored tariff snapshot.
-
-If a legacy/demo checked-in card has no tariff snapshot, Terminal may fallback to the current local active tariff only after showing a warning.
+Terminal operator taps the card. The app calculates parking duration, rounds up to the next started hour, charges using the fixed MVP tariff Rp2.000 per started hour, deducts balance, clears active visit status, appends a transaction log, and records the completed transaction in the local ledger for reporting/audit.
 
 ### Scout Inspection
 
@@ -151,14 +113,9 @@ Rounding rule:
 1 hour 5 minutes 1 second = 2 charged hours
 ```
 
-The tariff is locally configurable by authorized admin/station staff. However, checkout for an active visit uses the tariff snapshot locked at check-in.
+The tariff is fixed for MVP and is not editable at runtime.
 
 Example:
-
-| Scenario                                | Check-in tariff | Tariff later changed?                   | Checkout tariff |
-| --------------------------------------- | --------------: | --------------------------------------- | --------------: |
-| Member A checks in before tariff change |    Rp2.000/hour | Changed to Rp3.000/hour before checkout |    Rp2.000/hour |
-| Member B checks in after tariff change  |    Rp3.000/hour | No later change                         |    Rp3.000/hour |
 
 Guest flow is outside the project scope. The PDF describes guest parking as a separate manual path with Rp50.000 per hour pricing, but that context is not implemented in this app.
 
@@ -166,7 +123,7 @@ Guest flow is outside the project scope. The PDF describes guest parking as a se
 
 Parking is the required MVP activity because the PDF defines its exact tariff and operational flow.
 
-The domain and use cases may use clean boundaries such as tariff repository, parking visit use case, card codec, and ledger repository so future cooperative activities can be added later. Future extension readiness must not create MVP runtime screens, tests, or flows for non-parking activities.
+The domain and use cases may use clean boundaries such as parking tariff rule, parking visit use case, card codec, and ledger repository so future cooperative activities can be added later. Future extension readiness must not create MVP runtime screens, tests, or flows for non-parking activities.
 
 ## 9. Sequential Loop Rule
 
@@ -194,26 +151,25 @@ Minimum expectations:
 - Do not store plain JSON member data on the card.
 - Do not rely on Base64-only encoding as security.
 - Use production-grade authenticated encryption or equivalent integrity-protected secure wrapping.
-- Verify payload authenticity/integrity before trusting balance, visit status, or tariff snapshot.
+- Verify payload authenticity/integrity before trusting balance or visit status.
 - Reject tampered payloads with a clear card authentication failure.
 - Validate payload size before write.
 - After every NFC write, read back the card and verify the expected state before showing success.
 
 ## 11. Recommended Tech Stack
 
-| Area                 | Choice                             |
-| -------------------- | ---------------------------------- |
-| Mobile framework     | React Native CLI                   |
-| Language             | TypeScript                         |
-| NFC library          | `react-native-nfc-manager`         |
-| Local ledger         | SQLite                             |
-| Local tariff setting | SQLite or secure local storage     |
-| State management     | Zustand or React Context           |
-| Testing              | Jest, React Native Testing Library |
-| Architecture         | Clean Architecture                 |
-| UI system            | Signal UI                          |
+| Area             | Choice                             |
+| ---------------- | ---------------------------------- |
+| Mobile framework | React Native CLI                   |
+| Language         | TypeScript                         |
+| NFC library      | `react-native-nfc-manager`         |
+| Local ledger     | SQLite                             |
+| State management | Zustand or React Context           |
+| Testing          | Jest, React Native Testing Library |
+| Architecture     | Clean Architecture                 |
+| UI system        | Signal UI                          |
 
-The core member state should live on the card for the assessment flow. SQLite supports local audit/reporting and local tariff setting only.
+The core member state should live on the card for the assessment flow. SQLite supports local audit/reporting only.
 
 ## 12. Deliverables
 
@@ -224,3 +180,11 @@ The core member state should live on the card for the assessment flow. SQLite su
 - Presentation covering UI/UX design, software design, construction, quality, deployment, and security.
 
 The repository should be prepared for GitHub or GitLab submission.
+
+## NTAG215 Project Note
+
+This MBC MVP targets NTAG215 on Android. Because NTAG215 capacity is limited, the card writer should use compact payload fields, compact transaction tuples, ISO timestamps when capacity allows, and an AES-256-GCM protected Silent Shield envelope. Prefer raw byte/binary NDEF write when supported; use Base64URL/NDEF text only as a fallback. If the protected payload cannot fit, the app must fail safely with `CARD_CAPACITY_INSUFFICIENT` rather than writing partial or weaker card data.
+
+## Final MVP Device Decision
+
+The MVP real-card implementation is validated on **Android 9 FE** using **NTAG215** tags. iOS NFC write support is not required for MVP.

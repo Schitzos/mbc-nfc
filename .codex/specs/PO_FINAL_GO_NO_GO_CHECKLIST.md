@@ -13,14 +13,15 @@ Last PO review status for the current merged specification bundle.
 
 ## 2. Current PO Decisions Applied
 
-| Decision                                                               | Status        | Notes                                                                                                                           |
-| ---------------------------------------------------------------------- | ------------- | ------------------------------------------------------------------------------------------------------------------------------- |
-| `CHANGELOG.md` may live outside archive                                | ACCEPTED      | Current docs may reference external changelog. This is not a blocker.                                                           |
-| `__MACOSX/` archive metadata is ignored                                | ACCEPTED      | Mac-generated metadata is not product/spec content. It should not be considered a blocker.                                      |
-| MVP activity is parking only                                           | ACCEPTED      | No non-parking runtime flow, tariff fixture, or E2E path is required for MVP.                                                   |
-| Future activity extensibility remains required as architecture quality | ACCEPTED      | Code should keep tariff/session/use-case boundaries extensible, but not build generic activity behavior now.                    |
-| Silent Shield must be production-grade                                 | ACCEPTED      | Plain JSON, Base64-only, or weak obfuscation is not acceptable. Use authenticated encryption such as AES-256-GCM or equivalent. |
-| Device/card matrix remains TBD                                         | ACCEPTED RISK | Does not block mock-first implementation, but blocks final assessment readiness.                                                |
+| Decision                                                               | Status   | Notes                                                                                                                           |
+| ---------------------------------------------------------------------- | -------- | ------------------------------------------------------------------------------------------------------------------------------- |
+| `CHANGELOG.md` may live outside archive                                | ACCEPTED | Current docs may reference external changelog. This is not a blocker.                                                           |
+| `__MACOSX/` archive metadata is ignored                                | ACCEPTED | Mac-generated metadata is not product/spec content. It should not be considered a blocker.                                      |
+| MVP activity is parking only                                           | ACCEPTED | No non-parking runtime flow, tariff fixture, or E2E path is required for MVP.                                                   |
+| Future activity extensibility remains required as architecture quality | ACCEPTED | Code should keep tariff/session/use-case boundaries extensible, but not build generic activity behavior now.                    |
+| Silent Shield must be production-grade                                 | ACCEPTED | Plain JSON, Base64-only, or weak obfuscation is not acceptable. Use authenticated encryption such as AES-256-GCM or equivalent. |
+| Android test device selected                                           | ACCEPTED | Android 9 FE is the MVP real-device NFC read/write baseline. iOS write remains deferred/out of MVP.                             |
+| NTAG215 is MVP target tag                                              | ACCEPTED | Card payload must be compact, capacity-tested, and protected before write.                                                      |
 
 ## 3. Source Requirement Alignment Checklist
 
@@ -63,34 +64,31 @@ Last PO review status for the current merged specification bundle.
 
 ## 5. Implementation Readiness Checklist
 
-| Check                                                 | Status      | Notes                                                                                                                                                                                             |
-| ----------------------------------------------------- | ----------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Domain logic can be implemented now                   | PASS        | Mock-first implementation can begin.                                                                                                                                                              |
-| UI screens can be implemented now                     | PASS        | Role screens and user flows are specified.                                                                                                                                                        |
-| SQLite ledger can be implemented now                  | PASS        | Local-device scope and events are defined.                                                                                                                                                        |
-| Parking tariff can be implemented now                 | PASS        | Default Rp 2.000 per started hour is clear, and active tariff is now local-device configurable for post-APK changes.                                                                              |
-| Local tariff management can be implemented now        | PASS        | Authorized Station/Admin staff can update active tariff locally; Gate snapshots the active tariff at check-in; Terminal displays and uses the card-stored visit tariff snapshot before deduction. |
-| Mock NFC/card repository can be implemented now       | PASS        | Required for development before hardware.                                                                                                                                                         |
-| Production-grade Silent Shield can be implemented now | CONDITIONAL | Requires library/key-handling selection during implementation.                                                                                                                                    |
-| Real NFC read/write can be implemented now            | CONDITIONAL | Requires target device/card/tag decisions.                                                                                                                                                        |
-| Payload capacity can be finalized now                 | NOT READY   | Card/tag model and writable capacity are still TBD.                                                                                                                                               |
-| iOS NFC behavior can be finalized now                 | NOT READY   | iOS support decision/device behavior is still TBD.                                                                                                                                                |
-| Final demo evidence can be finalized now              | NOT READY   | Needs real device, card, security, and UI evidence.                                                                                                                                               |
+| Check                                                 | Status      | Notes                                                                                                                |
+| ----------------------------------------------------- | ----------- | -------------------------------------------------------------------------------------------------------------------- |
+| Domain logic can be implemented now                   | PASS        | Mock-first implementation can begin.                                                                                 |
+| UI screens can be implemented now                     | PASS        | Role screens and user flows are specified.                                                                           |
+| SQLite ledger can be implemented now                  | PASS        | Local-device scope and events are defined.                                                                           |
+| Parking tariff can be implemented now                 | PASS        | Default Rp 2.000 per started hour is clear and fixed for MVP.                                                        |
+| Mock NFC/card repository can be implemented now       | PASS        | Required for development before hardware.                                                                            |
+| Production-grade Silent Shield can be implemented now | CONDITIONAL | Requires library/key-handling selection during implementation.                                                       |
+| Real NFC read/write can be implemented now            | CONDITIONAL | Requires Android 9 FE and NTAG215 validation. iOS is out of MVP/best-effort unless separately validated.             |
+| Payload capacity can be finalized now                 | CONDITIONAL | Target tag is NTAG215, but actual protected payload size must still be measured on real tag/card form factor.        |
+| iOS NFC behavior can be finalized now                 | DEFERRED    | iOS NFC write support is not required for MVP and may be documented as best-effort/read-only unless validated later. |
+| Final demo evidence can be finalized now              | NOT READY   | Needs real device, card, security, and UI evidence.                                                                  |
 
 ## 6. Final Submission Blockers
 
-| Blocker                                                            | Owner/action                                                                 |
-| ------------------------------------------------------------------ | ---------------------------------------------------------------------------- |
-| Choose Android test device                                         | Fill `DEVICE_TEST_MATRIX.md`.                                                |
-| Choose iOS test device or explicitly defer iOS real-write support  | Fill `DEVICE_TEST_MATRIX.md` and release notes.                              |
-| Choose NFC card/tag type                                           | Fill card model and capacity in `DEVICE_TEST_MATRIX.md`.                     |
-| Confirm encrypted payload fits chosen tag/card                     | Add result to card/security docs or test evidence.                           |
-| Confirm all operational offline devices use the same active tariff | Manual pre-demo/pre-operation checklist item because tariff is device-local. |
-| Validate local tariff update flow                                  | Run `E2E-TARIFF-001` and `E2E-TARIFF-002`.                                   |
-| Select crypto library and key handling approach                    | Document in `SECURITY.md` or implementation notes.                           |
-| Verify generic NFC reader cannot reveal sensitive fields           | Add evidence/screenshot/result to final demo package.                        |
-| Confirm Signal UI reference/tokens or acceptable approximation     | Finalize `SIGNAL_UI_GUIDE.md`.                                               |
-| Run full E2E demo path                                             | Station → Gate → Terminal → Scout, including insufficient balance recovery.  |
+| Blocker                                                                  | Owner/action                                                                                                              |
+| ------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------- |
+| Confirm Android 9 FE test evidence                                       | Fill `DEVICE_TEST_MATRIX.md` with exact OS/API level and NFC results.                                                     |
+| Explicitly defer iOS NFC write support for MVP or validate it separately | Fill `DEVICE_TEST_MATRIX.md` and release notes.                                                                           |
+| Confirm NTAG215 form factor/vendor                                       | Fill exact NTAG215 card/sticker model in `DEVICE_TEST_MATRIX.md`.                                                         |
+| Confirm encrypted compact payload fits NTAG215                           | Add byte-size result to card/security docs or test evidence.                                                              |
+| Select crypto library and MVP key handling approach                      | Document AES-256-GCM plus demo-only bundled key for assessment; production requires secure provisioning/Android Keystore. |
+| Verify generic NFC reader cannot reveal sensitive fields                 | Add evidence/screenshot/result to final demo package.                                                                     |
+| Confirm Signal UI reference/tokens or acceptable approximation           | Finalize `SIGNAL_UI_GUIDE.md`.                                                                                            |
+| Run full E2E demo path                                                   | Station → Gate → Terminal → Scout, including insufficient balance recovery.                                               |
 
 ## 7. PO Final Statement
 
@@ -106,15 +104,6 @@ NOT GO YET for final assessment submission.
 Reason:
 
 The documentation is aligned enough to build the required parking MVP now. The remaining risks are not requirement-alignment problems; they are hardware, payload capacity, security proof, and final-demo evidence items.
-
-## Tariff Snapshot PO Gate
-
-- [ ] Gate check-in stores compact tariff snapshot on the card active visit.
-- [ ] Terminal checkout uses the stored visit tariff snapshot, not current local active tariff, when snapshot exists.
-- [ ] Existing checked-in member keeps Rp 2.000/hour if tariff changes to Rp 3.000/hour before checkout.
-- [ ] New check-ins after tariff change use Rp 3.000/hour.
-- [ ] Snapshot is protected by Silent Shield and cannot be tampered with using generic NFC tools.
-- [ ] Missing legacy/demo snapshot shows warning before fallback.
 
 ## Software Quality GO / NO-GO Addendum
 
@@ -132,7 +121,6 @@ Final assessment submission remains **NO-GO** if the 90% coverage gate is not me
 
 - [ ] Every feature PR has Senior QA Android simulator/device screenshot evidence or an approved exception.
 - [ ] Final QA use-case testing evidence package exists.
-- [ ] Final QA screenshots prove Station, Gate, Terminal, Scout, tariff snapshot, and important rejected flows.
 - [ ] GitHub Actions workflow for Firebase App Distribution exists.
 - [ ] Push/merge to `main` builds Android release artifact.
 - [ ] Build is uploaded to Firebase App Distribution or blocker/deferral is documented.

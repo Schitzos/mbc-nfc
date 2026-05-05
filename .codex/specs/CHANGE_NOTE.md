@@ -1,54 +1,30 @@
-# Change Note — Final Cross-Document Alignment Patch
+# Change Note — Final Android 9 FE / NTAG215 MVP Decisions
 
-This patch contains changed documents only.
+This patch applies the final platform/security/device decisions after the NTAG215 payload discussion.
 
-## Reason
+## Decisions applied
 
-A final PM/documentation audit found a small but important wording inconsistency after the tariff snapshot decision:
+- MVP real NFC write/read focus is Android.
+- Primary MVP test device is **Android 9 FE**.
+- MVP target NFC tag is **NTAG215**.
+- iOS NFC write is out of MVP and may be documented as deferred or best-effort/read-only unless separately validated later.
+- Silent Shield uses AES-256-GCM or equivalent authenticated encryption.
+- Assessment MVP may use a clearly labeled app-bundled demo AES key.
+- Production must replace demo key handling with secure provisioning and/or Android hardware-backed Keystore.
+- NFC writer should prefer raw byte/binary NDEF payloads; Base64URL/NDEF text is fallback only if the library requires text payloads.
+- Card transaction history keeps latest 5 records with FIFO behavior and stores only activity, nominal, and ISO time.
 
-- Some docs still implied Terminal checkout should read or display the current local active tariff.
-- The final agreed rule is that Gate reads the local active tariff at check-in and writes a compact tariff snapshot to the NFC card. Terminal checkout must calculate and display fee using the card-stored visit tariff snapshot, except for documented legacy/demo fallback with visible warning.
-- Some docs still used older wording like "parking demo activity". The final agreed scope is "required parking MVP activity".
+## Files changed
 
-## Updated Alignment Rule
-
-- Station/Admin can update the current local active tariff.
-- Gate check-in reads the current local active tariff and stores a compact tariff snapshot on the card.
-- Terminal checkout uses the card-stored tariff snapshot, not the current local active tariff.
-- Local active tariff changes affect only new check-ins.
-- Existing checked-in cards keep the tariff snapshot captured at check-in.
-- Legacy/demo checked-in cards without a snapshot may fallback to current local tariff only after a visible warning.
-
-## Files Updated
-
-- `AGENT_OPERATING_PROTOCOL.md`
-- `CARD_DATA_SECURITY_LEDGER_SPEC.md`
-- `DECISIONS.md`
-- `DESIGN.md`
-- `E2E_TEST_CASES.md`
-- `EXECUTION_ORDER.md`
-- `IMPROVEMENTS_NOT_EXPLAINED_IN_ORIGINAL_REQUIREMENT.md`
-- `PO_FINAL_GO_NO_GO_CHECKLIST.md`
+- `DEVICE_TEST_MATRIX.md`
 - `REQUIREMENTS.md`
-- `RFID_NFC_REACT_NATIVE_101.md`
+- `CARD_DATA_SECURITY_LEDGER_SPEC.md`
 - `SECURITY.md`
 - `TEST_PLAN.md`
+- `E2E_TEST_CASES.md`
+- `PO_FINAL_GO_NO_GO_CHECKLIST.md`
+- `RFID_NFC_REACT_NATIVE_101.md`
+- `TASKS.md`
 - `TRACEABILITY.md`
-
-## Audit Result After Patch
-
-- No missing task IDs were found.
-- `TASKS.md` remains compact and Codex-friendly at 340 lines with 45 task IDs.
-- `EXECUTION_ORDER.md` references the same task IDs.
-- Parking remains the only MVP runtime activity.
-- Generic/non-parking activity remains future extension only.
-- SQLite remains local audit/reporting only.
-- NFC card remains member state source of truth.
-- Production-grade Silent Shield remains required.
-- QA screenshot evidence and Firebase App Distribution release rules remain covered.
-
-## Known Accepted Items
-
-- `CHANGELOG.md` may be maintained outside the archive, per PO decision.
-- `__MACOSX/` metadata may appear when zipped from macOS and can be ignored.
-- NFC card/tag model, device model, and payload capacity proof remain TBD until real hardware testing.
+- `RISKS.md`
+- `TASK_PRESENTATION_BRIEF.md`

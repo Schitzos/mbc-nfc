@@ -103,7 +103,7 @@ Exit criteria:
 
 Scope:
 
-- Activity tariff calculator.
+- Parking tariff calculator.
 - Activity state policy.
 - Transaction log policy.
 - Local SQLite ledger repository and summary path.
@@ -113,7 +113,7 @@ Scope:
 Exit criteria:
 
 - Rp 2.000 started-hour tariff works for the required parking MVP.
-- Activity tariff and state logic are not hardcoded only to parking.
+- Parking tariff and state logic are not hardcoded only to parking.
 - Double check-in/out are rejected.
 - Latest five logs are retained.
 - Local ledger summary works offline on the device.

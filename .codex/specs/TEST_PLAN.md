@@ -8,7 +8,7 @@ This document defines the testing strategy for the MBC React Native NFC frontend
 
 | Level          | Purpose                                                                                                            | Runs On                          |
 | -------------- | ------------------------------------------------------------------------------------------------------------------ | -------------------------------- |
-| Unit           | Validate activity tariff, activity state, logs, and codec helpers                                                  | Local machine / CI               |
+| Unit           | Validate parking tariff, activity state, logs, and codec helpers                                                   | Local machine / CI               |
 | Application    | Validate Station, Gate, Terminal, and Scout use cases with mocked NFC card repository and local ledger integration | Local machine / CI               |
 | Infrastructure | Validate NFC repository and card codec behavior                                                                    | Local / real device where needed |
 | Presentation   | Validate role screens, forms, loading, success, and error states                                                   | Local machine / CI               |
@@ -64,18 +64,15 @@ Required cases:
 
 - Parking MVP default tariff: 1 hour charges Rp 2.000.
 - Parking MVP default tariff: 1 hour 5 minutes 1 second charges Rp 4.000.
-- Local active tariff changed to Rp 3.000: 1 hour charges Rp 3.000 and 1 hour 5 minutes 1 second charges Rp 6.000.
-- Activity tariff accepts a tariff rule from local tariff settings instead of hardcoding parking everywhere.
 - Double check-in is rejected.
 - Double check-out is rejected.
 - Starting a second activity while one is active is rejected.
 - Insufficient balance does not mutate card state.
 - Top-up amount must be positive.
-- Latest five logs are retained newest-first.
+- Latest five logs follow FIFO latest-five behavior: remove oldest when adding a sixth record.
 - Malformed payload fails safely.
 - Sensitive fields are redacted in logs.
 - Encoded payload size validation returns `CARD_CAPACITY_INSUFFICIENT` when payload cannot fit selected tag/card capacity.
-- Local tariff setting rejects zero, negative, non-integer, or unsupported currency values.
 - Gate simulation rejects future timestamps.
 
 Coverage expectation:
@@ -93,8 +90,6 @@ Must test:
 - `CheckOutActivityUseCase`
 - `InspectMemberCardUseCase`
 - `GetStationLedgerSummaryUseCase`
-- `GetActiveParkingTariffUseCase`
-- `UpdateActiveParkingTariffUseCase`
 
 Required cases:
 
@@ -109,8 +104,6 @@ Required cases:
 - Gate check-in sets activity ID/type, status, and timestamp.
 - Gate check-in appends a local ledger audit row with amount `0`.
 - Gate simulation mode writes past timestamp and rejects future timestamp.
-- Station/Admin can update local active tariff without APK rebuild.
-- Gate check-in reads active tariff from local tariff repository and stores a card tariff snapshot. Terminal checkout reads the card-stored snapshot, displays it before deduction, deducts correct parking fee, and clears status.
 - Terminal checkout rejects invalid duration/time before deduction.
 - Terminal insufficient balance returns top-up guidance and keeps checked-in status.
 - Insufficient-balance recovery works after Station top-up and Terminal retry.
@@ -127,10 +120,8 @@ Must test:
 - Unsupported or disabled NFC guidance.
 - Station registration does not require typed member ID or human-readable profile input in the first implementation round.
 - Station top-up validation.
-- Station local tariff setting is admin-only and validates positive tariff amount.
 - Station local ledger summary panel displays local totals clearly.
 - Gate simulation mode indicator.
-- Terminal visit tariff snapshot, fee, and insufficient balance display.
 - Terminal missing card/scan timeout recovery guidance.
 - Scout one-tap balance, status, and transaction log display.
 - NFC loading, success, and error states.
@@ -138,10 +129,10 @@ Must test:
 
 ## 7. Device Test Matrix
 
-| Platform | Device | OS Version | NFC Tag Type          | Expected Result                                                      |
-| -------- | ------ | ---------- | --------------------- | -------------------------------------------------------------------- |
-| Android  | TBD    | TBD        | Writable NFC card/tag | Register, top-up, activity check-in, activity checkout, inspect work |
-| iOS      | TBD    | TBD        | Writable NFC card/tag | Supported read/write flows are recorded                              |
+| Platform | Device | OS Version | NFC Tag Type | Expected Result                                                    |
+| -------- | ------ | ---------- | ------------ | ------------------------------------------------------------------ |
+| Android  | TBD    | TBD        | NTAG215      | Register, top-up, parking check-in, parking checkout, inspect work |
+| iOS      | TBD    | TBD        | NTAG215      | Supported read/write flows are recorded                            |
 
 ## 8. NFC Device Test Cases
 
@@ -162,7 +153,7 @@ Must test:
 | NFC-011  | One-tap Scout            | Member taps card once in Scout                          | Card content appears without write action                                            |
 | NFC-012  | Missing card at checkout | Terminal scan times out or no card is available         | User is directed to Station/manual recovery                                          |
 
-| NFC-013 | Payload capacity | Write payload to selected NFC tag/card | Oversized payload is blocked with `CARD_CAPACITY_INSUFFICIENT` |
+| NFC-013 | NTAG215 payload capacity | Write compact protected payload to NTAG215 | Oversized payload is blocked with `CARD_CAPACITY_INSUFFICIENT` |
 | NFC-014 | Write readback failure | Mock or simulate write then failed readback validation | App reports `WRITE_VERIFY_FAILED` and does not show success |
 | NFC-015 | Invalid checkout time | Terminal checkout with exit time before/equal entry | App blocks checkout with `INVALID_TIME` / `INVALID_DURATION` |
 
@@ -175,29 +166,29 @@ Must test:
 
 ## 10. Security Test Cases
 
-| ID      | Scenario                      | Expected                                                                                                                                          |
-| ------- | ----------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------- |
-| SEC-001 | Plain NFC read                | Generic NFC reader cannot reveal member identity, balance, parking status details, or transaction values                                          |
-| SEC-002 | Debug logging                 | Sensitive decoded data is not printed                                                                                                             |
-| SEC-003 | Payload tampering             | Invalid payload is rejected safely                                                                                                                |
-| SEC-004 | Codec validation              | Unsupported payload version is rejected                                                                                                           |
-| SEC-005 | Read-only Scout               | Scout does not write or mutate card data                                                                                                          |
-| SEC-006 | Local ledger privacy          | Ledger uses masked/short references instead of full sensitive identity where possible                                                             |
-| SEC-007 | Silent Shield decrypt success | Valid NFC Card Payload v1 decrypts with AES-GCM/equivalent authenticated encryption and then passes HMAC verification                             |
-| SEC-008 | Silent Shield tamper failure  | Changing ciphertext, tag, balance, identity, check-in state, transaction log, or counter causes decrypt/authentication or HMAC validation failure |
-| SEC-009 | Write counter                 | Counter increments after every successful card-state write                                                                                        |
-| SEC-010 | Transaction FIFO              | Card keeps only the latest five transaction logs after more than five operations                                                                  |
-| SEC-011 | SQLite authority boundary     | SQLite reporting data never overrides card balance, status, or activity state                                                                     |
-| SEC-012 | Write readback verification   | Real NFC writes are verified by reading back expected counter/state/signature                                                                     |
-| SEC-013 | Capacity guard                | Oversized protected payload is rejected before write                                                                                              |
-| SEC-014 | Local report scope            | Station summary clearly states current-device/current-installation only                                                                           |
+| ID      | Scenario                      | Expected                                                                                                                       |
+| ------- | ----------------------------- | ------------------------------------------------------------------------------------------------------------------------------ |
+| SEC-001 | Plain NFC read                | Generic NFC reader cannot reveal member identity, balance, parking status details, or transaction values                       |
+| SEC-002 | Debug logging                 | Sensitive decoded data is not printed                                                                                          |
+| SEC-003 | Payload tampering             | Invalid payload is rejected safely                                                                                             |
+| SEC-004 | Codec validation              | Unsupported payload version is rejected                                                                                        |
+| SEC-005 | Read-only Scout               | Scout does not write or mutate card data                                                                                       |
+| SEC-006 | Local ledger privacy          | Ledger uses masked/short references instead of full sensitive identity where possible                                          |
+| SEC-007 | Silent Shield decrypt success | Valid NFC Card Payload v1 decrypts/authenticates with AES-256-GCM or equivalent authenticated encryption                       |
+| SEC-008 | Silent Shield tamper failure  | Changing ciphertext, tag, balance, identity, check-in state, transaction log, or counter causes decrypt/authentication failure |
+| SEC-009 | Write counter                 | Counter increments after every successful card-state write                                                                     |
+| SEC-010 | Transaction FIFO              | Card keeps only the latest five transaction logs after more than five operations                                               |
+| SEC-011 | SQLite authority boundary     | SQLite reporting data never overrides card balance, status, or activity state                                                  |
+| SEC-012 | Write readback verification   | Real NFC writes are verified by reading back expected counter/state/authentication                                             |
+| SEC-013 | Capacity guard                | Oversized protected payload is rejected before write                                                                           |
+| SEC-014 | Local report scope            | Station summary clearly states current-device/current-installation only                                                        |
 
 ## 11. Entry Criteria
 
 - Requirements match the MBC assessment brief.
 - Design has card repository, codec, use-case, and role boundaries.
 - Tasks are traceable to requirements.
-- Writable NFC cards/tags and real devices are available for device tests.
+- NTAG215 tags/cards and real devices are available for device tests.
 
 ## 12. Exit Criteria
 
@@ -212,16 +203,8 @@ Must test:
 - SonarCloud analysis passes the configured quality gate.
 - Demo capture, documentation, and presentation material are ready.
 
-## Tariff Snapshot Tests
-
-| ID                  | Area           | Scenario                                                                             | Expected Result                                                                               |
-| ------------------- | -------------- | ------------------------------------------------------------------------------------ | --------------------------------------------------------------------------------------------- |
-| TARIFF-SNAPSHOT-001 | Gate           | Active tariff is Rp 2.000 and user checks in                                         | Card active visit stores tariff snapshot Rp 2.000 and current tariff version.                 |
-| TARIFF-SNAPSHOT-002 | Terminal       | User checked in at Rp 2.000, admin changes active tariff to Rp 3.000 before checkout | Checkout fee uses Rp 2.000 snapshot, not Rp 3.000 current local setting.                      |
-| TARIFF-SNAPSHOT-003 | Gate/Terminal  | User checks in after tariff changed to Rp 3.000                                      | Checkout fee uses Rp 3.000 snapshot.                                                          |
-| TARIFF-SNAPSHOT-004 | Terminal       | Checked-in legacy/demo card has no tariff snapshot                                   | App shows `TARIFF_SNAPSHOT_MISSING`; fallback to current tariff is allowed only with warning. |
-| TARIFF-SNAPSHOT-005 | Security/Codec | Tariff snapshot is modified outside the app                                          | Silent Shield validation rejects the tampered card.                                           |
-| TARIFF-SNAPSHOT-006 | Capacity       | Snapshot pushes protected payload over selected card capacity                        | Write is blocked with `CARD_CAPACITY_INSUFFICIENT`.                                           |
+| ID  | Area | Scenario | Expected Result |
+| --- | ---- | -------- | --------------- |
 
 ## QA Screenshot Evidence Gate
 
@@ -231,7 +214,7 @@ Minimum PR evidence:
 
 - Task/feature ID.
 - Branch/build identifier.
-- Android simulator/device name and OS/API level.
+- Android 9 FE device name, exact OS/API level, and NFC enabled status.
 - Scenario tested.
 - Screenshots proving the feature behavior.
 - Pass/fail result.
@@ -240,3 +223,23 @@ Minimum PR evidence:
 Final QA must provide a use-case testing evidence package with screenshots proving the project satisfies the required parking MVP flows.
 
 Refer to `QA_EVIDENCE_POLICY.md` for the detailed evidence policy.
+
+## Android-First NFC Validation Addendum
+
+- MVP real NFC read/write validation is required on Android using NTAG215.
+- iOS NFC write support is deferred or best-effort/read-only unless validated later.
+- Silent Shield tests must cover AES-256-GCM encrypt/decrypt success and tamper rejection.
+- The protected payload writer should prefer raw byte/binary NDEF payloads. Base64URL/NDEF text is allowed only as a compatibility fallback and must still fit NTAG215.
+- Assessment key handling may use a clearly labeled app-bundled demo AES key. Production notes must state that secure provisioning or Android hardware-backed Keystore is required outside the MVP assessment.
+
+## Android 9 FE / NTAG215 MVP Device Gate
+
+Before real NFC completion is claimed, QA must record:
+
+- Android 9 FE exact OS/API level.
+- NFC enabled/disabled behavior.
+- NTAG215 read/write/register/top-up/check-in/checkout/scout results.
+- Protected payload byte size at register/top-up/check-in/checkout states.
+- Generic NFC reader result showing card data is not plainly readable.
+
+iOS write testing is not required for MVP.
