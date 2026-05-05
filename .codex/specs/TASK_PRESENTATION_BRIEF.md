@@ -22,10 +22,10 @@ This brief explains each project task in a simple format that can be reused for 
 
 ## Platform NFC
 
-| Task                            | Purpose                                        | Owner                        | Output                                                     | Presentation Value                                             |
-| ------------------------------- | ---------------------------------------------- | ---------------------------- | ---------------------------------------------------------- | -------------------------------------------------------------- |
-| T-003 iOS NFC Configuration     | Prepare iPhone NFC capability where supported. | NFC/Mobile Native Specialist | iOS NFC capability and usage description.                  | Shows platform limitation awareness and honest iOS validation. |
-| T-004 Android NFC Configuration | Prepare Android NFC permissions and detection. | NFC/Mobile Native Specialist | Android NFC permission, feature declaration, device check. | Shows Android is the main practical real-card demo path.       |
+| Task                               | Purpose                                                  | Owner                        | Output                                                          | Presentation Value                                           |
+| ---------------------------------- | -------------------------------------------------------- | ---------------------------- | --------------------------------------------------------------- | ------------------------------------------------------------ |
+| T-003 iOS NFC Status Documentation | Document iOS as out of MVP/best-effort unless validated. | NFC/Mobile Native Specialist | iOS limitation note.                                            | Shows honest platform scope and avoids blocking Android MVP. |
+| T-004 Android NFC Configuration    | Prepare Android NFC permissions and detection.           | NFC/Mobile Native Specialist | Android 9 FE NFC permission, feature declaration, device check. | Shows Android 9 FE is the MVP real-card demo path.           |
 
 ## Domain Layer
 
@@ -81,7 +81,7 @@ This brief explains each project task in a simple format that can be reused for 
 | ------------------------------ | ------------------------------------------------------------- | ---------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------ |
 | T-027 Unit and Use-Case Tests  | Prove business logic works.                                   | Test Automation Engineer / Senior QA                       | Tests for tariff, state, logs, use cases, NFC guidance, and `E2E_TEST_CASES.md` with screenshot evidence paths. | Shows quality is not only manual demo and has traceable evidence.                                |
 | T-027A SonarCloud Quality Gate | Keep automated quality visible and enforceable.               | Test Automation Engineer / Demo/Release Engineer           | SonarCloud setup, coverage import, and quality-gate result.                                                     | Shows code quality is measured continuously, not judged only by demo feel.                       |
-| T-028 Device Tests             | Validate real NFC behavior.                                   | NFC Specialist / Senior QA                                 | Android/iOS device matrix.                                                                                      | Shows real hardware behavior is recorded honestly.                                               |
+| T-028 Device Tests             | Validate real NFC behavior.                                   | NFC Specialist / Senior QA                                 | Android + NTAG215 device matrix; iOS optional/deferred.                                                         | Shows real hardware behavior is recorded honestly.                                               |
 | T-029 Demo Capture             | Prepare evidence and installation path for assessment review. | Demo/Release Engineer / Technical Writer / UI UX Designer  | Images or short video of key flows plus APK distribution notes.                                                 | Shows the app working through Station, Gate, Terminal, Scout, and can be installed by reviewers. |
 | T-030 Submission Package       | Package the final assessment deliverables.                    | Demo/Release Engineer / Technical Writer / Project Manager | Repository, docs, presentation, run instructions, APK distribution plan.                                        | Shows the project is ready for reviewer handoff.                                                 |
 
@@ -100,7 +100,7 @@ This brief explains each project task in a simple format that can be reused for 
 
 - Phases 0 to 6 are already implemented in the app and merged through `develop`.
 - Phase 7 focuses on quality gates: stronger automated coverage, SonarCloud preparation, GitHub Actions, and presentation-ready verification notes.
-- Real NFC hardware/card details remain TBD and are tracked in `DEVICE_TEST_MATRIX.md` and `RISKS.md`.
+- MVP target tag is NTAG215; exact device/form factor/vendor and measured payload fit remain tracked in `DEVICE_TEST_MATRIX.md` and `RISKS.md`.
 - Figma hi-fi refinement is still pending, but the current Signal-based implementation is usable for mock-first demo flows.
 
 ## Software Quality Improvement Note

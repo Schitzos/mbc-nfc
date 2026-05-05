@@ -34,8 +34,7 @@ Screenshots should prove the visible behavior, not only the final screen.
 For role features, capture at least:
 
 - Station: register/top-up success and relevant validation/error state.
-- Gate: successful check-in, active tariff shown, and simulation indicator if simulation is used.
-- Terminal: checkout confirmation showing duration, tariff snapshot, fee, and balance result.
+- Gate: successful check-in, simulation indicator if simulation is used.
 - Scout: read-only card status, balance, active visit, and recent logs.
 - Error flows: representative errors such as already checked-in, insufficient balance, invalid card, or write failure when applicable.
 
@@ -61,17 +60,12 @@ Final QA evidence must cover at minimum:
 
 1. Station registers a new member card.
 2. Station tops up balance.
-3. Gate checks in with tariff snapshot stored at check-in.
-4. Terminal checks out using the card-stored tariff snapshot.
-5. Scout reads card state and recent logs without modifying the card.
-6. Double check-in is rejected.
-7. Double checkout/no active visit is rejected.
-8. Insufficient balance blocks checkout and allows recovery after top-up.
-9. Local tariff can be updated by authorized Station/Admin.
-10. Existing checked-in member keeps the old tariff snapshot after tariff changes.
-11. New checked-in member receives the new tariff snapshot after tariff changes.
-12. SQLite report shows only local-device audit/reporting data.
-13. Silent Shield protected payload is not plainly readable by generic NFC reader validation, when real NFC testing is available.
+3. Scout reads card state and recent logs without modifying the card.
+4. Double check-in is rejected.
+5. Double checkout/no active visit is rejected.
+6. Insufficient balance blocks checkout and allows recovery after top-up.
+7. SQLite report shows only local-device audit/reporting data.
+8. Silent Shield protected payload is not plainly readable by generic NFC reader validation, when real NFC testing is available.
 
 ## 6. Ownership
 

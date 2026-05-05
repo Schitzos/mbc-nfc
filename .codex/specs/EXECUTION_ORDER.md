@@ -84,21 +84,18 @@ Expected outcome:
 
 Goal:
 
-- Deliver the first usable admin feature: register, top up, local tariff management, and local reporting.
-
 Order:
 
 1. `T-012` Create Register Member Card Use Case
 2. `T-013` Create Top-Up Member Card Use Case
 3. `T-017` Implement Mock Card Repository
 4. `T-017A` Implement Local SQLite Ledger Repository
-5. `T-017B → T-017C` Implement Local Tariff Settings Repository
-6. `T-020A` Integrate Ledger Writes Into Role Flows
-7. `T-022` Build Station Screen
+5. `T-020A` Integrate Ledger Writes Into Role Flows
+6. `T-022` Build Station Screen
 
 Expected outcome:
 
-- Station can register cards, top up balances, manage active local parking tariff, and show local device-side reporting using mock data before real NFC hardware is available.
+- Station can register cards, top up balances, show local device-side reporting using mock data before real NFC hardware is available.
 
 ### Phase 3 Gate Feature
 
@@ -124,12 +121,9 @@ Goal:
 Order:
 
 1. `T-015` Create Check-Out Activity Use Case
-2. Confirm checkout reads the active tariff from `T-017B → T-017C` local tariff settings
-3. `T-024` Build Terminal Screen
+2. `T-024` Build Terminal Screen
 
 Expected outcome:
-
-- Terminal can display the card-stored visit tariff snapshot, calculate fee from that snapshot, deduct balance, and handle insufficient balance safely.
 
 ### Phase 5 Scout Feature
 
@@ -277,10 +271,6 @@ For this project thread:
 3. Update docs if the task changes project truth.
 4. Report the result.
 5. Wait for user confirmation before moving to the next task.
-
-## Tariff Snapshot Execution Note
-
-`T-017C Implement Tariff Snapshot at Check-In` must be completed after local tariff settings and before final Terminal checkout E2E validation. Gate writes the snapshot; Terminal consumes it.
 
 ## Phase Exit Quality Gate
 

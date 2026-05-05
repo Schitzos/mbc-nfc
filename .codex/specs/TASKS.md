@@ -5,21 +5,17 @@ Purpose: compact, Codex-friendly task cards. Execute task order from `EXECUTION_
 ## Source-of-Truth Order
 
 1. `REQUIREMENTS.md` — business behavior.
-2. `CARD_DATA_SECURITY_LEDGER_SPEC.md` — NFC/card/tariff snapshot/SQLite behavior.
-3. `SECURITY.md` — Silent Shield and secrets.
-4. `DESIGN.md` — architecture boundaries.
-5. `UNIT_TEST_COVERAGE_POLICY.md` — changed-file tests and 90% coverage.
-6. `QA_EVIDENCE_POLICY.md` / `TEST_PLAN.md` — QA proof and validation.
-7. `EXECUTION_ORDER.md` — official PM sequence.
+2. `SECURITY.md` — Silent Shield and secrets.
+3. `DESIGN.md` — architecture boundaries.
+4. `UNIT_TEST_COVERAGE_POLICY.md` — changed-file tests and 90% coverage.
+5. `QA_EVIDENCE_POLICY.md` / `TEST_PLAN.md` — QA proof and validation.
+6. `EXECUTION_ORDER.md` — official PM sequence.
 
 ## Codex Rules
 
 - Work on one task ID only.
 - Build parking MVP only; no non-parking runtime flow.
 - Keep future extension possible through interfaces.
-- NFC card is source of truth; SQLite is local audit/reporting and local tariff settings only.
-- Tariff is locally editable but locked on card at Gate check-in.
-- Terminal checkout uses card-stored tariff snapshot, not current local tariff.
 - Verify every successful card write by readback.
 - For every changed executable source file, create/update unit tests.
 - Keep executable-source coverage >=90% or document approved exception.
@@ -44,7 +40,6 @@ Return changed files, test files, commands run, coverage status, and risks.
 
 Owner: Architect / SA / Writer  
 Refs: `UML_SYSTEM_DIAGRAMS.md`, `DESIGN.md`  
-Do: Create/update component, use-case, sequence, and activity diagrams for Station, Gate, Terminal, Scout, NFC, Silent Shield, SQLite, tariff snapshot.  
 Done: Diagrams match parking MVP and are presentation-ready.
 
 ### T-000 — Repository Baseline
@@ -90,19 +85,19 @@ Done: Project builds with selected dependencies.
 
 ## Phase 2 — Platform NFC Setup
 
-### T-003 — iOS NFC Configuration
+### T-003 — iOS NFC Deferral Note
 
 Owner: NFC/Mobile Specialist  
 Refs: `DEVICE_TEST_MATRIX.md`, `RFID_NFC_REACT_NATIVE_101.md`  
-Do: Enable iOS NFC capability/usage description where supported; document limitations/test status.  
-Done: iOS NFC status is recorded honestly.
+Do: Document iOS NFC write as out of MVP / best-effort read-only unless validated later. Do not block Android MVP on iOS.  
+Done: iOS status is recorded honestly as deferred/out of MVP.
 
 ### T-004 — Android NFC Configuration
 
 Owner: NFC/Mobile Specialist  
 Refs: `DEVICE_TEST_MATRIX.md`, `RFID_NFC_REACT_NATIVE_101.md`  
-Do: Add Android NFC permission/feature config and verify NFC availability/card detection when hardware exists.  
-Done: Android NFC detection works or limitation is documented.
+Do: Add Android NFC permission/feature config and verify NFC availability/card detection on Android 9 FE with NTAG215.  
+Done: Android 9 FE NFC detection/readiness is documented.
 
 ---
 
@@ -112,22 +107,20 @@ Done: Android NFC detection works or limitation is documented.
 
 Owner: Architect  
 Refs: `DESIGN.md`, `CARD_DATA_SECURITY_LEDGER_SPEC.md`  
-Do: Create card, member, visit, transaction, tariff rule/snapshot, status, and parking activity types independent from RN/NFC/SQLite.  
+Do: Create card, member, visit, transaction, tariff rule, status, and parking activity types independent from RN/NFC/SQLite.  
 Done: Domain compiles and supports parking MVP only.
 
 ### T-006 — Repository Interfaces
 
 Owner: Architect  
 Refs: `DESIGN.md`  
-Do: Create card, ledger, and tariff settings repository interfaces; use cases depend on interfaces only.  
 Done: Mock/real implementations can be swapped.
 
 ### T-007 — Parking Tariff Calculator
 
 Owner: Senior RN FE / Test Automation  
 Refs: `REQUIREMENTS.md`, `CARD_DATA_SECURITY_LEDGER_SPEC.md`  
-Do: Calculate fee from supplied tariff snapshot/rule using started-hour rounding; reject zero/negative duration; test Rp2.000 and Rp3.000 rates.  
-Done: Isolated tests cover rounding, invalid duration, and rate changes.
+Done: Isolated tests cover rounding, invalid duration, and started-hour examples.
 
 ### T-008 — Activity State Policy
 
@@ -172,28 +165,28 @@ Done: Registration creates valid protected card and rejects overwrite.
 
 Owner: Senior RN FE  
 Refs: `EDGE_CASES.md`, `CARD_DATA_SECURITY_LEDGER_SPEC.md`  
-Do: Validate card/amount, increase balance, add top-up log, preserve active visit/snapshot, verify write, append ledger.  
+Do: Validate card/amount, increase balance, add top-up log, preserve active visit, verify write, append ledger.  
 Done: Top-up works for normal and checked-in cards.
 
 ### T-014 — Gate Check-In Use Case
 
 Owner: Senior RN FE  
-Refs: `REQUIREMENTS.md`, `EDGE_CASES.md`, `CARD_DATA_SECURITY_LEDGER_SPEC.md`  
-Do: Read card/local tariff, reject invalid state/future simulation time, write entry timestamp + parking activity + tariff snapshot, verify readback, append CHECKIN amount `0`.  
-Done: Check-in locks tariff snapshot and rejects invalid check-in.
+Refs: `REQUIREMENTS.md`, `EDGE_CASES.md`, `CARD_DATA_SECURITY_LEDGER_SPEC.md`
+
+Do: Read registered card, reject double check-in, write active visit timestamp/status, verify write with readback, log CHECKIN amount 0.  
+Done: Gate check-in works in mock/real repository path with unit tests.
 
 ### T-015 — Terminal Check-Out Use Case
 
 Owner: Senior RN FE  
 Refs: `EDGE_CASES.md`, `CARD_DATA_SECURITY_LEDGER_SPEC.md`  
-Do: Read checked-in card, calculate duration and fee from card-stored snapshot, warn on legacy fallback, reject insufficient balance without mutation, deduct/clear/log/write/verify/append ledger.  
-Done: Users keep check-in tariff even after local tariff changes.
+Do: Read checked-in card, calculate duration and fee using fixed Rp 2.000 per started hour, reject insufficient balance without mutation, deduct/clear/log/write/verify/append ledger.  
+Done: Checkout uses fixed MVP tariff and unit tests cover rounding/insufficient balance.
 
 ### T-016 — Scout Inspect Use Case
 
 Owner: Senior RN FE  
 Refs: `REQUIREMENTS.md`, `SECURITY.md`  
-Do: Read card and show masked member ref, balance, status, tariff snapshot, latest logs; never write.  
 Done: Scout is read-only.
 
 ---
@@ -204,7 +197,7 @@ Done: Scout is read-only.
 
 Owner: Senior RN FE / Test Automation  
 Refs: `DESIGN.md`, `EDGE_CASES.md`  
-Do: Implement mock card repository with fixtures for unregistered, registered, low balance, checked-in with/without snapshot, tampered, oversized.  
+Do: Implement mock card repository with fixtures for unregistered, registered, low balance, checked-in, tampered, oversized.  
 Done: All role flows run without real NFC.
 
 ### T-017A — SQLite Ledger Repository
@@ -213,20 +206,6 @@ Owner: Senior RN FE / Architect
 Refs: `CARD_DATA_SECURITY_LEDGER_SPEC.md`  
 Do: Store local register/top-up/check-in/checkout entries separately from card state; mask sensitive refs; never override card state.  
 Done: Station shows current-device transaction count/income.
-
-### T-017B — Local Tariff Settings Repository
-
-Owner: Senior RN FE / Architect  
-Refs: `EDGE_CASES.md`, `CARD_DATA_SECURITY_LEDGER_SPEC.md`  
-Do: Store active parking tariff locally, seed Rp2.000 IDR started-hour rule, track version metadata, validate positive IDR tariff.  
-Done: Authorized Station/Admin can change tariff without APK rebuild.
-
-### T-017C — Tariff Snapshot at Check-In
-
-Owner: Senior RN FE / Architect / NFC Specialist  
-Refs: `EDGE_CASES.md`, `CARD_DATA_SECURITY_LEDGER_SPEC.md`  
-Do: Store compact tariff snapshot in card active visit, enforce Terminal snapshot usage, test legacy fallback and payload capacity.  
-Done: Rp2.000 check-in remains Rp2.000 after tariff changes to Rp3.000.
 
 ### T-018 — Real NFC Card Repository
 
@@ -239,15 +218,15 @@ Done: Supported cards read/write safely on tested devices.
 
 Owner: Architect / Security  
 Refs: `CARD_DATA_SECURITY_LEDGER_SPEC.md`  
-Do: Implement payload v1 validation/codec, validate core fields/logs/snapshot/counter, enforce size guard.  
+Do: Implement compact NTAG215 payload v1 validation/codec, validate core fields/log tuples/counter, enforce size guard.  
 Done: Tests cover valid, invalid, legacy, oversized, unsupported version.
 
 ### T-020 — Silent Shield
 
 Owner: Security / Architect  
 Refs: `SECURITY.md`, `CARD_DATA_SECURITY_LEDGER_SPEC.md`  
-Do: Canonicalize, HMAC-sign, AEAD-encrypt, store opaque `mbc1`, keep secrets out of repo, reject tamper, redact logs.  
-Done: Generic NFC reader cannot plainly read identity, balance, status, tariff, or logs.
+Do: Canonicalize compact payload, AES-256-GCM encrypt/authenticate, store opaque `MBC1`, use demo-only bundled AES key for assessment or secure config, prefer raw/binary NFC payload with Base64URL fallback only if required, reject tamper, redact logs.  
+Done: Generic NFC reader cannot plainly read identity, balance, status, or logs.
 
 ### T-020A — Ledger Flow Integration
 
@@ -271,28 +250,26 @@ Done: Switching roles does not corrupt flow state.
 
 Owner: Senior RN FE / UI Designer  
 Refs: `REQUIREMENTS.md`, `EDGE_CASES.md`  
-Do: Implement register, top-up, admin tariff setting, local ledger summary, active tariff display, and auth path for tariff change.  
-Done: Station supports register/top-up/tariff update/local report safely.
+Do: Implement register, top-up, and local ledger summary UI.  
+Done: Station supports required MVP actions without extra pricing settings.
 
 ### T-023 — Gate Screen
 
 Owner: Senior RN FE / UI Designer  
 Refs: `REQUIREMENTS.md`, `EDGE_CASES.md`  
-Do: Implement check-in, optional past simulation, current time, active tariff display, and tariff-to-be-locked confirmation.  
-Done: Gate writes timestamp and tariff snapshot clearly.
+Do: Implement check-in, optional past simulation, and current device time display.
 
 ### T-024 — Terminal Screen
 
 Owner: Senior RN FE / UI Designer  
 Refs: `EDGE_CASES.md`, `CARD_DATA_SECURITY_LEDGER_SPEC.md`  
-Do: Implement checkout UI with card-stored tariff snapshot, duration, charged hours, fee, balance impact, insufficient-balance guidance, legacy warning.  
-Done: Fee source is unambiguous and follows snapshot rule.
+Do: Implement checkout UI showing fixed tariff, charged hours, calculated fee, insufficient balance guidance, and result state.  
+Done: Fee source is unambiguous and follows fixed tariff rule.
 
 ### T-025 — Scout Screen
 
 Owner: Senior RN FE / UI Designer  
 Refs: `REQUIREMENTS.md`, `SECURITY.md`  
-Do: Implement one-tap read-only inspection with masked member ref, balance, visit status, tariff snapshot, latest five logs.  
 Done: Scout never mutates card.
 
 ### T-026 — Signal UI Direction
@@ -366,14 +343,14 @@ Done: PR/final delivery has screenshots and QA result notes.
 
 Owner: NFC Specialist / Senior QA  
 Refs: `DEVICE_TEST_MATRIX.md`, `RFID_NFC_REACT_NATIVE_101.md`  
-Do: Test Android NFC first, iOS if available; record device, OS, card/tag, capacity, read/write result, limitations.  
-Done: Real-device evidence is recorded honestly.
+Do: Test Android 9 FE with NTAG215; record exact OS/API level, NFC status, tag form factor/vendor, payload byte size, read/write result, limitations. iOS is optional/deferred.  
+Done: Android 9 FE real-device evidence is recorded honestly.
 
 ### T-029 — Demo Capture
 
 Owner: Release Engineer / Writer / UI Designer  
 Refs: `E2E_TEST_CASES.md`, `PO_FINAL_GO_NO_GO_CHECKLIST.md`  
-Do: Capture Station, Gate, Terminal, Scout, tariff-change snapshot scenario, and Firebase reviewer notes.  
+Do: Capture Station, Gate, Terminal, Scout, Firebase reviewer notes.  
 Done: Demo evidence supports assessment submission.
 
 ### T-030 — Submission Package

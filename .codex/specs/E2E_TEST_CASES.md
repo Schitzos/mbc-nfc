@@ -126,7 +126,7 @@ Use this format for every test case:
 | Status          | Not Run                                                                        |
 | Evidence        | `.codex/specs/test-evidence/manual/station/E2E-TOP-002_02_pass_validation.png` |
 
-### E2E-GATE-001 Check-In Success (Parking Demo)
+### E2E-GATE-001 Check-In Success (Parking MVP)
 
 | Field           | Value                                                                                             |
 | --------------- | ------------------------------------------------------------------------------------------------- |
@@ -177,22 +177,21 @@ Use this format for every test case:
 | Status          | Not Run                                                                                    |
 | Evidence        | `.codex/specs/test-evidence/manual/gate/E2E-GATE-003_02_pass_reject.png`                   |
 
-### E2E-TERM-001 Check-Out Success (Parking Tariff)
+### E2E-TERM-001 Check-Out Success (Fixed Parking Tariff)
 
-| Field           | Value                                                                                                                                                                                                         |
-| --------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Test Case ID    | E2E-TERM-001                                                                                                                                                                                                  |
-| Feature         | Terminal - Check Out                                                                                                                                                                                          |
-| Objective       | Ensure checkout deducts correct parking started-hour fee and clears status.                                                                                                                                   |
-| Preconditions   | Card checked-in with known start time and sufficient balance.                                                                                                                                                 |
-| Test Data       | Start time such that duration is 1h 5m 1s.                                                                                                                                                                    |
-| Steps           | 1. Open Terminal. 2. Tap checkout action. 3. Tap checked-in card.                                                                                                                                             |
-| Expected Result | Terminal shows the card-stored visit tariff snapshot before deduction; fee charged as 2 started hours using the card snapshot (`Rp 4.000` by default); balance reduced; checked-in status cleared; log added. |
-| Priority        | High                                                                                                                                                                                                          |
-| Type            | Both                                                                                                                                                                                                          |
-| Owner           | Senior QA + Test Automation Engineer                                                                                                                                                                          |
-| Status          | Not Run                                                                                                                                                                                                       |
-| Evidence        | `.codex/specs/test-evidence/manual/terminal/E2E-TERM-001_03_pass_fee.png`                                                                                                                                     |
+| Field         | Value                                                                       |
+| ------------- | --------------------------------------------------------------------------- |
+| Test Case ID  | E2E-TERM-001                                                                |
+| Feature       | Terminal - Check Out                                                        |
+| Objective     | Ensure checkout deducts correct parking started-hour fee and clears status. |
+| Preconditions | Card checked-in with known start time and sufficient balance.               |
+| Test Data     | Start time such that duration is 1h 5m 1s.                                  |
+| Steps         | 1. Open Terminal. 2. Tap checkout action. 3. Tap checked-in card.           |
+| Priority      | High                                                                        |
+| Type          | Both                                                                        |
+| Owner         | Senior QA + Test Automation Engineer                                        |
+| Status        | Not Run                                                                     |
+| Evidence      | `.codex/specs/test-evidence/manual/terminal/E2E-TERM-001_03_pass_fee.png`   |
 
 ### E2E-TERM-002 Check-Out Insufficient Balance
 
@@ -228,41 +227,7 @@ Use this format for every test case:
 | Status          | Not Run                                                                                            |
 | Evidence        | `.codex/specs/test-evidence/manual/terminal/E2E-TERM-003_02_pass_timeout.png`                      |
 
-### E2E-TARIFF-001 Local Admin Tariff Change Without APK Rebuild
-
-| Field           | Value                                                                                                                                                                                                                          |
-| --------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| Test Case ID    | E2E-TARIFF-001                                                                                                                                                                                                                 |
-| Feature         | Station/Admin - Local Tariff Management                                                                                                                                                                                        |
-| Objective       | Ensure authorized staff can update the active parking tariff locally and new check-ins use the updated tariff without backend/API or APK rebuild.                                                                              |
-| Preconditions   | App installed; default active tariff is Rp 2.000 per started hour; authorized Station/Admin access is available.                                                                                                               |
-| Test Data       | New tariff: Rp 3.000 per started hour; registered card with enough balance.                                                                                                                                                    |
-| Steps           | 1. Open Station/Admin tariff setting. 2. Change tariff to Rp 3.000. 3. Gate check-in a registered card. 4. Terminal checkout after 1h 5m 1s. 5. Inspect result/log.                                                            |
-| Expected Result | Tariff update is saved locally; a new Gate check-in stores Rp 3.000/hour as the card tariff snapshot; Terminal shows that card-stored snapshot before deduction; checkout charges Rp 6.000; card and local ledger are updated. |
-| Priority        | High                                                                                                                                                                                                                           |
-| Type            | Both                                                                                                                                                                                                                           |
-| Owner           | Senior QA + Test Automation Engineer                                                                                                                                                                                           |
-| Status          | Not Run                                                                                                                                                                                                                        |
-| Evidence        | `.codex/specs/test-evidence/manual/tariff/E2E-TARIFF-001_01_pass_local_tariff.png`                                                                                                                                             |
-
-### E2E-TARIFF-002 Unauthorized Tariff Change Blocked
-
-| Field           | Value                                                                                                             |
-| --------------- | ----------------------------------------------------------------------------------------------------------------- |
-| Test Case ID    | E2E-TARIFF-002                                                                                                    |
-| Feature         | Station/Admin - Local Tariff Authorization                                                                        |
-| Objective       | Ensure non-admin roles cannot change the active local tariff.                                                     |
-| Preconditions   | App installed; user is in Gate, Terminal, or Scout role without admin authorization.                              |
-| Test Data       | Attempted tariff value: Rp 3.000.                                                                                 |
-| Steps           | 1. Open a non-admin role. 2. Attempt to access or perform tariff update.                                          |
-| Expected Result | Tariff update is unavailable or rejected with `TARIFF_UPDATE_UNAUTHORIZED`; existing active tariff remains valid. |
-| Priority        | Medium                                                                                                            |
-| Type            | Both                                                                                                              |
-| Owner           | Senior QA + Test Automation Engineer                                                                              |
-| Status          | Not Run                                                                                                           |
-| Evidence        | `.codex/specs/test-evidence/manual/tariff/E2E-TARIFF-002_01_pass_unauthorized.png`                                |
-
-### E2E-SCOUT-001 One-Tap Read-Only Inspect
+### E2E-SCOUT-001### E2E-SCOUT-001 One-Tap Read-Only Inspect
 
 | Field           | Value                                                                                       |
 | --------------- | ------------------------------------------------------------------------------------------- |
@@ -320,7 +285,7 @@ Use this format for every test case:
 | Feature         | Station Registration                                                                                                |
 | Objective       | Prevent accidental overwrite of a valid registered MBC card.                                                        |
 | Preconditions   | A valid MBC card is already registered.                                                                             |
-| Test Data       | Existing card with valid Silent Shield signature.                                                                   |
+| Test Data       | Existing card with valid Silent Shield authentication.                                                              |
 | Steps           | 1. Open Station. 2. Choose register card. 3. Tap the already registered card.                                       |
 | Expected Result | App rejects registration with `ALREADY_REGISTERED_CARD` and does not mutate card balance, status, counter, or logs. |
 | Priority        | Must                                                                                                                |
@@ -347,19 +312,19 @@ Use this format for every test case:
 
 ### E2E-NFC-001 Capacity Guard and Write Verification
 
-| Field           | Value                                                                                                                                        |
-| --------------- | -------------------------------------------------------------------------------------------------------------------------------------------- |
-| Feature         | Real NFC Write Safety                                                                                                                        |
-| Objective       | Confirm selected NFC tag/card capacity and post-write readback are enforced.                                                                 |
-| Preconditions   | Real or mocked NFC repository available.                                                                                                     |
-| Test Data       | One payload that fits selected capacity and one oversized payload.                                                                           |
-| Steps           | 1. Attempt write with valid payload. 2. Confirm readback verifies expected counter/state/signature. 3. Attempt write with oversized payload. |
-| Expected Result | Valid write succeeds only after readback verification. Oversized payload is rejected with `CARD_CAPACITY_INSUFFICIENT`.                      |
-| Priority        | Must                                                                                                                                         |
-| Type            | Manual device test + automated repository test                                                                                               |
-| Owner           | NFC/Mobile Native Specialist / Senior QA                                                                                                     |
-| Status          | Not Run                                                                                                                                      |
-| Evidence        | TBD                                                                                                                                          |
+| Field           | Value                                                                                                                                             |
+| --------------- | ------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Feature         | Real NFC Write Safety                                                                                                                             |
+| Objective       | Confirm selected NFC tag/card capacity and post-write readback are enforced.                                                                      |
+| Preconditions   | Real or mocked NFC repository available.                                                                                                          |
+| Test Data       | One payload that fits selected capacity and one oversized payload.                                                                                |
+| Steps           | 1. Attempt write with valid payload. 2. Confirm readback verifies expected counter/state/authentication. 3. Attempt write with oversized payload. |
+| Expected Result | Valid write succeeds only after readback verification. Oversized payload is rejected with `CARD_CAPACITY_INSUFFICIENT`.                           |
+| Priority        | Must                                                                                                                                              |
+| Type            | Manual device test + automated repository test                                                                                                    |
+| Owner           | NFC/Mobile Native Specialist / Senior QA                                                                                                          |
+| Status          | Not Run                                                                                                                                           |
+| Evidence        | TBD                                                                                                                                               |
 
 ### E2E-TIME-001 Invalid Checkout Time Rejection
 
@@ -384,10 +349,9 @@ Additional Must coverage added: E2E-REG-003, E2E-TERM-004, E2E-NFC-001, and E2E-
 - Station: `E2E-REG-001` to `E2E-TOP-002`
 - Gate: `E2E-GATE-001` to `E2E-GATE-003`
 - Terminal: `E2E-TERM-001` to `E2E-TERM-003`
-- Local tariff management: `E2E-TARIFF-001` to `E2E-TARIFF-002`
 - Scout: `E2E-SCOUT-001`
 - Security: `E2E-SEC-001`
-- Reusable activity tariff: `E2E-ACT-001`
+- Parking tariff: `E2E-TERM-001`
 
 ## 6. Execution and Reporting
 
@@ -395,44 +359,31 @@ Additional Must coverage added: E2E-REG-003, E2E-TERM-004, E2E-NFC-001, and E2E-
 - Test Automation Engineer links each automated scenario to test file names and CI job references.
 - Project Manager reviews weekly progress using pass/fail/block counts and missing evidence list.
 
-## E2E-TARIFF-003 Existing Checked-In Member Keeps Check-In Tariff
+## E2E-NFC-NTAG215 — Real Card Capacity Validation
 
-| Field           | Description                                                                                                            |
-| --------------- | ---------------------------------------------------------------------------------------------------------------------- |
-| Objective       | Ensure a tariff change after check-in does not affect an already checked-in member.                                    |
-| Preconditions   | Active local tariff is Rp 2.000/hour. Card is registered and has enough balance.                                       |
-| Steps           | 1. Gate checks in member. 2. Admin changes local active tariff to Rp 3.000/hour. 3. Terminal checks out the same card. |
-| Expected Result | Terminal displays and charges the card using the Rp 2.000/hour tariff snapshot captured at check-in.                   |
-| Notes           | Local tariff change applies only to future check-ins.                                                                  |
+Priority: High before final assessment.
 
-## E2E-TARIFF-004 New Member Uses Updated Tariff After Change
+Scenario:
 
-| Field           | Description                                                                                    |
-| --------------- | ---------------------------------------------------------------------------------------------- |
-| Objective       | Ensure new check-ins after a tariff change use the updated tariff.                             |
-| Preconditions   | Admin has changed local active tariff to Rp 3.000/hour. Card is registered and not checked in. |
-| Steps           | 1. Gate checks in member. 2. Terminal checks out the card.                                     |
-| Expected Result | Card active visit stores Rp 3.000/hour snapshot and Terminal charges using Rp 3.000/hour.      |
+1. Use NTAG215 as the physical card/tag.
+2. Register a card.
+3. Top up balance.
+4. Check in.
+5. Check out.
+6. Repeat enough operations until latest 5 transaction records are present.
+7. Verify each write performs capacity check and readback verification.
 
-## E2E-TARIFF-005 Legacy Missing Snapshot Warning
+Expected:
 
-| Field           | Description                                                                                                                                       |
-| --------------- | ------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Objective       | Ensure checkout is deterministic when a legacy/demo checked-in card lacks a tariff snapshot.                                                      |
-| Preconditions   | Card has active check-in but no tariff snapshot.                                                                                                  |
-| Steps           | Terminal attempts checkout.                                                                                                                       |
-| Expected Result | Terminal shows `TARIFF_SNAPSHOT_MISSING` warning. Fallback to current local tariff is allowed only after the warning is visible before deduction. |
+- Protected payload fits NTAG215 for the required MVP state, or write is blocked safely with `CARD_CAPACITY_INSUFFICIENT`.
+- Required card data is not removed: identity, balance, active visit state, and latest 5 transactions remain supported.
 
-## E2E Screenshot Evidence Requirement
+## E2E Platform and Security Scope Addendum
 
-For final delivery, Senior QA must capture Android simulator/device screenshots for the main E2E scenarios and include them in the final QA evidence package.
+Final MVP E2E evidence must prioritize Android + NTAG215 read/write. iOS evidence is optional/deferred and must not block MVP acceptance unless the project later explicitly adds iOS write support.
 
-Screenshots must prove:
+Security E2E evidence should show that a generic NFC reader cannot read plain member ID, balance, active visit, or transaction values from the card. The app may use an app-bundled demo AES key for assessment, but production key handling must be documented as future hardening.
 
-- Station registration/top-up.
-- Gate check-in with tariff snapshot.
-- Terminal checkout using card-stored tariff snapshot.
-- Scout read-only inspection.
-- Important rejected flows such as double check-in, no active visit, insufficient balance, invalid duration, or unauthorized tariff update when applicable.
+## Android 9 FE Real NFC Evidence Rule
 
-Screenshots should not expose secrets, raw encrypted payloads, private keys, or sensitive debug dumps.
+Final physical-card E2E evidence must use Android 9 FE with NTAG215 for the MVP read/write baseline. iOS write evidence is not required for MVP.
