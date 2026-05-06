@@ -74,5 +74,23 @@ describe('RegisterMemberCardUseCase – reset/re-registration flow', () => {
       expect(result.success).toBe(true);
       expect(result.card?.maskedMemberReference).toContain('MBC-***-');
     });
+
+    it('succeeds with warning when ledger append fails', async () => {
+      const cardRepository = createCardRepository();
+      const ledgerRepository = createLedgerRepository({
+        append: jest.fn().mockRejectedValue(new Error('disk full')),
+      });
+      const useCase = new RegisterMemberCardUseCase(
+        cardRepository,
+        ledgerRepository,
+      );
+
+      const result = await useCase.executeWithReset();
+
+      expect(result.success).toBe(true);
+      expect(result.message).toContain(
+        'local audit ledger could not be updated',
+      );
+    });
   });
 });

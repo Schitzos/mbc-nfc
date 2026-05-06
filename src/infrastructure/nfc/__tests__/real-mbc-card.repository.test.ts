@@ -151,4 +151,30 @@ describe('RealMbcCardRepository', () => {
       code: 'CARD_ALREADY_REGISTERED',
     });
   });
+
+  it('readWriteCard reads, transforms, and writes in a single session', async () => {
+    const result = await repository.readWriteCard((card: MbcCard) => ({
+      ...card,
+      balance: card.balance + 10000,
+    }));
+    expect(result.balance).toBe(60000);
+    expect(mockWriteNdefMessage).toHaveBeenCalled();
+    expect(mockCancelTechnologyRequest).toHaveBeenCalled();
+  });
+
+  it('readWriteCard propagates DomainError from transform', async () => {
+    const { DomainError } = require('../../../domain/errors/domain-error');
+    await expect(
+      repository.readWriteCard(() => {
+        throw new DomainError('INSUFFICIENT_BALANCE', 'Not enough');
+      }),
+    ).rejects.toMatchObject({ code: 'INSUFFICIENT_BALANCE' });
+  });
+
+  it('readWriteCard maps generic errors to NFC_UNAVAILABLE', async () => {
+    mockRequestTechnology.mockRejectedValueOnce(new Error('unknown'));
+    await expect(
+      repository.readWriteCard((card: MbcCard) => card),
+    ).rejects.toMatchObject({ code: 'NFC_UNAVAILABLE' });
+  });
 });
