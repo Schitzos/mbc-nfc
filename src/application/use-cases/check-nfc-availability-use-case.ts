@@ -1,12 +1,8 @@
+import type { CheckNfcAvailabilityResultDto } from '../dto/check-nfc-availability-result-dto';
 import type {
-  CheckNfcAvailabilityResultDto,
+  NfcAvailabilityRepository,
   NfcAvailabilityStatus,
-} from '../dto/check-nfc-availability-result-dto';
-import type { MbcCardRepository } from '../../domain/repositories/mbc-card-repository';
-
-type AvailabilityAwareCardRepository = MbcCardRepository & {
-  getAvailabilityStatus?: () => Promise<NfcAvailabilityStatus>;
-};
+} from '../../domain/repositories/nfc-availability-repository';
 
 type GuidanceContent = Omit<
   CheckNfcAvailabilityResultDto,
@@ -54,11 +50,11 @@ const GUIDANCE_BY_STATUS: Record<NfcAvailabilityStatus, GuidanceContent> = {
 
 export class CheckNfcAvailabilityUseCase {
   constructor(
-    private readonly cardRepository: AvailabilityAwareCardRepository,
+    private readonly nfcAvailabilityRepository: NfcAvailabilityRepository,
   ) {}
 
   async execute(): Promise<CheckNfcAvailabilityResultDto> {
-    const status = await this.resolveStatus();
+    const status = await this.nfcAvailabilityRepository.getAvailabilityStatus();
     const guidance = GUIDANCE_BY_STATUS[status];
 
     return {
@@ -66,14 +62,5 @@ export class CheckNfcAvailabilityUseCase {
       status,
       ...guidance,
     };
-  }
-
-  private async resolveStatus(): Promise<NfcAvailabilityStatus> {
-    if (this.cardRepository.getAvailabilityStatus) {
-      return this.cardRepository.getAvailabilityStatus();
-    }
-
-    const isSupported = await this.cardRepository.isSupported();
-    return isSupported ? 'SUPPORTED' : 'UNSUPPORTED';
   }
 }

@@ -1,27 +1,25 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo } from 'react';
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { appContainer } from '../../../app/container';
 import type { RootStackParamList } from '../../../app/navigation';
-import type { RoleActionResultDto } from '../../../application/dto/role-action-result-dto';
 import { SignalButton } from '../../components/SignalButton';
 import { NfcLogPanel } from '../../components/NfcLogPanel';
 import { NfcActionSheet } from '../../components/NfcActionSheet';
-import type { NfcActionState } from '../../components/NfcActionSheet';
 import { BackgroundDecor } from '../../components/BackgroundDecor';
 import { useAppStore } from '../../stores/app-store';
-import { UNKNOWN_ERROR_MESSAGE } from '../../../shared/constants';
+import { useGateServices } from '../../context/service-context';
 import { GateHeader } from './fragments/GateHeader';
 import { GateResultState } from './fragments/GateResultState';
+import { useGateActions } from './useGateActions';
 
 type Props = Readonly<NativeStackScreenProps<RootStackParamList, 'gate'>>;
 
 export function GateScreen({ navigation }: Props): React.JSX.Element {
   const insets = useSafeAreaInsets();
   const setSelectedRole = useAppStore(state => state.setSelectedRole);
-  const appendNfcLog = useAppStore(state => state.appendNfcLog);
-  const services = useMemo(() => appContainer.getGateServices(), []);
+  const services = useGateServices();
+  const actions = useGateActions(services);
   const contentContainerStyle = useMemo(
     () =>
       StyleSheet.create({
@@ -32,62 +30,10 @@ export function GateScreen({ navigation }: Props): React.JSX.Element {
       }),
     [insets.top, insets.bottom],
   );
-  const [latestResult, setLatestResult] = useState<RoleActionResultDto | null>(
-    null,
-  );
-  const [busy, setBusy] = useState(false);
-  const [nfcSheet, setNfcSheet] = useState<NfcActionState>({ phase: 'idle' });
 
   useEffect(() => {
     setSelectedRole('gate');
   }, [setSelectedRole]);
-
-  useEffect(() => {
-    services.checkNfcAvailabilityUseCase
-      .execute()
-      .then(status =>
-        appendNfcLog(`[NFC] Availability result: ${status.status}`),
-      )
-      .catch(() => undefined);
-  }, [appendNfcLog, services]);
-
-  const handleCheckIn = async () => {
-    setBusy(true);
-    setNfcSheet({
-      phase: 'scanning',
-      message: 'Hold your NFC card to check in',
-    });
-    try {
-      appendNfcLog('[NFC] Check-in flow started');
-      const result = await services.checkInActivityUseCase.execute({
-        activityId: 'parking-main-gate',
-        activityType: 'PARKING',
-      });
-      setLatestResult(result);
-      if (result.success) {
-        setNfcSheet({
-          phase: 'success',
-          title: 'Checked In',
-          message: result.message,
-        });
-        appendNfcLog('[NFC] Check-in succeeded');
-      } else {
-        setNfcSheet({
-          phase: 'error',
-          title: 'Check-In Failed',
-          message: result.message,
-        });
-        appendNfcLog(`[NFC] Check-in failed: ${result.message}`);
-      }
-    } catch (error) {
-      const msg =
-        error instanceof Error ? error.message : UNKNOWN_ERROR_MESSAGE;
-      setNfcSheet({ phase: 'error', title: 'Error', message: msg });
-      appendNfcLog(`[NFC] Check-in error: ${msg}`);
-    } finally {
-      setBusy(false);
-    }
-  };
 
   return (
     <View className="flex-1 bg-background">
@@ -114,21 +60,21 @@ export function GateScreen({ navigation }: Props): React.JSX.Element {
           </View>
 
           <SignalButton
-            label={busy ? 'Processing...' : 'Tap Card to Check In'}
-            disabled={busy}
+            label={actions.busy ? 'Processing...' : 'Tap Card to Check In'}
+            disabled={actions.busy}
             onPress={() => {
-              handleCheckIn().catch(() => undefined);
+              actions.handleCheckIn().catch(() => undefined);
             }}
           />
 
-          <GateResultState latestResult={latestResult} />
+          <GateResultState latestResult={actions.latestResult} />
 
           <NfcLogPanel />
         </View>
 
         <NfcActionSheet
-          state={nfcSheet}
-          onDismiss={() => setNfcSheet({ phase: 'idle' })}
+          state={actions.nfcSheet}
+          onDismiss={() => actions.setNfcSheet({ phase: 'idle' })}
         />
       </ScrollView>
     </View>

@@ -1,8 +1,6 @@
-export type NfcAvailabilityStatus =
-  | 'SUPPORTED'
-  | 'UNSUPPORTED'
-  | 'DISABLED'
-  | 'UNAVAILABLE';
+import type { NfcAvailabilityStatus } from '../../domain/repositories/nfc-availability-repository';
+
+export type { NfcAvailabilityStatus };
 
 export type CheckNfcAvailabilityResultDto = {
   supported: boolean;

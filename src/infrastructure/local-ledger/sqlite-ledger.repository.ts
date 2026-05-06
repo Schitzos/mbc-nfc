@@ -1,7 +1,7 @@
 import type { DB } from '@op-engineering/op-sqlite';
 import type { LocalLedgerRepository } from '../../domain/repositories/local-ledger-repository';
 import type { LedgerEntry } from '../../domain/entities/mbc-card';
-import type { StationLedgerSummaryDto } from '../../application/dto/station-ledger-summary-dto';
+import type { StationLedgerSummary } from '../../domain/entities/station-ledger-summary';
 import { mapLedgerRowToEntry } from './sqlite-ledger-mapper';
 
 const CREATE_LEDGER_TABLE_SQL = `
@@ -50,7 +50,7 @@ export class SqliteLedgerRepository implements LocalLedgerRepository {
     );
   }
 
-  async getStationSummary(): Promise<StationLedgerSummaryDto> {
+  async getStationSummary(): Promise<StationLedgerSummary> {
     await this.ensureInitialized();
 
     const summaryResult = await this.db.execute(

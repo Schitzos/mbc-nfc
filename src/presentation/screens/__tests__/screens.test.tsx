@@ -5,7 +5,6 @@ import {
   screen,
   waitFor,
 } from '@testing-library/react-native';
-import type { MockCardScenario } from '../../../infrastructure/nfc/mock-mbc-card.repository';
 import { GateScreen } from '../GateScreen';
 import { ScoutScreen } from '../ScoutScreen';
 import { StationScreen } from '../StationScreen';
@@ -15,16 +14,6 @@ import { useAppStore } from '../../stores/app-store';
 jest.mock('react-native-safe-area-context', () => ({
   useSafeAreaInsets: () => ({ top: 0, bottom: 0, left: 0, right: 0 }),
 }));
-
-const setScenario = jest.fn();
-const getScenario = jest.fn<MockCardScenario, []>(() => 'normal');
-const readCard = jest.fn();
-
-const mockRepository = {
-  setScenario,
-  getScenario,
-  readCard,
-};
 
 const mockCheckNfcAvailabilityUseCase = {
   execute: jest.fn().mockResolvedValue({
@@ -133,31 +122,55 @@ const mockInspectMemberCardUseCase = {
 };
 
 jest.mock('../../../app/container', () => ({
-  appContainer: {
-    getStationServices: () => ({
+  createAppServices: () => ({
+    station: {
       checkNfcAvailabilityUseCase: mockCheckNfcAvailabilityUseCase,
       registerMemberCardUseCase: mockRegisterMemberCardUseCase,
       topUpMemberCardUseCase: mockTopUpMemberCardUseCase,
       getStationLedgerSummaryUseCase: mockGetStationLedgerSummaryUseCase,
-      mockRepository,
-    }),
-    getGateServices: () => ({
+    },
+    gate: {
       checkNfcAvailabilityUseCase: mockCheckNfcAvailabilityUseCase,
       checkInActivityUseCase: mockCheckInActivityUseCase,
-      mockRepository,
-    }),
-    getTerminalServices: () => ({
+    },
+    terminal: {
       checkNfcAvailabilityUseCase: mockCheckNfcAvailabilityUseCase,
       checkOutActivityUseCase: mockCheckOutActivityUseCase,
-      mockRepository,
-    }),
-    getScoutServices: () => ({
+    },
+    scout: {
       checkNfcAvailabilityUseCase: mockCheckNfcAvailabilityUseCase,
       inspectMemberCardUseCase: mockInspectMemberCardUseCase,
-      mockRepository,
-    }),
-  },
+    },
+  }),
 }));
+
+const mockServices = {
+  station: {
+    checkNfcAvailabilityUseCase: mockCheckNfcAvailabilityUseCase,
+    registerMemberCardUseCase: mockRegisterMemberCardUseCase,
+    topUpMemberCardUseCase: mockTopUpMemberCardUseCase,
+    getStationLedgerSummaryUseCase: mockGetStationLedgerSummaryUseCase,
+  },
+  gate: {
+    checkNfcAvailabilityUseCase: mockCheckNfcAvailabilityUseCase,
+    checkInActivityUseCase: mockCheckInActivityUseCase,
+  },
+  terminal: {
+    checkNfcAvailabilityUseCase: mockCheckNfcAvailabilityUseCase,
+    checkOutActivityUseCase: mockCheckOutActivityUseCase,
+  },
+  scout: {
+    checkNfcAvailabilityUseCase: mockCheckNfcAvailabilityUseCase,
+    inspectMemberCardUseCase: mockInspectMemberCardUseCase,
+  },
+} as never;
+
+function renderWithServices(ui: React.ReactElement) {
+  const { ServiceProvider } = require('../../context/service-context');
+  return render(
+    <ServiceProvider services={mockServices}>{ui}</ServiceProvider>,
+  );
+}
 
 describe('role screens', () => {
   const navigation = {
@@ -168,16 +181,10 @@ describe('role screens', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     useAppStore.setState({ nfcLogEnabled: false, nfcLogs: [] });
-    getScenario.mockReturnValue('normal');
-    readCard.mockResolvedValue({
-      activeSession: {
-        activityType: 'PARKING',
-      },
-    });
   });
 
   it('runs Station mock actions and shows latest result', async () => {
-    render(<StationScreen navigation={navigation} />);
+    renderWithServices(<StationScreen navigation={navigation} />);
 
     await waitFor(() =>
       expect(mockCheckNfcAvailabilityUseCase.execute).toHaveBeenCalled(),
@@ -208,7 +215,7 @@ describe('role screens', () => {
   });
 
   it('runs Gate check-in flow', async () => {
-    render(<GateScreen navigation={navigation} />);
+    renderWithServices(<GateScreen navigation={navigation} />);
     await waitFor(() =>
       expect(mockCheckNfcAvailabilityUseCase.execute).toHaveBeenCalled(),
     );
@@ -227,7 +234,7 @@ describe('role screens', () => {
       message: 'Already checked in',
     });
 
-    render(<GateScreen navigation={navigation} />);
+    renderWithServices(<GateScreen navigation={navigation} />);
     await waitFor(() =>
       expect(mockCheckNfcAvailabilityUseCase.execute).toHaveBeenCalled(),
     );
@@ -241,7 +248,7 @@ describe('role screens', () => {
   });
 
   it('runs Terminal checkout flow', async () => {
-    render(<TerminalScreen navigation={navigation} />);
+    renderWithServices(<TerminalScreen navigation={navigation} />);
     await waitFor(() =>
       expect(mockCheckNfcAvailabilityUseCase.execute).toHaveBeenCalled(),
     );
@@ -260,7 +267,7 @@ describe('role screens', () => {
       message: 'Insufficient balance for checkout',
     });
 
-    render(<TerminalScreen navigation={navigation} />);
+    renderWithServices(<TerminalScreen navigation={navigation} />);
     await waitFor(() =>
       expect(mockCheckNfcAvailabilityUseCase.execute).toHaveBeenCalled(),
     );
@@ -273,7 +280,7 @@ describe('role screens', () => {
   });
 
   it('runs Scout inspection flow', async () => {
-    render(<ScoutScreen navigation={navigation} />);
+    renderWithServices(<ScoutScreen navigation={navigation} />);
     await waitFor(() =>
       expect(mockCheckNfcAvailabilityUseCase.execute).toHaveBeenCalled(),
     );

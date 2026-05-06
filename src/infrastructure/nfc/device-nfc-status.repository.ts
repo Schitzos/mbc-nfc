@@ -1,40 +1,15 @@
 import NfcManager from 'react-native-nfc-manager';
-import type { MbcCard } from '../../domain/entities/mbc-card';
-import type { MbcCardRepository } from '../../domain/repositories/mbc-card-repository';
-import type { NfcAvailabilityStatus } from '../../application/dto/check-nfc-availability-result-dto';
-import { CardRepositoryError } from '../../domain/errors/card-repository-error';
+import type {
+  NfcAvailabilityRepository,
+  NfcAvailabilityStatus,
+} from '../../domain/repositories/nfc-availability-repository';
 
-export class DeviceNfcStatusRepository implements MbcCardRepository {
+export class DeviceNfcStatusRepository implements NfcAvailabilityRepository {
   private hasStarted = false;
 
   async isSupported(): Promise<boolean> {
     await this.ensureStarted();
     return NfcManager.isSupported();
-  }
-
-  async readCard(): Promise<MbcCard> {
-    throw new CardRepositoryError(
-      'NFC_UNAVAILABLE',
-      'Device NFC status repository does not support card reads.',
-    );
-  }
-
-  async writeCard(): Promise<void> {
-    throw new CardRepositoryError(
-      'NFC_UNAVAILABLE',
-      'Device NFC status repository does not support card writes.',
-    );
-  }
-
-  async registerCard(): Promise<void> {
-    throw new CardRepositoryError(
-      'NFC_UNAVAILABLE',
-      'Device NFC status repository does not support card registration.',
-    );
-  }
-
-  async cancel(): Promise<void> {
-    return Promise.resolve();
   }
 
   async getAvailabilityStatus(): Promise<NfcAvailabilityStatus> {
