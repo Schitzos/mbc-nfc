@@ -29,7 +29,7 @@ export interface SignalButtonProps extends Omit<
 }
 
 function resolveOpacity(
-  disabled: boolean | undefined,
+  disabled: boolean | null | undefined,
   pressed: boolean,
 ): number {
   if (disabled) {
@@ -52,7 +52,7 @@ export function SignalButton({
   style,
   textStyle,
   ...pressableProps
-}: SignalButtonProps) {
+}: Readonly<SignalButtonProps>) {
   const [pressed, setPressed] = useState(false);
   const sizeToken = componentTokens.button.sizes[size];
   const variantToken = componentTokens.button.variants[variant];

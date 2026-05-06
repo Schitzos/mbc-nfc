@@ -26,6 +26,13 @@ export class DeviceNfcStatusRepository implements MbcCardRepository {
     );
   }
 
+  async registerCard(): Promise<void> {
+    throw new CardRepositoryError(
+      'NFC_UNAVAILABLE',
+      'Device NFC status repository does not support card registration.',
+    );
+  }
+
   async cancel(): Promise<void> {
     return Promise.resolve();
   }

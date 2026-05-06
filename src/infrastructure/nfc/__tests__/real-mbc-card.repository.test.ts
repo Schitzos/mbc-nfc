@@ -148,7 +148,7 @@ describe('RealMbcCardRepository', () => {
     // registerCard should detect existing valid data
     mockGetTag.mockResolvedValue(makeEncryptedTag(cardFixture, 2));
     await expect(repository.registerCard(cardFixture)).rejects.toMatchObject({
-      code: 'ALREADY_REGISTERED_CARD',
+      code: 'CARD_ALREADY_REGISTERED',
     });
   });
 });

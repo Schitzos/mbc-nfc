@@ -54,7 +54,7 @@ describe('RegisterMemberCardUseCase', () => {
         .fn()
         .mockRejectedValue(
           new CardRepositoryError(
-            'ALREADY_REGISTERED_CARD',
+            'CARD_ALREADY_REGISTERED',
             'This card is already registered.',
           ),
         ),

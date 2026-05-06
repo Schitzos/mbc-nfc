@@ -5,7 +5,9 @@ interface ScoutHeaderProps {
   onBack: () => void;
 }
 
-export function ScoutHeader({ onBack }: ScoutHeaderProps): React.JSX.Element {
+export function ScoutHeader({
+  onBack,
+}: Readonly<ScoutHeaderProps>): React.JSX.Element {
   return (
     <View className="rounded-2xl bg-[#001A41] p-4">
       <View className="flex-row items-center justify-between">

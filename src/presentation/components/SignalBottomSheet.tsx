@@ -31,7 +31,7 @@ export function SignalBottomSheet({
   stickyAction,
   onClose,
   style,
-}: SignalBottomSheetProps) {
+}: Readonly<SignalBottomSheetProps>) {
   return (
     <Modal
       transparent

@@ -49,7 +49,7 @@ export function SignalStatusBanner({
   body,
   items,
   children,
-}: SignalStatusBannerProps): React.JSX.Element {
+}: Readonly<SignalStatusBannerProps>): React.JSX.Element {
   const toneToken = toneMap[tone];
 
   return (

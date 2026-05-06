@@ -31,7 +31,7 @@ export function SignalOptionCard({
   disabled,
   style,
   ...pressableProps
-}: SignalOptionCardProps) {
+}: Readonly<SignalOptionCardProps>) {
   const [pressed, setPressed] = useState(false);
   const stateToken =
     componentTokens.optionCard.states[disabled ? 'disabled' : state];

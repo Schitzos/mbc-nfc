@@ -9,7 +9,7 @@ interface TerminalHeaderProps {
 export function TerminalHeader({
   subtitle,
   onBack,
-}: TerminalHeaderProps): React.JSX.Element {
+}: Readonly<TerminalHeaderProps>): React.JSX.Element {
   return (
     <View className="rounded-2xl bg-[#001A41] p-4">
       <View className="flex-row items-center justify-between">

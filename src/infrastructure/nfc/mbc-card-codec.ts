@@ -1,3 +1,4 @@
+import { Buffer } from 'buffer';
 import type {
   MbcCard,
   MbcActivity,
@@ -79,7 +80,7 @@ export function encode(
 
   const json = JSON.stringify(compact);
 
-  if (new TextEncoder().encode(json).length > SAFE_PLAINTEXT_BUDGET) {
+  if (Buffer.byteLength(json, 'utf8') > SAFE_PLAINTEXT_BUDGET) {
     return { ok: false, error: 'PAYLOAD_EXCEEDS_CAPACITY' };
   }
 

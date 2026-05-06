@@ -76,12 +76,12 @@ export class RealMbcCardRepository implements MbcCardRepository {
 
       if (currentTag?.ndefMessage?.length) {
         const rawPayload = currentTag.ndefMessage[0].payload;
-        const payloadBytes = Buffer.from(rawPayload ?? []);
+        const payloadBytes = Buffer.from(rawPayload as number[]);
         if (isMbcEnvelope(payloadBytes)) {
           const decryptResult = decrypt(payloadBytes);
           if (decryptResult.ok) {
             throw new CardRepositoryError(
-              'ALREADY_REGISTERED_CARD',
+              'CARD_ALREADY_REGISTERED',
               'This card is already registered. Use a blank card or reset first.',
             );
           }
@@ -135,12 +135,7 @@ export class RealMbcCardRepository implements MbcCardRepository {
 
     const mimeType = 'application/vnd.mbc.v1';
     const encoded = Ndef.encodeMessage([
-      Ndef.record(
-        Ndef.TNF_MIME_MEDIA,
-        Array.from(Buffer.from(mimeType, 'ascii')),
-        [],
-        Array.from(envelope),
-      ),
+      Ndef.record(Ndef.TNF_MIME_MEDIA, mimeType, '', Array.from(envelope)),
     ]);
 
     if (!encoded) {
@@ -163,7 +158,7 @@ export class RealMbcCardRepository implements MbcCardRepository {
     }
 
     const firstRecord = currentTag.ndefMessage[0];
-    const payloadBytes = Buffer.from(firstRecord.payload ?? []);
+    const payloadBytes = Buffer.from(firstRecord.payload as number[]);
 
     if (!isMbcEnvelope(payloadBytes)) {
       throw new CardRepositoryError(

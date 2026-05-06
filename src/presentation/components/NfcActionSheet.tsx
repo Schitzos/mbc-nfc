@@ -24,7 +24,7 @@ interface NfcActionSheetProps {
 export function NfcActionSheet({
   state,
   onDismiss,
-}: NfcActionSheetProps): React.JSX.Element | null {
+}: Readonly<NfcActionSheetProps>): React.JSX.Element | null {
   if (state.phase === 'idle') {
     return null;
   }

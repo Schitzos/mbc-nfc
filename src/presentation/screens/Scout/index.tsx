@@ -32,7 +32,7 @@ const MONTHS = [
 ];
 function formatLogTime(iso: string): string {
   const d = new Date(iso);
-  if (isNaN(d.getTime())) {
+  if (Number.isNaN(d.getTime())) {
     return iso;
   }
   const dd = String(d.getDate()).padStart(2, '0');

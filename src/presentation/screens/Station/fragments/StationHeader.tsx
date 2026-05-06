@@ -9,7 +9,7 @@ interface StationHeaderProps {
 export function StationHeader({
   modeLabel,
   onBack,
-}: StationHeaderProps): React.JSX.Element {
+}: Readonly<StationHeaderProps>): React.JSX.Element {
   return (
     <View className="rounded-2xl bg-[#001A41] p-4">
       <View className="flex-row items-center justify-between">

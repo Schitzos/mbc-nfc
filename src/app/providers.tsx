@@ -11,7 +11,7 @@ interface AppProvidersProps {
 
 export function AppProviders({
   children,
-}: AppProvidersProps): React.JSX.Element {
+}: Readonly<AppProvidersProps>): React.JSX.Element {
   return (
     <SafeAreaProvider>
       <NavigationContainer>{children}</NavigationContainer>

@@ -13,7 +13,7 @@ interface SignalSurfaceCardProps {
 export function SignalSurfaceCard({
   children,
   style,
-}: SignalSurfaceCardProps): React.JSX.Element {
+}: Readonly<SignalSurfaceCardProps>): React.JSX.Element {
   return <View style={[styles.card, style]}>{children}</View>;
 }
 

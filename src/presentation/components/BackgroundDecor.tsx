@@ -26,7 +26,7 @@ function getCircleColor(variant: Variant): string {
 
 export function BackgroundDecor({
   variant = 'roleSwitcher',
-}: BackgroundDecorProps): React.JSX.Element {
+}: Readonly<BackgroundDecorProps>): React.JSX.Element {
   const { height } = useWindowDimensions();
 
   const dynamicStyles = useMemo(

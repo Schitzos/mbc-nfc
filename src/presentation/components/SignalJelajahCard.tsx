@@ -31,7 +31,7 @@ export function SignalJelajahCard({
   imageSource,
   style,
   imageStyle,
-}: SignalJelajahCardProps) {
+}: Readonly<SignalJelajahCardProps>) {
   return (
     <View style={[styles.card, style]}>
       <Image

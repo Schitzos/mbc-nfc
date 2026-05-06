@@ -48,7 +48,7 @@ export class RegisterMemberCardUseCase {
     } catch (error) {
       if (
         error instanceof CardRepositoryError &&
-        error.code === 'ALREADY_REGISTERED_CARD'
+        error.code === 'CARD_ALREADY_REGISTERED'
       ) {
         return {
           success: false,

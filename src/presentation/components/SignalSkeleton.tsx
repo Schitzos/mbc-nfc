@@ -13,7 +13,7 @@ export interface SignalSkeletonProps {
 export function SignalSkeleton({
   variant = 'title',
   style,
-}: SignalSkeletonProps) {
+}: Readonly<SignalSkeletonProps>) {
   if (variant === 'button') {
     return <View style={[styles.button, style]} />;
   }

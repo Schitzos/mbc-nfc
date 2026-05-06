@@ -37,7 +37,7 @@ export function SignalTextField({
   style,
   placeholder = 'Placeholder',
   ...textInputProps
-}: SignalTextFieldProps) {
+}: Readonly<SignalTextFieldProps>) {
   const [focused, setFocused] = useState(false);
 
   let visualState: SignalTextFieldState = state;
