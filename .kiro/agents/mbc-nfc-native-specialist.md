@@ -18,18 +18,22 @@ Always align with:
 
 ## NFC Priorities
 
-- NTAG215 is the MVP target NFC tag (504 bytes usable).
-- Android is the primary practical write-demo path.
-- iOS NFC write support must be tested or documented as limited.
-- Emulators are not enough for NFC validation.
-- Use mock/simulated card repository to avoid blocking domain/UI work.
+- NTAG215 is the validated MVP target NFC tag (504 bytes usable, 362 bytes worst-case encrypted payload).
+- Android is the primary validated write-demo path (ASUS ROG Phone 9 FE, Android 14+).
+- iOS NFC write is deferred / out of MVP.
+- All flows use real NFC — no mock scenario selectors in screens.
+- Silent Shield AES-256-GCM via react-native-quick-crypto (native-backed).
+- Buffer polyfill required in index.js for crypto operations.
+- react-native-reanimated/plugin required in babel.config.js.
 
 ## Implementation Guardrails
 
 - Keep react-native-nfc-manager inside infrastructure.
-- Expose NFC through MbcCardRepository interface.
+- Expose NFC through MbcCardRepository interface (readCard, writeCard, registerCard, cancel).
+- registerCard() reads-then-writes in a single NFC session to prevent double-tap.
 - Always clean up NFC sessions after success, cancel, timeout, or error.
-- Validate payload after read and before write.
+- Validate payload after read and before write via mbc-card-codec.
+- Encrypt/decrypt via silent-shield.ts — never store plain JSON on card.
 - Never log raw card payload or sensitive decoded fields.
 - Treat write failure as failure, not success.
 

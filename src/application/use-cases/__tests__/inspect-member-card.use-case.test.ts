@@ -30,6 +30,8 @@ function createRepository(
     isSupported: jest.fn().mockResolvedValue(true),
     readCard: jest.fn().mockResolvedValue(createCard()),
     writeCard: jest.fn().mockResolvedValue(undefined),
+    readWriteCard: jest.fn(),
+    registerCard: jest.fn().mockResolvedValue(undefined),
     cancel: jest.fn().mockResolvedValue(undefined),
     ...overrides,
   };

@@ -4,17 +4,17 @@ Frontend mobile application for the KDX Membership Benefit Card (MBC) assessment
 
 ## Current Status
 
-This repository is currently in the `docs-first baseline` stage.
+The application is **functional with real NFC** on Android (ASUS ROG Phone 9 FE + NTAG215).
 
-The project already contains:
+Completed:
 
-- requirements and architecture specs
-- task inventory and feature-based execution order
-- UML/system diagrams
-- release, testing, security, and presentation planning
-- initial Signal-oriented presentation theme artifacts under `src/`
-
-Implementation will follow the execution sequence in `.codex/specs/EXECUTION_ORDER.md`.
+- Full parking MVP flow: Register → Top-Up → Check-In → Check-Out → Scout inspect
+- All NFC operations complete in a single tap (single-session read+write)
+- Silent Shield AES-256-GCM encryption via `react-native-quick-crypto`
+- Compact card codec (`v,c,m,b,s,i,x,n` format) fits NTAG215 (362 bytes worst-case)
+- NfcActionSheet bottom sheet (50% height, dark overlay, dismissable) for scan/success/error feedback
+- Local SQLite ledger for device-side audit and reporting
+- No simulation mode or mock scenario selectors — all flows use real NFC
 
 ## Product Summary
 
@@ -38,14 +38,19 @@ Real card operations require:
 
 - an NFC-capable device
 - NFC enabled on the device
-- a supported physical NFC card/tag
+- a supported physical NFC card/tag (NTAG215 validated)
 
-Current validation direction:
+Validated configuration:
 
-- Android is the primary real-device target
+- ASUS ROG Phone 9 FE (Android 14+) with NTAG215 tags
+- Android NFC permissions and intent filters configured
+- Buffer polyfill in `index.js` for binary crypto
+- `react-native-reanimated/plugin` in `babel.config.js` for bottom sheet animations
+
+Platform notes:
+
+- Android is the primary real-device target (fully validated)
 - iOS remains a secondary validation target and must be documented honestly based on real-device behavior
-
-Without a real NFC-capable device, the app may still support mock or simulation flows for development and demo.
 
 ## Repository Working Rules
 
@@ -110,13 +115,7 @@ Planned stack:
 
 ## Mock And Demo Path
 
-Before the real NFC card/tag is available, development may proceed with:
-
-- mocked card repository behavior
-- simulation flows
-- UI-level demo states
-
-This allows business logic, screens, tests, and documentation to progress without waiting for hardware.
+All flows now use real NFC — no simulation mode or mock scenario selectors remain in the app. Development and demo require an NFC-capable Android device with NTAG215 tags.
 
 ## Submission And Release Notes
 
@@ -136,10 +135,9 @@ Planned release automation:
 
 ## Known Limitations Right Now
 
-- real NFC card/tag details are still pending
 - final Figma refinement is still pending
 - GitHub, SonarCloud, and app distribution credentials are not configured yet
-- React Native application scaffolding is not created yet in full
+- iOS NFC validation is deferred
 
 ## Remote Setup Notes
 

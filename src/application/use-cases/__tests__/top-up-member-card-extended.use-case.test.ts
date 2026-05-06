@@ -5,18 +5,23 @@ import type { LocalLedgerRepository } from '../../../domain/repositories/local-l
 function createCardRepository(
   overrides?: Partial<MbcCardRepository>,
 ): MbcCardRepository {
+  const defaultCard = {
+    version: 1,
+    cardId: 'CARD-001',
+    member: { memberId: 'MEM-001' },
+    balance: 1000,
+    currency: 'IDR' as const,
+    visitStatus: 'NOT_CHECKED_IN' as const,
+    transactionLogs: [] as any[],
+  };
   return {
     isSupported: jest.fn().mockResolvedValue(true),
-    readCard: jest.fn().mockResolvedValue({
-      version: 1,
-      cardId: 'CARD-001',
-      member: { memberId: 'MEM-001' },
-      balance: 1000,
-      currency: 'IDR',
-      visitStatus: 'NOT_CHECKED_IN',
-      transactionLogs: [],
-    }),
+    readCard: jest.fn().mockResolvedValue(defaultCard),
     writeCard: jest.fn().mockResolvedValue(undefined),
+    readWriteCard: jest
+      .fn()
+      .mockImplementation(async (fn: any) => fn(defaultCard)),
+    registerCard: jest.fn().mockResolvedValue(undefined),
     cancel: jest.fn().mockResolvedValue(undefined),
     ...overrides,
   };
@@ -87,7 +92,7 @@ describe('TopUpMemberCardUseCase – extended coverage', () => {
 
   it('re-throws unexpected errors', async () => {
     const cardRepository = createCardRepository({
-      readCard: jest.fn().mockRejectedValue(new Error('Disk failure')),
+      readWriteCard: jest.fn().mockRejectedValue(new Error('Disk failure')),
     });
     const useCase = new TopUpMemberCardUseCase(cardRepository);
 

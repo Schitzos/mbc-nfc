@@ -1,40 +1,34 @@
 import React from 'react';
 import { ActivityIndicator, Text, View } from 'react-native';
-import { SignalBottomSheet } from './SignalBottomSheet';
-import { SignalButton } from './SignalButton';
+import { SignalBottomSheet } from '../SignalBottomSheet';
+import { SignalButton } from '../SignalButton';
+import type { NfcActionSheetProps } from './types';
 
-export type NfcActionState =
-  | { phase: 'idle' }
-  | { phase: 'scanning'; message?: string }
-  | { phase: 'success'; title: string; message: string }
-  | { phase: 'error'; title: string; message: string };
-
-type Props = {
-  state: NfcActionState;
-  onDismiss: () => void;
-};
+export type { NfcActionState, NfcActionSheetProps } from './types';
 
 export function NfcActionSheet({
   state,
   onDismiss,
-}: Props): React.JSX.Element | null {
+}: Readonly<NfcActionSheetProps>): React.JSX.Element | null {
   if (state.phase === 'idle') {
     return null;
   }
 
-  const visible = state.phase !== 'idle';
-  const canClose = state.phase === 'success' || state.phase === 'error';
+  const canClose = true;
+
+  let sheetTitle = '✕ Failed';
+  if (state.phase === 'scanning') {
+    sheetTitle = 'Ready to Scan';
+  } else if (state.phase === 'success') {
+    sheetTitle = '✓ Done';
+  } else if (state.phase === 'confirm') {
+    sheetTitle = '⚠ Confirm';
+  }
 
   return (
     <SignalBottomSheet
-      visible={visible}
-      title={
-        state.phase === 'scanning'
-          ? 'Ready to Scan'
-          : state.phase === 'success'
-            ? '✓ Done'
-            : '✕ Failed'
-      }
+      visible
+      title={sheetTitle}
       onClose={canClose ? onDismiss : undefined}
     >
       {state.phase === 'scanning' && (
@@ -48,7 +42,6 @@ export function NfcActionSheet({
           </Text>
         </View>
       )}
-
       {state.phase === 'success' && (
         <View className="gap-3 pb-6">
           <View className="rounded-xl bg-[#EAFBF2] p-4">
@@ -60,7 +53,6 @@ export function NfcActionSheet({
           <SignalButton label="Done" onPress={onDismiss} />
         </View>
       )}
-
       {state.phase === 'error' && (
         <View className="gap-3 pb-6">
           <View className="rounded-xl bg-[#FFECEC] p-4">
@@ -70,6 +62,18 @@ export function NfcActionSheet({
             <Text className="mt-1 text-sm text-red-700">{state.message}</Text>
           </View>
           <SignalButton label="Dismiss" onPress={onDismiss} />
+        </View>
+      )}
+      {state.phase === 'confirm' && (
+        <View className="gap-3 pb-6">
+          <View className="rounded-xl bg-[#FFF7DB] p-4">
+            <Text className="text-base font-bold text-amber-800">
+              {state.title}
+            </Text>
+            <Text className="mt-1 text-sm text-amber-700">{state.message}</Text>
+          </View>
+          <SignalButton label={state.confirmLabel} onPress={state.onConfirm} />
+          <SignalButton label="Skip" variant="secondary" onPress={onDismiss} />
         </View>
       )}
     </SignalBottomSheet>

@@ -381,10 +381,10 @@ Additional required validation tests:
 - Registration rejects already registered valid MBC cards.
 - Encoded protected payload size is checked against selected NFC tag/card capacity.
 - `CARD_CAPACITY_INSUFFICIENT` blocks write and keeps prior card state.
-- Every real NFC write performs readback verification and reports `WRITE_VERIFY_FAILED` if the card cannot be verified.
+- Every real NFC write relies on `writeNdefMessage` throwing on failure. No post-write readback is performed (codec does not preserve all fields round-trip).
 - SQLite ledger inserts after successful `REGISTER`, `TOPUP`, `CHECKIN`, and `CHECKOUT`.
 - Station ledger summary labels totals as current-device/current-installation only.
 - Checkout rejects invalid duration/time before balance deduction.
 - Gate writes active visit state at check-in; Terminal calculates checkout fee using the fixed Rp 2.000 per started hour tariff.
 - Insufficient balance recovery works: top-up while checked-in, then checkout succeeds.
-- Early card removal or failed readback returns `WRITE_VERIFY_FAILED` and does not show success.
+- If `writeNdefMessage` throws, the error is surfaced to the user and success is not shown.

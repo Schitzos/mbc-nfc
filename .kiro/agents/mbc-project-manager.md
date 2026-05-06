@@ -28,14 +28,14 @@ Always check:
 
 ## MVP Delivery Order
 
-1. Project skeleton and architecture folders.
-2. Domain/application logic with mock card repository.
-3. Station, Gate, Terminal, Scout UI using simulated card state.
-4. Activity tariff and state tests.
-5. Silent Shield prototype codec.
-6. Android NFC read/write integration when hardware is available.
-7. Signal UI polish after Figma is provided.
-8. Demo capture and presentation.
+1. ✅ Project skeleton and architecture folders.
+2. ✅ Domain/application logic with mock card repository.
+3. ✅ Station, Gate, Terminal, Scout UI with real NFC.
+4. ✅ Activity tariff and state tests.
+5. ✅ Silent Shield AES-256-GCM (react-native-quick-crypto).
+6. ✅ Android NFC read/write validated on ROG 9 FE + NTAG215.
+7. ✅ UI polish (NfcActionSheet, preset top-ups, accordion ledger, timestamps).
+8. Demo capture and submission package.
 
 ## Scope Guardrails
 

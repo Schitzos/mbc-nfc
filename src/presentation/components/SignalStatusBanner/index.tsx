@@ -1,20 +1,10 @@
-import React, { ReactNode } from 'react';
+import React, { useMemo } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
-import { signalColorTokens } from '../theme/colors';
-import { radius } from '../theme/radius';
-import { spacing } from '../theme/spacing';
-import { typography } from '../theme/typography';
+import { signalColorTokens } from '../../theme/colors';
+import type { SignalStatusBannerProps, Tone } from './types';
+import { styles } from './styles';
 
-type Tone = 'info' | 'warning' | 'error' | 'success';
-
-type Props = {
-  tone: Tone;
-  eyebrow: string;
-  title: string;
-  body: string;
-  items?: string[];
-  children?: ReactNode;
-};
+export type { SignalStatusBannerProps, Tone } from './types';
 
 const toneMap = {
   info: {
@@ -49,20 +39,24 @@ export function SignalStatusBanner({
   body,
   items,
   children,
-}: Props): React.JSX.Element {
+}: Readonly<SignalStatusBannerProps>): React.JSX.Element {
   const toneToken = toneMap[tone];
 
-  return (
-    <View
-      style={[
-        styles.root,
-        {
+  const dynamicStyles = useMemo(
+    () =>
+      StyleSheet.create({
+        rootTone: {
           borderColor: toneToken.borderColor,
           backgroundColor: toneToken.backgroundColor,
         },
-      ]}
-    >
-      <Text style={[styles.eyebrow, { color: toneToken.eyebrowColor }]}>
+        eyebrowColor: { color: toneToken.eyebrowColor },
+      }),
+    [toneToken],
+  );
+
+  return (
+    <View style={[styles.root, dynamicStyles.rootTone]}>
+      <Text style={[styles.eyebrow, dynamicStyles.eyebrowColor]}>
         {eyebrow}
       </Text>
       <Text style={styles.title}>{title}</Text>
@@ -80,31 +74,3 @@ export function SignalStatusBanner({
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  root: {
-    borderWidth: 1,
-    borderRadius: radius.card,
-    padding: spacing.xl,
-    gap: spacing.sm,
-  },
-  eyebrow: {
-    ...typography.labelBold,
-    textTransform: 'uppercase',
-  },
-  title: {
-    ...typography.mobileHeadline2,
-    color: signalColorTokens.text.primary,
-  },
-  body: {
-    ...typography.body1Regular,
-    color: signalColorTokens.text.secondary,
-  },
-  list: {
-    gap: spacing.xxs,
-  },
-  listItem: {
-    ...typography.body2Regular,
-    color: signalColorTokens.text.secondary,
-  },
-});

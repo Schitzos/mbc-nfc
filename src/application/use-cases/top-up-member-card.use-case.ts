@@ -10,9 +10,9 @@ import { toCardSummaryDto } from '../dto/card-summary-mapper';
 import type { LocalLedgerRepository } from '../../domain/repositories/local-ledger-repository';
 import { maskMemberReference } from '../../shared/utils/mask-member-reference';
 
-type TopUpMemberCardRequest = {
+interface TopUpMemberCardRequest {
   amount: number;
-};
+}
 
 export class TopUpMemberCardUseCase {
   constructor(
@@ -32,21 +32,17 @@ export class TopUpMemberCardUseCase {
     }
 
     try {
-      const card = await this.cardRepository.readCard();
-      const nextCard = appendTransactionLog(
-        {
-          ...card,
-          balance: card.balance + amount,
-        },
-        createTransactionLog({
-          id: createRandomId('LOG'),
-          activity: 'TOP_UP',
-          nominal: amount,
-          occurredAt: new Date().toISOString(),
-        }),
+      const nextCard = await this.cardRepository.readWriteCard(card =>
+        appendTransactionLog(
+          { ...card, balance: card.balance + amount },
+          createTransactionLog({
+            id: createRandomId('LOG'),
+            activity: 'TOP_UP',
+            nominal: amount,
+            occurredAt: new Date().toISOString(),
+          }),
+        ),
       );
-
-      await this.cardRepository.writeCard(nextCard);
 
       let message = 'Top-up completed successfully.';
 

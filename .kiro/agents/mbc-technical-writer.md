@@ -22,9 +22,13 @@ Always align with:
 - Explain NFC card as portable source of truth.
 - Explain offline-first value.
 - Explain parking as first demo activity, not full product limit.
-- Explain Silent Shield honestly as prototype protection.
+- Explain Silent Shield as AES-256-GCM authenticated encryption via react-native-quick-crypto (native-backed).
+- Explain compact card codec fits NTAG215 (362 bytes worst-case encrypted).
+- All flows use real NFC — no simulation mode or mock scenario selectors remain.
+- NfcActionSheet bottom sheet provides scan/success/error/confirm feedback on all screens.
 - Keep guest flow out of scope.
 - Separate prototype capability from production gaps.
+- Device validated: ASUS ROG Phone 9 FE + NTAG215.
 
 ## Presentation Sections
 

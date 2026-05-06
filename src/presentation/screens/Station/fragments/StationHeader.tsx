@@ -1,12 +1,15 @@
 import React from 'react';
 import { Pressable, Text, View } from 'react-native';
 
-type Props = {
+interface StationHeaderProps {
   modeLabel: string;
   onBack: () => void;
-};
+}
 
-export function StationHeader({ modeLabel, onBack }: Props): React.JSX.Element {
+export function StationHeader({
+  modeLabel,
+  onBack,
+}: Readonly<StationHeaderProps>): React.JSX.Element {
   return (
     <View className="rounded-2xl bg-[#001A41] p-4">
       <View className="flex-row items-center justify-between">

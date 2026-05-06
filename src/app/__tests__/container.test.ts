@@ -1,4 +1,5 @@
-import { appContainer } from '../container';
+import { createAppServices } from '../container';
+
 const mockOpen = jest.fn().mockReturnValue({
   execute: jest.fn(),
 });
@@ -28,32 +29,20 @@ jest.mock('react-native-quick-crypto', () => ({
   },
 }));
 
-describe('appContainer', () => {
-  it('reuses singleton repositories', () => {
-    const realA = appContainer.getRealMbcCardRepository();
-    const realB = appContainer.getRealMbcCardRepository();
-    const nfcA = appContainer.getDeviceNfcStatusRepository();
-    const nfcB = appContainer.getDeviceNfcStatusRepository();
-    const ledgerA = appContainer.getSqliteLedgerRepository();
-    const ledgerB = appContainer.getSqliteLedgerRepository();
-
-    expect(realA).toBe(realB);
-    expect(nfcA).toBe(nfcB);
-    expect(ledgerA).toBe(ledgerB);
-  });
-
+describe('createAppServices', () => {
   it('builds station, gate, terminal, and scout services', () => {
-    const station = appContainer.getStationServices();
-    const gate = appContainer.getGateServices();
-    const terminal = appContainer.getTerminalServices();
-    const scout = appContainer.getScoutServices();
+    const services = createAppServices();
 
-    expect(station.registerMemberCardUseCase).toBeTruthy();
-    expect(station.topUpMemberCardUseCase).toBeTruthy();
-    expect(station.getStationLedgerSummaryUseCase).toBeTruthy();
-    expect(gate.checkInActivityUseCase).toBeTruthy();
-    expect(terminal.checkOutActivityUseCase).toBeTruthy();
-    expect(scout.inspectMemberCardUseCase).toBeTruthy();
+    expect(services.station.registerMemberCardUseCase).toBeTruthy();
+    expect(services.station.topUpMemberCardUseCase).toBeTruthy();
+    expect(services.station.getStationLedgerSummaryUseCase).toBeTruthy();
+    expect(services.station.checkNfcAvailabilityUseCase).toBeTruthy();
+    expect(services.gate.checkInActivityUseCase).toBeTruthy();
+    expect(services.gate.checkNfcAvailabilityUseCase).toBeTruthy();
+    expect(services.terminal.checkOutActivityUseCase).toBeTruthy();
+    expect(services.terminal.checkNfcAvailabilityUseCase).toBeTruthy();
+    expect(services.scout.inspectMemberCardUseCase).toBeTruthy();
+    expect(services.scout.checkNfcAvailabilityUseCase).toBeTruthy();
     expect(mockOpen).toHaveBeenCalledTimes(1);
   });
 });

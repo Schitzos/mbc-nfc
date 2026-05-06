@@ -53,7 +53,7 @@ describe('CardRepositoryError', () => {
       'NFC_UNSUPPORTED',
       'NFC_DISABLED',
       'NFC_UNAVAILABLE',
-      'MOCK_SCENARIO_MISSING',
+      'SCAN_CANCELLED',
     ] as const;
 
     for (const code of codes) {

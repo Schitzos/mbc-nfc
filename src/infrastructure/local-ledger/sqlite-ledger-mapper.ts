@@ -1,6 +1,6 @@
 import type { LedgerEntry } from '../../domain/entities/mbc-card';
 
-type LedgerRow = {
+interface LedgerRow {
   id: string;
   role: LedgerEntry['role'];
   action: LedgerEntry['action'];
@@ -9,7 +9,7 @@ type LedgerRow = {
   amount: number | null;
   occurred_at: string;
   device_id: string | null;
-};
+}
 
 export function mapLedgerRowToEntry(row: LedgerRow): LedgerEntry {
   return {

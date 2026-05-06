@@ -6,20 +6,20 @@ This document defines the testing strategy for the MBC React Native NFC frontend
 
 ## 2. Test Levels
 
-| Level          | Purpose                                                                                                            | Runs On                          |
-| -------------- | ------------------------------------------------------------------------------------------------------------------ | -------------------------------- |
-| Unit           | Validate parking tariff, activity state, logs, and codec helpers                                                   | Local machine / CI               |
-| Application    | Validate Station, Gate, Terminal, and Scout use cases with mocked NFC card repository and local ledger integration | Local machine / CI               |
-| Infrastructure | Validate NFC repository and card codec behavior                                                                    | Local / real device where needed |
-| Presentation   | Validate role screens, forms, loading, success, and error states                                                   | Local machine / CI               |
-| Device         | Validate real NFC read/write behavior                                                                              | Physical iOS and Android devices |
-| Security       | Validate Silent Shield and redaction controls                                                                      | Local / manual review            |
+| Level          | Purpose                                                                                                         | Runs On                          |
+| -------------- | --------------------------------------------------------------------------------------------------------------- | -------------------------------- |
+| Unit           | Validate parking tariff, activity state, logs, and codec helpers                                                | Local machine / CI               |
+| Application    | Validate Station, Gate, Terminal, and Scout use cases with repository test doubles and local ledger integration | Local machine / CI               |
+| Infrastructure | Validate NFC repository and card codec behavior                                                                 | Local / real device where needed |
+| Presentation   | Validate role screens, forms, loading, success, and error states                                                | Local machine / CI               |
+| Device         | Validate real NFC read/write behavior                                                                           | Physical iOS and Android devices |
+| Security       | Validate Silent Shield and redaction controls                                                                   | Local / manual review            |
 
 ## 3. Test Ownership
 
 | Role                         | Test Responsibility                                                          |
 | ---------------------------- | ---------------------------------------------------------------------------- |
-| Test Automation Engineer     | Unit, application, mocked repository, and presentation automation.           |
+| Test Automation Engineer     | Unit, application, repository test-double, and presentation automation.      |
 | Senior QA                    | Manual acceptance, exploratory, edge-case, and regression review.            |
 | NFC/Mobile Native Specialist | Real-device NFC read/write, Android/iOS setup, and tag compatibility.        |
 | Security Pentester           | Silent Shield, tamper handling, privacy, and role-abuse tests.               |
@@ -102,7 +102,7 @@ Required cases:
 - Station top-up increases balance and adds log.
 - Gate check-in sets activity ID/type, status, and timestamp.
 - Gate check-in appends a local ledger audit row with amount `0`.
-- Gate simulation mode writes past timestamp for testing.
+- Gate check-in uses real device time and records current timestamp.
 - Terminal checkout rejects invalid duration/time before deduction.
 - Terminal insufficient balance returns top-up guidance and keeps checked-in status.
 - Insufficient-balance recovery works after Station top-up and Terminal retry.
@@ -120,7 +120,7 @@ Must test:
 - Station registration does not require typed member ID or human-readable profile input in the first implementation round.
 - Station top-up validation.
 - Station local ledger summary panel displays local totals clearly.
-- Gate simulation mode indicator.
+- Gate screen has no simulation controls in production flow.
 - Terminal missing card/scan timeout recovery guidance.
 - Scout one-tap balance, status, and transaction log display.
 - NFC loading, success, and error states.
@@ -138,13 +138,13 @@ Must test:
 | ID       | Scenario                 | Steps                                                   | Expected                                                                             |
 | -------- | ------------------------ | ------------------------------------------------------- | ------------------------------------------------------------------------------------ |
 | NFC-001  | NFC supported            | Open app on NFC-capable phone                           | App shows NFC available                                                              |
-| NFC-001A | NFC unsupported          | Open app on non-NFC device or mocked unsupported state  | App explains that real card operations require an NFC-capable device                 |
+| NFC-001A | NFC unsupported          | Open app on non-NFC device                              | App explains that real card operations require an NFC-capable device                 |
 | NFC-001B | NFC disabled             | Open app with NFC disabled where platform can detect it | App asks user to enable NFC before scanning                                          |
 | NFC-002  | Register card            | Station registers card                                  | Card can be inspected by Scout and registration rejects overwrite on same valid card |
 | NFC-003  | Top-up                   | Station tops up card                                    | Balance increases and log is added                                                   |
 | NFC-004  | Activity check-in        | Gate checks in card                                     | Activity status becomes checked in                                                   |
-| NFC-005  | Simulation check-in      | Gate checks in with past timestamp                      | Past entry time is stored                                                            |
-| NFC-006  | Activity checkout        | Terminal checks out card                                | Fee is deducted, status clears, and write-readback verification passes               |
+| NFC-005  | Real-time check-in       | Gate checks in with current device time                 | Current entry time is stored                                                         |
+| NFC-006  | Activity checkout        | Terminal checks out card                                | Fee is deducted, status clears, and write succeeds                                   |
 | NFC-007  | Double check-in          | Gate checks in same card twice                          | Second action is rejected                                                            |
 | NFC-008  | Double check-out         | Terminal checks out unchecked card                      | Action is rejected                                                                   |
 | NFC-009  | Insufficient balance     | Terminal checks out card with low balance               | User is told to top up; card remains checked in; after top-up checkout can retry     |
@@ -153,7 +153,7 @@ Must test:
 | NFC-012  | Missing card at checkout | Terminal scan times out or no card is available         | User is directed to Station/manual recovery                                          |
 
 | NFC-013 | NTAG215 payload capacity | Write compact protected payload to NTAG215 | Oversized payload is blocked with `CARD_CAPACITY_INSUFFICIENT` |
-| NFC-014 | Write readback failure | Mock or simulate write then failed readback validation | App reports `WRITE_VERIFY_FAILED` and does not show success |
+| NFC-014 | Write failure handling | Mock writeNdefMessage rejection | App reports NFC error and does not show success |
 | NFC-015 | Invalid checkout time | Terminal checkout with exit time before/equal entry | App blocks checkout with `INVALID_TIME` / `INVALID_DURATION` |
 
 ## 9. End-to-End Documentation Standard
@@ -178,7 +178,7 @@ Must test:
 | SEC-009 | Write counter                 | Counter increments after every successful card-state write                                                                     |
 | SEC-010 | Transaction FIFO              | Card keeps only the latest five transaction logs after more than five operations                                               |
 | SEC-011 | SQLite authority boundary     | SQLite reporting data never overrides card balance, status, or activity state                                                  |
-| SEC-012 | Write readback verification   | Real NFC writes are verified by reading back expected counter/state/authentication                                             |
+| SEC-012 | Write failure handling        | Real NFC writes rely on writeNdefMessage throwing on failure; capacity checked before write                                    |
 | SEC-013 | Capacity guard                | Oversized protected payload is rejected before write                                                                           |
 | SEC-014 | Local report scope            | Station summary clearly states current-device/current-installation only                                                        |
 

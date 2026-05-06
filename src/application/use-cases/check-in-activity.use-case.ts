@@ -43,15 +43,14 @@ export class CheckInActivityUseCase {
     const occurredAt = simulatedCheckedInAt ?? new Date().toISOString();
 
     try {
-      const card = await this.cardRepository.readCard();
-      const checkedInCard = applyCheckInState(card, {
-        activityId,
-        activityType,
-        checkedInAt: occurredAt,
+      const updatedCard = await this.cardRepository.readWriteCard(card => {
+        const checkedInCard = applyCheckInState(card, {
+          activityId,
+          activityType,
+          checkedInAt: occurredAt,
+        });
+        return createCheckInLog(checkedInCard, occurredAt);
       });
-      const updatedCard = createCheckInLog(checkedInCard, occurredAt);
-
-      await this.cardRepository.writeCard(updatedCard);
 
       return {
         success: true,

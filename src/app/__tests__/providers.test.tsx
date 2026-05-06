@@ -20,6 +20,15 @@ jest.mock('react-native-safe-area-context', () => ({
   ),
 }));
 
+jest.mock('../container', () => ({
+  createAppServices: () => ({
+    station: {},
+    gate: {},
+    terminal: {},
+    scout: {},
+  }),
+}));
+
 describe('AppProviders', () => {
   it('renders children inside providers', () => {
     const { AppProviders } = require('../providers');

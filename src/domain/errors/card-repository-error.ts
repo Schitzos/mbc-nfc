@@ -8,9 +8,7 @@ export class CardRepositoryError extends Error {
       | 'NFC_UNSUPPORTED'
       | 'NFC_DISABLED'
       | 'NFC_UNAVAILABLE'
-      | 'SCAN_CANCELLED'
-      | 'WRITE_VERIFY_FAILED'
-      | 'MOCK_SCENARIO_MISSING',
+      | 'SCAN_CANCELLED',
     message: string,
   ) {
     super(message);

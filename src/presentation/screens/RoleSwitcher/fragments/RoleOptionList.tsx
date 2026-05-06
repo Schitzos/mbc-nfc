@@ -2,11 +2,11 @@ import React from 'react';
 import { Pressable, Text, View } from 'react-native';
 import type { RoleOption } from '../../../config/role-options';
 
-type Props = {
-  activeRoleKey: RoleOption['key'];
+interface RoleOptionListProps {
+  activeRoleKey: RoleOption['key'] | null;
   roles: RoleOption[];
   onSelect: (roleKey: RoleOption['key']) => void;
-};
+}
 
 const roleIcon: Record<RoleOption['key'], string> = {
   station: 'S',
@@ -26,9 +26,9 @@ export function RoleOptionList({
   activeRoleKey,
   roles,
   onSelect,
-}: Props): React.JSX.Element {
+}: Readonly<RoleOptionListProps>): React.JSX.Element {
   return (
-    <View className="rounded-2xl bg-white p-4">
+    <View className="rounded-2xl bg-white p-4 shadow-sm">
       <Text className="text-2xl font-bold text-foreground">Choose role</Text>
 
       <View className="mt-4 rounded-xl border border-[#2A8BFF] bg-[#EAF4FF] p-4">

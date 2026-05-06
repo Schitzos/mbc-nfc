@@ -3,22 +3,26 @@ import NfcManager, { Ndef, NfcTech } from 'react-native-nfc-manager';
 import type { MbcCard } from '../../domain/entities/mbc-card';
 import type { MbcCardRepository } from '../../domain/repositories/mbc-card-repository';
 import { CardRepositoryError } from '../../domain/errors/card-repository-error';
+import { DomainError } from '../../domain/errors/domain-error';
 import { encrypt, decrypt, isMbcEnvelope } from './silent-shield';
 
 const NTAG215_USER_MEMORY = 504;
 
-type NdefRecord = {
+interface NdefRecord {
   tnf: number;
   type: number[] | Uint8Array;
   payload: number[] | Uint8Array;
-};
+}
 
-type NdefTag = {
+interface NdefTag {
   ndefMessage?: NdefRecord[];
-};
+}
 
-function toReadableError(error: unknown): CardRepositoryError {
+function toReadableError(error: unknown): CardRepositoryError | DomainError {
   if (error instanceof CardRepositoryError) {
+    return error;
+  }
+  if (error instanceof DomainError) {
     return error;
   }
   if (error instanceof Error && /cancel/i.test(error.message)) {
@@ -45,12 +49,9 @@ export class RealMbcCardRepository implements MbcCardRepository {
   async readCard(): Promise<MbcCard> {
     await this.ensureStarted();
     try {
-      console.log('[NFC:repo] requestTechnology for read...');
       await this.requestNdefTechnology();
-      console.log('[NFC:repo] technology acquired, reading...');
       return await this.readCardFromActiveSession();
     } catch (error) {
-      console.log('[NFC:repo] readCard error:', error);
       throw toReadableError(error);
     } finally {
       await this.cancel();
@@ -60,12 +61,24 @@ export class RealMbcCardRepository implements MbcCardRepository {
   async writeCard(card: MbcCard): Promise<void> {
     await this.ensureStarted();
     try {
-      console.log('[NFC:repo] requestTechnology for write...');
       await this.requestNdefTechnology();
-      console.log('[NFC:repo] technology acquired, encrypting...');
       await this.writeToActiveSession(card);
     } catch (error) {
-      console.log('[NFC:repo] writeCard error:', error);
+      throw toReadableError(error);
+    } finally {
+      await this.cancel();
+    }
+  }
+
+  async readWriteCard(transform: (card: MbcCard) => MbcCard): Promise<MbcCard> {
+    await this.ensureStarted();
+    try {
+      await this.requestNdefTechnology();
+      const card = await this.readCardFromActiveSession();
+      const updated = transform(card);
+      await this.writeToActiveSession(updated);
+      return updated;
+    } catch (error) {
       throw toReadableError(error);
     } finally {
       await this.cancel();
@@ -75,44 +88,27 @@ export class RealMbcCardRepository implements MbcCardRepository {
   async registerCard(card: MbcCard): Promise<void> {
     await this.ensureStarted();
     try {
-      console.log('[NFC:repo] requestTechnology for register...');
       await this.requestNdefTechnology();
-      console.log('[NFC:repo] technology acquired, checking existing data...');
 
       // Check if card already has valid MBC data
       const currentTag = (await NfcManager.getTag()) as NdefTag | null;
-      console.log(
-        '[NFC:repo] getTag result:',
-        currentTag ? 'has tag' : 'null',
-        'ndefMessage:',
-        currentTag?.ndefMessage?.length ?? 0,
-      );
 
       if (currentTag?.ndefMessage?.length) {
         const rawPayload = currentTag.ndefMessage[0].payload;
-        console.log(
-          '[NFC:repo] payload type:',
-          typeof rawPayload,
-          'length:',
-          rawPayload?.length ?? 0,
-        );
-        const payloadBytes = Buffer.from(rawPayload ?? []);
-        console.log('[NFC:repo] buffer created, length:', payloadBytes.length);
+        const payloadBytes = Buffer.from(rawPayload as number[]);
         if (isMbcEnvelope(payloadBytes)) {
           const decryptResult = decrypt(payloadBytes);
           if (decryptResult.ok) {
             throw new CardRepositoryError(
-              'ALREADY_REGISTERED_CARD',
+              'CARD_ALREADY_REGISTERED',
               'This card is already registered. Use a blank card or reset first.',
             );
           }
         }
       }
 
-      console.log('[NFC:repo] card is blank/unregistered, writing...');
       await this.writeToActiveSession(card);
     } catch (error) {
-      console.log('[NFC:repo] registerCard error:', error);
       throw toReadableError(error);
     } finally {
       await this.cancel();
@@ -158,12 +154,7 @@ export class RealMbcCardRepository implements MbcCardRepository {
 
     const mimeType = 'application/vnd.mbc.v1';
     const encoded = Ndef.encodeMessage([
-      Ndef.record(
-        Ndef.TNF_MIME_MEDIA,
-        Array.from(Buffer.from(mimeType, 'ascii')),
-        [],
-        Array.from(envelope),
-      ),
+      Ndef.record(Ndef.TNF_MIME_MEDIA, mimeType, '', Array.from(envelope)),
     ]);
 
     if (!encoded) {
@@ -174,20 +165,29 @@ export class RealMbcCardRepository implements MbcCardRepository {
     }
 
     await NfcManager.ndefHandler.writeNdefMessage(encoded);
-    console.log('[NFC:repo] write complete!');
   }
 
   private async readCardFromActiveSession(): Promise<MbcCard> {
-    const currentTag = (await NfcManager.getTag()) as NdefTag | null;
-    if (!currentTag?.ndefMessage?.length) {
+    let ndefMessage: NdefRecord[] | undefined;
+    try {
+      const msg = await NfcManager.ndefHandler.getNdefMessage();
+      // getNdefMessage returns a tag-like object { ndefMessage: [...] }
+      const tagObj = msg as NdefTag | null;
+      ndefMessage = tagObj?.ndefMessage;
+    } catch {
+      const currentTag = (await NfcManager.getTag()) as NdefTag | null;
+      ndefMessage = currentTag?.ndefMessage;
+    }
+
+    if (!ndefMessage?.length) {
       throw new CardRepositoryError(
         'UNREGISTERED_CARD',
         'Card is blank or not registered yet.',
       );
     }
 
-    const firstRecord = currentTag.ndefMessage[0];
-    const payloadBytes = Buffer.from(firstRecord.payload ?? []);
+    const firstRecord = ndefMessage[0];
+    const payloadBytes = Buffer.from(firstRecord.payload as number[]);
 
     if (!isMbcEnvelope(payloadBytes)) {
       throw new CardRepositoryError(

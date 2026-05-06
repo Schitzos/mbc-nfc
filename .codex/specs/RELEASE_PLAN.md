@@ -43,7 +43,7 @@ A feature is not release-ready without:
 | Senior React Native FE                     | Implements role flows and frontend integration through separate feature branches.                                                                                                                           |
 | UI/UX Designer                             | Confirms Signal UI alignment, role UX, and screen states.                                                                                                                                                   |
 | NFC/Mobile Native Specialist               | Confirms NFC setup, device behavior, and tag/card constraints.                                                                                                                                              |
-| Test Automation Engineer                   | Confirms repeatable automated tests and mocked repository coverage.                                                                                                                                         |
+| Test Automation Engineer                   | Confirms repeatable automated tests and repository test-double coverage.                                                                                                                                    |
 | Senior QA                                  | Confirms manual QA coverage and acceptance readiness.                                                                                                                                                       |
 | Security Pentester                         | Confirms Silent Shield, tamper handling, and privacy risks.                                                                                                                                                 |
 | Technical Writer / Presentation Specialist | Confirms docs and presentation material.                                                                                                                                                                    |
@@ -61,7 +61,7 @@ Scope:
 - `CODEOWNERS` or equivalent reviewer-routing guidance.
 - Git commit-message convention.
 - React Native-ready `.gitignore`.
-- README with setup, run, NFC hardware, mock/demo, and known limitation notes.
+- README with setup, run, NFC hardware, and known limitation notes.
 - Security check for secrets and generated artifacts before baseline commit.
 
 Exit criteria:
@@ -108,7 +108,7 @@ Scope:
 - Transaction log policy.
 - Local SQLite ledger repository and summary path.
 - Mock card repository fixtures.
-- Use-case tests with mocked card repository.
+- Use-case tests with repository test doubles in automated suite.
 
 Exit criteria:
 
@@ -130,13 +130,13 @@ Scope:
 - Station registration.
 - Station top-up.
 - Station local ledger summary.
-- Gate parking check-in and simulation mode.
+- Gate parking check-in with real device time.
 - Terminal parking checkout and insufficient balance handling.
 - Scout inspection.
 
 Exit criteria:
 
-- All role use cases pass tests with mocked card repository.
+- All role use cases pass tests with repository test doubles.
 - Station reporting path is understandable and clearly marked as device-local history.
 - Product Owner confirms role flows satisfy MVP acceptance.
 - UI/UX Designer confirms role flows are understandable before final Signal UI polish.
@@ -200,7 +200,7 @@ Exit criteria:
 - Station registration tested.
 - Station top-up tested.
 - Gate parking check-in tested.
-- Gate simulation mode tested.
+- Gate real-time check-in behavior tested.
 - Terminal checkout tested.
 - Insufficient balance tested.
 - Scout inspection tested.

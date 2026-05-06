@@ -4,12 +4,13 @@ import { PARKING_TARIFF_PER_STARTED_HOUR } from '../entities/mbc-card';
 export type ActivityTariffCalculation = {
   chargedHours: number;
   chargedAmount: number;
+  durationMs: number;
 };
 
-type CalculateActivityTariffInput = {
+interface CalculateActivityTariffInput {
   checkedInAt: string;
   checkedOutAt: string;
-};
+}
 
 function parseIsoDate(value: string): Date {
   const parsedDate = new Date(value);
@@ -45,5 +46,6 @@ export function calculateActivityTariff({
   return {
     chargedHours,
     chargedAmount: chargedHours * PARKING_TARIFF_PER_STARTED_HOUR,
+    durationMs,
   };
 }

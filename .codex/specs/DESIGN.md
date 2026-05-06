@@ -28,9 +28,11 @@ Layer responsibilities:
 | Mobile framework  | React Native CLI                                       |
 | Language          | TypeScript                                             |
 | NFC library       | `react-native-nfc-manager`                             |
+| Crypto library    | `react-native-quick-crypto` (AES-256-GCM)              |
 | Local database    | SQLite                                                 |
 | UI system         | Signal UI, guided by `.codex/specs/SIGNAL_UI_GUIDE.md` |
 | Navigation        | React Navigation                                       |
+| Animations        | `react-native-reanimated`                              |
 | State management  | Zustand or React Context                               |
 | Testing           | Jest, React Native Testing Library                     |
 | Static analysis   | SonarCloud                                             |
@@ -245,6 +247,8 @@ export interface MbcCardRepository {
   isSupported(): Promise<boolean>;
   readCard(): Promise<MbcCard>;
   writeCard(card: MbcCard): Promise<void>;
+  readWriteCard(transform: (card: MbcCard) => MbcCard): Promise<MbcCard>;
+  registerCard(card: MbcCard): Promise<void>;
   cancel(): Promise<void>;
 }
 
@@ -278,10 +282,12 @@ export interface ParkingTariffRule {
 
 ### Registration Safety### Registration Safety
 
-- Station registration detects already-registered or tampered cards and offers a reset confirmation to the user.
-- If the user confirms reset, the card is erased and registered fresh with a new member ID and zero balance.
-- If the user declines, no modification is made to the card.
+- Station registration uses `registerCard()` which reads-then-writes in a single NFC session.
+- If the card is already registered or has tampered data, the app shows a confirmation prompt (Wipe & Re-register / Skip).
+- If the user confirms, `executeWithReset()` wipes the card and writes a fresh payload with a new member ID.
+- If the user skips, no modification is made.
 - The reset flow generates a new card ID and member ID (does not reuse old ones).
+- No initial balance field is presented during registration; new cards start at zero balance.
 
 ### Visit State
 
@@ -290,7 +296,7 @@ export interface ParkingTariffRule {
 - A card with `CHECKED_IN` can be checked out if balance is sufficient.
 - A card with `NOT_CHECKED_IN` cannot be checked out.
 - A card can only have one active activity session at a time.
-- Gate simulation writes a past timestamp for testing.
+- Gate writes check-in using real device time in production flow.
 
 ### Transaction Logs
 
@@ -308,34 +314,37 @@ export interface ParkingTariffRule {
 - Register, top-up, and checkout actions append ledger entries after successful business completion.
 - A masked or shortened member reference is preferred over full sensitive identity.
 
-### NFC Capacity and Write Verification
+### NFC Capacity and Single-Session Operations
 
 - NTAG215 is the MVP target tag and its writable capacity must be documented before real-card support is claimed.
 - The encoded protected payload length must be checked before every NTAG215 write.
 - If payload exceeds capacity, return `CARD_CAPACITY_INSUFFICIENT` and do not show success.
-- After every real NFC write, the repository must read the card back, decode it, verify Silent Shield authentication, and confirm expected counter/state.
-- If readback verification fails, return `WRITE_VERIFY_FAILED`.
-- If the card is removed too early and the readback cannot confirm expected counter/state, do not show success.
+- `writeNdefMessage` throws on write failure; no post-write readback verification is performed (the codec does not preserve all fields round-trip, making fingerprint comparison unreliable).
+- `readWriteCard(transform)` performs read, transform, and write in a single NFC session (one tap). Used by top-up, check-in, and check-out flows.
+- `registerCard(card)` checks for existing data then writes in a single NFC session.
+- `readCard()` is used for read-only operations (inspect).
 
 ## 9. Silent Shield Design
 
-Silent Shield must be implemented in production-grade assessment mode, because assessors may inspect the NFC card with generic NFC tools.
+Silent Shield is implemented in production-grade assessment mode using `react-native-quick-crypto` for AES-256-GCM authenticated encryption.
 
 Design rules:
 
 - Logical card payload remains a compact domain object for tests and business logic. Use compact NFC DTOs for NTAG215 writes.
-- NFC storage must be a protected `mbc1` envelope, not direct JSON.
-- Canonicalize the compact logical payload.
-- Encrypt/authenticate it using AES-256-GCM or equivalent authenticated encryption.
-- Optional HMAC may be added only as defense-in-depth if capacity allows and keys are separated.
-- Use secure encryption keys from secure configuration. Optional HMAC may use a separate MAC key if implemented.
-- Do not commit real keys or secrets.
+- NFC storage is a protected `MBC1` binary envelope, not direct JSON.
+- Card codec encodes `MbcCard` to a compact payload using the format: `v,c,m,b,s,i,x,n` (version, cardId, memberId, balance, visitStatus, activityId, checkInTimestamp, transaction log entries as compact tuples).
+- Silent Shield envelope structure: `MBC1` magic (4 bytes) + version (1 byte) + kid (1 byte) + alg (1 byte) + IV (12 bytes) + authTag (16 bytes) + ciphertext.
+- Encryption uses AES-256-GCM via `react-native-quick-crypto`.
+- Do not commit real keys or secrets. MVP uses a documented demo key.
 - Keep crypto, codec, and key-loading logic inside infrastructure.
 - Generic NFC readers must not reveal member identity, balance, parking status details, or transaction values.
 - Any decrypt/authentication failure maps to `CARD_TAMPERED`.
-- After every real NFC write, read back and verify decrypt/authentication result, counter, and expected state.
 
-For the first implementation round, Android is the primary real-card target. iOS behavior must be validated later on a real device and documented without assuming full parity.
+Measured payload sizes on NTAG215 (504 bytes user memory):
+
+- Worst-case 5-log payload: 327 bytes plaintext, 362 bytes encrypted (fits NTAG215).
+
+Android is the primary real-card target (validated on ASUS ROG 9 FE with NTAG215). iOS behavior must be validated later on a real device and documented without assuming full parity.
 
 Remaining real-world production hardening such as fleet key rotation, backend reconciliation, operator authentication, and physical card authenticity controls remains outside MVP but must be documented as future production work.
 
@@ -343,13 +352,15 @@ Remaining real-world production hardening such as fleet key rotation, backend re
 
 The app starts with role selection and then shows the active role surface.
 
-Before any real card operation, the presentation layer checks NFC availability through the application use case. If NFC is unsupported or disabled, the role screen must show a clear message that real MBC card scan/read/write requires an NFC-capable device with NFC enabled. Mock or simulation mode may remain available for development/demo, but it must be visually distinct from real NFC operation.
+Before any real card operation, the presentation layer checks NFC availability through the application use case. If NFC is unsupported or disabled, the role screen must show a clear message that real MBC card scan/read/write requires an NFC-capable device with NFC enabled.
 
-- Station also shows a simple local ledger summary for that device, such as top-up total and checkout total.
-- Gate: default parking indicator, check-in action, simulation time control, NFC write action, status result.
-- Terminal: checkout action, fixed tariff display, duration/fee summary, insufficient balance guidance, NFC write action, status result.
-- Scout: one-tap read-only card summary, balance, visit status, last five logs.
-- Shared troubleshooting: NFC log panel can be toggled on/off and cleared by the operator. It records safe operational events only (no sensitive payload data).
+All role screens use `NfcActionSheet` — a bottom sheet component that provides scan/success/error feedback during NFC operations.
+
+- Station has preset top-up amounts (10k/20k/50k/100k) instead of a free-text field. The local ledger summary is displayed as a collapsible accordion (collapsed by default).
+- Gate: parking check-in action, NFC write action, status result. No simulation mode or mock scenario selectors.
+- Terminal: checkout action, fixed tariff display, duration/fee summary, tap-out time displayed in `dd-MMM-YYYY hh:mm` format, insufficient balance guidance, NFC write action, status result.
+- Scout: one-tap read-only card summary, balance, visit status, last five logs with timestamps on transaction entries.
+- Shared: NFC Log panel is scrollable with a fixed max height, can be toggled on/off and cleared by the operator. It records safe operational events only (no sensitive payload data).
 
 NFC operational log design rules:
 
@@ -358,7 +369,7 @@ NFC operational log design rules:
 - Log format should be concise (`HH.mm.ss [NFC:*] message`).
 - Logs must never include raw decrypted payload, private keys, full internal member IDs, or security secrets.
 
-The UI should apply the Signal UI design system direction, stay simple and direct, and be usable by cooperative staff. Avoid unnecessary dashboard complexity.
+The UI applies the Signal UI design system direction, stays simple and direct, and is usable by cooperative staff. Avoid unnecessary dashboard complexity.
 
 Signal UI adoption is documented in `.codex/specs/SIGNAL_UI_GUIDE.md`. Role screens must preserve the MBC business flows while using Signal UI colors, typography, icon style, components, and interaction patterns once the Figma tokens are fully extracted.
 
@@ -382,13 +393,21 @@ The implementation should be shaped so the final submission can include:
 
 ## NTAG215 Compact Payload Design
 
-The architecture must separate readable domain models from compact NFC DTOs. Screens and use cases may use readable names, but the NFC repository must normalize card state into the compact NTAG215 payload before Silent Shield protection.
+The architecture separates readable domain models from compact NFC DTOs. Screens and use cases use readable names, but the NFC repository normalizes card state into the compact NTAG215 payload before Silent Shield protection.
+
+Compact codec format: `v,c,m,b,s,i,x,n` where fields are pipe/comma-separated values for version, cardId, memberId, balance, visitStatus, activityId, checkInTimestamp, and transaction log tuples.
 
 Compact rules:
 
 - no display name/profile/debug data on card;
 - no tariff-management fields on card for fixed-tariff MVP;
-- active visit uses compact state and ISO timestamp when capacity allows;
+- active visit uses compact state and ISO timestamp;
 - latest 5 card transactions use tuple records;
-- binary Silent Shield envelope is preferred over Base64 text on NTAG215;
+- binary Silent Shield envelope is written directly to NTAG215;
 - write is blocked with `CARD_CAPACITY_INSUFFICIENT` if protected payload does not fit.
+
+Measured capacity (NTAG215, 504 bytes user memory):
+
+- Worst-case 5-log payload: 327 bytes plaintext, 362 bytes encrypted.
+- Envelope overhead: 35 bytes (4 magic + 1 version + 1 kid + 1 alg + 12 IV + 16 authTag).
+- Fits comfortably within NTAG215 usable capacity.

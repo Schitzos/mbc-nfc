@@ -194,7 +194,7 @@ Use this table to find which tasks support each required presentation section:
 | Tamper detection | GCM authentication tag; any modification → `CARD_TAMPERED`               |
 | Key handling     | Demo key bundled (documented as demo-only); production requires Keystore |
 | Logging          | Identity and balance redacted from all logs                              |
-| Write safety     | Post-write readback verifies decrypt + expected state                    |
+| Write safety     | writeNdefMessage throws on failure; capacity guard enforced before write |
 | Capacity guard   | Payload checked against NTAG215 limit before every write                 |
 
 ### Prototype vs Production — Honest Separation
