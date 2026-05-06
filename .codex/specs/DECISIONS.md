@@ -204,7 +204,7 @@ Status: Accepted
 
 Decision:
 
-Real MBC card scan, read, and write operations require a physical NFC-capable device with NFC enabled. Non-NFC devices may open the app and may use mock/simulation flows for development or demo, but they cannot perform real card operations.
+Real MBC card scan, read, and write operations require a physical NFC-capable device with NFC enabled. Non-NFC devices may open the app, but they cannot perform real card operations.
 
 Reason:
 
@@ -215,7 +215,6 @@ Consequences:
 - The app must check NFC availability before real card actions.
 - Role screens must clearly tell users that NFC is required for real card operations.
 - Unsupported or disabled NFC states must block real card operations with actionable guidance.
-- Mock/simulation mode must be visually distinct from real NFC operation.
 
 ## ADR-013 Use Android as the First Real NFC Target
 

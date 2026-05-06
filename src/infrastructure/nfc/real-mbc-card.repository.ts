@@ -17,6 +17,10 @@ interface NdefTag {
   ndefMessage?: NdefRecord[];
 }
 
+function cardFingerprint(card: MbcCard): string {
+  return JSON.stringify(card);
+}
+
 function toReadableError(error: unknown): CardRepositoryError {
   if (error instanceof CardRepositoryError) {
     return error;
@@ -146,6 +150,14 @@ export class RealMbcCardRepository implements MbcCardRepository {
     }
 
     await NfcManager.ndefHandler.writeNdefMessage(encoded);
+
+    const readback = await this.readCardFromActiveSession();
+    if (cardFingerprint(readback) !== cardFingerprint(card)) {
+      throw new CardRepositoryError(
+        'WRITE_VERIFY_FAILED',
+        'Card write could not be verified by post-write readback.',
+      );
+    }
   }
 
   private async readCardFromActiveSession(): Promise<MbcCard> {

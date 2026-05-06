@@ -65,7 +65,7 @@ Use this format for every test case:
 | Test Case ID    | E2E-REG-002                                                                                                                                                                     |
 | Feature         | Station - NFC Availability Guard                                                                                                                                                |
 | Objective       | Ensure user gets clear guidance when NFC is unsupported/disabled.                                                                                                               |
-| Preconditions   | Unsupported or disabled NFC state is active (real or mocked).                                                                                                                   |
+| Preconditions   | Unsupported or disabled NFC state is active on a real device state/configuration.                                                                                               |
 | Test Data       | N/A                                                                                                                                                                             |
 | Steps           | 1. Open Station. 2. Tap register action.                                                                                                                                        |
 | Expected Result | Action is blocked; user sees clear message that real card operations require NFC-capable device with NFC enabled.                                                               |
@@ -143,22 +143,22 @@ Use this format for every test case:
 | Status          | Pass (Mock sweep 2026-05-02)                                                                      |
 | Evidence        | `.codex/specs/test-evidence/2026-05-02-sweep/31-gate-normal-success.png`                          |
 
-### E2E-GATE-002 Check-In With Simulation Timestamp
+### E2E-GATE-002 Simulation Check-In (Removed)
 
-| Field           | Value                                                                        |
-| --------------- | ---------------------------------------------------------------------------- |
-| Test Case ID    | E2E-GATE-002                                                                 |
-| Feature         | Gate - Simulation Mode                                                       |
-| Objective       | Ensure simulation stores past check-in timestamp for demo/testing.           |
-| Preconditions   | Registered card; simulation mode available.                                  |
-| Test Data       | Simulated check-in time: 2 hours in the past.                                |
-| Steps           | 1. Enable simulation mode. 2. Set past timestamp. 3. Execute check-in.       |
-| Expected Result | Stored check-in time equals simulated value; flow still valid.               |
-| Priority        | Medium                                                                       |
-| Type            | Both                                                                         |
-| Owner           | Senior QA + Test Automation Engineer                                         |
-| Status          | Pass (Mock sweep 2026-05-02)                                                 |
-| Evidence        | `.codex/specs/test-evidence/2026-05-02-sweep/35-gate-simulation-success.png` |
+| Field           | Value                                                             |
+| --------------- | ----------------------------------------------------------------- |
+| Test Case ID    | E2E-GATE-002                                                      |
+| Feature         | Gate - Simulation Mode (Removed)                                  |
+| Objective       | Historical reference only; production flow uses real device time. |
+| Preconditions   | N/A                                                               |
+| Test Data       | N/A                                                               |
+| Steps           | N/A                                                               |
+| Expected Result | N/A                                                               |
+| Priority        | Medium                                                            |
+| Type            | Both                                                              |
+| Owner           | Senior QA + Test Automation Engineer                              |
+| Status          | Removed in Phase 9                                                |
+| Evidence        | N/A                                                               |
 
 ### E2E-GATE-003 Reject Double Check-In
 
@@ -251,7 +251,7 @@ Use this format for every test case:
 | Test Case ID    | E2E-SEC-001                                                                                                                                                                                                                                        |
 | Feature         | Security - Silent Shield / Payload Validation                                                                                                                                                                                                      |
 | Objective       | Ensure tampered or malformed payload is rejected safely.                                                                                                                                                                                           |
-| Preconditions   | Tampered payload fixture available in mock repository or test harness.                                                                                                                                                                             |
+| Preconditions   | Tampered payload fixture or controlled test harness input is available.                                                                                                                                                                            |
 | Test Data       | Corrupted payload bytes / invalid version.                                                                                                                                                                                                         |
 | Steps           | 1. Attempt inspect or transactional action with tampered card data.                                                                                                                                                                                |
 | Expected Result | Action blocked safely; error state appears; no unsafe crash; no sensitive data leakage.                                                                                                                                                            |
@@ -316,7 +316,7 @@ Use this format for every test case:
 | --------------- | ------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Feature         | Real NFC Write Safety                                                                                                                             |
 | Objective       | Confirm selected NFC tag/card capacity and post-write readback are enforced.                                                                      |
-| Preconditions   | Real or mocked NFC repository available.                                                                                                          |
+| Preconditions   | Real NFC repository available on target device; automated test harness may use repository test doubles.                                           |
 | Test Data       | One payload that fits selected capacity and one oversized payload.                                                                                |
 | Steps           | 1. Attempt write with valid payload. 2. Confirm readback verifies expected counter/state/authentication. 3. Attempt write with oversized payload. |
 | Expected Result | Valid write succeeds only after readback verification. Oversized payload is rejected with `CARD_CAPACITY_INSUFFICIENT`.                           |

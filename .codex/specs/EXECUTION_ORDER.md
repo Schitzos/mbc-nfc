@@ -95,7 +95,7 @@ Order:
 
 Expected outcome:
 
-- Station can register cards, top up balances, show local device-side reporting using mock data before real NFC hardware is available.
+- Station can register cards, top up balances, and show local device-side reporting on real NFC devices.
 
 ### Phase 3 Gate Feature
 
@@ -110,7 +110,7 @@ Order:
 
 Expected outcome:
 
-- Gate can check members into the required parking MVP activity and support simulation mode.
+- Gate can check members into the required parking MVP activity using real device time.
 
 ### Phase 4 Terminal Feature
 
@@ -181,7 +181,7 @@ Expected outcome:
 
 Goal:
 
-- Replace mock-only behavior with real card interaction when hardware details are available.
+- Deliver real card interaction on target NFC hardware and finalize device validation.
 
 Dependency:
 

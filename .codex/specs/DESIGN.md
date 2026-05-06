@@ -295,7 +295,7 @@ export interface ParkingTariffRule {
 - A card with `CHECKED_IN` can be checked out if balance is sufficient.
 - A card with `NOT_CHECKED_IN` cannot be checked out.
 - A card can only have one active activity session at a time.
-- Gate simulation writes a past timestamp for testing.
+- Gate writes check-in using real device time in production flow.
 
 ### Transaction Logs
 

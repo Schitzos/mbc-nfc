@@ -7,7 +7,7 @@ Last PO review status for the current merged specification bundle.
 | Gate                        | Verdict        | Reason                                                                                                                                                                                |
 | --------------------------- | -------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Codex implementation start  | GO             | The required MBC parking MVP flow, local ledger rule, NFC card source-of-truth rule, and production-grade Silent Shield requirement are documented clearly enough for implementation. |
-| Mock-first development      | GO             | Hardware/card TBD items do not block domain logic, UI, mock repository, SQLite ledger, tests, or parking tariff implementation.                                                       |
+| Real-device-first runtime   | GO             | Runtime flow uses real NFC repository; repository test doubles remain in automated tests only.                                                                                        |
 | Real NFC implementation     | CONDITIONAL GO | Can start after Android/iOS/card assumptions are chosen, but real validation remains incomplete until device/card matrix is filled.                                                   |
 | Final assessment submission | NOT GO YET     | Final submission still needs real NFC evidence, card capacity proof, Silent Shield verification using a generic NFC reader, Signal UI evidence, and completed device matrix.          |
 
@@ -31,7 +31,7 @@ Last PO review status for the current merged specification bundle.
 | Station registers member card             | PASS                                | Covered in requirements, tasks, tests, and E2E.                                                                                      |
 | Station tops up card balance              | PASS                                | Covered in requirements, tasks, tests, and E2E.                                                                                      |
 | Gate writes entry/check-in timestamp      | PASS                                | Covered in requirements, tasks, tests, and E2E.                                                                                      |
-| Gate supports simulated past entry time   | PASS                                | Covered in requirements and E2E simulation case.                                                                                     |
+| Gate uses real device time for check-in   | PASS                                | Covered in requirements and updated E2E references.                                                                                  |
 | Terminal calculates duration              | PASS                                | Covered in tariff and checkout requirements.                                                                                         |
 | Terminal deducts balance                  | PASS                                | Covered in checkout requirements, tasks, and E2E.                                                                                    |
 | Terminal clears active parking status     | PASS                                | Covered in checkout requirements and E2E.                                                                                            |
@@ -96,7 +96,7 @@ Current status:
 
 ```txt
 GO for Codex implementation.
-GO for mock-first development.
+GO for real-device runtime implementation.
 CONDITIONAL GO for real NFC implementation.
 NOT GO YET for final assessment submission.
 ```

@@ -51,7 +51,7 @@ The receiving owner must update or request updates to the relevant `.codex/specs
 | Senior React Native FE                     | React Native implementation, role screens, state management, UI integration, and feature-branch delivery into `develop`.                            |
 | UI/UX Designer                             | Signal UI alignment, role UX, screen states, and usability.                                                                                         |
 | NFC/Mobile Native Specialist               | Android/iOS NFC setup, card/tag behavior, and native lifecycle.                                                                                     |
-| Test Automation Engineer                   | Automated tests, mocked repository coverage, and CI-friendly regression.                                                                            |
+| Test Automation Engineer                   | Automated tests, repository test-double coverage, and CI-friendly regression.                                                                       |
 | Senior QA                                  | Manual QA, acceptance validation, edge cases, and release confidence.                                                                               |
 | Security Pentester                         | Silent Shield, tamper handling, NFC payload abuse cases, and privacy checks.                                                                        |
 | Technical Writer / Presentation Specialist | README, docs, demo script, assumptions, limitations, and presentation.                                                                              |

@@ -44,7 +44,7 @@ Do not use community libraries such as Material, iOS, or Simple Design System as
 - Keep Station simple for cooperative staff: short labels, direct validation, clear NFC action.
 - Keep Scout visually read-only: no write-style call to action.
 - Terminal must clearly show duration, charged hours, fee, balance before, and balance after.
-- Gate simulation mode must be visibly active when enabled.
+- Gate check-in uses real device time; simulation controls are not shown in production flow.
 
 ## 4. Screen Mapping
 
@@ -52,7 +52,7 @@ Do not use community libraries such as Material, iOS, or Simple Design System as
 | ------------- | ----------------------------------------------------------------------------------------------------------------------- |
 | Role Switcher | Use clear navigation or selector patterns; each role should have a distinct label, icon, and short operational purpose. |
 | Station       | Use form/input patterns, primary action button, validation/error states, and success result summary.                    |
-| Gate          | Use activity selector, NFC scan action, active simulation state, and member validation result.                          |
+| Gate          | Use activity selector, NFC scan action, and member validation result.                                                   |
 | Terminal      | Use fee summary, status/result panels, warning/error state, and insufficient balance recovery guidance.                 |
 | Scout         | Use read-only summary, balance/status surface, and compact transaction history list.                                    |
 

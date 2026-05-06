@@ -295,7 +295,7 @@ The app shall explicitly handle common offline/NFC operational edge cases so fie
 
 Acceptance criteria:
 
-- Gate simulation must only allow a past entry timestamp.
+- Gate uses real device time for check-in; simulation mode is not part of production flow.
 - If the device clock causes checkout time to be earlier than or equal to check-in time, checkout is rejected before any balance deduction.
 - If a card is removed too early or write-readback cannot verify the expected state, success is not shown.
 - If SQLite/local reporting data is deleted, the card remains operational source of truth but local reports for that device may be incomplete.

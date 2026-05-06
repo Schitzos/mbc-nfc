@@ -43,7 +43,7 @@ Supporting roles:
 | -------- | ---------------------------- | -------------------------------------------------------- | -------- | -------------------------------------------------------------------------------------- | ------ |
 | DTM-001  | NFC availability             | DEV-ANDROID-001 / ASUS ROG 9 FE                          | None     | App shows NFC status                                                                   | PASS   |
 | DTM-002  | iOS NFC availability         | iOS / optional                                           | None     | Documented as out of MVP unless separately validated                                   | N/A    |
-| DTM-002A | NFC unsupported              | Non-NFC device or mocked unsupported state               | None     | App explains real card operations require NFC-capable device                           | PASS   |
+| DTM-002A | NFC unsupported              | Non-NFC device                                           | None     | App explains real card operations require NFC-capable device                           | PASS   |
 | DTM-002B | NFC disabled                 | DEV-ANDROID-001 / ASUS ROG 9 FE                          | None     | App asks user to enable NFC before scan/read/write                                     | PASS   |
 | DTM-003  | Station registration         | DEV-ANDROID-001 / ASUS ROG 9 FE                          | CARD-001 | Registered MBC payload written                                                         | PASS   |
 | DTM-004  | Station top-up               | DEV-ANDROID-001 / ASUS ROG 9 FE                          | CARD-001 | Balance increases                                                                      | PASS   |

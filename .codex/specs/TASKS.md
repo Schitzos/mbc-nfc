@@ -151,7 +151,7 @@ Done: UI can render from DTOs only.
 
 Owner: Senior RN FE / NFC Specialist  
 Refs: `RFID_NFC_REACT_NATIVE_101.md`  
-Do: Return supported/unsupported/disabled/unavailable/timeout/mock states with user guidance.  
+Do: Return supported/unsupported/disabled/unavailable/timeout states with user guidance.  
 Done: Screens can show clear NFC readiness messages.
 
 ### T-012 — Register Card Use Case
@@ -174,7 +174,7 @@ Owner: Senior RN FE
 Refs: `REQUIREMENTS.md`, `EDGE_CASES.md`, `CARD_DATA_SECURITY_LEDGER_SPEC.md`
 
 Do: Read registered card, reject double check-in, write active visit timestamp/status, verify write with readback, log CHECKIN amount 0.  
-Done: Gate check-in works in mock/real repository path with unit tests.
+Done: Gate check-in works with real NFC repository path and unit tests.
 
 ### T-015 — Terminal Check-Out Use Case
 
@@ -198,7 +198,7 @@ Done: Scout is read-only.
 Owner: Senior RN FE / Test Automation  
 Refs: `DESIGN.md`, `EDGE_CASES.md`  
 Do: Implement mock card repository with fixtures for unregistered, registered, low balance, checked-in, tampered, oversized.  
-Done: All role flows run without real NFC.
+Done: Test doubles are available for automated tests only; production runtime uses real NFC repository.
 
 ### T-017A — SQLite Ledger Repository
 
@@ -257,7 +257,7 @@ Done: Station supports required MVP actions without extra pricing settings.
 
 Owner: Senior RN FE / UI Designer  
 Refs: `REQUIREMENTS.md`, `EDGE_CASES.md`  
-Do: Implement check-in, optional past simulation.
+Do: Implement check-in using real device time only.
 
 ### T-024 — Terminal Screen
 
