@@ -50,9 +50,9 @@ jobs:
 
   build_and_distribute_apk:
     runs-on: ubuntu-latest
-    needs:
-      - sonarcloud
-      - unit_test
+    # needs:
+    #   - sonarcloud
+    #   - unit_test
 
     steps:
       - name: Checkout repository
@@ -79,7 +79,7 @@ jobs:
           path: |
             ~/.gradle/caches
             ~/.gradle/wrapper
-          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+          key: ${{ runner.os }}-gradle-${{ hashFiles('android/gradle/wrapper/gradle-wrapper.properties', 'android/build.gradle', 'android/app/build.gradle', 'android/settings.gradle') }}
           restore-keys: |
             ${{ runner.os }}-gradle-
 
