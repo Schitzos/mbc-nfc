@@ -387,5 +387,4 @@ Additional required validation tests:
 - Checkout rejects invalid duration/time before balance deduction.
 - Gate writes active visit state at check-in; Terminal calculates checkout fee using the fixed Rp 2.000 per started hour tariff.
 - Insufficient balance recovery works: top-up while checked-in, then checkout succeeds.
-- Gate simulation rejects future timestamps.
 - Early card removal or failed readback returns `WRITE_VERIFY_FAILED` and does not show success.

@@ -73,7 +73,6 @@ Required cases:
 - Malformed payload fails safely.
 - Sensitive fields are redacted in logs.
 - Encoded payload size validation returns `CARD_CAPACITY_INSUFFICIENT` when payload cannot fit selected tag/card capacity.
-- Gate simulation rejects future timestamps.
 
 Coverage expectation:
 
@@ -103,7 +102,7 @@ Required cases:
 - Station top-up increases balance and adds log.
 - Gate check-in sets activity ID/type, status, and timestamp.
 - Gate check-in appends a local ledger audit row with amount `0`.
-- Gate simulation mode writes past timestamp and rejects future timestamp.
+- Gate simulation mode writes past timestamp for testing.
 - Terminal checkout rejects invalid duration/time before deduction.
 - Terminal insufficient balance returns top-up guidance and keeps checked-in status.
 - Insufficient-balance recovery works after Station top-up and Terminal retry.

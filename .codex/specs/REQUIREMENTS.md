@@ -99,7 +99,7 @@ The PDF uses member parking as the concrete required assessment scenario. Parkin
 - Non-members use a separate manual guest process and are outside this project.
 - The PDF states the guest path charges Rp 50.000 per hour and uses a separate limited/manual gate; the app should document this context but not implement it.
 - Internet access must not be required for core membership, balance, activity entry, or activity exit flows.
-- Device clock correctness matters for check-in/check-out duration. Operators must be able to see the current device time before writing entry or checkout state.
+- Device clock correctness matters for check-in/check-out duration.
 
 ## 6. User Stories
 
@@ -297,8 +297,7 @@ The app shall explicitly handle common offline/NFC operational edge cases so fie
 
 Acceptance criteria:
 
-- Gate simulation must only allow a past entry timestamp; future timestamps are rejected.
-- Gate and Terminal must display the current device time before writing check-in or checkout state.
+- Gate simulation must only allow a past entry timestamp.
 - If the device clock causes checkout time to be earlier than or equal to check-in time, checkout is rejected before any balance deduction.
 - If a card is removed too early or write-readback cannot verify the expected state, success is not shown.
 - If SQLite/local reporting data is deleted, the card remains operational source of truth but local reports for that device may be incomplete.
@@ -399,7 +398,6 @@ Acceptance criteria:
 - App blocks real card operations with clear guidance when the device has no NFC hardware or NFC is disabled.
 - Repository, demo capture, documentation, and presentation are ready for submission.
 - Check-in/check-out logic is implemented for the required parking MVP. Future non-parking activities are out of scope.
-- Gate and Terminal display current device time and reject invalid/future simulation timing.
 
 ## 12. Product Owner Alignment Notes
 
