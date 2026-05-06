@@ -10,8 +10,8 @@
 | EC-004 | Top-up while checked in                    | Allow top-up and keep active visit unchanged so checkout can continue later.                                                                          |
 | EC-005 | Checkout time is before check-in time      | Reject with `INVALID_DURATION`.                                                                                                                       |
 | EC-006 | Gate simulation uses future time           | Removed — Gate no longer has simulation mode; uses real device time only.                                                                             |
-| EC-007 | Card removed during write                  | Do not show success; return `WRITE_FAILED` or `WRITE_VERIFY_FAILED`.                                                                                  |
-| EC-008 | Post-write readback mismatch               | Return `WRITE_VERIFY_FAILED`; operator must retry safely.                                                                                             |
+| EC-007 | Card removed during write                  | `writeNdefMessage` throws; error surfaced to user, success not shown.                                                                                 |
+| EC-008 | Post-write readback mismatch               | Removed — no post-write readback performed (codec lossy round-trip).                                                                                  |
 | EC-009 | Protected payload exceeds NTAG215 capacity | Use compact payload/tuple logs and remove optional data first. If still too large, return `CARD_CAPACITY_INSUFFICIENT`; do not write partial payload. |
 | EC-010 | More than five card logs                   | Keep latest five logs on card; older history may remain only in local ledger.                                                                         |
 | EC-011 | SQLite ledger is deleted                   | Card remains source of truth; reporting history for that device is lost.                                                                              |

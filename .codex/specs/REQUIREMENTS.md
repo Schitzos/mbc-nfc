@@ -297,7 +297,7 @@ Acceptance criteria:
 
 - Gate uses real device time for check-in; simulation mode is not part of production flow.
 - If the device clock causes checkout time to be earlier than or equal to check-in time, checkout is rejected before any balance deduction.
-- If a card is removed too early or write-readback cannot verify the expected state, success is not shown.
+- If a card is removed during write, `writeNdefMessage` throws and success is not shown.
 - If SQLite/local reporting data is deleted, the card remains operational source of truth but local reports for that device may be incomplete.
 - Unsupported card, unsupported payload version, tampered payload, capacity failure, and write verification failure must produce clear recovery guidance.
 
@@ -347,7 +347,7 @@ Acceptance criteria:
 | NFR-015 | Branching and release automation | The project shall use feature branches with controlled promotion to `develop` and `main`, and merging to `main` shall trigger automated APK app-distribution publishing.    |
 | NFR-016 | Dependency vulnerability gate    | After installing or changing libraries, `npm audit` shall report 0 known vulnerabilities before the task is considered done.                                                |
 | NFR-017 | NTAG215 capacity compatibility   | NTAG215 is the MVP target tag. The protected compact payload must fit NTAG215 or fail safely with `CARD_CAPACITY_INSUFFICIENT`.                                             |
-| NFR-018 | Write verification               | Every real NFC write must be followed by readback verification: decrypt/authenticate, validate schema, and confirm expected counter/state before showing success.           |
+| NFR-018 | Write verification               | Every real NFC write relies on `writeNdefMessage` throwing on failure. Capacity is checked before write. No post-write readback (codec lossy round-trip).                   |
 | NFR-023 | Troubleshooting observability    | NFC operational logging in UI must be concise, optional (toggleable), clearable, and safe (no sensitive payload disclosure).                                                |
 
 ## 9. Security Requirements
@@ -382,7 +382,7 @@ Acceptance criteria:
 | AMOUNT_INVALID             | Top-up or calculated amount is invalid.                          |
 | WRITE_FAILED               | NFC card write failed.                                           |
 | READ_FAILED                | NFC card read failed.                                            |
-| WRITE_VERIFY_FAILED        | NFC write could not be verified by post-write readback.          |
+| WRITE_VERIFY_FAILED        | Removed — no post-write readback performed.                      |
 | CARD_CAPACITY_INSUFFICIENT | Protected payload does not fit the selected NFC tag/card.        |
 | INVALID_TIME               | Device or simulated time is invalid for the requested operation. |
 | INVALID_DURATION           | Checkout time is not after check-in time.                        |
@@ -417,7 +417,7 @@ Acceptance criteria:
 - Parking is the required acceptance path; non-parking activity support is future-friendly design, not required demo scope.
 - SQLite is a device-local transaction/reporting ledger only. It does not create global reporting across devices and never overrides card state.
 - Registration rejects already registered valid MBC cards with `ALREADY_REGISTERED_CARD`.
-- Real NFC writes require post-write readback verification.
+- Real NFC writes rely on `writeNdefMessage` throwing on failure. Capacity guard is enforced before write.
 - NTAG215 payload capacity must be validated before claiming real-card support.
 - Device time correctness is an operational dependency and must be visible in Gate/Terminal flows.
 

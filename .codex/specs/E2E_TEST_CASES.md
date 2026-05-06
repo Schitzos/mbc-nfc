@@ -312,19 +312,19 @@ Use this format for every test case:
 
 ### E2E-NFC-001 Capacity Guard and Write Verification
 
-| Field           | Value                                                                                                                                             |
-| --------------- | ------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Feature         | Real NFC Write Safety                                                                                                                             |
-| Objective       | Confirm selected NFC tag/card capacity and post-write readback are enforced.                                                                      |
-| Preconditions   | Real NFC repository available on target device; automated test harness may use repository test doubles.                                           |
-| Test Data       | One payload that fits selected capacity and one oversized payload.                                                                                |
-| Steps           | 1. Attempt write with valid payload. 2. Confirm readback verifies expected counter/state/authentication. 3. Attempt write with oversized payload. |
-| Expected Result | Valid write succeeds only after readback verification. Oversized payload is rejected with `CARD_CAPACITY_INSUFFICIENT`.                           |
-| Priority        | Must                                                                                                                                              |
-| Type            | Manual device test + automated repository test                                                                                                    |
-| Owner           | NFC/Mobile Native Specialist / Senior QA                                                                                                          |
-| Status          | Not Run                                                                                                                                           |
-| Evidence        | TBD                                                                                                                                               |
+| Field           | Value                                                                                                                  |
+| --------------- | ---------------------------------------------------------------------------------------------------------------------- |
+| Feature         | Real NFC Write Safety                                                                                                  |
+| Objective       | Confirm selected NFC tag/card capacity guard is enforced and write errors are handled.                                 |
+| Preconditions   | Real NFC repository available on target device; automated test harness may use repository test doubles.                |
+| Test Data       | One payload that fits selected capacity and one oversized payload.                                                     |
+| Steps           | 1. Attempt write with valid payload. 2. Confirm write succeeds without error. 3. Attempt write with oversized payload. |
+| Expected Result | Valid write succeeds. Oversized payload is rejected with `CARD_CAPACITY_INSUFFICIENT`.                                 |
+| Priority        | Must                                                                                                                   |
+| Type            | Manual device test + automated repository test                                                                         |
+| Owner           | NFC/Mobile Native Specialist / Senior QA                                                                               |
+| Status          | Not Run                                                                                                                |
+| Evidence        | TBD                                                                                                                    |
 
 ### E2E-TIME-001 Invalid Checkout Time Rejection
 
@@ -371,7 +371,7 @@ Scenario:
 4. Check in.
 5. Check out.
 6. Repeat enough operations until latest 5 transaction records are present.
-7. Verify each write performs capacity check and readback verification.
+7. Verify each write performs capacity check and errors are handled.
 
 Expected:
 

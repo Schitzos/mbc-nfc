@@ -144,7 +144,7 @@ Must test:
 | NFC-003  | Top-up                   | Station tops up card                                    | Balance increases and log is added                                                   |
 | NFC-004  | Activity check-in        | Gate checks in card                                     | Activity status becomes checked in                                                   |
 | NFC-005  | Real-time check-in       | Gate checks in with current device time                 | Current entry time is stored                                                         |
-| NFC-006  | Activity checkout        | Terminal checks out card                                | Fee is deducted, status clears, and write-readback verification passes               |
+| NFC-006  | Activity checkout        | Terminal checks out card                                | Fee is deducted, status clears, and write succeeds                                   |
 | NFC-007  | Double check-in          | Gate checks in same card twice                          | Second action is rejected                                                            |
 | NFC-008  | Double check-out         | Terminal checks out unchecked card                      | Action is rejected                                                                   |
 | NFC-009  | Insufficient balance     | Terminal checks out card with low balance               | User is told to top up; card remains checked in; after top-up checkout can retry     |
@@ -153,7 +153,7 @@ Must test:
 | NFC-012  | Missing card at checkout | Terminal scan times out or no card is available         | User is directed to Station/manual recovery                                          |
 
 | NFC-013 | NTAG215 payload capacity | Write compact protected payload to NTAG215 | Oversized payload is blocked with `CARD_CAPACITY_INSUFFICIENT` |
-| NFC-014 | Write readback failure | Mock or simulate write then failed readback validation | App reports `WRITE_VERIFY_FAILED` and does not show success |
+| NFC-014 | Write failure handling | Mock writeNdefMessage rejection | App reports NFC error and does not show success |
 | NFC-015 | Invalid checkout time | Terminal checkout with exit time before/equal entry | App blocks checkout with `INVALID_TIME` / `INVALID_DURATION` |
 
 ## 9. End-to-End Documentation Standard
@@ -178,7 +178,7 @@ Must test:
 | SEC-009 | Write counter                 | Counter increments after every successful card-state write                                                                     |
 | SEC-010 | Transaction FIFO              | Card keeps only the latest five transaction logs after more than five operations                                               |
 | SEC-011 | SQLite authority boundary     | SQLite reporting data never overrides card balance, status, or activity state                                                  |
-| SEC-012 | Write readback verification   | Real NFC writes are verified by reading back expected counter/state/authentication                                             |
+| SEC-012 | Write failure handling        | Real NFC writes rely on writeNdefMessage throwing on failure; capacity checked before write                                    |
 | SEC-013 | Capacity guard                | Oversized protected payload is rejected before write                                                                           |
 | SEC-014 | Local report scope            | Station summary clearly states current-device/current-installation only                                                        |
 

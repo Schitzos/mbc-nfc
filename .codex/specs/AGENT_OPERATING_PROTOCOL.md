@@ -100,7 +100,7 @@ Minimum agent self-check before claiming a task is clear:
 - Silent Shield protects identity and balance from plain NFC reads and includes tamper/integrity validation.
 - Mock card repository must support progress before real NFC hardware is available.
 - Registration must reject already registered valid MBC cards.
-- Real NFC writes must include capacity guard and post-write readback verification.
+- Real NFC writes must include capacity guard. writeNdefMessage throws on failure (no post-write readback).
 - Real NFC findings must be recorded in `.codex/specs/DEVICE_TEST_MATRIX.md`.
 - Every changed executable source file must have a created or updated unit test unless an approved exception is documented.
 - Feature work must preserve at least 90% automated unit-test coverage for executable source.

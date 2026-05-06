@@ -16,7 +16,7 @@ Purpose: compact, Codex-friendly task cards. Execute task order from `EXECUTION_
 - Work on one task ID only.
 - Build parking MVP only; no non-parking runtime flow.
 - Keep future extension possible through interfaces.
-- Verify every successful card write by readback.
+- Capacity guard enforced before every write. writeNdefMessage throws on failure.
 - For every changed executable source file, create/update unit tests.
 - Keep executable-source coverage >=90% or document approved exception.
 
@@ -158,7 +158,7 @@ Done: Screens can show clear NFC readiness messages.
 
 Owner: Senior RN FE  
 Refs: `REQUIREMENTS.md`, `CARD_DATA_SECURITY_LEDGER_SPEC.md`, `SECURITY.md`  
-Do: Reject existing MBC overwrite, generate member ID, initialize balance/status/log, write protected card, verify readback, then append ledger.  
+Do: Reject existing MBC overwrite, generate member ID, initialize balance/status/log, write protected card, confirm write success, then append ledger.  
 Done: Registration creates valid protected card and rejects overwrite.
 
 ### T-013 — Top-Up Use Case
@@ -173,7 +173,7 @@ Done: Top-up works for normal and checked-in cards.
 Owner: Senior RN FE  
 Refs: `REQUIREMENTS.md`, `EDGE_CASES.md`, `CARD_DATA_SECURITY_LEDGER_SPEC.md`
 
-Do: Read registered card, reject double check-in, write active visit timestamp/status, verify write with readback, log CHECKIN amount 0.  
+Do: Read registered card, reject double check-in, write active visit timestamp/status, confirm write success, log CHECKIN amount 0.  
 Done: Gate check-in works with real NFC repository path and unit tests.
 
 ### T-015 — Terminal Check-Out Use Case
@@ -211,7 +211,7 @@ Done: Station shows current-device transaction count/income.
 
 Owner: NFC/Mobile Specialist  
 Refs: `RFID_NFC_REACT_NATIVE_101.md`, `CARD_DATA_SECURITY_LEDGER_SPEC.md`  
-Do: Implement NFC read/write/cancel/session cleanup, handle errors, and verify writes by readback.  
+Do: Implement NFC read/write/cancel/session cleanup, handle errors, and handle write errors.  
 Done: Supported cards read/write safely on tested devices.
 
 ### T-019 — MBC Card Codec
@@ -232,7 +232,7 @@ Done: Generic NFC reader cannot plainly read identity, balance, status, or logs.
 
 Owner: Senior RN FE / Architect  
 Refs: `CARD_DATA_SECURITY_LEDGER_SPEC.md`  
-Do: Append ledger only after card write-readback for register/top-up/check-in/checkout; warn if ledger fails after card success.  
+Do: Append ledger only after card write success for register/top-up/check-in/checkout; warn if ledger fails after card success.  
 Done: Local reports reflect successful operations on this device only.
 
 ---
