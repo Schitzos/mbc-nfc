@@ -1,5 +1,5 @@
-import React from 'react';
-import { ScrollView, View } from 'react-native';
+import React, { useMemo } from 'react';
+import { ScrollView, StyleSheet, View } from 'react-native';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import type { RootStackParamList } from '../../../app/navigation';
@@ -18,6 +18,17 @@ export function RoleSwitcherScreen({ navigation }: Props): React.JSX.Element {
   const selectedRole = useAppStore(state => state.selectedRole);
   const setSelectedRole = useAppStore(state => state.setSelectedRole);
 
+  const contentContainerStyle = useMemo(
+    () =>
+      StyleSheet.create({
+        container: {
+          paddingTop: insets.top + 8,
+          paddingBottom: insets.bottom + 24,
+        },
+      }),
+    [insets.top, insets.bottom],
+  );
+
   const handleSelectRole = (roleKey: (typeof roleOptions)[number]['key']) => {
     setSelectedRole(roleKey);
     navigation?.navigate?.(roleKey);
@@ -28,10 +39,7 @@ export function RoleSwitcherScreen({ navigation }: Props): React.JSX.Element {
       <BackgroundDecor variant="roleSwitcher" />
       <ScrollView
         className="flex-1 px-6"
-        contentContainerStyle={{
-          paddingTop: insets.top + 8,
-          paddingBottom: insets.bottom + 24,
-        }}
+        contentContainerStyle={contentContainerStyle.container}
       >
         <View className="gap-4">
           <AppHeaderCard />

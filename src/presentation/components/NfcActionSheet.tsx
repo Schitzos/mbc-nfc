@@ -31,18 +31,19 @@ export function NfcActionSheet({
 
   const canClose = state.phase !== 'scanning';
 
+  let sheetTitle = '✕ Failed';
+  if (state.phase === 'scanning') {
+    sheetTitle = 'Ready to Scan';
+  } else if (state.phase === 'success') {
+    sheetTitle = '✓ Done';
+  } else if (state.phase === 'confirm') {
+    sheetTitle = '⚠ Confirm';
+  }
+
   return (
     <SignalBottomSheet
       visible
-      title={
-        state.phase === 'scanning'
-          ? 'Ready to Scan'
-          : state.phase === 'success'
-            ? '✓ Done'
-            : state.phase === 'confirm'
-              ? '⚠ Confirm'
-              : '✕ Failed'
-      }
+      title={sheetTitle}
       onClose={canClose ? onDismiss : undefined}
     >
       {state.phase === 'scanning' && (

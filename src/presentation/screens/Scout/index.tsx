@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { ScrollView, Text, View } from 'react-native';
+import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { appContainer } from '../../../app/container';
@@ -11,6 +11,7 @@ import { NfcActionSheet } from '../../components/NfcActionSheet';
 import type { NfcActionState } from '../../components/NfcActionSheet';
 import { BackgroundDecor } from '../../components/BackgroundDecor';
 import { useAppStore } from '../../stores/app-store';
+import { LOCALE_ID, UNKNOWN_ERROR_MESSAGE } from '../../../shared/constants';
 import { ScoutHeader } from './fragments/ScoutHeader';
 
 type Props = Readonly<NativeStackScreenProps<RootStackParamList, 'scout'>>;
@@ -47,6 +48,16 @@ export function ScoutScreen({ navigation }: Props): React.JSX.Element {
   const setSelectedRole = useAppStore(state => state.setSelectedRole);
   const appendNfcLog = useAppStore(state => state.appendNfcLog);
   const services = useMemo(() => appContainer.getScoutServices(), []);
+  const contentContainerStyle = useMemo(
+    () =>
+      StyleSheet.create({
+        container: {
+          paddingTop: insets.top + 8,
+          paddingBottom: insets.bottom + 24,
+        },
+      }),
+    [insets.top, insets.bottom],
+  );
   const [latestResult, setLatestResult] = useState<RoleActionResultDto | null>(
     null,
   );
@@ -92,7 +103,8 @@ export function ScoutScreen({ navigation }: Props): React.JSX.Element {
         appendNfcLog(`[NFC] Inspect failed: ${result.message}`);
       }
     } catch (error) {
-      const msg = error instanceof Error ? error.message : 'Unknown error';
+      const msg =
+        error instanceof Error ? error.message : UNKNOWN_ERROR_MESSAGE;
       setNfcSheet({ phase: 'error', title: 'Error', message: msg });
       appendNfcLog(`[NFC] Inspect error: ${msg}`);
     } finally {
@@ -105,10 +117,7 @@ export function ScoutScreen({ navigation }: Props): React.JSX.Element {
       <BackgroundDecor variant="scout" />
       <ScrollView
         className="flex-1 px-6"
-        contentContainerStyle={{
-          paddingTop: insets.top + 8,
-          paddingBottom: insets.bottom + 24,
-        }}
+        contentContainerStyle={contentContainerStyle.container}
       >
         <View className="gap-4">
           <ScoutHeader onBack={() => navigation.goBack()} />
@@ -147,7 +156,7 @@ export function ScoutScreen({ navigation }: Props): React.JSX.Element {
                 <View className="flex-1 rounded-lg border border-green-400 bg-[#E9F8EF] p-2">
                   <Text className="text-xs text-muted">Balance</Text>
                   <Text className="text-2xl font-bold text-foreground">
-                    Rp {latestResult.card.balance.toLocaleString('id-ID')}
+                    Rp {latestResult.card.balance.toLocaleString(LOCALE_ID)}
                   </Text>
                 </View>
               </View>
@@ -174,7 +183,7 @@ export function ScoutScreen({ navigation }: Props): React.JSX.Element {
                     <Text key={log.id} className="mt-1 text-xs text-muted">
                       {index + 1}. {log.activity}
                       {log.nominal
-                        ? ` — Rp ${log.nominal.toLocaleString('id-ID')}`
+                        ? ` — Rp ${log.nominal.toLocaleString(LOCALE_ID)}`
                         : ''}{' '}
                       • {formatLogTime(log.occurredAt)}
                     </Text>

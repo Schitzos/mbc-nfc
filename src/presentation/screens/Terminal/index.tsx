@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { ScrollView, Text, View } from 'react-native';
+import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { appContainer } from '../../../app/container';
@@ -11,6 +11,7 @@ import { NfcActionSheet } from '../../components/NfcActionSheet';
 import type { NfcActionState } from '../../components/NfcActionSheet';
 import { BackgroundDecor } from '../../components/BackgroundDecor';
 import { useAppStore } from '../../stores/app-store';
+import { LOCALE_ID, UNKNOWN_ERROR_MESSAGE } from '../../../shared/constants';
 import { TerminalHeader } from './fragments/TerminalHeader';
 
 type Props = Readonly<NativeStackScreenProps<RootStackParamList, 'terminal'>>;
@@ -43,6 +44,16 @@ export function TerminalScreen({ navigation }: Props): React.JSX.Element {
   const setSelectedRole = useAppStore(state => state.setSelectedRole);
   const appendNfcLog = useAppStore(state => state.appendNfcLog);
   const services = useMemo(() => appContainer.getTerminalServices(), []);
+  const contentContainerStyle = useMemo(
+    () =>
+      StyleSheet.create({
+        container: {
+          paddingTop: insets.top + 8,
+          paddingBottom: insets.bottom + 24,
+        },
+      }),
+    [insets.top, insets.bottom],
+  );
   const [latestResult, setLatestResult] = useState<RoleActionResultDto | null>(
     null,
   );
@@ -90,7 +101,8 @@ export function TerminalScreen({ navigation }: Props): React.JSX.Element {
         appendNfcLog(`[NFC] Checkout failed: ${result.message}`);
       }
     } catch (error) {
-      const msg = error instanceof Error ? error.message : 'Unknown error';
+      const msg =
+        error instanceof Error ? error.message : UNKNOWN_ERROR_MESSAGE;
       setNfcSheet({ phase: 'error', title: 'Error', message: msg });
       appendNfcLog(`[NFC] Checkout error: ${msg}`);
       if (error instanceof Error) {
@@ -127,10 +139,7 @@ export function TerminalScreen({ navigation }: Props): React.JSX.Element {
       <BackgroundDecor variant="terminal" />
       <ScrollView
         className="flex-1 px-6"
-        contentContainerStyle={{
-          paddingTop: insets.top + 8,
-          paddingBottom: insets.bottom + 24,
-        }}
+        contentContainerStyle={contentContainerStyle.container}
       >
         <View className="gap-4">
           <TerminalHeader
@@ -179,11 +188,12 @@ export function TerminalScreen({ navigation }: Props): React.JSX.Element {
                 <Text className="mt-2 text-xs text-muted">Fee</Text>
                 <Text className="text-xl font-bold text-foreground">
                   Rp{' '}
-                  {latestResult.chargedAmount?.toLocaleString('id-ID') ?? '0'}
+                  {latestResult.chargedAmount?.toLocaleString(LOCALE_ID) ?? '0'}
                 </Text>
                 <Text className="mt-2 text-xs text-muted">Current balance</Text>
                 <Text className="text-xl font-bold text-foreground">
-                  Rp {latestResult.card?.balance.toLocaleString('id-ID') ?? '0'}
+                  Rp{' '}
+                  {latestResult.card?.balance.toLocaleString(LOCALE_ID) ?? '0'}
                 </Text>
               </View>
             </View>

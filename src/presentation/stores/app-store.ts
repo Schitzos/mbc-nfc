@@ -2,13 +2,13 @@ import { create } from 'zustand';
 
 type AppRole = 'station' | 'gate' | 'terminal' | 'scout' | null;
 
-type NfcLogEntry = {
+interface NfcLogEntry {
   id: string;
   createdAt: string;
   message: string;
-};
+}
 
-type AppStore = {
+interface AppStore {
   selectedRole: AppRole;
   nfcLogEnabled: boolean;
   nfcLogs: NfcLogEntry[];
@@ -17,7 +17,7 @@ type AppStore = {
   toggleNfcLogEnabled: () => void;
   appendNfcLog: (message: string) => void;
   clearNfcLogs: () => void;
-};
+}
 
 export const useAppStore = create<AppStore>(set => ({
   selectedRole: null,

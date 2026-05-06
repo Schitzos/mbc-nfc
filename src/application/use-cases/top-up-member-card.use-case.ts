@@ -10,9 +10,9 @@ import { toCardSummaryDto } from '../dto/card-summary-mapper';
 import type { LocalLedgerRepository } from '../../domain/repositories/local-ledger-repository';
 import { maskMemberReference } from '../../shared/utils/mask-member-reference';
 
-type TopUpMemberCardRequest = {
+interface TopUpMemberCardRequest {
   amount: number;
-};
+}
 
 export class TopUpMemberCardUseCase {
   constructor(

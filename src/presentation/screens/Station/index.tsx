@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import { Pressable, ScrollView, Text, View } from 'react-native';
+import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { appContainer } from '../../../app/container';
@@ -13,6 +13,7 @@ import { NfcActionSheet } from '../../components/NfcActionSheet';
 import type { NfcActionState } from '../../components/NfcActionSheet';
 import { BackgroundDecor } from '../../components/BackgroundDecor';
 import { useAppStore } from '../../stores/app-store';
+import { LOCALE_ID, UNKNOWN_ERROR_MESSAGE } from '../../../shared/constants';
 import { StationHeader } from './fragments/StationHeader';
 
 type Props = Readonly<NativeStackScreenProps<RootStackParamList, 'station'>>;
@@ -49,11 +50,33 @@ function formatResultDate(d: Date): string {
   return `${dd}-${mmm}-${yyyy} ${hh}:${mm}`;
 }
 
+function getStationButtonLabel(
+  registerMode: boolean,
+  busyAction: string | null,
+): string {
+  if (registerMode) {
+    return busyAction === 'register'
+      ? 'Registering...'
+      : 'Tap NFC Card to Register';
+  }
+  return busyAction === 'topup' ? 'Processing...' : 'Tap NFC Card to Top Up';
+}
+
 export function StationScreen({ navigation }: Props): React.JSX.Element {
   const insets = useSafeAreaInsets();
   const setSelectedRole = useAppStore(state => state.setSelectedRole);
   const appendNfcLog = useAppStore(state => state.appendNfcLog);
   const services = useMemo(() => appContainer.getStationServices(), []);
+  const contentContainerStyle = useMemo(
+    () =>
+      StyleSheet.create({
+        container: {
+          paddingTop: insets.top + 8,
+          paddingBottom: insets.bottom + 24,
+        },
+      }),
+    [insets.top, insets.bottom],
+  );
   const [nfcStatus, setNfcStatus] =
     useState<CheckNfcAvailabilityResultDto | null>(null);
   const [summary, setSummary] = useState<StationLedgerSummaryDto>(emptySummary);
@@ -117,7 +140,8 @@ export function StationScreen({ navigation }: Props): React.JSX.Element {
       }
       await refreshSummary();
     } catch (error) {
-      const msg = error instanceof Error ? error.message : 'Unknown error';
+      const msg =
+        error instanceof Error ? error.message : UNKNOWN_ERROR_MESSAGE;
       setNfcSheet({ phase: 'error', title: 'Error', message: msg });
     } finally {
       setBusyAction(null);
@@ -166,7 +190,8 @@ export function StationScreen({ navigation }: Props): React.JSX.Element {
       }
       await refreshSummary();
     } catch (error) {
-      const msg = error instanceof Error ? error.message : 'Unknown error';
+      const msg =
+        error instanceof Error ? error.message : UNKNOWN_ERROR_MESSAGE;
       setNfcSheet({ phase: 'error', title: 'Error', message: msg });
       appendNfcLog(`[NFC] Register error: ${msg}`);
     } finally {
@@ -201,7 +226,8 @@ export function StationScreen({ navigation }: Props): React.JSX.Element {
       }
       await refreshSummary();
     } catch (error) {
-      const msg = error instanceof Error ? error.message : 'Unknown error';
+      const msg =
+        error instanceof Error ? error.message : UNKNOWN_ERROR_MESSAGE;
       setNfcSheet({ phase: 'error', title: 'Error', message: msg });
       appendNfcLog(`[NFC] Top-up error: ${msg}`);
     } finally {
@@ -214,10 +240,7 @@ export function StationScreen({ navigation }: Props): React.JSX.Element {
       <BackgroundDecor variant="station" />
       <ScrollView
         className="flex-1 px-6"
-        contentContainerStyle={{
-          paddingTop: insets.top + 8,
-          paddingBottom: insets.bottom + 24,
-        }}
+        contentContainerStyle={contentContainerStyle.container}
       >
         <View className="gap-4">
           <StationHeader
@@ -260,7 +283,7 @@ export function StationScreen({ navigation }: Props): React.JSX.Element {
                             : 'text-foreground'
                         }`}
                       >
-                        Rp {amount.toLocaleString('id-ID')}
+                        Rp {amount.toLocaleString(LOCALE_ID)}
                       </Text>
                     </Pressable>
                   ))}
@@ -269,15 +292,7 @@ export function StationScreen({ navigation }: Props): React.JSX.Element {
             )}
 
             <SignalButton
-              label={
-                registerMode
-                  ? busyAction === 'register'
-                    ? 'Registering...'
-                    : 'Tap NFC Card to Register'
-                  : busyAction === 'topup'
-                    ? 'Processing...'
-                    : 'Tap NFC Card to Top Up'
-              }
+              label={getStationButtonLabel(registerMode, busyAction)}
               disabled={busyAction !== null}
               onPress={() => {
                 if (registerMode) {
@@ -339,8 +354,8 @@ export function StationScreen({ navigation }: Props): React.JSX.Element {
             {ledgerExpanded && (
               <View className="mt-3">
                 <Text className="text-sm text-muted">
-                  Top-up: Rp {summary.topUpTotal.toLocaleString('id-ID')} •
-                  Checkout: Rp {summary.checkoutTotal.toLocaleString('id-ID')}
+                  Top-up: Rp {summary.topUpTotal.toLocaleString(LOCALE_ID)} •
+                  Checkout: Rp {summary.checkoutTotal.toLocaleString(LOCALE_ID)}
                 </Text>
                 <Text className="mt-1 text-sm text-muted">
                   Registers: {summary.registerCount} • Top-ups:{' '}

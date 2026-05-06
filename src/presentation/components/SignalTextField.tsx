@@ -39,11 +39,13 @@ export function SignalTextField({
   ...textInputProps
 }: SignalTextFieldProps) {
   const [focused, setFocused] = useState(false);
-  const visualState: SignalTextFieldState = !editable
-    ? 'disabled'
-    : state === 'enabled' && focused
-      ? 'focused'
-      : state;
+
+  let visualState: SignalTextFieldState = state;
+  if (editable === false) {
+    visualState = 'disabled';
+  } else if (state === 'enabled' && focused) {
+    visualState = 'focused';
+  }
   const stateToken = componentTokens.textField.states[visualState];
 
   return (

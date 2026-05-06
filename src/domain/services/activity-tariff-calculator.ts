@@ -6,10 +6,10 @@ export type ActivityTariffCalculation = {
   chargedAmount: number;
 };
 
-type CalculateActivityTariffInput = {
+interface CalculateActivityTariffInput {
   checkedInAt: string;
   checkedOutAt: string;
-};
+}
 
 function parseIsoDate(value: string): Date {
   const parsedDate = new Date(value);

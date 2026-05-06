@@ -5,11 +5,13 @@ import { enableScreens } from 'react-native-screens';
 
 enableScreens();
 
-type Props = {
+interface AppProvidersProps {
   children: React.ReactNode;
-};
+}
 
-export function AppProviders({ children }: Props): React.JSX.Element {
+export function AppProviders({
+  children,
+}: AppProvidersProps): React.JSX.Element {
   return (
     <SafeAreaProvider>
       <NavigationContainer>{children}</NavigationContainer>

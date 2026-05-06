@@ -43,7 +43,6 @@ export function encrypt(
   }
 
   const plaintext = Buffer.from(encodeResult.value, 'utf8');
-  console.log('[SilentShield] Before encrypt (plaintext):', encodeResult.value);
   const iv = Crypto.randomBytes(IV_LENGTH);
 
   const cipher = Crypto.createCipheriv('aes-256-gcm', DEMO_KEY, iv);
@@ -57,12 +56,6 @@ export function encrypt(
     authTag,
     encrypted,
   ]);
-
-  console.log(
-    '[SilentShield] After encrypt (envelope):',
-    envelope.toString('hex'),
-  );
-  console.log('[SilentShield] Envelope size:', envelope.length, 'bytes');
 
   return { ok: true, value: envelope };
 }
