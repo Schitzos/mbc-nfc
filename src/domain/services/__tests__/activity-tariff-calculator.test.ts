@@ -16,6 +16,7 @@ describe('calculateActivityTariff', () => {
     ).toEqual({
       chargedHours: 1,
       chargedAmount: 2000,
+      durationMs: 3600000,
     });
   });
 
@@ -28,6 +29,7 @@ describe('calculateActivityTariff', () => {
     ).toEqual({
       chargedHours: 2,
       chargedAmount: 4000,
+      durationMs: 3901000,
     });
   });
 
@@ -40,6 +42,7 @@ describe('calculateActivityTariff', () => {
     ).toEqual({
       chargedHours: 3,
       chargedAmount: 6000,
+      durationMs: 8100000,
     });
   });
 

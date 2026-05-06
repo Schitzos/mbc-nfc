@@ -244,7 +244,7 @@ describe('role screens', () => {
       expect(mockCheckInActivityUseCase.execute).toHaveBeenCalled(),
     );
     expect(screen.getByText('Blocked')).toBeTruthy();
-    expect(screen.getByText('Recovery guidance')).toBeTruthy();
+    expect(screen.getAllByText('Already checked in').length).toBeGreaterThan(0);
   });
 
   it('runs Terminal checkout flow', async () => {
