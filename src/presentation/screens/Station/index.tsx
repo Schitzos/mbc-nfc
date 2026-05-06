@@ -15,7 +15,7 @@ import { BackgroundDecor } from '../../components/BackgroundDecor';
 import { useAppStore } from '../../stores/app-store';
 import { StationHeader } from './fragments/StationHeader';
 
-type Props = NativeStackScreenProps<RootStackParamList, 'station'>;
+type Props = Readonly<NativeStackScreenProps<RootStackParamList, 'station'>>;
 
 const emptySummary: StationLedgerSummaryDto = {
   topUpTotal: 0,

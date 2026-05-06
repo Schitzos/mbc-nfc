@@ -9,8 +9,8 @@ import { useAppStore } from '../../stores/app-store';
 import { AppHeaderCard } from './fragments/AppHeaderCard';
 import { RoleOptionList } from './fragments/RoleOptionList';
 
-type Props = Partial<
-  NativeStackScreenProps<RootStackParamList, 'roleSwitcher'>
+type Props = Readonly<
+  Partial<NativeStackScreenProps<RootStackParamList, 'roleSwitcher'>>
 >;
 
 export function RoleSwitcherScreen({ navigation }: Props): React.JSX.Element {

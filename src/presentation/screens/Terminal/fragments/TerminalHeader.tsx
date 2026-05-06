@@ -1,12 +1,15 @@
 import React from 'react';
 import { Pressable, Text, View } from 'react-native';
 
-type Props = {
+interface TerminalHeaderProps {
   subtitle: string;
   onBack: () => void;
-};
+}
 
-export function TerminalHeader({ subtitle, onBack }: Props): React.JSX.Element {
+export function TerminalHeader({
+  subtitle,
+  onBack,
+}: TerminalHeaderProps): React.JSX.Element {
   return (
     <View className="rounded-2xl bg-[#001A41] p-4">
       <View className="flex-row items-center justify-between">

@@ -13,7 +13,7 @@ import { BackgroundDecor } from '../../components/BackgroundDecor';
 import { useAppStore } from '../../stores/app-store';
 import { TerminalHeader } from './fragments/TerminalHeader';
 
-type Props = NativeStackScreenProps<RootStackParamList, 'terminal'>;
+type Props = Readonly<NativeStackScreenProps<RootStackParamList, 'terminal'>>;
 
 const MONTHS = [
   'Jan',

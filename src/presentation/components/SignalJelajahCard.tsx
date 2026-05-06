@@ -15,14 +15,14 @@ import { shadows } from '../theme/shadows';
 import { spacing } from '../theme/spacing';
 import { typography } from '../theme/typography';
 
-export type SignalJelajahCardProps = {
+export interface SignalJelajahCardProps {
   title: string;
   date: string;
   category: string;
   imageSource: ImageSourcePropType;
   style?: StyleProp<ViewStyle>;
   imageStyle?: StyleProp<ImageStyle>;
-};
+}
 
 export function SignalJelajahCard({
   title,
@@ -34,7 +34,11 @@ export function SignalJelajahCard({
 }: SignalJelajahCardProps) {
   return (
     <View style={[styles.card, style]}>
-      <Image source={imageSource} style={[styles.image, imageStyle]} resizeMode="cover" />
+      <Image
+        source={imageSource}
+        style={[styles.image, imageStyle]}
+        resizeMode="cover"
+      />
 
       <View style={styles.content}>
         <Text numberOfLines={2} style={styles.title}>

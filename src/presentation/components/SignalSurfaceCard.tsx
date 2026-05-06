@@ -5,15 +5,15 @@ import { radius } from '../theme/radius';
 import { shadows } from '../theme/shadows';
 import { spacing } from '../theme/spacing';
 
-type Props = {
+interface SignalSurfaceCardProps {
   children: ReactNode;
   style?: StyleProp<ViewStyle>;
-};
+}
 
 export function SignalSurfaceCard({
   children,
   style,
-}: Props): React.JSX.Element {
+}: SignalSurfaceCardProps): React.JSX.Element {
   return <View style={[styles.card, style]}>{children}</View>;
 }
 

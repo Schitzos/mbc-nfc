@@ -14,15 +14,15 @@ import { typography } from '../theme/typography';
 export type SignalOptionCardState =
   keyof typeof componentTokens.optionCard.states;
 
-export type SignalOptionCardProps = Omit<
+export interface SignalOptionCardProps extends Omit<
   PressableProps,
   'style' | 'children'
-> & {
+> {
   title: string;
   state?: SignalOptionCardState;
   trailingIcon?: ReactNode;
   style?: StyleProp<ViewStyle>;
-};
+}
 
 export function SignalOptionCard({
   title,

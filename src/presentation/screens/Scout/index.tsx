@@ -13,7 +13,7 @@ import { BackgroundDecor } from '../../components/BackgroundDecor';
 import { useAppStore } from '../../stores/app-store';
 import { ScoutHeader } from './fragments/ScoutHeader';
 
-type Props = NativeStackScreenProps<RootStackParamList, 'scout'>;
+type Props = Readonly<NativeStackScreenProps<RootStackParamList, 'scout'>>;
 
 const MONTHS = [
   'Jan',

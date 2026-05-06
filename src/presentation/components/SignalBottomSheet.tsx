@@ -13,7 +13,7 @@ import { componentTokens } from '../theme/components';
 import { shadows } from '../theme/shadows';
 import { typography } from '../theme/typography';
 
-export type SignalBottomSheetProps = {
+export interface SignalBottomSheetProps {
   visible: boolean;
   title?: string;
   caption?: string;
@@ -21,7 +21,7 @@ export type SignalBottomSheetProps = {
   stickyAction?: ReactNode;
   onClose?: () => void;
   style?: StyleProp<ViewStyle>;
-};
+}
 
 export function SignalBottomSheet({
   visible,

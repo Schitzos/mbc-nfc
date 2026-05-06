@@ -2,13 +2,13 @@ import React from 'react';
 import { Text, View } from 'react-native';
 import type { RoleActionResultDto } from '../../../../application/dto/role-action-result-dto';
 
-type Props = {
+interface GateResultStateProps {
   latestResult: RoleActionResultDto | null;
-};
+}
 
 export function GateResultState({
   latestResult,
-}: Props): React.JSX.Element | null {
+}: GateResultStateProps): React.JSX.Element | null {
   if (!latestResult) {
     return null;
   }

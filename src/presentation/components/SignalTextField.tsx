@@ -12,16 +12,17 @@ import { signalColorTokens } from '../theme/colors';
 import { componentTokens } from '../theme/components';
 import { typography } from '../theme/typography';
 
-export type SignalTextFieldState = keyof typeof componentTokens.textField.states;
+export type SignalTextFieldState =
+  keyof typeof componentTokens.textField.states;
 
-export type SignalTextFieldProps = Omit<TextInputProps, 'style'> & {
+export interface SignalTextFieldProps extends Omit<TextInputProps, 'style'> {
   label?: string;
   required?: boolean;
   helperText?: string;
   state?: Exclude<SignalTextFieldState, 'disabled'>;
   rightElement?: ReactNode;
   style?: StyleProp<ViewStyle>;
-};
+}
 
 export function SignalTextField({
   label,
@@ -69,11 +70,11 @@ export function SignalTextField({
           placeholder={placeholder}
           placeholderTextColor={stateToken.placeholderColor}
           style={[styles.input, { color: stateToken.textColor }]}
-          onFocus={(event) => {
+          onFocus={event => {
             setFocused(true);
             onFocus?.(event);
           }}
-          onBlur={(event) => {
+          onBlur={event => {
             setFocused(false);
             onBlur?.(event);
           }}
@@ -83,7 +84,9 @@ export function SignalTextField({
       </View>
 
       {helperText ? (
-        <Text style={[styles.helper, { color: stateToken.helperColor }]}>{helperText}</Text>
+        <Text style={[styles.helper, { color: stateToken.helperColor }]}>
+          {helperText}
+        </Text>
       ) : null}
     </View>
   );

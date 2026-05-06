@@ -14,7 +14,7 @@ import { useAppStore } from '../../stores/app-store';
 import { GateHeader } from './fragments/GateHeader';
 import { GateResultState } from './fragments/GateResultState';
 
-type Props = NativeStackScreenProps<RootStackParamList, 'gate'>;
+type Props = Readonly<NativeStackScreenProps<RootStackParamList, 'gate'>>;
 
 export function GateScreen({ navigation }: Props): React.JSX.Element {
   const insets = useSafeAreaInsets();

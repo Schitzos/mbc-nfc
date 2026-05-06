@@ -16,15 +16,15 @@ export type NfcActionState =
       onConfirm: () => void;
     };
 
-type Props = {
+interface NfcActionSheetProps {
   state: NfcActionState;
   onDismiss: () => void;
-};
+}
 
 export function NfcActionSheet({
   state,
   onDismiss,
-}: Props): React.JSX.Element | null {
+}: NfcActionSheetProps): React.JSX.Element | null {
   if (state.phase === 'idle') {
     return null;
   }

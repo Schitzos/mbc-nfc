@@ -7,14 +7,14 @@ import { typography } from '../theme/typography';
 
 type Tone = 'info' | 'warning' | 'error' | 'success';
 
-type Props = {
+interface SignalStatusBannerProps {
   tone: Tone;
   eyebrow: string;
   title: string;
   body: string;
   items?: string[];
   children?: ReactNode;
-};
+}
 
 const toneMap = {
   info: {
@@ -49,7 +49,7 @@ export function SignalStatusBanner({
   body,
   items,
   children,
-}: Props): React.JSX.Element {
+}: SignalStatusBannerProps): React.JSX.Element {
   const toneToken = toneMap[tone];
 
   return (

@@ -1,11 +1,11 @@
 import React from 'react';
 import { Pressable, Text, View } from 'react-native';
 
-type Props = {
+interface GateHeaderProps {
   onBack: () => void;
-};
+}
 
-export function GateHeader({ onBack }: Props): React.JSX.Element {
+export function GateHeader({ onBack }: GateHeaderProps): React.JSX.Element {
   return (
     <View className="rounded-2xl bg-[#001A41] p-4">
       <View className="flex-row items-center justify-between">

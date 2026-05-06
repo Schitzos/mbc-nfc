@@ -5,12 +5,15 @@ import { componentTokens } from '../theme/components';
 
 export type SignalSkeletonVariant = 'title' | 'button' | 'card';
 
-export type SignalSkeletonProps = {
+export interface SignalSkeletonProps {
   variant?: SignalSkeletonVariant;
   style?: StyleProp<ViewStyle>;
-};
+}
 
-export function SignalSkeleton({ variant = 'title', style }: SignalSkeletonProps) {
+export function SignalSkeleton({
+  variant = 'title',
+  style,
+}: SignalSkeletonProps) {
   if (variant === 'button') {
     return <View style={[styles.button, style]} />;
   }
