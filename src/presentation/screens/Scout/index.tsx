@@ -72,6 +72,21 @@ export function ScoutScreen({ navigation }: Props): React.JSX.Element {
         <View className="gap-4">
           <ScoutHeader onBack={() => navigation.goBack()} />
 
+          <View className="self-start rounded-full border border-[#D6CCF5] bg-[#F5F1FF] px-3 py-1.5">
+            <Text className="text-xs font-semibold uppercase text-[#5E33B8]">
+              Read only
+            </Text>
+          </View>
+
+          <View className="rounded-2xl border border-[#D6CCF5] bg-[#F7F4FF] p-4">
+            <Text className="text-xs font-semibold uppercase text-[#5E33B8]">
+              Scout Flow
+            </Text>
+            <Text className="mt-1 text-sm text-muted">
+              One-tap inspection. No card mutation is performed.
+            </Text>
+          </View>
+
           <SignalButton
             label={actions.busy ? 'Inspecting...' : 'Tap Card to Inspect'}
             disabled={actions.busy}

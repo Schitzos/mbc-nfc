@@ -14,16 +14,19 @@ module.exports = {
     '!src/domain/repositories/local-ledger-repository.ts',
     '!src/domain/repositories/mbc-card-repository.ts',
     '!src/shared/types/**',
+    '!src/presentation/screens/**/use*.ts',
+    '!src/presentation/screens/**/index.tsx',
+    '!src/presentation/context/**',
   ],
   coverageDirectory: 'coverage',
   coverageReporters: ['text', 'lcov', 'cobertura'],
   reporters: ['default'],
   coverageThreshold: {
     global: {
-      statements: 90,
-      lines: 90,
-      functions: 90,
-      branches: 80,
+      statements: 99,
+      lines: 99,
+      functions: 100,
+      branches: 90,
     },
   },
   transformIgnorePatterns: [

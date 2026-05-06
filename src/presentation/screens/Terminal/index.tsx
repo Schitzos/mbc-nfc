@@ -55,6 +55,15 @@ export function TerminalScreen({ navigation }: Props): React.JSX.Element {
             onBack={() => navigation.goBack()}
           />
 
+          <View className="rounded-2xl border border-[#FFE2B8] bg-[#FFF8ED] p-4">
+            <Text className="text-xs font-semibold uppercase text-[#8A5B00]">
+              Terminal Flow
+            </Text>
+            <Text className="mt-1 text-sm text-muted">
+              Calculate fee, deduct balance, and close active parking session.
+            </Text>
+          </View>
+
           {actions.latestResult === null && (
             <View className="rounded-2xl bg-white p-4 shadow-sm">
               <Text className="text-xl font-bold text-foreground">
@@ -66,6 +75,12 @@ export function TerminalScreen({ navigation }: Props): React.JSX.Element {
                 </Text>
                 <Text className="text-lg font-bold text-foreground">
                   Rp 2.000 / started hour
+                </Text>
+              </View>
+              <View className="mt-3 rounded-xl border border-slate-200 bg-slate-50 p-3">
+                <Text className="text-xs text-muted">
+                  Expected state: card is CHECKED_IN with active parking
+                  session.
                 </Text>
               </View>
             </View>

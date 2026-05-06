@@ -405,3 +405,53 @@ describe('mbc-card-codec', () => {
     });
   });
 });
+
+describe('mbc-card-codec – additional decode error paths', () => {
+  it('rejects when x is not an array', () => {
+    const raw = JSON.stringify({
+      v: 1,
+      c: 'C1',
+      m: 'M1',
+      b: 0,
+      s: 'A',
+      n: 0,
+      x: 'not-array',
+      i: null,
+    });
+    const result = decode(raw);
+    expect(result.ok).toBe(false);
+    if (!result.ok) expect(result.error).toBe('MISSING_TRANSACTION_LOGS');
+  });
+
+  it('rejects when check-in i is not an object', () => {
+    const raw = JSON.stringify({
+      v: 1,
+      c: 'C1',
+      m: 'M1',
+      b: 0,
+      s: 'A',
+      n: 0,
+      x: [],
+      i: 'string',
+    });
+    const result = decode(raw);
+    expect(result.ok).toBe(false);
+    if (!result.ok) expect(result.error).toBe('INVALID_CHECK_IN');
+  });
+
+  it('rejects when transaction log time is not a string', () => {
+    const raw = JSON.stringify({
+      v: 1,
+      c: 'C1',
+      m: 'M1',
+      b: 0,
+      s: 'A',
+      n: 0,
+      x: [['R', 0, 123]],
+      i: null,
+    });
+    const result = decode(raw);
+    expect(result.ok).toBe(false);
+    if (!result.ok) expect(result.error).toBe('INVALID_TRANSACTION_LOG_ENTRY');
+  });
+});

@@ -45,6 +45,15 @@ export function GateScreen({ navigation }: Props): React.JSX.Element {
         <View className="gap-4">
           <GateHeader onBack={() => navigation.goBack()} />
 
+          <View className="rounded-2xl border border-[#BFE8D3] bg-[#F2FCF7] p-4">
+            <Text className="text-xs font-semibold uppercase text-[#007A4D]">
+              Gate Flow
+            </Text>
+            <Text className="mt-1 text-sm text-muted">
+              Tap card to start parking session with current device time.
+            </Text>
+          </View>
+
           <View className="rounded-2xl bg-white p-4 shadow-sm">
             <View className="rounded-xl border border-[#2A8BFF] bg-[#EAF4FF] p-3">
               <Text className="text-sm font-semibold text-muted">
@@ -55,6 +64,11 @@ export function GateScreen({ navigation }: Props): React.JSX.Element {
               </Text>
               <Text className="text-sm text-muted">
                 Rp 2.000 / started hour
+              </Text>
+            </View>
+            <View className="mt-3 rounded-xl border border-slate-200 bg-slate-50 p-3">
+              <Text className="text-xs text-muted">
+                Expected state: member card is registered and not checked in.
               </Text>
             </View>
           </View>

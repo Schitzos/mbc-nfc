@@ -118,3 +118,30 @@ describe('activityStatePolicy – extended branch coverage', () => {
     }
   });
 });
+
+describe('applyCheckInState – activeSession guard', () => {
+  it('throws ACTIVE_SESSION_EXISTS when card has activeSession but NOT_CHECKED_IN status', () => {
+    const card: MbcCard = {
+      version: 1,
+      cardId: 'C1',
+      member: { memberId: 'M1' },
+      balance: 5000,
+      currency: 'IDR',
+      visitStatus: 'NOT_CHECKED_IN',
+      activeSession: {
+        activityId: 'existing',
+        activityType: 'PARKING',
+        checkedInAt: '2026-05-01T08:00:00.000Z',
+      },
+      transactionLogs: [],
+    };
+
+    expect(() =>
+      applyCheckInState(card, {
+        activityId: 'new',
+        activityType: 'PARKING',
+        checkedInAt: '2026-05-01T09:00:00.000Z',
+      }),
+    ).toThrow(DomainError);
+  });
+});

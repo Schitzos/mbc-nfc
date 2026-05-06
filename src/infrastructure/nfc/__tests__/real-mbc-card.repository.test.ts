@@ -3,6 +3,7 @@ const mockIsSupported = jest.fn();
 const mockRequestTechnology = jest.fn();
 const mockGetTag = jest.fn();
 const mockWriteNdefMessage = jest.fn();
+const mockGetNdefMessage = jest.fn();
 const mockCancelTechnologyRequest = jest.fn();
 const mockEncodeMessage = jest.fn();
 const mockRecord = jest.fn();
@@ -15,7 +16,10 @@ jest.mock('react-native-nfc-manager', () => ({
     requestTechnology: mockRequestTechnology,
     getTag: mockGetTag,
     cancelTechnologyRequest: mockCancelTechnologyRequest,
-    ndefHandler: { writeNdefMessage: mockWriteNdefMessage },
+    ndefHandler: {
+      writeNdefMessage: mockWriteNdefMessage,
+      getNdefMessage: mockGetNdefMessage,
+    },
   },
   NfcTech: { Ndef: 'Ndef' },
   Ndef: {
@@ -80,6 +84,7 @@ describe('RealMbcCardRepository', () => {
     );
     mockEncodeMessage.mockImplementation((records: any[]) => records[0]);
     mockGetTag.mockResolvedValue(makeEncryptedTag(cardFixture, 1));
+    mockGetNdefMessage.mockRejectedValue(new Error('not available'));
   });
 
   it('checks NFC support', async () => {
@@ -152,6 +157,25 @@ describe('RealMbcCardRepository', () => {
     });
   });
 
+  it('readCard uses getTag fallback when getNdefMessage rejects', async () => {
+    mockGetNdefMessage.mockRejectedValueOnce(new Error('unsupported'));
+    const card = await repository.readCard();
+    expect(card.cardId).toBe('C000001');
+  });
+
+  it('readCard uses getNdefMessage when it resolves successfully', async () => {
+    mockGetNdefMessage.mockResolvedValueOnce(makeEncryptedTag(cardFixture, 1));
+    const card = await repository.readCard();
+    expect(card.cardId).toBe('C000001');
+  });
+
+  it('writeCard catch maps errors to readable', async () => {
+    mockWriteNdefMessage.mockRejectedValueOnce(new Error('io error'));
+    await expect(repository.writeCard(cardFixture)).rejects.toMatchObject({
+      code: 'NFC_UNAVAILABLE',
+    });
+  });
+
   it('readWriteCard reads, transforms, and writes in a single session', async () => {
     const result = await repository.readWriteCard((card: MbcCard) => ({
       ...card,
@@ -176,5 +200,65 @@ describe('RealMbcCardRepository', () => {
     await expect(
       repository.readWriteCard((card: MbcCard) => card),
     ).rejects.toMatchObject({ code: 'NFC_UNAVAILABLE' });
+  });
+});
+
+describe('RealMbcCardRepository – additional error paths', () => {
+  let repository: InstanceType<typeof RealMbcCardRepository>;
+
+  beforeEach(() => {
+    repository = new RealMbcCardRepository();
+    jest.clearAllMocks();
+    mockIsSupported.mockResolvedValue(true);
+    mockStart.mockResolvedValue(undefined);
+    mockRequestTechnology.mockResolvedValue(undefined);
+    mockCancelTechnologyRequest.mockResolvedValue(undefined);
+    mockWriteNdefMessage.mockResolvedValue(undefined);
+    mockRecord.mockImplementation(
+      (_tnf: number, _type: any, _id: any, payload: any) => payload,
+    );
+    mockEncodeMessage.mockImplementation((records: any[]) => records[0]);
+    mockGetTag.mockResolvedValue(makeEncryptedTag(cardFixture, 1));
+  });
+
+  it('rejects write when encode returns null', async () => {
+    mockEncodeMessage.mockReturnValueOnce(null);
+    await expect(repository.writeCard(cardFixture)).rejects.toMatchObject({
+      code: 'NFC_UNAVAILABLE',
+    });
+  });
+
+  it('rejects write when payload exceeds NTAG215 capacity', async () => {
+    // Mock encrypt to return an oversized buffer
+    const silentShield = require('../silent-shield');
+    const originalEncrypt = silentShield.encrypt;
+    silentShield.encrypt = () => ({ ok: true, value: Buffer.alloc(600) });
+    await expect(repository.writeCard(cardFixture)).rejects.toMatchObject({
+      code: 'CARD_CAPACITY_INSUFFICIENT',
+    });
+    silentShield.encrypt = originalEncrypt;
+  });
+
+  it('registerCard error path maps to readable error', async () => {
+    mockRequestTechnology.mockRejectedValueOnce(new Error('timeout'));
+    await expect(repository.registerCard(cardFixture)).rejects.toMatchObject({
+      code: 'NFC_UNAVAILABLE',
+    });
+  });
+
+  it('rejects write when encrypt fails', async () => {
+    const silentShield = require('../silent-shield');
+    const originalEncrypt = silentShield.encrypt;
+    silentShield.encrypt = () => ({ ok: false, error: 'TEST_ERROR' });
+    await expect(repository.writeCard(cardFixture)).rejects.toMatchObject({
+      code: 'TAMPERED_CARD',
+    });
+    silentShield.encrypt = originalEncrypt;
+  });
+
+  it('readCard falls back to getTag when getNdefMessage throws', async () => {
+    mockGetNdefMessage.mockRejectedValueOnce(new Error('not supported'));
+    const card = await repository.readCard();
+    expect(card.cardId).toBe('C000001');
   });
 });

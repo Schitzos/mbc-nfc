@@ -88,6 +88,15 @@ export function StationScreen({ navigation }: Props): React.JSX.Element {
             onBack={() => navigation.goBack()}
           />
 
+          <View className="rounded-2xl border border-[#BFD7FF] bg-[#F4F9FF] p-4">
+            <Text className="text-xs font-semibold uppercase text-[#0050AE]">
+              Station Ops
+            </Text>
+            <Text className="mt-1 text-sm text-muted">
+              Register new cards and top up member balance with real NFC scan.
+            </Text>
+          </View>
+
           <View className="rounded-2xl bg-white p-4 shadow-sm">
             {actions.registerMode === false && (
               <View className="mb-4">
@@ -145,6 +154,13 @@ export function StationScreen({ navigation }: Props): React.JSX.Element {
                 variant="secondary"
                 onPress={() => actions.setRegisterMode(prev => !prev)}
               />
+            </View>
+
+            <View className="mt-3 rounded-xl border border-slate-200 bg-slate-50 p-3">
+              <Text className="text-xs text-muted">
+                Member ID is generated automatically and never typed by
+                operator.
+              </Text>
             </View>
           </View>
 
