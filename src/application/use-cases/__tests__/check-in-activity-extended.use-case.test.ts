@@ -19,10 +19,15 @@ function createCard(overrides?: Partial<MbcCard>): MbcCard {
 function createCardRepository(
   overrides?: Partial<MbcCardRepository>,
 ): MbcCardRepository {
+  const defaultCard = createCard();
   return {
     isSupported: jest.fn().mockResolvedValue(true),
-    readCard: jest.fn().mockResolvedValue(createCard()),
+    readCard: jest.fn().mockResolvedValue(defaultCard),
     writeCard: jest.fn().mockResolvedValue(undefined),
+    readWriteCard: jest
+      .fn()
+      .mockImplementation(async (fn: any) => fn(defaultCard)),
+    registerCard: jest.fn().mockResolvedValue(undefined),
     cancel: jest.fn().mockResolvedValue(undefined),
     ...overrides,
   };
@@ -31,7 +36,7 @@ function createCardRepository(
 describe('CheckInActivityUseCase – extended coverage', () => {
   it('handles CardRepositoryError gracefully', async () => {
     const cardRepository = createCardRepository({
-      readCard: jest
+      readWriteCard: jest
         .fn()
         .mockRejectedValue(
           new CardRepositoryError(
@@ -82,7 +87,9 @@ describe('CheckInActivityUseCase – extended coverage', () => {
 
   it('re-throws unexpected errors', async () => {
     const cardRepository = createCardRepository({
-      readCard: jest.fn().mockRejectedValue(new Error('Unexpected failure')),
+      readWriteCard: jest
+        .fn()
+        .mockRejectedValue(new Error('Unexpected failure')),
     });
     const useCase = new CheckInActivityUseCase(cardRepository);
 
@@ -95,17 +102,18 @@ describe('CheckInActivityUseCase – extended coverage', () => {
   });
 
   it('rejects check-in when card has an active session (ACTIVE_SESSION_EXISTS)', async () => {
+    const checkedInCard = createCard({
+      visitStatus: 'CHECKED_IN',
+      activeSession: {
+        activityId: 'existing-activity',
+        activityType: 'GENERIC',
+        checkedInAt: '2026-05-01T08:00:00.000Z',
+      },
+    });
     const cardRepository = createCardRepository({
-      readCard: jest.fn().mockResolvedValue(
-        createCard({
-          visitStatus: 'CHECKED_IN',
-          activeSession: {
-            activityId: 'existing-activity',
-            activityType: 'GENERIC',
-            checkedInAt: '2026-05-01T08:00:00.000Z',
-          },
-        }),
-      ),
+      readWriteCard: jest
+        .fn()
+        .mockImplementation(async (fn: any) => fn(checkedInCard)),
     });
     const useCase = new CheckInActivityUseCase(cardRepository);
 

@@ -29,37 +29,37 @@ export class CheckOutActivityUseCase {
     const occurredAt = checkedOutAt ?? new Date().toISOString();
 
     try {
-      const card = await this.cardRepository.readCard();
+      let tariffResult = { chargedAmount: 0, chargedHours: 0, durationMs: 0 };
+      let sessionActivityType: string = 'PARKING';
 
-      if (!card.activeSession) {
-        return {
-          success: false,
-          role: 'TERMINAL',
-          message:
+      const updatedCard = await this.cardRepository.readWriteCard(card => {
+        if (!card.activeSession) {
+          throw new DomainError(
+            'ACTIVE_SESSION_MISSING',
             'Card does not have an active activity session to check out.',
-        };
-      }
+          );
+        }
 
-      const tariffResult = calculateActivityTariff({
-        checkedInAt: card.activeSession.checkedInAt,
-        checkedOutAt: occurredAt,
+        sessionActivityType = card.activeSession.activityType;
+        tariffResult = calculateActivityTariff({
+          checkedInAt: card.activeSession.checkedInAt,
+          checkedOutAt: occurredAt,
+        });
+
+        const checkedOutCard = applyCheckOutState(card, {
+          chargedAmount: tariffResult.chargedAmount,
+        });
+
+        return appendTransactionLog(
+          checkedOutCard,
+          createTransactionLog({
+            id: createRandomId('LOG'),
+            activity: 'CHECK_OUT',
+            nominal: tariffResult.chargedAmount,
+            occurredAt,
+          }),
+        );
       });
-
-      const checkedOutCard = applyCheckOutState(card, {
-        chargedAmount: tariffResult.chargedAmount,
-      });
-
-      const updatedCard = appendTransactionLog(
-        checkedOutCard,
-        createTransactionLog({
-          id: createRandomId('LOG'),
-          activity: 'CHECK_OUT',
-          nominal: tariffResult.chargedAmount,
-          occurredAt,
-        }),
-      );
-
-      await this.cardRepository.writeCard(updatedCard);
 
       let message = 'Card checked out successfully.';
 
@@ -72,7 +72,7 @@ export class CheckOutActivityUseCase {
             maskedMemberReference: maskMemberReference(
               updatedCard.member.memberId,
             ),
-            activityType: card.activeSession.activityType,
+            activityType: sessionActivityType as 'PARKING' | 'GENERIC',
             amount: tariffResult.chargedAmount,
             occurredAt,
           });
@@ -88,6 +88,7 @@ export class CheckOutActivityUseCase {
         message,
         chargedHours: tariffResult.chargedHours,
         chargedAmount: tariffResult.chargedAmount,
+        durationMs: tariffResult.durationMs,
         card: toCardSummaryDto(updatedCard),
       };
     } catch (error) {

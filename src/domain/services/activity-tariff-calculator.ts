@@ -4,6 +4,7 @@ import { PARKING_TARIFF_PER_STARTED_HOUR } from '../entities/mbc-card';
 export type ActivityTariffCalculation = {
   chargedHours: number;
   chargedAmount: number;
+  durationMs: number;
 };
 
 interface CalculateActivityTariffInput {
@@ -45,5 +46,6 @@ export function calculateActivityTariff({
   return {
     chargedHours,
     chargedAmount: chargedHours * PARKING_TARIFF_PER_STARTED_HOUR,
+    durationMs,
   };
 }

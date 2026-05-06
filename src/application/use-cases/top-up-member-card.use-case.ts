@@ -32,21 +32,17 @@ export class TopUpMemberCardUseCase {
     }
 
     try {
-      const card = await this.cardRepository.readCard();
-      const nextCard = appendTransactionLog(
-        {
-          ...card,
-          balance: card.balance + amount,
-        },
-        createTransactionLog({
-          id: createRandomId('LOG'),
-          activity: 'TOP_UP',
-          nominal: amount,
-          occurredAt: new Date().toISOString(),
-        }),
+      const nextCard = await this.cardRepository.readWriteCard(card =>
+        appendTransactionLog(
+          { ...card, balance: card.balance + amount },
+          createTransactionLog({
+            id: createRandomId('LOG'),
+            activity: 'TOP_UP',
+            nominal: amount,
+            occurredAt: new Date().toISOString(),
+          }),
+        ),
       );
-
-      await this.cardRepository.writeCard(nextCard);
 
       let message = 'Top-up completed successfully.';
 

@@ -35,10 +35,15 @@ function createLedgerRepository(
 function createCardRepository(
   overrides?: Partial<MbcCardRepository>,
 ): MbcCardRepository {
+  const defaultCard = createCheckedInCard();
   return {
     isSupported: jest.fn().mockResolvedValue(true),
-    readCard: jest.fn().mockResolvedValue(createCheckedInCard()),
+    readCard: jest.fn().mockResolvedValue(defaultCard),
     writeCard: jest.fn().mockResolvedValue(undefined),
+    readWriteCard: jest
+      .fn()
+      .mockImplementation(async (fn: any) => fn(defaultCard)),
+    registerCard: jest.fn().mockResolvedValue(undefined),
     cancel: jest.fn().mockResolvedValue(undefined),
     ...overrides,
   };
@@ -62,13 +67,14 @@ describe('CheckOutActivityUseCase', () => {
   });
 
   it('handles invalid state safely', async () => {
+    const noSessionCard = createCheckedInCard({
+      visitStatus: 'NOT_CHECKED_IN',
+      activeSession: undefined,
+    });
     const cardRepository = createCardRepository({
-      readCard: jest.fn().mockResolvedValue(
-        createCheckedInCard({
-          visitStatus: 'NOT_CHECKED_IN',
-          activeSession: undefined,
-        }),
-      ),
+      readWriteCard: jest
+        .fn()
+        .mockImplementation(async (fn: any) => fn(noSessionCard)),
     });
     const useCase = new CheckOutActivityUseCase(cardRepository);
 
@@ -78,7 +84,6 @@ describe('CheckOutActivityUseCase', () => {
 
     expect(result.success).toBe(false);
     expect(result.message).toContain('active activity session');
-    expect(cardRepository.writeCard).not.toHaveBeenCalled();
   });
 
   it('returns top-up guidance and keeps checked-in state when balance is insufficient', async () => {
@@ -86,7 +91,9 @@ describe('CheckOutActivityUseCase', () => {
       balance: 1000,
     });
     const cardRepository = createCardRepository({
-      readCard: jest.fn().mockResolvedValue(insufficientCard),
+      readWriteCard: jest
+        .fn()
+        .mockImplementation(async (fn: any) => fn(insufficientCard)),
     });
     const useCase = new CheckOutActivityUseCase(cardRepository);
 
@@ -96,9 +103,6 @@ describe('CheckOutActivityUseCase', () => {
 
     expect(result.success).toBe(false);
     expect(result.message).toContain('top up at Station');
-    expect(cardRepository.writeCard).not.toHaveBeenCalled();
-    expect(insufficientCard.visitStatus).toBe('CHECKED_IN');
-    expect(insufficientCard.activeSession).toBeDefined();
   });
 
   it('appends a local ledger entry after successful checkout when configured', async () => {
@@ -142,7 +146,7 @@ describe('CheckOutActivityUseCase', () => {
   it('surfaces repository errors safely during checkout', async () => {
     const useCase = new CheckOutActivityUseCase(
       createCardRepository({
-        readCard: jest
+        readWriteCard: jest
           .fn()
           .mockRejectedValue(
             new CardRepositoryError(

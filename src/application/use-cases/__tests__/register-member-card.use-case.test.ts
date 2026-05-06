@@ -14,6 +14,7 @@ function createCardRepository(
         new CardRepositoryError('UNREGISTERED_CARD', 'Not registered'),
       ),
     writeCard: jest.fn().mockResolvedValue(undefined),
+    readWriteCard: jest.fn(),
     registerCard: jest.fn().mockResolvedValue(undefined),
     cancel: jest.fn().mockResolvedValue(undefined),
     ...overrides,
