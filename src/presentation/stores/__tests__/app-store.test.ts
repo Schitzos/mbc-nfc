@@ -2,7 +2,11 @@ import { useAppStore } from '../app-store';
 
 describe('useAppStore', () => {
   beforeEach(() => {
-    useAppStore.setState({ selectedRole: null });
+    useAppStore.setState({
+      selectedRole: null,
+      nfcLogEnabled: false,
+      nfcLogs: [],
+    });
   });
 
   it('starts with null selected role', () => {
@@ -33,5 +37,22 @@ describe('useAppStore', () => {
     useAppStore.getState().setSelectedRole('station');
     useAppStore.getState().setSelectedRole(null);
     expect(useAppStore.getState().selectedRole).toBeNull();
+  });
+
+  it('toggles nfc log visibility', () => {
+    expect(useAppStore.getState().nfcLogEnabled).toBe(false);
+    useAppStore.getState().toggleNfcLogEnabled();
+    expect(useAppStore.getState().nfcLogEnabled).toBe(true);
+    useAppStore.getState().setNfcLogEnabled(false);
+    expect(useAppStore.getState().nfcLogEnabled).toBe(false);
+  });
+
+  it('appends and clears nfc logs', () => {
+    useAppStore.getState().appendNfcLog('[NFC] test line');
+    expect(useAppStore.getState().nfcLogs.length).toBe(1);
+    expect(useAppStore.getState().nfcLogs[0].message).toContain('test line');
+
+    useAppStore.getState().clearNfcLogs();
+    expect(useAppStore.getState().nfcLogs).toHaveLength(0);
   });
 });

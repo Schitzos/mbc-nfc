@@ -10,6 +10,11 @@ import { GateScreen } from '../GateScreen';
 import { ScoutScreen } from '../ScoutScreen';
 import { StationScreen } from '../StationScreen';
 import { TerminalScreen } from '../TerminalScreen';
+import { useAppStore } from '../../stores/app-store';
+
+jest.mock('react-native-safe-area-context', () => ({
+  useSafeAreaInsets: () => ({ top: 0, bottom: 0, left: 0, right: 0 }),
+}));
 
 const setScenario = jest.fn();
 const getScenario = jest.fn<MockCardScenario, []>(() => 'normal');
@@ -157,6 +162,7 @@ describe('role screens', () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
+    useAppStore.setState({ nfcLogEnabled: false, nfcLogs: [] });
     getScenario.mockReturnValue('normal');
     readCard.mockResolvedValue({
       activeSession: {

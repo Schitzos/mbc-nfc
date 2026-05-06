@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { appContainer } from '../../../app/container';
 import type { RootStackParamList } from '../../../app/navigation';
 import type { CheckNfcAvailabilityResultDto } from '../../../application/dto/check-nfc-availability-result-dto';
@@ -9,6 +10,7 @@ import type { StationLedgerSummaryDto } from '../../../application/dto/station-l
 import type { MockCardScenario } from '../../../infrastructure/nfc/mock-mbc-card.repository';
 import { SignalButton } from '../../components/SignalButton';
 import { SignalTextField } from '../../components/SignalTextField';
+import { NfcLogPanel } from '../../components/NfcLogPanel';
 import { useAppStore } from '../../stores/app-store';
 import { StationHeader } from './fragments/StationHeader';
 
@@ -32,7 +34,9 @@ const emptySummary: StationLedgerSummaryDto = {
 };
 
 export function StationScreen({ navigation }: Props): React.JSX.Element {
+  const insets = useSafeAreaInsets();
   const setSelectedRole = useAppStore(state => state.setSelectedRole);
+  const appendNfcLog = useAppStore(state => state.appendNfcLog);
   const services = useMemo(() => appContainer.getStationServices(), []);
   const [nfcStatus, setNfcStatus] =
     useState<CheckNfcAvailabilityResultDto | null>(null);
@@ -64,18 +68,34 @@ export function StationScreen({ navigation }: Props): React.JSX.Element {
 
   useEffect(() => {
     const loadInitialState = async () => {
-      setNfcStatus(await services.checkNfcAvailabilityUseCase.execute());
+      appendNfcLog('[NFC] Checking device NFC availability');
+      const status = await services.checkNfcAvailabilityUseCase.execute();
+      setNfcStatus(status);
+      appendNfcLog(`[NFC] Availability result: ${status.status}`);
       await refreshSummary();
     };
     loadInitialState().catch(() => undefined);
-  }, [refreshSummary, services]);
+  }, [appendNfcLog, refreshSummary, services]);
 
   const handleRegister = async () => {
     setBusyAction('register');
     try {
+      appendNfcLog('[NFC] Register flow started');
       const result = await services.registerMemberCardUseCase.execute();
       setLatestResult(result);
+      appendNfcLog(
+        result.success
+          ? '[NFC] Register succeeded'
+          : `[NFC] Register failed: ${result.message}`,
+      );
       await refreshSummary();
+    } catch (error) {
+      appendNfcLog(
+        `[NFC] Register error: ${
+          error instanceof Error ? error.message : 'Unknown error'
+        }`,
+      );
+      throw error;
     } finally {
       setBusyAction(null);
     }
@@ -84,18 +104,37 @@ export function StationScreen({ navigation }: Props): React.JSX.Element {
   const handleTopUp = async () => {
     setBusyAction('topup');
     try {
+      appendNfcLog('[NFC] Top-up flow started');
       const result = await services.topUpMemberCardUseCase.execute({
         amount: Number(topUpAmount),
       });
       setLatestResult(result);
+      appendNfcLog(
+        result.success
+          ? '[NFC] Top-up succeeded'
+          : `[NFC] Top-up failed: ${result.message}`,
+      );
       await refreshSummary();
+    } catch (error) {
+      appendNfcLog(
+        `[NFC] Top-up error: ${
+          error instanceof Error ? error.message : 'Unknown error'
+        }`,
+      );
+      throw error;
     } finally {
       setBusyAction(null);
     }
   };
 
   return (
-    <ScrollView className="flex-1 bg-background px-6 py-6">
+    <ScrollView
+      className="flex-1 bg-background px-6"
+      contentContainerStyle={{
+        paddingTop: insets.top + 8,
+        paddingBottom: insets.bottom + 24,
+      }}
+    >
       <View className="gap-4">
         <StationHeader
           modeLabel={
@@ -271,6 +310,8 @@ export function StationScreen({ navigation }: Props): React.JSX.Element {
             </Text>
           )}
         </View>
+
+        <NfcLogPanel />
       </View>
     </ScrollView>
   );

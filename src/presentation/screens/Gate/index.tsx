@@ -1,12 +1,14 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { Pressable, ScrollView, Text, View } from 'react-native';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { appContainer } from '../../../app/container';
 import type { RootStackParamList } from '../../../app/navigation';
 import type { CheckNfcAvailabilityResultDto } from '../../../application/dto/check-nfc-availability-result-dto';
 import type { RoleActionResultDto } from '../../../application/dto/role-action-result-dto';
 import type { MockCardScenario } from '../../../infrastructure/nfc/mock-mbc-card.repository';
 import { SignalButton } from '../../components/SignalButton';
+import { NfcLogPanel } from '../../components/NfcLogPanel';
 import { useAppStore } from '../../stores/app-store';
 import { GateHeader } from './fragments/GateHeader';
 import { GateResultState } from './fragments/GateResultState';
@@ -21,7 +23,9 @@ const gateScenarios: Array<{ key: MockCardScenario; label: string }> = [
 ];
 
 export function GateScreen({ navigation }: Props): React.JSX.Element {
+  const insets = useSafeAreaInsets();
   const setSelectedRole = useAppStore(state => state.setSelectedRole);
+  const appendNfcLog = useAppStore(state => state.appendNfcLog);
   const services = useMemo(() => appContainer.getGateServices(), []);
   const [nfcStatus, setNfcStatus] =
     useState<CheckNfcAvailabilityResultDto | null>(null);
@@ -41,9 +45,12 @@ export function GateScreen({ navigation }: Props): React.JSX.Element {
   useEffect(() => {
     services.checkNfcAvailabilityUseCase
       .execute()
-      .then(setNfcStatus)
+      .then(status => {
+        setNfcStatus(status);
+        appendNfcLog(`[NFC] Availability result: ${status.status}`);
+      })
       .catch(() => undefined);
-  }, [services]);
+  }, [appendNfcLog, services]);
 
   useEffect(() => {
     services.mockRepository.setScenario(selectedScenario);
@@ -52,19 +59,38 @@ export function GateScreen({ navigation }: Props): React.JSX.Element {
   const handleCheckIn = async () => {
     setBusy(true);
     try {
+      appendNfcLog('[NFC] Check-in flow started');
       const result = await services.checkInActivityUseCase.execute({
         activityId: 'parking-main-gate',
         activityType: 'PARKING',
         simulatedCheckedInAt: simulationTimestamp || undefined,
       });
       setLatestResult(result);
+      appendNfcLog(
+        result.success
+          ? '[NFC] Check-in succeeded'
+          : `[NFC] Check-in failed: ${result.message}`,
+      );
+    } catch (error) {
+      appendNfcLog(
+        `[NFC] Check-in error: ${
+          error instanceof Error ? error.message : 'Unknown error'
+        }`,
+      );
+      throw error;
     } finally {
       setBusy(false);
     }
   };
 
   return (
-    <ScrollView className="flex-1 bg-background px-6 py-6">
+    <ScrollView
+      className="flex-1 bg-background px-6"
+      contentContainerStyle={{
+        paddingTop: insets.top + 8,
+        paddingBottom: insets.bottom + 24,
+      }}
+    >
       <View className="gap-4">
         <GateHeader onBack={() => navigation.goBack()} />
 
@@ -118,7 +144,7 @@ export function GateScreen({ navigation }: Props): React.JSX.Element {
                 }}
               >
                 <Text className="text-xs font-semibold text-muted">
-                  {simulationTimestamp ? 'Clear' : 'Set past time'}
+                  {simulationTimestamp ? 'Clear simulation' : 'Set past time'}
                 </Text>
               </Pressable>
             </View>
@@ -164,6 +190,8 @@ export function GateScreen({ navigation }: Props): React.JSX.Element {
             {nfcStatus?.title ?? 'Checking device NFC'}
           </Text>
         </View>
+
+        <NfcLogPanel />
       </View>
     </ScrollView>
   );
