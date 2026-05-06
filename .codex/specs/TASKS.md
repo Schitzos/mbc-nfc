@@ -257,7 +257,7 @@ Done: Station supports required MVP actions without extra pricing settings.
 
 Owner: Senior RN FE / UI Designer  
 Refs: `REQUIREMENTS.md`, `EDGE_CASES.md`  
-Do: Implement check-in, optional past simulation, and current device time display.
+Do: Implement check-in, optional past simulation.
 
 ### T-024 — Terminal Screen
 

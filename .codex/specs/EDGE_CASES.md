@@ -9,14 +9,14 @@
 | EC-003 | Balance is insufficient at checkout        | Reject checkout, keep card checked in, show required fee/top-up guidance.                                                                             |
 | EC-004 | Top-up while checked in                    | Allow top-up and keep active visit unchanged so checkout can continue later.                                                                          |
 | EC-005 | Checkout time is before check-in time      | Reject with `INVALID_DURATION`.                                                                                                                       |
-| EC-006 | Gate simulation uses future time           | Reject with `INVALID_TIME`; simulation may only use valid past time.                                                                                  |
+| EC-006 | Gate simulation uses future time           | Allowed — simulation is for testing purposes and may use any timestamp.                                                                               |
 | EC-007 | Card removed during write                  | Do not show success; return `WRITE_FAILED` or `WRITE_VERIFY_FAILED`.                                                                                  |
 | EC-008 | Post-write readback mismatch               | Return `WRITE_VERIFY_FAILED`; operator must retry safely.                                                                                             |
 | EC-009 | Protected payload exceeds NTAG215 capacity | Use compact payload/tuple logs and remove optional data first. If still too large, return `CARD_CAPACITY_INSUFFICIENT`; do not write partial payload. |
 | EC-010 | More than five card logs                   | Keep latest five logs on card; older history may remain only in local ledger.                                                                         |
 | EC-011 | SQLite ledger is deleted                   | Card remains source of truth; reporting history for that device is lost.                                                                              |
 | EC-012 | Card used across multiple offline devices  | Card state travels with card; reports remain device-local.                                                                                            |
-| EC-013 | Device clock is wrong                      | Show device time in Gate/Terminal and reject invalid duration.                                                                                        |
+| EC-013 | Device clock is wrong                      | Reject invalid duration at checkout (exit ≤ entry).                                                                                                   |
 | EC-014 | Existing card is registered again          | Reject overwrite unless a future reset flow is explicitly approved.                                                                                   |
 | EC-015 | Unknown/non-MBC card tapped                | Return `CARD_UNSUPPORTED` or `CARD_UNREGISTERED`.                                                                                                     |
 | EC-016 | Tampered payload                           | Reject with `CARD_TAMPERED`.                                                                                                                          |

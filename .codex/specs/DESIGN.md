@@ -286,8 +286,7 @@ export interface ParkingTariffRule {
 - A card with `CHECKED_IN` can be checked out if balance is sufficient.
 - A card with `NOT_CHECKED_IN` cannot be checked out.
 - A card can only have one active activity session at a time.
-- Gate simulation must only write a past timestamp; future timestamps are rejected.
-- Gate and Terminal must display current device time before committing card writes because offline fee calculation depends on local clock correctness.
+- Gate simulation writes a past timestamp for testing.
 
 ### Transaction Logs
 
@@ -343,8 +342,8 @@ The app starts with role selection and then shows the active role surface.
 Before any real card operation, the presentation layer checks NFC availability through the application use case. If NFC is unsupported or disabled, the role screen must show a clear message that real MBC card scan/read/write requires an NFC-capable device with NFC enabled. Mock or simulation mode may remain available for development/demo, but it must be visually distinct from real NFC operation.
 
 - Station also shows a simple local ledger summary for that device, such as top-up total and checkout total.
-- Gate: default parking indicator, check-in action, simulation time control limited to past timestamps, current device time display, NFC write action, status result.
-- Terminal: checkout action, fixed tariff display, duration/fee summary, insufficient balance guidance, current device time display, NFC write action, status result.
+- Gate: default parking indicator, check-in action, simulation time control, NFC write action, status result.
+- Terminal: checkout action, fixed tariff display, duration/fee summary, insufficient balance guidance, NFC write action, status result.
 - Scout: one-tap read-only card summary, balance, visit status, last five logs.
 
 The UI should apply the Signal UI design system direction, stay simple and direct, and be usable by cooperative staff. Avoid unnecessary dashboard complexity.
