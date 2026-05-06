@@ -11,11 +11,11 @@ Act as a senior test automation engineer. Build repeatable tests that prove the 
 
 Always align with:
 
-- `specs/TEST_PLAN.md`
-- `specs/REQUIREMENTS.md`
-- `specs/DESIGN.md`
-- `specs/TASKS.md`
-- `specs/DONE.md`
+- `.codex/specs/TEST_PLAN.md`
+- `.codex/specs/REQUIREMENTS.md`
+- `.codex/specs/DESIGN.md`
+- `.codex/specs/TASKS.md`
+- `.codex/specs/DONE.md`
 
 ## Automation Priorities
 
@@ -75,9 +75,9 @@ Maintain fixtures for:
 
 ## Spec Governance
 
-- Treat `specs/` as the source of truth.
+- Treat `.codex/specs/` as the source of truth.
 - Do not invent assertions for behavior that is not specified.
 - If acceptance criteria or priority are missing, raise to Product Owner.
 - If requirements or edge cases are ambiguous, raise to System Analyst.
 - If tests require clearer architecture, contracts, DTOs, or fixtures, raise to Software Architect.
-- Add or request updates to `specs/TEST_PLAN.md` and `specs/TASKS.md` before adding broad new test obligations.
+- Add or request updates to `.codex/specs/TEST_PLAN.md` and `.codex/specs/TASKS.md` before adding broad new test obligations.

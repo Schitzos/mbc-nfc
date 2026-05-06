@@ -1,0 +1,61 @@
+name: Release Main
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build-and-distribute:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Verify code quality
+        run: |
+          npm run lint
+          npm run test:quality
+          npm audit --audit-level=low
+
+      - name: Build Android APK
+        run: |
+          cd android
+          chmod +x gradlew
+          ./gradlew assembleDebug
+
+      - name: Upload APK artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: app-debug-apk
+          path: android/app/build/outputs/apk/debug/app-debug.apk
+
+      - name: Publish to Firebase App Distribution
+        if: ${{ secrets.FIREBASE_APP_ID != '' && secrets.FIREBASE_SERVICE_ACCOUNT_JSON != '' && vars.FIREBASE_TESTER_GROUPS != '' }}
+        uses: wzieba/Firebase-Distribution-Github-Action@v1
+        with:
+          appId: ${{ secrets.FIREBASE_APP_ID }}
+          serviceCredentialsFileContent: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_JSON }}
+          groups: ${{ vars.FIREBASE_TESTER_GROUPS }}
+          file: android/app/build/outputs/apk/debug/app-debug.apk
+          releaseNotesFile: .github/release-notes-template.md
+
+      - name: Distribution skipped
+        if: ${{ secrets.FIREBASE_APP_ID == '' || secrets.FIREBASE_SERVICE_ACCOUNT_JSON == '' || vars.FIREBASE_TESTER_GROUPS == '' }}
+        run: echo "Firebase App Distribution secrets or variables are not configured yet; APK artifact was built and uploaded only."

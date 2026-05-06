@@ -2,11 +2,11 @@
 
 Use these docs before implementation:
 
-- `specs/REQUIREMENTS.md`: source of business, system, and functional requirements.
-- `specs/DESIGN.md`: Clean Architecture, domain model, folder structure.
-- `specs/TASKS.md`: implementation sequence.
-- `specs/SECURITY.md`: Silent Shield and logging rules.
-- `specs/TEST_PLAN.md`: expected verification.
+- `.codex/specs/REQUIREMENTS.md`: source of business, system, and functional requirements.
+- `.codex/specs/DESIGN.md`: Clean Architecture, domain model, folder structure.
+- `.codex/specs/TASKS.md`: implementation sequence.
+- `.codex/specs/SECURITY.md`: Silent Shield and logging rules.
+- `.codex/specs/TEST_PLAN.md`: expected verification.
 
 Key implementation direction:
 

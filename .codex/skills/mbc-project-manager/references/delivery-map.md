@@ -2,12 +2,12 @@
 
 Primary docs:
 
-- `specs/TASKS.md`
-- `specs/RELEASE_PLAN.md`
-- `specs/DONE.md`
-- `specs/RISKS.md`
-- `specs/TRACEABILITY.md`
-- `specs/REQUIREMENTS.md`
+- `.codex/specs/TASKS.md`
+- `.codex/specs/RELEASE_PLAN.md`
+- `.codex/specs/DONE.md`
+- `.codex/specs/RISKS.md`
+- `.codex/specs/TRACEABILITY.md`
+- `.codex/specs/REQUIREMENTS.md`
 
 Delivery anchors:
 

@@ -1,5 +1,13 @@
 import React, { ReactNode } from 'react';
-import { Modal, Pressable, StyleProp, StyleSheet, Text, View, ViewStyle } from 'react-native';
+import {
+  Modal,
+  Pressable,
+  StyleProp,
+  StyleSheet,
+  Text,
+  View,
+  ViewStyle,
+} from 'react-native';
 import { colors, signalColorTokens } from '../theme/colors';
 import { componentTokens } from '../theme/components';
 import { shadows } from '../theme/shadows';
@@ -25,9 +33,18 @@ export function SignalBottomSheet({
   style,
 }: SignalBottomSheetProps) {
   return (
-    <Modal transparent visible={visible} animationType="slide" onRequestClose={onClose}>
+    <Modal
+      transparent
+      visible={visible}
+      animationType="slide"
+      onRequestClose={onClose}
+    >
       <View style={styles.root}>
-        <Pressable accessibilityRole="button" style={styles.overlay} onPress={onClose} />
+        <Pressable
+          accessibilityRole="button"
+          style={styles.overlay}
+          onPress={onClose}
+        />
         <View style={[styles.sheet, style]}>
           <View style={styles.header}>
             {title ? (
@@ -38,7 +55,11 @@ export function SignalBottomSheet({
               <View style={styles.titleSpacer} />
             )}
             {onClose ? (
-              <Pressable accessibilityRole="button" onPress={onClose} style={styles.closeButton}>
+              <Pressable
+                accessibilityRole="button"
+                onPress={onClose}
+                style={styles.closeButton}
+              >
                 <Text style={styles.closeText}>x</Text>
               </Pressable>
             ) : null}
@@ -68,7 +89,7 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-end',
   },
   overlay: {
-    ...StyleSheet.absoluteFillObject,
+    ...StyleSheet.absoluteFill,
     backgroundColor: componentTokens.bottomSheet.overlayColor,
     opacity: componentTokens.bottomSheet.overlayOpacity,
   },
@@ -123,4 +144,3 @@ const styles = StyleSheet.create({
     color: colors.bodySecondary,
   },
 });
-

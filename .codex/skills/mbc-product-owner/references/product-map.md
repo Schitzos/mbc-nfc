@@ -2,12 +2,12 @@
 
 Primary docs:
 
-- `specs/REQUIREMENTS.md`
-- `specs/RFID_NFC_REACT_NATIVE_101.md`
-- `specs/TASKS.md`
-- `specs/RELEASE_PLAN.md`
-- `specs/DONE.md`
-- `specs/RISKS.md`
+- `.codex/specs/REQUIREMENTS.md`
+- `.codex/specs/RFID_NFC_REACT_NATIVE_101.md`
+- `.codex/specs/TASKS.md`
+- `.codex/specs/RELEASE_PLAN.md`
+- `.codex/specs/DONE.md`
+- `.codex/specs/RISKS.md`
 
 Product anchors:
 

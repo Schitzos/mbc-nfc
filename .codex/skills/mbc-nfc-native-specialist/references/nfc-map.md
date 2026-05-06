@@ -2,11 +2,11 @@
 
 Primary docs:
 
-- `specs/DESIGN.md`
-- `specs/SECURITY.md`
-- `specs/DEVICE_TEST_MATRIX.md`
-- `specs/TEST_PLAN.md`
-- `specs/RISKS.md`
+- `.codex/specs/DESIGN.md`
+- `.codex/specs/SECURITY.md`
+- `.codex/specs/DEVICE_TEST_MATRIX.md`
+- `.codex/specs/TEST_PLAN.md`
+- `.codex/specs/RISKS.md`
 
 NFC anchors:
 

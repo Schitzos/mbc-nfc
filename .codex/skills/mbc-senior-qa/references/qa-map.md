@@ -2,13 +2,13 @@
 
 Primary QA docs:
 
-- `specs/REQUIREMENTS.md`
-- `specs/TEST_PLAN.md`
-- `specs/TRACEABILITY.md`
-- `specs/DONE.md`
-- `specs/SECURITY.md`
-- `specs/DEVICE_TEST_MATRIX.md`
-- `specs/RISKS.md`
+- `.codex/specs/REQUIREMENTS.md`
+- `.codex/specs/TEST_PLAN.md`
+- `.codex/specs/TRACEABILITY.md`
+- `.codex/specs/DONE.md`
+- `.codex/specs/SECURITY.md`
+- `.codex/specs/DEVICE_TEST_MATRIX.md`
+- `.codex/specs/RISKS.md`
 
 High-risk behaviors:
 

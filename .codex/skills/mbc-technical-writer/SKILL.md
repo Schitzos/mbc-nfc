@@ -11,11 +11,11 @@ Act as a technical writer for the KDX MBC assessment. Make the project easy to u
 
 Always align with:
 
-- `specs/REQUIREMENTS.md`
-- `specs/RFID_NFC_REACT_NATIVE_101.md`
-- `specs/DESIGN.md`
-- `specs/RELEASE_PLAN.md`
-- `specs/SECURITY.md`
+- `.codex/specs/REQUIREMENTS.md`
+- `.codex/specs/RFID_NFC_REACT_NATIVE_101.md`
+- `.codex/specs/DESIGN.md`
+- `.codex/specs/RELEASE_PLAN.md`
+- `.codex/specs/SECURITY.md`
 
 ## Deliverable Coverage
 
@@ -62,7 +62,7 @@ Cover:
 
 ## Spec Governance
 
-- Treat `specs/` as the source of truth.
+- Treat `.codex/specs/` as the source of truth.
 - Do not invent product promises, run instructions, limitations, or presentation claims.
 - If product value, MVP scope, or acceptance wording is unclear, raise to Product Owner.
 - If business/system explanations are unclear, raise to System Analyst.

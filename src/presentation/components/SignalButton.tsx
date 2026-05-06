@@ -1,4 +1,4 @@
-import React, { ReactNode } from 'react';
+import React, { ReactNode, useState } from 'react';
 import {
   Pressable,
   PressableProps,
@@ -37,21 +37,27 @@ export function SignalButton({
   textStyle,
   ...pressableProps
 }: SignalButtonProps) {
+  const [pressed, setPressed] = useState(false);
   const sizeToken = componentTokens.button.sizes[size];
   const variantToken = componentTokens.button.variants[variant];
+  const resolvedBackgroundColor = variantToken?.backgroundColor ?? '#ED0226';
+  const resolvedBorderColor = variantToken?.borderColor ?? '#ED0226';
+  const resolvedTextColor = variantToken?.textColor ?? '#FFFFFF';
 
   return (
     <Pressable
       accessibilityRole="button"
       disabled={disabled}
-      style={({ pressed }) => [
+      onPressIn={() => setPressed(true)}
+      onPressOut={() => setPressed(false)}
+      style={[
         styles.base,
         {
-          minWidth: fullWidth ? sizeToken.minWidth : undefined,
-          height: sizeToken.height,
+          minHeight: sizeToken.height,
+          paddingHorizontal: 16,
           borderRadius: componentTokens.button.radius,
-          backgroundColor: variantToken.backgroundColor,
-          borderColor: variantToken.borderColor,
+          backgroundColor: resolvedBackgroundColor,
+          borderColor: resolvedBorderColor,
           opacity: disabled ? 0.5 : pressed ? 0.86 : 1,
         },
         fullWidth && styles.fullWidth,
@@ -61,7 +67,13 @@ export function SignalButton({
     >
       <View style={[styles.content, { gap: sizeToken.gap }]}>
         {leftIcon}
-        <Text style={[sizeToken.typography, { color: variantToken.textColor }, textStyle]}>
+        <Text
+          style={[
+            sizeToken.typography,
+            { color: resolvedTextColor },
+            textStyle,
+          ]}
+        >
           {label}
         </Text>
         {rightIcon}
@@ -72,11 +84,13 @@ export function SignalButton({
 
 const styles = StyleSheet.create({
   base: {
+    display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
     borderWidth: 2,
   },
   fullWidth: {
+    alignSelf: 'stretch',
     width: '100%',
   },
   content: {
@@ -85,4 +99,3 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
 });
-

@@ -1,6 +1,6 @@
 ---
 name: mbc-project-manager
-description: Project management guidance for the KDX Membership Benefit Card app. Use when Codex is planning milestones, prioritizing work, creating sprint/task breakdowns, checking delivery readiness, managing scope, coordinating documentation, preparing demo/release checklists, or aligning specs/TASKS.md, specs/RELEASE_PLAN.md, specs/DONE.md, specs/RISKS.md, and specs/TRACEABILITY.md for the MBC assessment.
+description: Project management guidance for the KDX Membership Benefit Card app. Use when Codex is planning milestones, prioritizing work, creating sprint/task breakdowns, checking delivery readiness, managing scope, coordinating documentation, preparing demo/release checklists, or aligning .codex/specs/TASKS.md, .codex/specs/RELEASE_PLAN.md, .codex/specs/DONE.md, .codex/specs/RISKS.md, and .codex/specs/TRACEABILITY.md for the MBC assessment.
 ---
 
 # MBC Project Manager
@@ -11,12 +11,12 @@ Act as a project manager for the KDX Membership Benefit Card assessment. Keep th
 
 Always check:
 
-- `specs/TASKS.md`
-- `specs/RELEASE_PLAN.md`
-- `specs/DONE.md`
-- `specs/RISKS.md`
-- `specs/TRACEABILITY.md`
-- `specs/REQUIREMENTS.md`
+- `.codex/specs/TASKS.md`
+- `.codex/specs/RELEASE_PLAN.md`
+- `.codex/specs/DONE.md`
+- `.codex/specs/RISKS.md`
+- `.codex/specs/TRACEABILITY.md`
+- `.codex/specs/REQUIREMENTS.md`
 
 ## Delivery Priorities
 
@@ -32,7 +32,7 @@ Always check:
 2. Map work to requirements and existing task IDs.
 3. Separate MVP/demo-critical work from future production work.
 4. Call out dependencies and blockers.
-5. Update or propose changes to `specs/TASKS.md`, `specs/RELEASE_PLAN.md`, `specs/RISKS.md`, or `specs/DONE.md`.
+5. Update or propose changes to `.codex/specs/TASKS.md`, `.codex/specs/RELEASE_PLAN.md`, `.codex/specs/RISKS.md`, or `.codex/specs/DONE.md`.
 
 ## MVP Delivery Order
 
@@ -65,7 +65,7 @@ For status or planning, report:
 
 ## Spec Governance
 
-- Treat `specs/` as the source of truth.
+- Treat `.codex/specs/` as the source of truth.
 - Do not invent tasks, scope, dates, owners, or acceptance criteria outside the served specs.
 - If a task needs missing product direction, raise it to Product Owner.
 - If a task needs missing architecture or technical sequencing, raise it to Software Architect.

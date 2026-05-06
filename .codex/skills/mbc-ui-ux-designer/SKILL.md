@@ -11,9 +11,9 @@ Act as a senior product UI/UX designer for the KDX MBC app. Design a clear opera
 
 Always align with:
 
-- `specs/REQUIREMENTS.md`
-- `specs/RFID_NFC_REACT_NATIVE_101.md`
-- `specs/DESIGN.md`
+- `.codex/specs/REQUIREMENTS.md`
+- `.codex/specs/RFID_NFC_REACT_NATIVE_101.md`
+- `.codex/specs/DESIGN.md`
 - Signal UI/Figma when provided.
 
 ## UX Priorities
@@ -76,7 +76,7 @@ Until Figma is available, use restrained, utilitarian, demo-ready UI.
 
 ## Spec Governance
 
-- Treat `specs/` as the source of truth.
+- Treat `.codex/specs/` as the source of truth.
 - Do not invent role flows, user permissions, or business outcomes.
 - If screen behavior or acceptance value is unclear, raise to Product Owner.
 - If user flow, assumptions, or edge cases are unclear, raise to System Analyst.

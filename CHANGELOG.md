@@ -2,6 +2,50 @@
 
 All notable spec and design changes should be recorded here.
 
+## 2026-05-02 - Product Owner Alignment Pass
+
+Updated the spec set to align all markdown files with the original MBC PDF requirement and the agreed product-owner recommendations.
+
+Changes:
+
+- Clarified that parking is the required MVP/demo activity; generic activity support is future-friendly design only.
+- Standardized SQLite as a current-device/current-installation ledger for reporting and audit, not member-state truth or global cooperative reporting.
+- Required ledger records for every successful card-state operation: `REGISTER`, `TOPUP`, `CHECKIN`, and `CHECKOUT`.
+- Added registration overwrite protection: valid existing MBC cards must be rejected during registration.
+- Added NFC capacity guard with `CARD_CAPACITY_INSUFFICIENT`.
+- Added post-write readback verification with `WRITE_VERIFY_FAILED`.
+- Standardized card transaction logs as newest-first, max five entries.
+- Added invalid checkout time/duration handling.
+- Added insufficient-balance recovery flow: top-up while checked in, then retry checkout.
+- Tightened Silent Shield wording so v1 does not claim encryption unless authenticated encryption is implemented.
+- Marked Signal UI exact token extraction as a design-hardening dependency.
+- Removed duplicate `DECISIONS copy.md` and `RISKS copy.md` to avoid Codex ambiguity.
+
+# Change Note - Tariff Snapshot at Check-In Patch
+
+This patch contains only revised/new documents related to the newly identified tariff edge case.
+
+## Product decision
+
+When tariff changes while a member is already checked in, checkout must use the tariff that was active at check-in time.
+
+Gate writes a compact tariff snapshot into the NFC card active visit state. Terminal checkout uses that card-stored snapshot for fee calculation. Local tariff changes affect only new check-ins.
+
+## Files included
+
+- EDGE_CASES.md
+- REQUIREMENTS.md
+- DESIGN.md
+- CARD_DATA_SECURITY_LEDGER_SPEC.md
+- TASKS.md
+- EXECUTION_ORDER.md
+- TEST_PLAN.md
+- E2E_TEST_CASES.md
+- TRACEABILITY.md
+- SECURITY.md
+- DECISIONS.md
+- PO_FINAL_GO_NO_GO_CHECKLIST.md
+
 ## 2026-05-01
 
 ### Changed
@@ -33,6 +77,13 @@ All notable spec and design changes should be recorded here.
 - Added explicit GitHub repository governance task before app scaffolding so branch rules and reviewer routing are enforced early.
 - Aligned traceability with the new GitHub repository governance task and branching/release-automation requirement.
 - Added repository-level GitHub governance files for reviewer routing and branch-rule guidance.
+- Corrected repository governance guidance so it matches the current zero-approval solo workflow rulesets.
+- Added the React Native CLI TypeScript baseline, native project folders, Jest/lint/prettier setup, and the tracked Clean Architecture starter structure for `T-001`.
+- Moved Husky, commit-message validation, and changed-file lint enforcement earlier into setup work instead of leaving them in `T-027A`.
+- Moved Husky, commit-message validation, and changed-file lint enforcement one step earlier again so they belong directly to `T-001`.
+- Added `T-002` core runtime dependencies: NFC manager, React Navigation, Zustand, NativeWind/Tailwind, SQLite ledger support, and CI-friendly coverage/JUnit test outputs.
+- Added a minimal navigation/provider/store baseline and verified iOS pods plus Android `assembleDebug` after dependency installation.
+- Added an `npm audit` zero-vulnerability rule for dependency changes and upgraded the React Native CLI toolchain so the current dependency set reports 0 known vulnerabilities.
 
 ### Documentation Updated
 

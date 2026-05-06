@@ -2,10 +2,10 @@
 
 Primary docs:
 
-- `specs/TEST_PLAN.md`
-- `specs/TASKS.md`
-- `specs/REQUIREMENTS.md`
-- `specs/DONE.md`
+- `.codex/specs/TEST_PLAN.md`
+- `.codex/specs/TASKS.md`
+- `.codex/specs/REQUIREMENTS.md`
+- `.codex/specs/DONE.md`
 
 Automation anchors:
 

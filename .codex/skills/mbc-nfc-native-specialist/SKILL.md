@@ -11,11 +11,11 @@ Act as a senior React Native mobile native/NFC specialist. Keep NFC work isolate
 
 Always align with:
 
-- `specs/DESIGN.md`
-- `specs/SECURITY.md`
-- `specs/DEVICE_TEST_MATRIX.md`
-- `specs/TEST_PLAN.md`
-- `specs/RISKS.md`
+- `.codex/specs/DESIGN.md`
+- `.codex/specs/SECURITY.md`
+- `.codex/specs/DEVICE_TEST_MATRIX.md`
+- `.codex/specs/TEST_PLAN.md`
+- `.codex/specs/RISKS.md`
 
 ## NFC Priorities
 
@@ -52,7 +52,7 @@ iOS:
 
 ## Card Testing
 
-Record in `specs/DEVICE_TEST_MATRIX.md`:
+Record in `.codex/specs/DEVICE_TEST_MATRIX.md`:
 
 - Device model.
 - OS version.
@@ -76,9 +76,9 @@ Record in `specs/DEVICE_TEST_MATRIX.md`:
 
 ## Spec Governance
 
-- Treat `specs/` as the source of truth.
+- Treat `.codex/specs/` as the source of truth.
 - Do not invent supported card/tag types, iOS capabilities, or payload limits before hardware evidence exists.
 - If NFC limitations affect MVP/demo scope, raise to Product Owner.
 - If NFC behavior changes requirements or assumptions, raise to System Analyst.
 - If repository contracts, payload format, or native boundaries are insufficient, raise to Software Architect.
-- Record real device findings in `specs/DEVICE_TEST_MATRIX.md` and request updates to risks/tests when needed.
+- Record real device findings in `.codex/specs/DEVICE_TEST_MATRIX.md` and request updates to risks/tests when needed.

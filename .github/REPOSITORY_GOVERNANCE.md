@@ -30,18 +30,28 @@ These settings should be configured directly in GitHub repository settings.
 ### `develop`
 
 - require pull request before merge
-- require at least 1 approval
+- approvals may remain `0` while the repository is effectively single-reviewer and agent-assisted
 - dismiss stale approvals when new commits are pushed
 - restrict direct pushes if the workflow should be enforced strictly
+- require conversation resolution before merging
 - optionally require code-owner review once CODEOWNERS enforcement is enabled
 
 ### `main`
 
 - require pull request before merge
-- require at least 1 approval
+- approvals may remain `0` while the repository is effectively single-reviewer and agent-assisted
 - restrict direct pushes
+- require conversation resolution before merging
 - optionally require code-owner review
 - later require successful status checks from CI/CD
+
+## Future Tightening
+
+When another real reviewer identity or team exists, and CI is available, the repository should be tightened by enabling:
+
+- at least 1 required approval
+- code-owner review where useful
+- required status checks for lint, tests, SonarCloud, and release workflows
 
 ## Deferred Required Checks
 

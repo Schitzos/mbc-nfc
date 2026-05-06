@@ -2,10 +2,10 @@
 
 Primary docs:
 
-- `specs/RELEASE_PLAN.md`
-- `specs/DONE.md`
-- `specs/DEVICE_TEST_MATRIX.md`
-- `specs/RISKS.md`
+- `.codex/specs/RELEASE_PLAN.md`
+- `.codex/specs/DONE.md`
+- `.codex/specs/DEVICE_TEST_MATRIX.md`
+- `.codex/specs/RISKS.md`
 
 Release anchors:
 
