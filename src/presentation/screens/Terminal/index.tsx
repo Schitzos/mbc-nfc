@@ -107,18 +107,20 @@ export function TerminalScreen({ navigation }: Props): React.JSX.Element {
 
   const insufficient = Boolean(
     latestResult &&
-    !latestResult.success &&
+    latestResult.success === false &&
     latestResult.message.toLowerCase().includes('insufficient'),
   );
   const genericFailure = Boolean(
-    latestResult && !latestResult.success && !insufficient,
+    latestResult && latestResult.success === false && insufficient === false,
   );
   const success = Boolean(latestResult?.success);
-  const subtitle = success
-    ? 'Checkout completed'
-    : insufficient
-      ? 'Balance not enough'
-      : 'Activity checkout';
+
+  let subtitle = 'Activity checkout';
+  if (success) {
+    subtitle = 'Checkout completed';
+  } else if (insufficient) {
+    subtitle = 'Balance not enough';
+  }
 
   return (
     <View className="flex-1 bg-background">
@@ -136,7 +138,7 @@ export function TerminalScreen({ navigation }: Props): React.JSX.Element {
             onBack={() => navigation.goBack()}
           />
 
-          {!latestResult && (
+          {latestResult === null && (
             <View className="rounded-2xl bg-white p-4 shadow-sm">
               <Text className="text-xl font-bold text-foreground">
                 Checkout action

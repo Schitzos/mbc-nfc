@@ -1,4 +1,4 @@
-import React, { ReactNode, useState } from 'react';
+import React, { ReactNode, useMemo, useState } from 'react';
 import {
   Pressable,
   PressableProps,
@@ -14,7 +14,10 @@ import { componentTokens } from '../theme/components';
 export type SignalButtonVariant = keyof typeof componentTokens.button.variants;
 export type SignalButtonSize = keyof typeof componentTokens.button.sizes;
 
-export type SignalButtonProps = Omit<PressableProps, 'style' | 'children'> & {
+export interface SignalButtonProps extends Omit<
+  PressableProps,
+  'style' | 'children'
+> {
   label: string;
   variant?: SignalButtonVariant;
   size?: SignalButtonSize;
@@ -23,7 +26,20 @@ export type SignalButtonProps = Omit<PressableProps, 'style' | 'children'> & {
   fullWidth?: boolean;
   style?: StyleProp<ViewStyle>;
   textStyle?: StyleProp<TextStyle>;
-};
+}
+
+function resolveOpacity(
+  disabled: boolean | undefined,
+  pressed: boolean,
+): number {
+  if (disabled) {
+    return 0.5;
+  }
+  if (pressed) {
+    return 0.86;
+  }
+  return 1;
+}
 
 export function SignalButton({
   label,
@@ -44,6 +60,37 @@ export function SignalButton({
   const resolvedBorderColor = variantToken?.borderColor ?? '#ED0226';
   const resolvedTextColor = variantToken?.textColor ?? '#FFFFFF';
 
+  const pressableStyle = useMemo(
+    () =>
+      StyleSheet.create({
+        dynamic: {
+          minHeight: sizeToken.height,
+          paddingHorizontal: 16,
+          borderRadius: componentTokens.button.radius,
+          backgroundColor: resolvedBackgroundColor,
+          borderColor: resolvedBorderColor,
+          opacity: resolveOpacity(disabled, pressed),
+        },
+      }),
+    [
+      sizeToken.height,
+      resolvedBackgroundColor,
+      resolvedBorderColor,
+      disabled,
+      pressed,
+    ],
+  );
+
+  const contentGapStyle = useMemo(
+    () => StyleSheet.create({ gap: { gap: sizeToken.gap } }),
+    [sizeToken.gap],
+  );
+
+  const textColorStyle = useMemo(
+    () => StyleSheet.create({ color: { color: resolvedTextColor } }),
+    [resolvedTextColor],
+  );
+
   return (
     <Pressable
       accessibilityRole="button"
@@ -52,28 +99,15 @@ export function SignalButton({
       onPressOut={() => setPressed(false)}
       style={[
         styles.base,
-        {
-          minHeight: sizeToken.height,
-          paddingHorizontal: 16,
-          borderRadius: componentTokens.button.radius,
-          backgroundColor: resolvedBackgroundColor,
-          borderColor: resolvedBorderColor,
-          opacity: disabled ? 0.5 : pressed ? 0.86 : 1,
-        },
+        pressableStyle.dynamic,
         fullWidth && styles.fullWidth,
         style,
       ]}
       {...pressableProps}
     >
-      <View style={[styles.content, { gap: sizeToken.gap }]}>
+      <View style={[styles.content, contentGapStyle.gap]}>
         {leftIcon}
-        <Text
-          style={[
-            sizeToken.typography,
-            { color: resolvedTextColor },
-            textStyle,
-          ]}
-        >
+        <Text style={[sizeToken.typography, textColorStyle.color, textStyle]}>
           {label}
         </Text>
         {rightIcon}

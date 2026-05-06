@@ -121,7 +121,7 @@ export function ScoutScreen({ navigation }: Props): React.JSX.Element {
             }}
           />
 
-          {latestResult && !latestResult.success ? (
+          {latestResult && latestResult.success === false ? (
             <View className="rounded-xl border border-red-400 bg-[#FFECEC] p-3">
               <Text className="text-xs font-semibold uppercase text-red-700">
                 Card cannot be processed

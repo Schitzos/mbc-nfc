@@ -237,7 +237,7 @@ export function StationScreen({ navigation }: Props): React.JSX.Element {
           </View>
 
           <View className="rounded-2xl bg-white p-4 shadow-sm">
-            {!registerMode && (
+            {registerMode === false && (
               <View className="mb-4">
                 <Text className="mb-2 text-sm font-semibold text-foreground">
                   Top-up amount
