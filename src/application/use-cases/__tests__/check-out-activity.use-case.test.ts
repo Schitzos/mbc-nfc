@@ -2,16 +2,7 @@ import { CheckOutActivityUseCase } from '../check-out-activity.use-case';
 import type { MbcCardRepository } from '../../../domain/repositories/mbc-card-repository';
 import type { LocalLedgerRepository } from '../../../domain/repositories/local-ledger-repository';
 import { CardRepositoryError } from '../../../domain/errors/card-repository-error';
-import type {
-  ActivityTariffRule,
-  MbcCard,
-} from '../../../domain/entities/mbc-card';
-
-const parkingRule: ActivityTariffRule = {
-  activityType: 'PARKING',
-  feePerStartedHour: 2000,
-  currency: 'IDR',
-};
+import type { MbcCard } from '../../../domain/entities/mbc-card';
 
 function createCheckedInCard(overrides?: Partial<MbcCard>): MbcCard {
   return {
@@ -54,12 +45,11 @@ function createCardRepository(
 }
 
 describe('CheckOutActivityUseCase', () => {
-  it('calculates duration and fee correctly, deducts balance, and clears status', async () => {
+  it('calculates duration and fee using fixed tariff, deducts balance, and clears status', async () => {
     const cardRepository = createCardRepository();
     const useCase = new CheckOutActivityUseCase(cardRepository);
 
     const result = await useCase.execute({
-      tariffRule: parkingRule,
       checkedOutAt: '2026-05-01T09:05:01.000Z',
     });
 
@@ -83,7 +73,6 @@ describe('CheckOutActivityUseCase', () => {
     const useCase = new CheckOutActivityUseCase(cardRepository);
 
     const result = await useCase.execute({
-      tariffRule: parkingRule,
       checkedOutAt: '2026-05-01T09:05:01.000Z',
     });
 
@@ -102,7 +91,6 @@ describe('CheckOutActivityUseCase', () => {
     const useCase = new CheckOutActivityUseCase(cardRepository);
 
     const result = await useCase.execute({
-      tariffRule: parkingRule,
       checkedOutAt: '2026-05-01T09:05:01.000Z',
     });
 
@@ -121,7 +109,6 @@ describe('CheckOutActivityUseCase', () => {
     );
 
     const result = await useCase.execute({
-      tariffRule: parkingRule,
       checkedOutAt: '2026-05-01T09:05:01.000Z',
     });
 
@@ -145,7 +132,6 @@ describe('CheckOutActivityUseCase', () => {
     );
 
     const result = await useCase.execute({
-      tariffRule: parkingRule,
       checkedOutAt: '2026-05-01T09:05:01.000Z',
     });
 
@@ -168,7 +154,6 @@ describe('CheckOutActivityUseCase', () => {
     );
 
     const result = await useCase.execute({
-      tariffRule: parkingRule,
       checkedOutAt: '2026-05-01T09:05:01.000Z',
     });
 
@@ -180,7 +165,6 @@ describe('CheckOutActivityUseCase', () => {
     const useCase = new CheckOutActivityUseCase(createCardRepository());
 
     const result = await useCase.execute({
-      tariffRule: parkingRule,
       checkedOutAt: 'not-a-real-date',
     });
 

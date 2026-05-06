@@ -1,4 +1,3 @@
-import type { ActivityTariffRule } from '../../domain/entities/mbc-card';
 import type { MbcCardRepository } from '../../domain/repositories/mbc-card-repository';
 import { CardRepositoryError } from '../../domain/errors/card-repository-error';
 import { DomainError } from '../../domain/errors/domain-error';
@@ -15,7 +14,6 @@ import type { LocalLedgerRepository } from '../../domain/repositories/local-ledg
 import { maskMemberReference } from '../../shared/utils/mask-member-reference';
 
 export type CheckOutActivityRequest = {
-  tariffRule: ActivityTariffRule;
   checkedOutAt?: string;
 };
 
@@ -26,9 +24,8 @@ export class CheckOutActivityUseCase {
   ) {}
 
   async execute({
-    tariffRule,
     checkedOutAt,
-  }: CheckOutActivityRequest): Promise<RoleActionResultDto> {
+  }: CheckOutActivityRequest = {}): Promise<RoleActionResultDto> {
     const occurredAt = checkedOutAt ?? new Date().toISOString();
 
     try {
@@ -46,7 +43,6 @@ export class CheckOutActivityUseCase {
       const tariffResult = calculateActivityTariff({
         checkedInAt: card.activeSession.checkedInAt,
         checkedOutAt: occurredAt,
-        rule: tariffRule,
       });
 
       const checkedOutCard = applyCheckOutState(card, {
@@ -76,7 +72,7 @@ export class CheckOutActivityUseCase {
             maskedMemberReference: maskMemberReference(
               updatedCard.member.memberId,
             ),
-            activityType: tariffRule.activityType,
+            activityType: card.activeSession.activityType,
             amount: tariffResult.chargedAmount,
             occurredAt,
           });
