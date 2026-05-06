@@ -219,6 +219,7 @@ describe('RealMbcCardRepository – additional error paths', () => {
     );
     mockEncodeMessage.mockImplementation((records: any[]) => records[0]);
     mockGetTag.mockResolvedValue(makeEncryptedTag(cardFixture, 1));
+    mockGetNdefMessage.mockRejectedValue(new Error('not available'));
   });
 
   it('rejects write when encode returns null', async () => {
@@ -240,7 +241,9 @@ describe('RealMbcCardRepository – additional error paths', () => {
   });
 
   it('registerCard error path maps to readable error', async () => {
-    mockRequestTechnology.mockRejectedValueOnce(new Error('timeout'));
+    // Make writeNdefMessage fail after the blank-card check passes
+    mockGetTag.mockResolvedValueOnce({ ndefMessage: [] });
+    mockWriteNdefMessage.mockRejectedValueOnce(new Error('write failed'));
     await expect(repository.registerCard(cardFixture)).rejects.toMatchObject({
       code: 'NFC_UNAVAILABLE',
     });

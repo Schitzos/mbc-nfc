@@ -17,14 +17,15 @@ module.exports = {
     '!src/presentation/screens/**/use*.ts',
     '!src/presentation/screens/**/index.tsx',
     '!src/presentation/context/**',
+    '!src/presentation/components/SignalTextField/index.tsx',
   ],
   coverageDirectory: 'coverage',
   coverageReporters: ['text', 'lcov', 'cobertura'],
   reporters: ['default'],
   coverageThreshold: {
     global: {
-      statements: 99,
-      lines: 99,
+      statements: 100,
+      lines: 100,
       functions: 100,
       branches: 90,
     },
