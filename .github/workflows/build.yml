@@ -2,10 +2,13 @@ name: Firebase App Distribution
 
 on:
   pull_request:
-    types:
-      - closed # Triggers only when a PR is closed
     branches:
-      - main # Ensures it runs only for PRs targeting the main branch
+      - develop
+      - main
+  push:
+    branches:
+      - develop
+      - main
 
 jobs:
   sonarcloud:
@@ -32,7 +35,7 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: 18.18.0
+          node-version: 20
 
       - name: Install dependencies
         run: npm install --force
