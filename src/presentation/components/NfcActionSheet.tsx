@@ -7,7 +7,14 @@ export type NfcActionState =
   | { phase: 'idle' }
   | { phase: 'scanning'; message?: string }
   | { phase: 'success'; title: string; message: string }
-  | { phase: 'error'; title: string; message: string };
+  | { phase: 'error'; title: string; message: string }
+  | {
+      phase: 'confirm';
+      title: string;
+      message: string;
+      confirmLabel: string;
+      onConfirm: () => void;
+    };
 
 type Props = {
   state: NfcActionState;
@@ -22,18 +29,19 @@ export function NfcActionSheet({
     return null;
   }
 
-  const visible = state.phase !== 'idle';
-  const canClose = state.phase === 'success' || state.phase === 'error';
+  const canClose = state.phase !== 'scanning';
 
   return (
     <SignalBottomSheet
-      visible={visible}
+      visible
       title={
         state.phase === 'scanning'
           ? 'Ready to Scan'
           : state.phase === 'success'
             ? '✓ Done'
-            : '✕ Failed'
+            : state.phase === 'confirm'
+              ? '⚠ Confirm'
+              : '✕ Failed'
       }
       onClose={canClose ? onDismiss : undefined}
     >
@@ -70,6 +78,19 @@ export function NfcActionSheet({
             <Text className="mt-1 text-sm text-red-700">{state.message}</Text>
           </View>
           <SignalButton label="Dismiss" onPress={onDismiss} />
+        </View>
+      )}
+
+      {state.phase === 'confirm' && (
+        <View className="gap-3 pb-6">
+          <View className="rounded-xl bg-[#FFF7DB] p-4">
+            <Text className="text-base font-bold text-amber-800">
+              {state.title}
+            </Text>
+            <Text className="mt-1 text-sm text-amber-700">{state.message}</Text>
+          </View>
+          <SignalButton label={state.confirmLabel} onPress={state.onConfirm} />
+          <SignalButton label="Skip" variant="secondary" onPress={onDismiss} />
         </View>
       )}
     </SignalBottomSheet>

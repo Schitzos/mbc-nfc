@@ -88,6 +88,41 @@ export function StationScreen({ navigation }: Props): React.JSX.Element {
     loadInitialState().catch(() => undefined);
   }, [appendNfcLog, refreshSummary, services]);
 
+  const handleWipeAndRegister = async () => {
+    setBusyAction('register');
+    setNfcSheet({
+      phase: 'scanning',
+      message: 'Hold the same card to wipe and re-register',
+    });
+    try {
+      appendNfcLog('[NFC] Wipe & re-register flow started');
+      const result =
+        await services.registerMemberCardUseCase.executeWithReset();
+      setLatestResult(result);
+      setResultTime(new Date());
+      if (result.success) {
+        setNfcSheet({
+          phase: 'success',
+          title: 'Card Re-registered',
+          message: result.message,
+        });
+        appendNfcLog('[NFC] Wipe & re-register succeeded');
+      } else {
+        setNfcSheet({
+          phase: 'error',
+          title: 'Failed',
+          message: result.message,
+        });
+      }
+      await refreshSummary();
+    } catch (error) {
+      const msg = error instanceof Error ? error.message : 'Unknown error';
+      setNfcSheet({ phase: 'error', title: 'Error', message: msg });
+    } finally {
+      setBusyAction(null);
+    }
+  };
+
   const handleRegister = async () => {
     setBusyAction('register');
     setNfcSheet({
@@ -106,6 +141,20 @@ export function StationScreen({ navigation }: Props): React.JSX.Element {
           message: result.message,
         });
         appendNfcLog('[NFC] Register succeeded');
+      } else if (result.message.toLowerCase().includes('already registered')) {
+        setNfcSheet({
+          phase: 'confirm',
+          title: 'Card Already Registered',
+          message:
+            'This card has existing data. Wipe and register as a new member?',
+          confirmLabel: 'Wipe & Re-register',
+          onConfirm: () => {
+            handleWipeAndRegister().catch(() => undefined);
+          },
+        });
+        appendNfcLog('[NFC] Card already registered — awaiting user decision');
+        setBusyAction(null);
+        return;
       } else {
         setNfcSheet({
           phase: 'error',

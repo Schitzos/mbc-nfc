@@ -146,8 +146,8 @@ Acceptance criteria:
 - The registration form does not require staff to type a member ID.
 - Normal member/operator screens do not expose the full internal member ID; if a support reference is needed, the app may show a masked or short reference only. Scout may show a safe member reference after successful decode, not the raw full identifier.
 - App writes a valid MBC payload to the NFC card.
-- If the card is already registered with a valid MBC payload, the app rejects with `ALREADY_REGISTERED_CARD`.
-- If the card has an unrecognized or tampered payload, the app shows a confirmation prompt offering to reset and re-register. If the user confirms, the card is erased and registered fresh. If the user declines, no modification is made.
+- If the card is already registered with a valid MBC payload, the app shows a confirmation prompt offering to wipe and re-register with a new member ID. If the user confirms, the card is erased and registered fresh. If the user declines (Skip), no modification is made.
+- If the card has an unrecognized or tampered payload, the app shows the same confirmation prompt offering to wipe and re-register. If the user confirms, the card is erased and registered fresh. If the user declines, no modification is made.
 - New card starts with zero balance and `NOT_CHECKED_IN` visit status. No initial balance field is presented.
 - Registration writes a transaction log entry.
 

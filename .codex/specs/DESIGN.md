@@ -282,8 +282,9 @@ export interface ParkingTariffRule {
 ### Registration Safety### Registration Safety
 
 - Station registration uses `registerCard()` which reads-then-writes in a single NFC session.
-- Registration rejects already-registered cards with `ALREADY_REGISTERED_CARD` error.
-- If the card contains an unrecognized or tampered payload, the app shows a confirmation prompt offering to reset and re-register. If the user confirms, the card is erased and registered fresh. If the user declines, no modification is made.
+- If the card is already registered or has tampered data, the app shows a confirmation prompt (Wipe & Re-register / Skip).
+- If the user confirms, `executeWithReset()` wipes the card and writes a fresh payload with a new member ID.
+- If the user skips, no modification is made.
 - The reset flow generates a new card ID and member ID (does not reuse old ones).
 - No initial balance field is presented during registration; new cards start at zero balance.
 

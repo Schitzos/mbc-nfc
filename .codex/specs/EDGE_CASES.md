@@ -17,7 +17,7 @@
 | EC-011 | SQLite ledger is deleted                   | Card remains source of truth; reporting history for that device is lost.                                                                              |
 | EC-012 | Card used across multiple offline devices  | Card state travels with card; reports remain device-local.                                                                                            |
 | EC-013 | Device clock is wrong                      | Reject invalid duration at checkout (exit ≤ entry).                                                                                                   |
-| EC-014 | Existing card is registered again          | Reject with `ALREADY_REGISTERED_CARD`. Registration does not overwrite existing valid cards.                                                          |
+| EC-014 | Existing card is registered again          | Show confirmation prompt: user can Wipe & Re-register (new member ID) or Skip. No silent overwrite.                                                   |
 | EC-015 | Unknown/non-MBC card tapped                | Return `CARD_UNSUPPORTED` or `CARD_UNREGISTERED`.                                                                                                     |
 | EC-016 | Tampered payload                           | Show reset confirmation at Station. If user confirms, erase and re-register. Other roles reject with `CARD_TAMPERED`.                                 |
 | EC-017 | Unsupported schema version                 | Reject unsupported future versions safely.                                                                                                            |
