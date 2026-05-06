@@ -91,7 +91,14 @@ export function TerminalScreen({ navigation }: Props): React.JSX.Element {
                 </Text>
                 <Text className="mt-2 text-xs text-muted">Duration</Text>
                 <Text className="text-xl font-bold text-foreground">
-                  {actions.latestResult.chargedHours ?? 0}h
+                  {(() => {
+                    const ms = actions.latestResult.durationMs ?? 0;
+                    const totalSec = Math.floor(ms / 1000);
+                    const h = Math.floor(totalSec / 3600);
+                    const m = Math.floor((totalSec % 3600) / 60);
+                    const s = totalSec % 60;
+                    return `${h}h ${m}m ${s}s`;
+                  })()}
                 </Text>
                 <Text className="mt-2 text-xs text-muted">Fee</Text>
                 <Text className="text-xl font-bold text-foreground">
@@ -159,7 +166,7 @@ export function TerminalScreen({ navigation }: Props): React.JSX.Element {
 
         <NfcActionSheet
           state={actions.nfcSheet}
-          onDismiss={() => actions.setNfcSheet({ phase: 'idle' })}
+          onDismiss={() => actions.handleDismissSheet()}
         />
       </ScrollView>
     </View>

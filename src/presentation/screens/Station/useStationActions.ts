@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import type { CheckNfcAvailabilityResultDto } from '../../../application/dto/check-nfc-availability-result-dto';
 import type { RoleActionResultDto } from '../../../application/dto/role-action-result-dto';
 import type { StationLedgerSummaryDto } from '../../../application/dto/station-ledger-summary-dto';
@@ -27,6 +27,16 @@ export function useStationActions(services: StationServices) {
   const [resultTime, setResultTime] = useState<Date | null>(null);
   const [topUpAmount, setTopUpAmount] = useState('50000');
   const [registerMode, setRegisterMode] = useState(true);
+  const dismissedRef = useRef(false);
+
+  const handleSetRegisterMode = useCallback(
+    (value: boolean | ((prev: boolean) => boolean)) => {
+      setRegisterMode(value);
+      setLatestResult(null);
+      setResultTime(null);
+    },
+    [],
+  );
   const [busyAction, setBusyAction] = useState<'register' | 'topup' | null>(
     null,
   );
@@ -76,6 +86,9 @@ export function useStationActions(services: StationServices) {
       }
       await refreshSummary();
     } catch (error) {
+      if (dismissedRef.current) {
+        return;
+      }
       const msg =
         error instanceof Error ? error.message : UNKNOWN_ERROR_MESSAGE;
       setNfcSheet({ phase: 'error', title: 'Error', message: msg });
@@ -85,6 +98,7 @@ export function useStationActions(services: StationServices) {
   }, [appendNfcLog, refreshSummary, services]);
 
   const handleRegister = useCallback(async () => {
+    dismissedRef.current = false;
     setBusyAction('register');
     setNfcSheet({
       phase: 'scanning',
@@ -93,6 +107,9 @@ export function useStationActions(services: StationServices) {
     try {
       appendNfcLog('[NFC] Register flow started');
       const result = await services.registerMemberCardUseCase.execute();
+      if (dismissedRef.current) {
+        return;
+      }
       setLatestResult(result);
       setResultTime(new Date());
       if (result.success) {
@@ -126,6 +143,9 @@ export function useStationActions(services: StationServices) {
       }
       await refreshSummary();
     } catch (error) {
+      if (dismissedRef.current) {
+        return;
+      }
       const msg =
         error instanceof Error ? error.message : UNKNOWN_ERROR_MESSAGE;
       setNfcSheet({ phase: 'error', title: 'Error', message: msg });
@@ -136,6 +156,7 @@ export function useStationActions(services: StationServices) {
   }, [appendNfcLog, handleWipeAndRegister, refreshSummary, services]);
 
   const handleTopUp = useCallback(async () => {
+    dismissedRef.current = false;
     setBusyAction('topup');
     setNfcSheet({ phase: 'scanning', message: 'Hold your NFC card to top up' });
     try {
@@ -143,13 +164,16 @@ export function useStationActions(services: StationServices) {
       const result = await services.topUpMemberCardUseCase.execute({
         amount: Number(topUpAmount),
       });
+      if (dismissedRef.current) {
+        return;
+      }
       setLatestResult(result);
       setResultTime(new Date());
       if (result.success) {
         setNfcSheet({
           phase: 'success',
           title: 'Top-Up Complete',
-          message: result.message,
+          message: `${result.message}\nBalance: Rp ${result.card?.balance?.toLocaleString('id-ID') ?? '0'}`,
         });
         appendNfcLog('[NFC] Top-up succeeded');
       } else {
@@ -162,6 +186,9 @@ export function useStationActions(services: StationServices) {
       }
       await refreshSummary();
     } catch (error) {
+      if (dismissedRef.current) {
+        return;
+      }
       const msg =
         error instanceof Error ? error.message : UNKNOWN_ERROR_MESSAGE;
       setNfcSheet({ phase: 'error', title: 'Error', message: msg });
@@ -171,6 +198,12 @@ export function useStationActions(services: StationServices) {
     }
   }, [appendNfcLog, refreshSummary, services, topUpAmount]);
 
+  const handleDismissSheet = useCallback(() => {
+    dismissedRef.current = true;
+    setNfcSheet({ phase: 'idle' });
+    setBusyAction(null);
+  }, []);
+
   return {
     nfcStatus,
     summary,
@@ -179,12 +212,13 @@ export function useStationActions(services: StationServices) {
     topUpAmount,
     setTopUpAmount,
     registerMode,
-    setRegisterMode,
+    setRegisterMode: handleSetRegisterMode,
     busyAction,
     nfcSheet,
     setNfcSheet,
     refreshSummary,
     handleRegister,
     handleTopUp,
+    handleDismissSheet,
   };
 }

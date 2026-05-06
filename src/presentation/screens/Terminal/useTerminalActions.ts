@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import type { RoleActionResultDto } from '../../../application/dto/role-action-result-dto';
 import type { NfcActionState } from '../../components/NfcActionSheet';
 import { useAppStore } from '../../stores/app-store';
@@ -37,6 +37,7 @@ export function useTerminalActions(services: TerminalServices) {
   const [busy, setBusy] = useState(false);
   const [nfcSheet, setNfcSheet] = useState<NfcActionState>({ phase: 'idle' });
   const [checkoutTime, setCheckoutTime] = useState('');
+  const dismissedRef = useRef(false);
 
   useEffect(() => {
     services.checkNfcAvailabilityUseCase
@@ -47,7 +48,14 @@ export function useTerminalActions(services: TerminalServices) {
       .catch(() => undefined);
   }, [appendNfcLog, services]);
 
+  const handleDismissSheet = useCallback(() => {
+    dismissedRef.current = true;
+    setNfcSheet({ phase: 'idle' });
+    setBusy(false);
+  }, []);
+
   const handleCheckout = useCallback(async () => {
+    dismissedRef.current = false;
     setBusy(true);
     setNfcSheet({
       phase: 'scanning',
@@ -56,6 +64,9 @@ export function useTerminalActions(services: TerminalServices) {
     try {
       appendNfcLog('[NFC] Checkout flow started');
       const result = await services.checkOutActivityUseCase.execute({});
+      if (dismissedRef.current) {
+        return;
+      }
       setLatestResult(result);
       if (result.success) {
         setCheckoutTime(formatTime(new Date()));
@@ -74,17 +85,13 @@ export function useTerminalActions(services: TerminalServices) {
         appendNfcLog(`[NFC] Checkout failed: ${result.message}`);
       }
     } catch (error) {
+      if (dismissedRef.current) {
+        return;
+      }
       const msg =
         error instanceof Error ? error.message : UNKNOWN_ERROR_MESSAGE;
       setNfcSheet({ phase: 'error', title: 'Error', message: msg });
       appendNfcLog(`[NFC] Checkout error: ${msg}`);
-      if (error instanceof Error) {
-        setLatestResult({
-          success: false,
-          role: 'TERMINAL',
-          message: error.message,
-        });
-      }
     } finally {
       setBusy(false);
     }
@@ -107,6 +114,7 @@ export function useTerminalActions(services: TerminalServices) {
     setNfcSheet,
     checkoutTime,
     handleCheckout,
+    handleDismissSheet,
     insufficient,
     genericFailure,
     success,

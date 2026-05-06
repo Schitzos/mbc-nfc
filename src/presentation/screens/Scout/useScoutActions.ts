@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import type { RoleActionResultDto } from '../../../application/dto/role-action-result-dto';
 import type { NfcActionState } from '../../components/NfcActionSheet';
 import { useAppStore } from '../../stores/app-store';
@@ -12,6 +12,7 @@ export function useScoutActions(services: ScoutServices) {
   );
   const [busy, setBusy] = useState(false);
   const [nfcSheet, setNfcSheet] = useState<NfcActionState>({ phase: 'idle' });
+  const dismissedRef = useRef(false);
 
   useEffect(() => {
     services.checkNfcAvailabilityUseCase
@@ -22,7 +23,14 @@ export function useScoutActions(services: ScoutServices) {
       .catch(() => undefined);
   }, [appendNfcLog, services]);
 
+  const handleDismissSheet = useCallback(() => {
+    dismissedRef.current = true;
+    setNfcSheet({ phase: 'idle' });
+    setBusy(false);
+  }, []);
+
   const handleInspect = useCallback(async () => {
+    dismissedRef.current = false;
     setBusy(true);
     setNfcSheet({
       phase: 'scanning',
@@ -31,6 +39,9 @@ export function useScoutActions(services: ScoutServices) {
     try {
       appendNfcLog('[NFC] Inspect flow started');
       const result = await services.inspectMemberCardUseCase.execute();
+      if (dismissedRef.current) {
+        return;
+      }
       setLatestResult(result);
       if (result.success) {
         setNfcSheet({
@@ -48,6 +59,9 @@ export function useScoutActions(services: ScoutServices) {
         appendNfcLog(`[NFC] Inspect failed: ${result.message}`);
       }
     } catch (error) {
+      if (dismissedRef.current) {
+        return;
+      }
       const msg =
         error instanceof Error ? error.message : UNKNOWN_ERROR_MESSAGE;
       setNfcSheet({ phase: 'error', title: 'Error', message: msg });
@@ -57,5 +71,12 @@ export function useScoutActions(services: ScoutServices) {
     }
   }, [appendNfcLog, services]);
 
-  return { latestResult, busy, nfcSheet, setNfcSheet, handleInspect };
+  return {
+    latestResult,
+    busy,
+    nfcSheet,
+    setNfcSheet,
+    handleInspect,
+    handleDismissSheet,
+  };
 }

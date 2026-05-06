@@ -153,7 +153,7 @@ export function ScoutScreen({ navigation }: Props): React.JSX.Element {
 
         <NfcActionSheet
           state={actions.nfcSheet}
-          onDismiss={() => actions.setNfcSheet({ phase: 'idle' })}
+          onDismiss={() => actions.handleDismissSheet()}
         />
       </ScrollView>
     </View>

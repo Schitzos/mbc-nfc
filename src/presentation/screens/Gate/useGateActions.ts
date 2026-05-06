@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import type { RoleActionResultDto } from '../../../application/dto/role-action-result-dto';
 import type { NfcActionState } from '../../components/NfcActionSheet';
 import { useAppStore } from '../../stores/app-store';
@@ -12,6 +12,7 @@ export function useGateActions(services: GateServices) {
   );
   const [busy, setBusy] = useState(false);
   const [nfcSheet, setNfcSheet] = useState<NfcActionState>({ phase: 'idle' });
+  const dismissedRef = useRef(false);
 
   useEffect(() => {
     services.checkNfcAvailabilityUseCase
@@ -22,7 +23,14 @@ export function useGateActions(services: GateServices) {
       .catch(() => undefined);
   }, [appendNfcLog, services]);
 
+  const handleDismissSheet = useCallback(() => {
+    dismissedRef.current = true;
+    setNfcSheet({ phase: 'idle' });
+    setBusy(false);
+  }, []);
+
   const handleCheckIn = useCallback(async () => {
+    dismissedRef.current = false;
     setBusy(true);
     setNfcSheet({
       phase: 'scanning',
@@ -34,12 +42,15 @@ export function useGateActions(services: GateServices) {
         activityId: 'parking-main-gate',
         activityType: 'PARKING',
       });
+      if (dismissedRef.current) {
+        return;
+      }
       setLatestResult(result);
       if (result.success) {
         setNfcSheet({
           phase: 'success',
           title: 'Checked In',
-          message: result.message,
+          message: `${result.message}\nBalance: Rp ${result.card?.balance?.toLocaleString('id-ID') ?? '0'}`,
         });
         appendNfcLog('[NFC] Check-in succeeded');
       } else {
@@ -51,6 +62,9 @@ export function useGateActions(services: GateServices) {
         appendNfcLog(`[NFC] Check-in failed: ${result.message}`);
       }
     } catch (error) {
+      if (dismissedRef.current) {
+        return;
+      }
       const msg =
         error instanceof Error ? error.message : UNKNOWN_ERROR_MESSAGE;
       setNfcSheet({ phase: 'error', title: 'Error', message: msg });
@@ -60,5 +74,12 @@ export function useGateActions(services: GateServices) {
     }
   }, [appendNfcLog, services]);
 
-  return { latestResult, busy, nfcSheet, setNfcSheet, handleCheckIn };
+  return {
+    latestResult,
+    busy,
+    nfcSheet,
+    setNfcSheet,
+    handleCheckIn,
+    handleDismissSheet,
+  };
 }

@@ -88,15 +88,6 @@ export function StationScreen({ navigation }: Props): React.JSX.Element {
             onBack={() => navigation.goBack()}
           />
 
-          <View className="rounded-2xl bg-[#EAF4FF] p-4">
-            <Text className="text-xs font-semibold uppercase text-[#0050AE]">
-              Real NFC mode
-            </Text>
-            <Text className="mt-1 text-xs text-muted">
-              {actions.nfcStatus?.title ?? 'Checking device NFC'}
-            </Text>
-          </View>
-
           <View className="rounded-2xl bg-white p-4 shadow-sm">
             {actions.registerMode === false && (
               <View className="mb-4">
@@ -196,9 +187,20 @@ export function StationScreen({ navigation }: Props): React.JSX.Element {
               <Text className="text-xl font-bold text-foreground">
                 Local Station ledger
               </Text>
-              <Text className="text-sm text-muted">
-                {ledgerExpanded ? '▲' : '▼'}
-              </Text>
+              <View className="flex-row items-center gap-3">
+                <Pressable
+                  onPress={() => {
+                    actions.refreshSummary().catch(() => undefined);
+                  }}
+                >
+                  <Text className="text-sm font-semibold text-[#0050AE]">
+                    Refresh
+                  </Text>
+                </Pressable>
+                <Text className="text-sm text-muted">
+                  {ledgerExpanded ? '▲' : '▼'}
+                </Text>
+              </View>
             </Pressable>
             {ledgerExpanded && (
               <View className="mt-3">
@@ -213,16 +215,6 @@ export function StationScreen({ navigation }: Props): React.JSX.Element {
                   {actions.summary.topUpCount} • Checkouts:{' '}
                   {actions.summary.checkoutCount}
                 </Text>
-                <View className="mt-2">
-                  <SignalButton
-                    label="Refresh"
-                    variant="secondary"
-                    size="small"
-                    onPress={() => {
-                      actions.refreshSummary().catch(() => undefined);
-                    }}
-                  />
-                </View>
               </View>
             )}
           </View>
@@ -232,7 +224,7 @@ export function StationScreen({ navigation }: Props): React.JSX.Element {
 
         <NfcActionSheet
           state={actions.nfcSheet}
-          onDismiss={() => actions.setNfcSheet({ phase: 'idle' })}
+          onDismiss={() => actions.handleDismissSheet()}
         />
       </ScrollView>
     </View>
