@@ -247,6 +247,7 @@ export interface MbcCardRepository {
   isSupported(): Promise<boolean>;
   readCard(): Promise<MbcCard>;
   writeCard(card: MbcCard): Promise<void>;
+  readWriteCard(transform: (card: MbcCard) => MbcCard): Promise<MbcCard>;
   registerCard(card: MbcCard): Promise<void>;
   cancel(): Promise<void>;
 }
@@ -313,14 +314,15 @@ export interface ParkingTariffRule {
 - Register, top-up, and checkout actions append ledger entries after successful business completion.
 - A masked or shortened member reference is preferred over full sensitive identity.
 
-### NFC Capacity and Write Verification
+### NFC Capacity and Single-Session Operations
 
 - NTAG215 is the MVP target tag and its writable capacity must be documented before real-card support is claimed.
 - The encoded protected payload length must be checked before every NTAG215 write.
 - If payload exceeds capacity, return `CARD_CAPACITY_INSUFFICIENT` and do not show success.
-- After every real NFC write, the repository must read the card back, decode it, verify Silent Shield authentication, and confirm expected counter/state.
-- If readback verification fails, return `WRITE_VERIFY_FAILED`.
-- If the card is removed too early and the readback cannot confirm expected counter/state, do not show success.
+- `writeNdefMessage` throws on write failure; no post-write readback verification is performed (the codec does not preserve all fields round-trip, making fingerprint comparison unreliable).
+- `readWriteCard(transform)` performs read, transform, and write in a single NFC session (one tap). Used by top-up, check-in, and check-out flows.
+- `registerCard(card)` checks for existing data then writes in a single NFC session.
+- `readCard()` is used for read-only operations (inspect).
 
 ## 9. Silent Shield Design
 
@@ -337,7 +339,6 @@ Design rules:
 - Keep crypto, codec, and key-loading logic inside infrastructure.
 - Generic NFC readers must not reveal member identity, balance, parking status details, or transaction values.
 - Any decrypt/authentication failure maps to `CARD_TAMPERED`.
-- After every real NFC write, read back and verify decrypt/authentication result and expected state.
 
 Measured payload sizes on NTAG215 (504 bytes user memory):
 
