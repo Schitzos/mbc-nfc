@@ -4,6 +4,7 @@ import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import type { RootStackParamList } from '../../../app/navigation';
 import { roleOptions } from '../../config/role-options';
+import { BackgroundDecor } from '../../components/BackgroundDecor';
 import { useAppStore } from '../../stores/app-store';
 import { AppHeaderCard } from './fragments/AppHeaderCard';
 import { RoleOptionList } from './fragments/RoleOptionList';
@@ -23,21 +24,24 @@ export function RoleSwitcherScreen({ navigation }: Props): React.JSX.Element {
   };
 
   return (
-    <ScrollView
-      className="flex-1 bg-background px-6"
-      contentContainerStyle={{
-        paddingTop: insets.top + 8,
-        paddingBottom: insets.bottom + 24,
-      }}
-    >
-      <View className="gap-4">
-        <AppHeaderCard />
-        <RoleOptionList
-          activeRoleKey={selectedRole}
-          roles={roleOptions}
-          onSelect={handleSelectRole}
-        />
-      </View>
-    </ScrollView>
+    <View className="flex-1 bg-background">
+      <BackgroundDecor variant="roleSwitcher" />
+      <ScrollView
+        className="flex-1 px-6"
+        contentContainerStyle={{
+          paddingTop: insets.top + 8,
+          paddingBottom: insets.bottom + 24,
+        }}
+      >
+        <View className="gap-4">
+          <AppHeaderCard />
+          <RoleOptionList
+            activeRoleKey={selectedRole}
+            roles={roleOptions}
+            onSelect={handleSelectRole}
+          />
+        </View>
+      </ScrollView>
+    </View>
   );
 }

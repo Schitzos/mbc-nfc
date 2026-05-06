@@ -9,6 +9,7 @@ import { SignalButton } from '../../components/SignalButton';
 import { NfcLogPanel } from '../../components/NfcLogPanel';
 import { NfcActionSheet } from '../../components/NfcActionSheet';
 import type { NfcActionState } from '../../components/NfcActionSheet';
+import { BackgroundDecor } from '../../components/BackgroundDecor';
 import { useAppStore } from '../../stores/app-store';
 import { ScoutHeader } from './fragments/ScoutHeader';
 
@@ -100,95 +101,98 @@ export function ScoutScreen({ navigation }: Props): React.JSX.Element {
   };
 
   return (
-    <ScrollView
-      className="flex-1 bg-background px-6"
-      contentContainerStyle={{
-        paddingTop: insets.top + 8,
-        paddingBottom: insets.bottom + 24,
-      }}
-    >
-      <View className="gap-4">
-        <ScoutHeader onBack={() => navigation.goBack()} />
+    <View className="flex-1 bg-background">
+      <BackgroundDecor variant="scout" />
+      <ScrollView
+        className="flex-1 px-6"
+        contentContainerStyle={{
+          paddingTop: insets.top + 8,
+          paddingBottom: insets.bottom + 24,
+        }}
+      >
+        <View className="gap-4">
+          <ScoutHeader onBack={() => navigation.goBack()} />
 
-        <SignalButton
-          label={busy ? 'Inspecting...' : 'Tap Card to Inspect'}
-          disabled={busy}
-          onPress={() => {
-            handleInspect().catch(() => undefined);
-          }}
-        />
+          <SignalButton
+            label={busy ? 'Inspecting...' : 'Tap Card to Inspect'}
+            disabled={busy}
+            onPress={() => {
+              handleInspect().catch(() => undefined);
+            }}
+          />
 
-        {latestResult && !latestResult.success ? (
-          <View className="rounded-xl border border-red-400 bg-[#FFECEC] p-3">
-            <Text className="text-xs font-semibold uppercase text-red-700">
-              Card cannot be processed
-            </Text>
-            <Text className="mt-1 text-sm font-semibold text-red-900">
-              {latestResult.message}
-            </Text>
-          </View>
-        ) : null}
-
-        {latestResult?.card ? (
-          <View className="rounded-xl border border-[#2A8BFF] bg-[#EAF4FF] p-3">
-            <Text className="text-base font-bold text-foreground">
-              Member card
-            </Text>
-            <View className="mt-2 flex-row gap-2">
-              <View className="flex-1 rounded-lg border border-[#2A8BFF] bg-[#DCEBFA] p-2">
-                <Text className="text-xs text-muted">Card ref</Text>
-                <Text className="text-2xl font-bold text-foreground">
-                  {latestResult.card.maskedMemberReference ?? 'MBC-***'}
-                </Text>
-              </View>
-              <View className="flex-1 rounded-lg border border-green-400 bg-[#E9F8EF] p-2">
-                <Text className="text-xs text-muted">Balance</Text>
-                <Text className="text-2xl font-bold text-foreground">
-                  Rp {latestResult.card.balance.toLocaleString('id-ID')}
-                </Text>
-              </View>
-            </View>
-            <View className="mt-2 rounded-lg border border-[#2A8BFF] bg-[#DCEBFA] p-2">
-              <Text className="text-xs text-muted">Status</Text>
-              <Text className="text-2xl font-bold text-foreground">
-                {latestResult.card.visitStatus === 'CHECKED_IN'
-                  ? 'Checked in'
-                  : 'Not checked in'}
+          {latestResult && !latestResult.success ? (
+            <View className="rounded-xl border border-red-400 bg-[#FFECEC] p-3">
+              <Text className="text-xs font-semibold uppercase text-red-700">
+                Card cannot be processed
+              </Text>
+              <Text className="mt-1 text-sm font-semibold text-red-900">
+                {latestResult.message}
               </Text>
             </View>
-          </View>
-        ) : null}
+          ) : null}
 
-        {latestResult?.card ? (
-          <View className="rounded-xl border border-slate-200 bg-white p-3">
-            <Text className="text-base font-bold text-foreground">
-              Latest five logs
-            </Text>
-            {latestResult.card.transactionLogs.length ? (
-              latestResult.card.transactionLogs
-                .slice(0, 5)
-                .map((log, index) => (
-                  <Text key={log.id} className="mt-1 text-xs text-muted">
-                    {index + 1}. {log.activity}
-                    {log.nominal
-                      ? ` — Rp ${log.nominal.toLocaleString('id-ID')}`
-                      : ''}{' '}
-                    • {formatLogTime(log.occurredAt)}
+          {latestResult?.card ? (
+            <View className="rounded-xl border border-[#2A8BFF] bg-[#EAF4FF] p-3">
+              <Text className="text-base font-bold text-foreground">
+                Member card
+              </Text>
+              <View className="mt-2 flex-row gap-2">
+                <View className="flex-1 rounded-lg border border-[#2A8BFF] bg-[#DCEBFA] p-2">
+                  <Text className="text-xs text-muted">Card ref</Text>
+                  <Text className="text-2xl font-bold text-foreground">
+                    {latestResult.card.maskedMemberReference ?? 'MBC-***'}
                   </Text>
-                ))
-            ) : (
-              <Text className="mt-1 text-xs text-muted">No logs yet.</Text>
-            )}
-          </View>
-        ) : null}
+                </View>
+                <View className="flex-1 rounded-lg border border-green-400 bg-[#E9F8EF] p-2">
+                  <Text className="text-xs text-muted">Balance</Text>
+                  <Text className="text-2xl font-bold text-foreground">
+                    Rp {latestResult.card.balance.toLocaleString('id-ID')}
+                  </Text>
+                </View>
+              </View>
+              <View className="mt-2 rounded-lg border border-[#2A8BFF] bg-[#DCEBFA] p-2">
+                <Text className="text-xs text-muted">Status</Text>
+                <Text className="text-2xl font-bold text-foreground">
+                  {latestResult.card.visitStatus === 'CHECKED_IN'
+                    ? 'Checked in'
+                    : 'Not checked in'}
+                </Text>
+              </View>
+            </View>
+          ) : null}
 
-        <NfcLogPanel />
-      </View>
+          {latestResult?.card ? (
+            <View className="rounded-xl border border-slate-200 bg-white p-3">
+              <Text className="text-base font-bold text-foreground">
+                Latest five logs
+              </Text>
+              {latestResult.card.transactionLogs.length ? (
+                latestResult.card.transactionLogs
+                  .slice(0, 5)
+                  .map((log, index) => (
+                    <Text key={log.id} className="mt-1 text-xs text-muted">
+                      {index + 1}. {log.activity}
+                      {log.nominal
+                        ? ` — Rp ${log.nominal.toLocaleString('id-ID')}`
+                        : ''}{' '}
+                      • {formatLogTime(log.occurredAt)}
+                    </Text>
+                  ))
+              ) : (
+                <Text className="mt-1 text-xs text-muted">No logs yet.</Text>
+              )}
+            </View>
+          ) : null}
 
-      <NfcActionSheet
-        state={nfcSheet}
-        onDismiss={() => setNfcSheet({ phase: 'idle' })}
-      />
-    </ScrollView>
+          <NfcLogPanel />
+        </View>
+
+        <NfcActionSheet
+          state={nfcSheet}
+          onDismiss={() => setNfcSheet({ phase: 'idle' })}
+        />
+      </ScrollView>
+    </View>
   );
 }

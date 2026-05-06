@@ -9,6 +9,7 @@ import { SignalButton } from '../../components/SignalButton';
 import { NfcLogPanel } from '../../components/NfcLogPanel';
 import { NfcActionSheet } from '../../components/NfcActionSheet';
 import type { NfcActionState } from '../../components/NfcActionSheet';
+import { BackgroundDecor } from '../../components/BackgroundDecor';
 import { useAppStore } from '../../stores/app-store';
 import { GateHeader } from './fragments/GateHeader';
 import { GateResultState } from './fragments/GateResultState';
@@ -77,43 +78,50 @@ export function GateScreen({ navigation }: Props): React.JSX.Element {
   };
 
   return (
-    <ScrollView
-      className="flex-1 bg-background px-6"
-      contentContainerStyle={{
-        paddingTop: insets.top + 8,
-        paddingBottom: insets.bottom + 24,
-      }}
-    >
-      <View className="gap-4">
-        <GateHeader onBack={() => navigation.goBack()} />
+    <View className="flex-1 bg-background">
+      <BackgroundDecor variant="gate" />
+      <ScrollView
+        className="flex-1 px-6"
+        contentContainerStyle={{
+          paddingTop: insets.top + 8,
+          paddingBottom: insets.bottom + 24,
+        }}
+      >
+        <View className="gap-4">
+          <GateHeader onBack={() => navigation.goBack()} />
 
-        <View className="rounded-2xl bg-white p-4">
-          <View className="rounded-xl border border-[#2A8BFF] bg-[#EAF4FF] p-3">
-            <Text className="text-sm font-semibold text-muted">
-              Selected activity
-            </Text>
-            <Text className="text-2xl font-bold text-foreground">Parking</Text>
-            <Text className="text-sm text-muted">Rp 2.000 / started hour</Text>
+          <View className="rounded-2xl bg-white p-4 shadow-sm">
+            <View className="rounded-xl border border-[#2A8BFF] bg-[#EAF4FF] p-3">
+              <Text className="text-sm font-semibold text-muted">
+                Selected activity
+              </Text>
+              <Text className="text-2xl font-bold text-foreground">
+                Parking
+              </Text>
+              <Text className="text-sm text-muted">
+                Rp 2.000 / started hour
+              </Text>
+            </View>
           </View>
+
+          <SignalButton
+            label={busy ? 'Processing...' : 'Tap Card to Check In'}
+            disabled={busy}
+            onPress={() => {
+              handleCheckIn().catch(() => undefined);
+            }}
+          />
+
+          <GateResultState latestResult={latestResult} />
+
+          <NfcLogPanel />
         </View>
 
-        <SignalButton
-          label={busy ? 'Processing...' : 'Tap Card to Check In'}
-          disabled={busy}
-          onPress={() => {
-            handleCheckIn().catch(() => undefined);
-          }}
+        <NfcActionSheet
+          state={nfcSheet}
+          onDismiss={() => setNfcSheet({ phase: 'idle' })}
         />
-
-        <GateResultState latestResult={latestResult} />
-
-        <NfcLogPanel />
-      </View>
-
-      <NfcActionSheet
-        state={nfcSheet}
-        onDismiss={() => setNfcSheet({ phase: 'idle' })}
-      />
-    </ScrollView>
+      </ScrollView>
+    </View>
   );
 }

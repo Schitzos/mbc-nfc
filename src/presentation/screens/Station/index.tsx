@@ -11,6 +11,7 @@ import { SignalButton } from '../../components/SignalButton';
 import { NfcLogPanel } from '../../components/NfcLogPanel';
 import { NfcActionSheet } from '../../components/NfcActionSheet';
 import type { NfcActionState } from '../../components/NfcActionSheet';
+import { BackgroundDecor } from '../../components/BackgroundDecor';
 import { useAppStore } from '../../stores/app-store';
 import { StationHeader } from './fragments/StationHeader';
 
@@ -209,161 +210,164 @@ export function StationScreen({ navigation }: Props): React.JSX.Element {
   };
 
   return (
-    <ScrollView
-      className="flex-1 bg-background px-6"
-      contentContainerStyle={{
-        paddingTop: insets.top + 8,
-        paddingBottom: insets.bottom + 24,
-      }}
-    >
-      <View className="gap-4">
-        <StationHeader
-          modeLabel={
-            registerMode ? 'Register member card' : 'Top up member card'
-          }
-          onBack={() => navigation.goBack()}
-        />
-
-        <View className="rounded-2xl bg-[#EAF4FF] p-4">
-          <Text className="text-xs font-semibold uppercase text-[#0050AE]">
-            Real NFC mode
-          </Text>
-          <Text className="mt-1 text-xs text-muted">
-            {nfcStatus?.title ?? 'Checking device NFC'}
-          </Text>
-        </View>
-
-        <View className="rounded-2xl bg-white p-4">
-          {!registerMode && (
-            <View className="mb-4">
-              <Text className="mb-2 text-sm font-semibold text-foreground">
-                Top-up amount
-              </Text>
-              <View className="flex-row flex-wrap gap-2">
-                {[10000, 20000, 50000, 100000].map(amount => (
-                  <Pressable
-                    key={amount}
-                    onPress={() => setTopUpAmount(String(amount))}
-                    className={`rounded-xl border px-4 py-3 ${
-                      topUpAmount === String(amount)
-                        ? 'border-[#0050AE] bg-[#EAF4FF]'
-                        : 'border-slate-200 bg-white'
-                    }`}
-                  >
-                    <Text
-                      className={`text-sm font-semibold ${
-                        topUpAmount === String(amount)
-                          ? 'text-[#0050AE]'
-                          : 'text-foreground'
-                      }`}
-                    >
-                      Rp {amount.toLocaleString('id-ID')}
-                    </Text>
-                  </Pressable>
-                ))}
-              </View>
-            </View>
-          )}
-
-          <SignalButton
-            label={
-              registerMode
-                ? busyAction === 'register'
-                  ? 'Registering...'
-                  : 'Tap NFC Card to Register'
-                : busyAction === 'topup'
-                  ? 'Processing...'
-                  : 'Tap NFC Card to Top Up'
+    <View className="flex-1 bg-background">
+      <BackgroundDecor variant="station" />
+      <ScrollView
+        className="flex-1 px-6"
+        contentContainerStyle={{
+          paddingTop: insets.top + 8,
+          paddingBottom: insets.bottom + 24,
+        }}
+      >
+        <View className="gap-4">
+          <StationHeader
+            modeLabel={
+              registerMode ? 'Register member card' : 'Top up member card'
             }
-            disabled={busyAction !== null}
-            onPress={() => {
-              if (registerMode) {
-                handleRegister().catch(() => undefined);
-              } else {
-                handleTopUp().catch(() => undefined);
-              }
-            }}
+            onBack={() => navigation.goBack()}
           />
 
-          <View className="mt-3">
-            <SignalButton
-              label={registerMode ? 'Switch to Top Up' : 'Switch to Register'}
-              variant="secondary"
-              onPress={() => setRegisterMode(prev => !prev)}
-            />
-          </View>
-        </View>
-
-        {latestResult && (
-          <View
-            className={`rounded-2xl p-4 ${
-              latestResult.success
-                ? 'border border-green-400 bg-[#EAFBF2]'
-                : 'border border-red-400 bg-[#FFECEC]'
-            }`}
-          >
-            <Text className="text-xl font-bold text-foreground">
-              Latest result
-            </Text>
-            <Text
-              className={`mt-2 text-sm font-semibold ${
-                latestResult.success ? 'text-green-700' : 'text-red-700'
-              }`}
-            >
-              {latestResult.success ? 'Success' : 'Unable to complete'}
-            </Text>
-            <Text className="mt-1 text-sm text-muted">
-              {latestResult.message}
+          <View className="rounded-2xl bg-[#EAF4FF] p-4">
+            <Text className="text-xs font-semibold uppercase text-[#0050AE]">
+              Real NFC mode
             </Text>
             <Text className="mt-1 text-xs text-muted">
-              {resultTime ? formatResultDate(resultTime) : ''}
+              {nfcStatus?.title ?? 'Checking device NFC'}
             </Text>
           </View>
-        )}
 
-        <View className="rounded-2xl bg-white p-4">
-          <Pressable
-            onPress={() => setLedgerExpanded(prev => !prev)}
-            className="flex-row items-center justify-between"
-          >
-            <Text className="text-xl font-bold text-foreground">
-              Local Station ledger
-            </Text>
-            <Text className="text-sm text-muted">
-              {ledgerExpanded ? '▲' : '▼'}
-            </Text>
-          </Pressable>
-          {ledgerExpanded && (
+          <View className="rounded-2xl bg-white p-4 shadow-sm">
+            {!registerMode && (
+              <View className="mb-4">
+                <Text className="mb-2 text-sm font-semibold text-foreground">
+                  Top-up amount
+                </Text>
+                <View className="flex-row flex-wrap gap-2">
+                  {[10000, 20000, 50000, 100000].map(amount => (
+                    <Pressable
+                      key={amount}
+                      onPress={() => setTopUpAmount(String(amount))}
+                      className={`rounded-xl border px-4 py-3 ${
+                        topUpAmount === String(amount)
+                          ? 'border-[#0050AE] bg-[#EAF4FF]'
+                          : 'border-slate-200 bg-white'
+                      }`}
+                    >
+                      <Text
+                        className={`text-sm font-semibold ${
+                          topUpAmount === String(amount)
+                            ? 'text-[#0050AE]'
+                            : 'text-foreground'
+                        }`}
+                      >
+                        Rp {amount.toLocaleString('id-ID')}
+                      </Text>
+                    </Pressable>
+                  ))}
+                </View>
+              </View>
+            )}
+
+            <SignalButton
+              label={
+                registerMode
+                  ? busyAction === 'register'
+                    ? 'Registering...'
+                    : 'Tap NFC Card to Register'
+                  : busyAction === 'topup'
+                    ? 'Processing...'
+                    : 'Tap NFC Card to Top Up'
+              }
+              disabled={busyAction !== null}
+              onPress={() => {
+                if (registerMode) {
+                  handleRegister().catch(() => undefined);
+                } else {
+                  handleTopUp().catch(() => undefined);
+                }
+              }}
+            />
+
             <View className="mt-3">
-              <Text className="text-sm text-muted">
-                Top-up: Rp {summary.topUpTotal.toLocaleString('id-ID')} •
-                Checkout: Rp {summary.checkoutTotal.toLocaleString('id-ID')}
+              <SignalButton
+                label={registerMode ? 'Switch to Top Up' : 'Switch to Register'}
+                variant="secondary"
+                onPress={() => setRegisterMode(prev => !prev)}
+              />
+            </View>
+          </View>
+
+          {latestResult && (
+            <View
+              className={`rounded-2xl p-4 ${
+                latestResult.success
+                  ? 'border border-green-400 bg-[#EAFBF2]'
+                  : 'border border-red-400 bg-[#FFECEC]'
+              }`}
+            >
+              <Text className="text-xl font-bold text-foreground">
+                Latest result
+              </Text>
+              <Text
+                className={`mt-2 text-sm font-semibold ${
+                  latestResult.success ? 'text-green-700' : 'text-red-700'
+                }`}
+              >
+                {latestResult.success ? 'Success' : 'Unable to complete'}
               </Text>
               <Text className="mt-1 text-sm text-muted">
-                Registers: {summary.registerCount} • Top-ups:{' '}
-                {summary.topUpCount} • Checkouts: {summary.checkoutCount}
+                {latestResult.message}
               </Text>
-              <View className="mt-2">
-                <SignalButton
-                  label="Refresh"
-                  variant="secondary"
-                  size="small"
-                  onPress={() => {
-                    refreshSummary().catch(() => undefined);
-                  }}
-                />
-              </View>
+              <Text className="mt-1 text-xs text-muted">
+                {resultTime ? formatResultDate(resultTime) : ''}
+              </Text>
             </View>
           )}
+
+          <View className="rounded-2xl bg-white p-4 shadow-sm">
+            <Pressable
+              onPress={() => setLedgerExpanded(prev => !prev)}
+              className="flex-row items-center justify-between"
+            >
+              <Text className="text-xl font-bold text-foreground">
+                Local Station ledger
+              </Text>
+              <Text className="text-sm text-muted">
+                {ledgerExpanded ? '▲' : '▼'}
+              </Text>
+            </Pressable>
+            {ledgerExpanded && (
+              <View className="mt-3">
+                <Text className="text-sm text-muted">
+                  Top-up: Rp {summary.topUpTotal.toLocaleString('id-ID')} •
+                  Checkout: Rp {summary.checkoutTotal.toLocaleString('id-ID')}
+                </Text>
+                <Text className="mt-1 text-sm text-muted">
+                  Registers: {summary.registerCount} • Top-ups:{' '}
+                  {summary.topUpCount} • Checkouts: {summary.checkoutCount}
+                </Text>
+                <View className="mt-2">
+                  <SignalButton
+                    label="Refresh"
+                    variant="secondary"
+                    size="small"
+                    onPress={() => {
+                      refreshSummary().catch(() => undefined);
+                    }}
+                  />
+                </View>
+              </View>
+            )}
+          </View>
+
+          <NfcLogPanel />
         </View>
 
-        <NfcLogPanel />
-      </View>
-
-      <NfcActionSheet
-        state={nfcSheet}
-        onDismiss={() => setNfcSheet({ phase: 'idle' })}
-      />
-    </ScrollView>
+        <NfcActionSheet
+          state={nfcSheet}
+          onDismiss={() => setNfcSheet({ phase: 'idle' })}
+        />
+      </ScrollView>
+    </View>
   );
 }
