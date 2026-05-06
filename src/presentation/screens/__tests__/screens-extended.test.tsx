@@ -169,30 +169,20 @@ describe('role screens – extended branch coverage', () => {
     });
   });
 
-  it('Gate simulation mode toggle works', async () => {
+  it('Gate check-in calls use case', async () => {
     render(<GateScreen navigation={navigation} />);
     await waitFor(() =>
       expect(mockCheckNfcAvailabilityUseCase.execute).toHaveBeenCalled(),
     );
 
-    // Toggle simulation on
-    fireEvent.press(screen.getByText('Set past time'));
-    expect(screen.getByText('Simulation active')).toBeTruthy();
-    expect(screen.getByText('On')).toBeTruthy();
-
-    // Check in with simulation timestamp
     fireEvent.press(screen.getByText('Tap Card to Check In'));
     await waitFor(() =>
       expect(mockCheckInActivityUseCase.execute).toHaveBeenCalledWith(
         expect.objectContaining({
-          simulatedCheckedInAt: '2026-05-01T08:30:00.000Z',
+          activityType: 'PARKING',
         }),
       ),
     );
-
-    // Toggle simulation off
-    fireEvent.press(screen.getByText('Clear simulation'));
-    expect(screen.getByText('Off')).toBeTruthy();
   });
 
   it('Gate shows non-double-check-in error (generic card error)', async () => {

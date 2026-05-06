@@ -191,8 +191,6 @@ describe('role screens', () => {
         }));
     });
 
-    fireEvent.changeText(screen.getByPlaceholderText('50000'), '75000');
-
     // Expand ledger accordion then refresh
     fireEvent.press(screen.getByText('Local Station ledger'));
     fireEvent.press(screen.getByText('Refresh'));
