@@ -4,5 +4,6 @@ export interface MbcCardRepository {
   isSupported(): Promise<boolean>;
   readCard(): Promise<MbcCard>;
   writeCard(card: MbcCard): Promise<void>;
+  registerCard(card: MbcCard): Promise<void>;
   cancel(): Promise<void>;
 }

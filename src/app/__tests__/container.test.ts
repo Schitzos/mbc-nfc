@@ -1,6 +1,4 @@
 import { appContainer } from '../container';
-import type { MbcCard } from '../../domain/entities/mbc-card';
-
 const mockOpen = jest.fn().mockReturnValue({
   execute: jest.fn(),
 });
@@ -21,52 +19,25 @@ jest.mock('react-native-nfc-manager', () => ({
   },
 }));
 
-const mockCard: MbcCard = {
-  version: 1,
-  cardId: 'CARD-001',
-  member: { memberId: 'MEM-001' },
-  balance: 1000,
-  currency: 'IDR',
-  visitStatus: 'NOT_CHECKED_IN',
-  transactionLogs: [],
-};
-
-jest.mock('../../infrastructure/nfc/mock-mbc-card.repository', () => {
-  class MockRepository {
-    private scenario = 'normal';
-    async isSupported() {
-      return true;
-    }
-    async readCard() {
-      return { ...mockCard };
-    }
-    async writeCard() {
-      return undefined;
-    }
-    async cancel() {
-      return undefined;
-    }
-    setScenario(next: string) {
-      this.scenario = next;
-    }
-    getScenario() {
-      return this.scenario;
-    }
-  }
-
-  return { MockMbcCardRepository: MockRepository };
-});
+jest.mock('react-native-quick-crypto', () => ({
+  __esModule: true,
+  default: {
+    randomBytes: (size: number) => Buffer.alloc(size),
+    createCipheriv: jest.fn(),
+    createDecipheriv: jest.fn(),
+  },
+}));
 
 describe('appContainer', () => {
   it('reuses singleton repositories', () => {
-    const mockA = appContainer.getMockCardRepository();
-    const mockB = appContainer.getMockCardRepository();
+    const realA = appContainer.getRealMbcCardRepository();
+    const realB = appContainer.getRealMbcCardRepository();
     const nfcA = appContainer.getDeviceNfcStatusRepository();
     const nfcB = appContainer.getDeviceNfcStatusRepository();
     const ledgerA = appContainer.getSqliteLedgerRepository();
     const ledgerB = appContainer.getSqliteLedgerRepository();
 
-    expect(mockA).toBe(mockB);
+    expect(realA).toBe(realB);
     expect(nfcA).toBe(nfcB);
     expect(ledgerA).toBe(ledgerB);
   });

@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Pressable, ScrollView, Text, View } from 'react-native';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { appContainer } from '../../../app/container';
@@ -7,22 +7,14 @@ import type { RootStackParamList } from '../../../app/navigation';
 import type { CheckNfcAvailabilityResultDto } from '../../../application/dto/check-nfc-availability-result-dto';
 import type { RoleActionResultDto } from '../../../application/dto/role-action-result-dto';
 import type { StationLedgerSummaryDto } from '../../../application/dto/station-ledger-summary-dto';
-import type { MockCardScenario } from '../../../infrastructure/nfc/mock-mbc-card.repository';
 import { SignalButton } from '../../components/SignalButton';
-import { SignalTextField } from '../../components/SignalTextField';
 import { NfcLogPanel } from '../../components/NfcLogPanel';
+import { NfcActionSheet } from '../../components/NfcActionSheet';
+import type { NfcActionState } from '../../components/NfcActionSheet';
 import { useAppStore } from '../../stores/app-store';
 import { StationHeader } from './fragments/StationHeader';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'station'>;
-
-const mockScenarios: Array<{ key: MockCardScenario; label: string }> = [
-  { key: 'normal', label: 'Normal card' },
-  { key: 'low-balance', label: 'Low balance' },
-  { key: 'checked-in', label: 'Checked in' },
-  { key: 'unregistered', label: 'Unregistered' },
-  { key: 'tampered', label: 'Tampered' },
-];
 
 const emptySummary: StationLedgerSummaryDto = {
   topUpTotal: 0,
@@ -32,6 +24,29 @@ const emptySummary: StationLedgerSummaryDto = {
   checkoutCount: 0,
   latestEntries: [],
 };
+
+const MONTHS = [
+  'Jan',
+  'Feb',
+  'Mar',
+  'Apr',
+  'May',
+  'Jun',
+  'Jul',
+  'Aug',
+  'Sep',
+  'Oct',
+  'Nov',
+  'Dec',
+];
+function formatResultDate(d: Date): string {
+  const dd = String(d.getDate()).padStart(2, '0');
+  const mmm = MONTHS[d.getMonth()];
+  const yyyy = d.getFullYear();
+  const hh = String(d.getHours()).padStart(2, '0');
+  const mm = String(d.getMinutes()).padStart(2, '0');
+  return `${dd}-${mmm}-${yyyy} ${hh}:${mm}`;
+}
 
 export function StationScreen({ navigation }: Props): React.JSX.Element {
   const insets = useSafeAreaInsets();
@@ -44,14 +59,14 @@ export function StationScreen({ navigation }: Props): React.JSX.Element {
   const [latestResult, setLatestResult] = useState<RoleActionResultDto | null>(
     null,
   );
-  const [selectedScenario, setSelectedScenario] = useState<MockCardScenario>(
-    services.mockRepository.getScenario(),
-  );
+  const [resultTime, setResultTime] = useState<Date | null>(null);
   const [topUpAmount, setTopUpAmount] = useState('50000');
   const [registerMode, setRegisterMode] = useState(true);
   const [busyAction, setBusyAction] = useState<'register' | 'topup' | null>(
     null,
   );
+  const [ledgerExpanded, setLedgerExpanded] = useState(false);
+  const [nfcSheet, setNfcSheet] = useState<NfcActionState>({ phase: 'idle' });
 
   const refreshSummary = useCallback(async () => {
     const nextSummary = await services.getStationLedgerSummaryUseCase.execute();
@@ -61,10 +76,6 @@ export function StationScreen({ navigation }: Props): React.JSX.Element {
   useEffect(() => {
     setSelectedRole('station');
   }, [setSelectedRole]);
-
-  useEffect(() => {
-    services.mockRepository.setScenario(selectedScenario);
-  }, [selectedScenario, services]);
 
   useEffect(() => {
     const loadInitialState = async () => {
@@ -79,23 +90,35 @@ export function StationScreen({ navigation }: Props): React.JSX.Element {
 
   const handleRegister = async () => {
     setBusyAction('register');
+    setNfcSheet({
+      phase: 'scanning',
+      message: 'Hold your NFC card to register',
+    });
     try {
       appendNfcLog('[NFC] Register flow started');
       const result = await services.registerMemberCardUseCase.execute();
       setLatestResult(result);
-      appendNfcLog(
-        result.success
-          ? '[NFC] Register succeeded'
-          : `[NFC] Register failed: ${result.message}`,
-      );
+      setResultTime(new Date());
+      if (result.success) {
+        setNfcSheet({
+          phase: 'success',
+          title: 'Card Registered',
+          message: result.message,
+        });
+        appendNfcLog('[NFC] Register succeeded');
+      } else {
+        setNfcSheet({
+          phase: 'error',
+          title: 'Registration Failed',
+          message: result.message,
+        });
+        appendNfcLog(`[NFC] Register failed: ${result.message}`);
+      }
       await refreshSummary();
     } catch (error) {
-      appendNfcLog(
-        `[NFC] Register error: ${
-          error instanceof Error ? error.message : 'Unknown error'
-        }`,
-      );
-      throw error;
+      const msg = error instanceof Error ? error.message : 'Unknown error';
+      setNfcSheet({ phase: 'error', title: 'Error', message: msg });
+      appendNfcLog(`[NFC] Register error: ${msg}`);
     } finally {
       setBusyAction(null);
     }
@@ -103,25 +126,34 @@ export function StationScreen({ navigation }: Props): React.JSX.Element {
 
   const handleTopUp = async () => {
     setBusyAction('topup');
+    setNfcSheet({ phase: 'scanning', message: 'Hold your NFC card to top up' });
     try {
       appendNfcLog('[NFC] Top-up flow started');
       const result = await services.topUpMemberCardUseCase.execute({
         amount: Number(topUpAmount),
       });
       setLatestResult(result);
-      appendNfcLog(
-        result.success
-          ? '[NFC] Top-up succeeded'
-          : `[NFC] Top-up failed: ${result.message}`,
-      );
+      setResultTime(new Date());
+      if (result.success) {
+        setNfcSheet({
+          phase: 'success',
+          title: 'Top-Up Complete',
+          message: result.message,
+        });
+        appendNfcLog('[NFC] Top-up succeeded');
+      } else {
+        setNfcSheet({
+          phase: 'error',
+          title: 'Top-Up Failed',
+          message: result.message,
+        });
+        appendNfcLog(`[NFC] Top-up failed: ${result.message}`);
+      }
       await refreshSummary();
     } catch (error) {
-      appendNfcLog(
-        `[NFC] Top-up error: ${
-          error instanceof Error ? error.message : 'Unknown error'
-        }`,
-      );
-      throw error;
+      const msg = error instanceof Error ? error.message : 'Unknown error';
+      setNfcSheet({ phase: 'error', title: 'Error', message: msg });
+      appendNfcLog(`[NFC] Top-up error: ${msg}`);
     } finally {
       setBusyAction(null);
     }
@@ -143,182 +175,146 @@ export function StationScreen({ navigation }: Props): React.JSX.Element {
           onBack={() => navigation.goBack()}
         />
 
-        <View className="rounded-2xl bg-[#FFF6DA] p-4">
-          <Text className="text-xs font-semibold uppercase text-amber-700">
-            Mock scenario
+        <View className="rounded-2xl bg-[#EAF4FF] p-4">
+          <Text className="text-xs font-semibold uppercase text-[#0050AE]">
+            Real NFC mode
           </Text>
-          <View className="mt-3 flex-row flex-wrap gap-2">
-            {mockScenarios.map(option => {
-              const active = option.key === selectedScenario;
-              return (
-                <Pressable
-                  key={option.key}
-                  className={`rounded-full border px-3 py-2 ${
-                    active
-                      ? 'border-[#2A8BFF] bg-[#EAF4FF]'
-                      : 'border-amber-300 bg-white'
-                  }`}
-                  onPress={() => {
-                    services.mockRepository.setScenario(option.key);
-                    setSelectedScenario(option.key);
-                    setLatestResult(null);
-                  }}
-                >
-                  <Text
-                    className={`text-xs font-semibold ${
-                      active ? 'text-[#0050AE]' : 'text-foreground'
-                    }`}
-                  >
-                    {option.label}
-                  </Text>
-                </Pressable>
-              );
-            })}
-          </View>
-          <Text className="mt-3 text-xs text-muted">
+          <Text className="mt-1 text-xs text-muted">
             {nfcStatus?.title ?? 'Checking device NFC'}
           </Text>
         </View>
 
         <View className="rounded-2xl bg-white p-4">
-          <Text className="text-2xl font-bold text-foreground">
-            Member registration
-          </Text>
-          <View className="mt-3 gap-3">
-            {registerMode ? (
-              <SignalTextField
-                label="Initial balance"
-                value={`Rp ${Number(topUpAmount || 0).toLocaleString('id-ID')}`}
-                editable={false}
-                style={styles.fullWidth}
-              />
-            ) : (
-              <SignalTextField
-                label="Top-up amount"
-                placeholder="50000"
-                keyboardType="numeric"
-                value={topUpAmount}
-                onChangeText={setTopUpAmount}
-                helperText="Positive IDR amount only."
-                style={styles.fullWidth}
-              />
-            )}
-          </View>
+          {!registerMode && (
+            <View className="mb-4">
+              <Text className="mb-2 text-sm font-semibold text-foreground">
+                Top-up amount
+              </Text>
+              <View className="flex-row flex-wrap gap-2">
+                {[10000, 20000, 50000, 100000].map(amount => (
+                  <Pressable
+                    key={amount}
+                    onPress={() => setTopUpAmount(String(amount))}
+                    className={`rounded-xl border px-4 py-3 ${
+                      topUpAmount === String(amount)
+                        ? 'border-[#0050AE] bg-[#EAF4FF]'
+                        : 'border-slate-200 bg-white'
+                    }`}
+                  >
+                    <Text
+                      className={`text-sm font-semibold ${
+                        topUpAmount === String(amount)
+                          ? 'text-[#0050AE]'
+                          : 'text-foreground'
+                      }`}
+                    >
+                      Rp {amount.toLocaleString('id-ID')}
+                    </Text>
+                  </Pressable>
+                ))}
+              </View>
+            </View>
+          )}
 
-          <View className="mt-4">
-            {registerMode ? (
-              <SignalButton
-                label={
-                  busyAction === 'register'
-                    ? 'Registering...'
-                    : 'Tap NFC Card to Register'
-                }
-                disabled={busyAction !== null}
-                onPress={() => {
-                  handleRegister().catch(() => undefined);
-                }}
-              />
-            ) : (
-              <SignalButton
-                label={
-                  busyAction === 'topup'
-                    ? 'Processing...'
-                    : 'Tap NFC Card to Top Up'
-                }
-                disabled={busyAction !== null}
-                onPress={() => {
-                  handleTopUp().catch(() => undefined);
-                }}
-              />
-            )}
-          </View>
+          <SignalButton
+            label={
+              registerMode
+                ? busyAction === 'register'
+                  ? 'Registering...'
+                  : 'Tap NFC Card to Register'
+                : busyAction === 'topup'
+                  ? 'Processing...'
+                  : 'Tap NFC Card to Top Up'
+            }
+            disabled={busyAction !== null}
+            onPress={() => {
+              if (registerMode) {
+                handleRegister().catch(() => undefined);
+              } else {
+                handleTopUp().catch(() => undefined);
+              }
+            }}
+          />
 
-          <View className="mt-3 items-center">
+          <View className="mt-3">
             <SignalButton
               label={registerMode ? 'Switch to Top Up' : 'Switch to Register'}
               variant="secondary"
-              size="small"
-              fullWidth={false}
               onPress={() => setRegisterMode(prev => !prev)}
             />
           </View>
-
-          <View className="mt-4 rounded-xl border border-slate-200 bg-slate-50 p-3">
-            <Text className="text-sm font-bold text-foreground">
-              Writes to card
-            </Text>
-            <Text className="text-xs text-muted">
-              Balance, NOT_CHECKED_IN status, register log, protected Silent
-              Shield payload.
-            </Text>
-          </View>
         </View>
 
+        {latestResult && (
+          <View
+            className={`rounded-2xl p-4 ${
+              latestResult.success
+                ? 'border border-green-400 bg-[#EAFBF2]'
+                : 'border border-red-400 bg-[#FFECEC]'
+            }`}
+          >
+            <Text className="text-xl font-bold text-foreground">
+              Latest result
+            </Text>
+            <Text
+              className={`mt-2 text-sm font-semibold ${
+                latestResult.success ? 'text-green-700' : 'text-red-700'
+              }`}
+            >
+              {latestResult.success ? 'Success' : 'Unable to complete'}
+            </Text>
+            <Text className="mt-1 text-sm text-muted">
+              {latestResult.message}
+            </Text>
+            <Text className="mt-1 text-xs text-muted">
+              {resultTime ? formatResultDate(resultTime) : ''}
+            </Text>
+          </View>
+        )}
+
         <View className="rounded-2xl bg-white p-4">
-          <View className="flex-row items-center justify-between">
+          <Pressable
+            onPress={() => setLedgerExpanded(prev => !prev)}
+            className="flex-row items-center justify-between"
+          >
             <Text className="text-xl font-bold text-foreground">
               Local Station ledger
             </Text>
-            <SignalButton
-              label="Refresh"
-              variant="secondary"
-              size="small"
-              fullWidth={false}
-              onPress={() => {
-                refreshSummary().catch(() => undefined);
-              }}
-            />
-          </View>
-          <Text className="mt-2 text-sm text-muted">
-            Top-up: Rp {summary.topUpTotal.toLocaleString('id-ID')} • Checkout:
-            Rp {summary.checkoutTotal.toLocaleString('id-ID')}
-          </Text>
-          <Text className="mt-1 text-sm text-muted">
-            Registers: {summary.registerCount} • Top-ups: {summary.topUpCount} •
-            Checkouts: {summary.checkoutCount}
-          </Text>
-        </View>
-
-        <View
-          className={`rounded-2xl p-4 ${
-            latestResult
-              ? latestResult.success
-                ? 'border border-green-400 bg-[#EAFBF2]'
-                : 'border border-red-400 bg-[#FFECEC]'
-              : 'bg-white'
-          }`}
-        >
-          <Text className="text-xl font-bold text-foreground">
-            Latest result
-          </Text>
-          {latestResult ? (
-            <>
-              <Text
-                className={`mt-2 text-sm font-semibold ${
-                  latestResult.success ? 'text-green-700' : 'text-red-700'
-                }`}
-              >
-                {latestResult.success ? 'Success' : 'Unable to complete'}
+            <Text className="text-sm text-muted">
+              {ledgerExpanded ? '▲' : '▼'}
+            </Text>
+          </Pressable>
+          {ledgerExpanded && (
+            <View className="mt-3">
+              <Text className="text-sm text-muted">
+                Top-up: Rp {summary.topUpTotal.toLocaleString('id-ID')} •
+                Checkout: Rp {summary.checkoutTotal.toLocaleString('id-ID')}
               </Text>
               <Text className="mt-1 text-sm text-muted">
-                {latestResult.message}
+                Registers: {summary.registerCount} • Top-ups:{' '}
+                {summary.topUpCount} • Checkouts: {summary.checkoutCount}
               </Text>
-            </>
-          ) : (
-            <Text className="mt-2 text-sm text-muted">
-              Station actions will show their latest outcome here.
-            </Text>
+              <View className="mt-2">
+                <SignalButton
+                  label="Refresh"
+                  variant="secondary"
+                  size="small"
+                  onPress={() => {
+                    refreshSummary().catch(() => undefined);
+                  }}
+                />
+              </View>
+            </View>
           )}
         </View>
 
         <NfcLogPanel />
       </View>
+
+      <NfcActionSheet
+        state={nfcSheet}
+        onDismiss={() => setNfcSheet({ phase: 'idle' })}
+      />
     </ScrollView>
   );
 }
-
-const styles = StyleSheet.create({
-  fullWidth: {
-    width: '100%',
-  },
-});

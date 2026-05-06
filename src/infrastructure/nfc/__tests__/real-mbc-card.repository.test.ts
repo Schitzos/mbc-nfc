@@ -1,0 +1,154 @@
+const mockStart = jest.fn();
+const mockIsSupported = jest.fn();
+const mockRequestTechnology = jest.fn();
+const mockGetTag = jest.fn();
+const mockWriteNdefMessage = jest.fn();
+const mockCancelTechnologyRequest = jest.fn();
+const mockEncodeMessage = jest.fn();
+const mockRecord = jest.fn();
+
+jest.mock('react-native-nfc-manager', () => ({
+  __esModule: true,
+  default: {
+    start: mockStart,
+    isSupported: mockIsSupported,
+    requestTechnology: mockRequestTechnology,
+    getTag: mockGetTag,
+    cancelTechnologyRequest: mockCancelTechnologyRequest,
+    ndefHandler: { writeNdefMessage: mockWriteNdefMessage },
+  },
+  NfcTech: { Ndef: 'Ndef' },
+  Ndef: {
+    TNF_MIME_MEDIA: 0x02,
+    encodeMessage: mockEncodeMessage,
+    record: mockRecord,
+  },
+}));
+
+jest.mock('react-native-quick-crypto', () => {
+  const nodeCrypto = require('crypto');
+  return {
+    __esModule: true,
+    default: {
+      randomBytes: (size: number) => nodeCrypto.randomBytes(size),
+      createCipheriv: (alg: string, key: Buffer, iv: Buffer) =>
+        nodeCrypto.createCipheriv(alg, key, iv),
+      createDecipheriv: (alg: string, key: Buffer, iv: Buffer) =>
+        nodeCrypto.createDecipheriv(alg, key, iv),
+    },
+  };
+});
+
+import { encrypt } from '../silent-shield';
+import type { MbcCard } from '../../../domain/entities/mbc-card';
+
+const { RealMbcCardRepository } = require('../real-mbc-card.repository');
+
+const cardFixture: MbcCard = {
+  version: 1,
+  cardId: 'C000001',
+  member: { memberId: 'M000001' },
+  balance: 50000,
+  currency: 'IDR',
+  visitStatus: 'NOT_CHECKED_IN',
+  transactionLogs: [],
+};
+
+function makeEncryptedTag(card: MbcCard, counter: number) {
+  const result = encrypt(card, counter);
+  if (!result.ok) {
+    throw new Error('encrypt failed: ' + result.error);
+  }
+  return {
+    ndefMessage: [{ payload: Array.from(result.value) }],
+  };
+}
+
+describe('RealMbcCardRepository', () => {
+  let repository: InstanceType<typeof RealMbcCardRepository>;
+
+  beforeEach(() => {
+    repository = new RealMbcCardRepository();
+    jest.clearAllMocks();
+    mockIsSupported.mockResolvedValue(true);
+    mockStart.mockResolvedValue(undefined);
+    mockRequestTechnology.mockResolvedValue(undefined);
+    mockCancelTechnologyRequest.mockResolvedValue(undefined);
+    mockWriteNdefMessage.mockResolvedValue(undefined);
+    mockRecord.mockImplementation(
+      (_tnf: number, _type: any, _id: any, payload: any) => payload,
+    );
+    mockEncodeMessage.mockImplementation((records: any[]) => records[0]);
+    mockGetTag.mockResolvedValue(makeEncryptedTag(cardFixture, 1));
+  });
+
+  it('checks NFC support', async () => {
+    const supported = await repository.isSupported();
+    expect(supported).toBe(true);
+    expect(mockStart).toHaveBeenCalledTimes(1);
+  });
+
+  it('reads and decrypts a card from Silent Shield envelope', async () => {
+    const card = await repository.readCard();
+    expect(card.cardId).toBe('C000001');
+    expect(card.balance).toBe(50000);
+    expect(card.visitStatus).toBe('NOT_CHECKED_IN');
+    expect(mockCancelTechnologyRequest).toHaveBeenCalled();
+  });
+
+  it('writes encrypted card', async () => {
+    await repository.writeCard(cardFixture);
+    expect(mockWriteNdefMessage).toHaveBeenCalled();
+    expect(mockCancelTechnologyRequest).toHaveBeenCalled();
+  });
+
+  it('rejects blank/unregistered card', async () => {
+    mockGetTag.mockResolvedValueOnce({ ndefMessage: [] });
+    await expect(repository.readCard()).rejects.toMatchObject({
+      code: 'UNREGISTERED_CARD',
+    });
+  });
+
+  it('rejects non-MBC envelope (tampered)', async () => {
+    mockGetTag.mockResolvedValueOnce({
+      ndefMessage: [{ payload: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9] }],
+    });
+    await expect(repository.readCard()).rejects.toMatchObject({
+      code: 'TAMPERED_CARD',
+    });
+  });
+
+  it('rejects corrupted Silent Shield envelope', async () => {
+    const result = encrypt(cardFixture, 1);
+    if (!result.ok) {
+      return;
+    }
+    const corrupted = Array.from(result.value);
+    // eslint-disable-next-line no-bitwise
+    corrupted[corrupted.length - 1] ^= 0xff;
+    mockGetTag.mockResolvedValueOnce({
+      ndefMessage: [{ payload: corrupted }],
+    });
+    await expect(repository.readCard()).rejects.toMatchObject({
+      code: 'TAMPERED_CARD',
+    });
+  });
+
+  it('maps cancelled scan into scan cancelled error', async () => {
+    mockRequestTechnology.mockRejectedValueOnce(new Error('user cancelled'));
+    await expect(repository.readCard()).rejects.toMatchObject({
+      code: 'SCAN_CANCELLED',
+    });
+  });
+
+  it('detects already registered card on registerCard', async () => {
+    // First write succeeds
+    await repository.writeCard(cardFixture);
+
+    // registerCard should detect existing valid data
+    mockGetTag.mockResolvedValue(makeEncryptedTag(cardFixture, 2));
+    await expect(repository.registerCard(cardFixture)).rejects.toMatchObject({
+      code: 'ALREADY_REGISTERED_CARD',
+    });
+  });
+});

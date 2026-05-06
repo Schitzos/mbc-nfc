@@ -43,16 +43,24 @@ export class RegisterMemberCardUseCase {
   ) {}
 
   async execute(): Promise<RoleActionResultDto> {
-    const registerState = await this.validateInitialCardState();
-
-    if (!registerState.canRegister) {
-      return {
-        success: false,
-        role: 'STATION',
-        message: registerState.message,
-      };
+    try {
+      return await this.performRegistration();
+    } catch (error) {
+      if (
+        error instanceof CardRepositoryError &&
+        error.code === 'ALREADY_REGISTERED_CARD'
+      ) {
+        return {
+          success: false,
+          role: 'STATION',
+          message: error.message,
+        };
+      }
+      throw error;
     }
+  }
 
+  async executeWithReset(): Promise<RoleActionResultDto> {
     const card = createInitialCard();
     await this.cardRepository.writeCard(card);
 
@@ -81,8 +89,38 @@ export class RegisterMemberCardUseCase {
     };
   }
 
+  private async performRegistration(): Promise<RoleActionResultDto> {
+    const card = createInitialCard();
+    await this.cardRepository.registerCard(card);
+
+    let message = 'Member card registered successfully.';
+
+    if (this.localLedgerRepository) {
+      try {
+        await this.localLedgerRepository.append({
+          id: createRandomId('LEDGER'),
+          role: 'STATION',
+          action: 'REGISTER',
+          maskedMemberReference: maskMemberReference(card.member.memberId),
+          occurredAt: new Date().toISOString(),
+        });
+      } catch {
+        message =
+          'Member card registered, but the local audit ledger could not be updated.';
+      }
+    }
+
+    return {
+      success: true,
+      role: 'STATION',
+      message,
+      card: toCardSummaryDto(card),
+    };
+  }
+
   private async validateInitialCardState(): Promise<{
     canRegister: boolean;
+    requiresReset: boolean;
     message: string;
   }> {
     try {
@@ -91,7 +129,9 @@ export class RegisterMemberCardUseCase {
       if (existingCard.member.memberId) {
         return {
           canRegister: false,
-          message: 'Card is already registered and cannot be registered again.',
+          requiresReset: true,
+          message:
+            'This card has existing data. Do you want to reset and register as new?',
         };
       }
     } catch (error) {
@@ -101,13 +141,27 @@ export class RegisterMemberCardUseCase {
       ) {
         return {
           canRegister: true,
+          requiresReset: false,
           message: 'Blank or reusable card is ready for registration.',
+        };
+      }
+
+      if (
+        error instanceof CardRepositoryError &&
+        error.code === 'TAMPERED_CARD'
+      ) {
+        return {
+          canRegister: false,
+          requiresReset: true,
+          message:
+            'This card has invalid or unrecognized data. Do you want to reset and register as new?',
         };
       }
 
       if (error instanceof CardRepositoryError) {
         return {
           canRegister: false,
+          requiresReset: false,
           message: error.message,
         };
       }
@@ -117,6 +171,7 @@ export class RegisterMemberCardUseCase {
 
     return {
       canRegister: true,
+      requiresReset: false,
       message: 'Card is ready for registration.',
     };
   }

@@ -1,5 +1,5 @@
 import React from 'react';
-import { Pressable, Text, View } from 'react-native';
+import { Pressable, ScrollView, Text, View } from 'react-native';
 import { useAppStore } from '../stores/app-store';
 
 const formatTime = (iso: string): string => {
@@ -33,19 +33,23 @@ export function NfcLogPanel(): React.JSX.Element {
       </View>
 
       {nfcLogEnabled ? (
-        <View className="mt-2 max-h-40 rounded-lg bg-[#111827] p-2">
+        <ScrollView
+          className="mt-2 rounded-lg bg-[#111827] p-2"
+          style={{ maxHeight: 160 }}
+          nestedScrollEnabled
+        >
           {nfcLogs.length === 0 ? (
             <Text className="text-xs text-slate-300">
               No NFC log lines yet.
             </Text>
           ) : (
-            nfcLogs.slice(-12).map(entry => (
+            nfcLogs.slice(-20).map(entry => (
               <Text key={entry.id} className="text-xs text-slate-200">
                 {formatTime(entry.createdAt)} {entry.message}
               </Text>
             ))
           )}
-        </View>
+        </ScrollView>
       ) : (
         <Text className="mt-2 text-xs text-slate-300">
           Log panel hidden. Tap ON to view NFC operational events.

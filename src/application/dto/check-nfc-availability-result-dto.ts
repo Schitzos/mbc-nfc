@@ -10,5 +10,4 @@ export type CheckNfcAvailabilityResultDto = {
   title: string;
   message: string;
   guidance: string[];
-  shouldUseMockMode: boolean;
 };

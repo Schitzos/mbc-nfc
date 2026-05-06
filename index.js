@@ -3,6 +3,8 @@
  */
 
 import 'react-native-reanimated';
+import { Buffer } from 'buffer';
+global.Buffer = Buffer;
 import './global.css';
 import { AppRegistry } from 'react-native';
 import App from './App';

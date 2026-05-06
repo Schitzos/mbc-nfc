@@ -170,6 +170,19 @@ export class MockMbcCardRepository implements MbcCardRepository {
     };
   }
 
+  async registerCard(card: MbcCard): Promise<void> {
+    if (this.state.kind === 'registered') {
+      throw new CardRepositoryError(
+        'ALREADY_REGISTERED_CARD',
+        'This card is already registered.',
+      );
+    }
+    this.state = {
+      kind: 'registered',
+      card: cloneCard(card),
+    };
+  }
+
   async cancel(): Promise<void> {
     return Promise.resolve();
   }
