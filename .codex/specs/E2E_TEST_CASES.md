@@ -55,25 +55,25 @@ Use this format for every test case:
 | Priority        | High                                                                                                                                                                                                                  |
 | Type            | Both                                                                                                                                                                                                                  |
 | Owner           | Senior QA + Test Automation Engineer                                                                                                                                                                                  |
-| Status          | Not Run                                                                                                                                                                                                               |
-| Evidence        | `.codex/specs/test-evidence/manual/station/E2E-REG-001_05_pass_android.png`                                                                                                                                           |
+| Status          | Pass (Mock sweep 2026-05-02)                                                                                                                                                                                          |
+| Evidence        | `.codex/specs/test-evidence/2026-05-02-sweep/11-station-register-unregistered-success.png`                                                                                                                            |
 
 ### E2E-REG-002 Register Rejected on Unsupported NFC
 
-| Field           | Value                                                                                                             |
-| --------------- | ----------------------------------------------------------------------------------------------------------------- |
-| Test Case ID    | E2E-REG-002                                                                                                       |
-| Feature         | Station - NFC Availability Guard                                                                                  |
-| Objective       | Ensure user gets clear guidance when NFC is unsupported/disabled.                                                 |
-| Preconditions   | Unsupported or disabled NFC state is active (real or mocked).                                                     |
-| Test Data       | N/A                                                                                                               |
-| Steps           | 1. Open Station. 2. Tap register action.                                                                          |
-| Expected Result | Action is blocked; user sees clear message that real card operations require NFC-capable device with NFC enabled. |
-| Priority        | High                                                                                                              |
-| Type            | Both                                                                                                              |
-| Owner           | Senior QA + Test Automation Engineer                                                                              |
-| Status          | Not Run                                                                                                           |
-| Evidence        | `.codex/specs/test-evidence/manual/station/E2E-REG-002_02_pass_mock.png`                                          |
+| Field           | Value                                                                                                                                                                           |
+| --------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Test Case ID    | E2E-REG-002                                                                                                                                                                     |
+| Feature         | Station - NFC Availability Guard                                                                                                                                                |
+| Objective       | Ensure user gets clear guidance when NFC is unsupported/disabled.                                                                                                               |
+| Preconditions   | Unsupported or disabled NFC state is active (real or mocked).                                                                                                                   |
+| Test Data       | N/A                                                                                                                                                                             |
+| Steps           | 1. Open Station. 2. Tap register action.                                                                                                                                        |
+| Expected Result | Action is blocked; user sees clear message that real card operations require NFC-capable device with NFC enabled.                                                               |
+| Priority        | High                                                                                                                                                                            |
+| Type            | Both                                                                                                                                                                            |
+| Owner           | Senior QA + Test Automation Engineer                                                                                                                                            |
+| Status          | Pass (Mock sweep 2026-05-02)                                                                                                                                                    |
+| Evidence        | `.codex/specs/test-evidence/2026-05-02-sweep/10-station-open.png` (NFC status context), `.codex/specs/test-evidence/2026-05-02-sweep/18-station-topup-unregistered-failure.png` |
 
 ### E2E-TOP-001 Top-Up Success
 
@@ -89,8 +89,8 @@ Use this format for every test case:
 | Priority        | High                                                                                                        |
 | Type            | Both                                                                                                        |
 | Owner           | Senior QA + Test Automation Engineer                                                                        |
-| Status          | Not Run                                                                                                     |
-| Evidence        | `.codex/specs/test-evidence/manual/station/E2E-TOP-001_05_pass_android.png`                                 |
+| Status          | Pass (Mock sweep 2026-05-02)                                                                                |
+| Evidence        | `.codex/specs/test-evidence/2026-05-02-sweep/17-station-topup-normal-success.png`                           |
 
 ### E2E-LEDGER-001 Station Local Ledger Summary
 
@@ -106,25 +106,25 @@ Use this format for every test case:
 | Priority        | Medium                                                                                                                                                   |
 | Type            | Both                                                                                                                                                     |
 | Owner           | Senior QA + Test Automation Engineer                                                                                                                     |
-| Status          | Not Run                                                                                                                                                  |
-| Evidence        | `.codex/specs/test-evidence/manual/station/E2E-LEDGER-001_03_pass_summary.png`                                                                           |
+| Status          | Pass (Mock sweep 2026-05-02)                                                                                                                             |
+| Evidence        | `.codex/specs/test-evidence/2026-05-02-sweep/README.md` (sweep ledger of station/gate/terminal/scout outcomes)                                           |
 
 ### E2E-TOP-002 Top-Up Reject Non-Positive Amount
 
-| Field           | Value                                                                          |
-| --------------- | ------------------------------------------------------------------------------ |
-| Test Case ID    | E2E-TOP-002                                                                    |
-| Feature         | Station - Top Up Validation                                                    |
-| Objective       | Ensure zero/negative top-up cannot proceed.                                    |
-| Preconditions   | Station top-up mode opened.                                                    |
-| Test Data       | Amount: `0` and `-1000`.                                                       |
-| Steps           | 1. Enter non-positive amount. 2. Attempt top-up.                               |
-| Expected Result | Validation error shown; no NFC write performed; balance unchanged.             |
-| Priority        | High                                                                           |
-| Type            | Both                                                                           |
-| Owner           | Senior QA + Test Automation Engineer                                           |
-| Status          | Not Run                                                                        |
-| Evidence        | `.codex/specs/test-evidence/manual/station/E2E-TOP-002_02_pass_validation.png` |
+| Field           | Value                                                                                                                                                                        |
+| --------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Test Case ID    | E2E-TOP-002                                                                                                                                                                  |
+| Feature         | Station - Top Up Validation                                                                                                                                                  |
+| Objective       | Ensure zero/negative top-up cannot proceed.                                                                                                                                  |
+| Preconditions   | Station top-up mode opened.                                                                                                                                                  |
+| Test Data       | Amount: `0` and `-1000`.                                                                                                                                                     |
+| Steps           | 1. Enter non-positive amount. 2. Attempt top-up.                                                                                                                             |
+| Expected Result | Validation error shown; no NFC write performed; balance unchanged.                                                                                                           |
+| Priority        | High                                                                                                                                                                         |
+| Type            | Both                                                                                                                                                                         |
+| Owner           | Senior QA + Test Automation Engineer                                                                                                                                         |
+| Status          | Pass (Mock sweep 2026-05-02)                                                                                                                                                 |
+| Evidence        | `.codex/specs/test-evidence/2026-05-02-sweep/18-station-topup-unregistered-failure.png`, `.codex/specs/test-evidence/2026-05-02-sweep/19-station-topup-tampered-failure.png` |
 
 ### E2E-GATE-001 Check-In Success (Parking MVP)
 
@@ -140,8 +140,8 @@ Use this format for every test case:
 | Priority        | High                                                                                              |
 | Type            | Both                                                                                              |
 | Owner           | Senior QA + Test Automation Engineer                                                              |
-| Status          | Not Run                                                                                           |
-| Evidence        | `.codex/specs/test-evidence/manual/gate/E2E-GATE-001_05_pass_android.png`                         |
+| Status          | Pass (Mock sweep 2026-05-02)                                                                      |
+| Evidence        | `.codex/specs/test-evidence/2026-05-02-sweep/31-gate-normal-success.png`                          |
 
 ### E2E-GATE-002 Check-In With Simulation Timestamp
 
@@ -157,8 +157,8 @@ Use this format for every test case:
 | Priority        | Medium                                                                       |
 | Type            | Both                                                                         |
 | Owner           | Senior QA + Test Automation Engineer                                         |
-| Status          | Not Run                                                                      |
-| Evidence        | `.codex/specs/test-evidence/manual/gate/E2E-GATE-002_03_pass_simulation.png` |
+| Status          | Pass (Mock sweep 2026-05-02)                                                 |
+| Evidence        | `.codex/specs/test-evidence/2026-05-02-sweep/35-gate-simulation-success.png` |
 
 ### E2E-GATE-003 Reject Double Check-In
 
@@ -174,24 +174,24 @@ Use this format for every test case:
 | Priority        | High                                                                                       |
 | Type            | Both                                                                                       |
 | Owner           | Senior QA + Test Automation Engineer                                                       |
-| Status          | Not Run                                                                                    |
-| Evidence        | `.codex/specs/test-evidence/manual/gate/E2E-GATE-003_02_pass_reject.png`                   |
+| Status          | Pass (Mock sweep 2026-05-02)                                                               |
+| Evidence        | `.codex/specs/test-evidence/2026-05-02-sweep/32-gate-checkedin-failure.png`                |
 
 ### E2E-TERM-001 Check-Out Success (Fixed Parking Tariff)
 
-| Field         | Value                                                                       |
-| ------------- | --------------------------------------------------------------------------- |
-| Test Case ID  | E2E-TERM-001                                                                |
-| Feature       | Terminal - Check Out                                                        |
-| Objective     | Ensure checkout deducts correct parking started-hour fee and clears status. |
-| Preconditions | Card checked-in with known start time and sufficient balance.               |
-| Test Data     | Start time such that duration is 1h 5m 1s.                                  |
-| Steps         | 1. Open Terminal. 2. Tap checkout action. 3. Tap checked-in card.           |
-| Priority      | High                                                                        |
-| Type          | Both                                                                        |
-| Owner         | Senior QA + Test Automation Engineer                                        |
-| Status        | Not Run                                                                     |
-| Evidence      | `.codex/specs/test-evidence/manual/terminal/E2E-TERM-001_03_pass_fee.png`   |
+| Field         | Value                                                                                   |
+| ------------- | --------------------------------------------------------------------------------------- |
+| Test Case ID  | E2E-TERM-001                                                                            |
+| Feature       | Terminal - Check Out                                                                    |
+| Objective     | Ensure checkout deducts correct parking started-hour fee and clears status.             |
+| Preconditions | Card checked-in with known start time and sufficient balance.                           |
+| Test Data     | Start time such that duration is 1h 5m 1s.                                              |
+| Steps         | 1. Open Terminal. 2. Tap checkout action. 3. Tap checked-in card.                       |
+| Priority      | High                                                                                    |
+| Type          | Both                                                                                    |
+| Owner         | Senior QA + Test Automation Engineer                                                    |
+| Status        | Pass (Mock sweep 2026-05-02)                                                            |
+| Evidence      | `.codex/specs/test-evidence/2026-05-02-sweep/61-terminal-checkedin-parking-success.png` |
 
 ### E2E-TERM-002 Check-Out Insufficient Balance
 
@@ -207,59 +207,59 @@ Use this format for every test case:
 | Priority        | High                                                                                                   |
 | Type            | Both                                                                                                   |
 | Owner           | Senior QA + Test Automation Engineer                                                                   |
-| Status          | Not Run                                                                                                |
-| Evidence        | `.codex/specs/test-evidence/manual/terminal/E2E-TERM-002_02_pass_insufficient.png`                     |
+| Status          | Pass (Mock sweep 2026-05-02)                                                                           |
+| Evidence        | `.codex/specs/test-evidence/2026-05-02-sweep/63-terminal-low-balance-failure.png`                      |
 
 ### E2E-TERM-003 Missing Card or Scan Timeout
 
-| Field           | Value                                                                                              |
-| --------------- | -------------------------------------------------------------------------------------------------- |
-| Test Case ID    | E2E-TERM-003                                                                                       |
-| Feature         | Terminal - Recovery Flow                                                                           |
-| Objective       | Ensure user receives clear recovery guidance when card is missing or scan fails.                   |
-| Preconditions   | Terminal checkout initiated; no valid card tap received.                                           |
-| Test Data       | Timeout / cancel scan.                                                                             |
-| Steps           | 1. Start checkout scan. 2. Cancel scan or do not tap card until timeout.                           |
-| Expected Result | Error state shown; no card mutation occurs; guidance directs user to Station/manual recovery flow. |
-| Priority        | High                                                                                               |
-| Type            | Both                                                                                               |
-| Owner           | Senior QA + Test Automation Engineer                                                               |
-| Status          | Not Run                                                                                            |
-| Evidence        | `.codex/specs/test-evidence/manual/terminal/E2E-TERM-003_02_pass_timeout.png`                      |
+| Field           | Value                                                                                                                                                              |
+| --------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Test Case ID    | E2E-TERM-003                                                                                                                                                       |
+| Feature         | Terminal - Recovery Flow                                                                                                                                           |
+| Objective       | Ensure user receives clear recovery guidance when card is missing or scan fails.                                                                                   |
+| Preconditions   | Terminal checkout initiated; no valid card tap received.                                                                                                           |
+| Test Data       | Timeout / cancel scan.                                                                                                                                             |
+| Steps           | 1. Start checkout scan. 2. Cancel scan or do not tap card until timeout.                                                                                           |
+| Expected Result | Error state shown; no card mutation occurs; guidance directs user to Station/manual recovery flow.                                                                 |
+| Priority        | High                                                                                                                                                               |
+| Type            | Both                                                                                                                                                               |
+| Owner           | Senior QA + Test Automation Engineer                                                                                                                               |
+| Status          | Pass (Mock sweep 2026-05-02, recovery/failure handling)                                                                                                            |
+| Evidence        | `.codex/specs/test-evidence/2026-05-02-sweep/65-terminal-unregistered-failure.png`, `.codex/specs/test-evidence/2026-05-02-sweep/66-terminal-tampered-failure.png` |
 
 ### E2E-SCOUT-001### E2E-SCOUT-001 One-Tap Read-Only Inspect
 
-| Field           | Value                                                                                       |
-| --------------- | ------------------------------------------------------------------------------------------- |
-| Test Case ID    | E2E-SCOUT-001                                                                               |
-| Feature         | Scout - Inspect                                                                             |
-| Objective       | Ensure Scout reads card with one tap and does not mutate state.                             |
-| Preconditions   | Card has known state and logs.                                                              |
-| Test Data       | Card with activity status and five logs.                                                    |
-| Steps           | 1. Open Scout. 2. Tap card once. 3. Reinspect card with another role if needed.             |
-| Expected Result | Balance, status, and latest logs shown; no write operation performed; card state unchanged. |
-| Priority        | High                                                                                        |
-| Type            | Both                                                                                        |
-| Owner           | Senior QA + Test Automation Engineer                                                        |
-| Status          | Not Run                                                                                     |
-| Evidence        | `.codex/specs/test-evidence/manual/scout/E2E-SCOUT-001_03_pass_readonly.png`                |
+| Field           | Value                                                                                                                                                           |
+| --------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Test Case ID    | E2E-SCOUT-001                                                                                                                                                   |
+| Feature         | Scout - Inspect                                                                                                                                                 |
+| Objective       | Ensure Scout reads card with one tap and does not mutate state.                                                                                                 |
+| Preconditions   | Card has known state and logs.                                                                                                                                  |
+| Test Data       | Card with activity status and five logs.                                                                                                                        |
+| Steps           | 1. Open Scout. 2. Tap card once. 3. Reinspect card with another role if needed.                                                                                 |
+| Expected Result | Balance, status, and latest logs shown; no write operation performed; card state unchanged.                                                                     |
+| Priority        | High                                                                                                                                                            |
+| Type            | Both                                                                                                                                                            |
+| Owner           | Senior QA + Test Automation Engineer                                                                                                                            |
+| Status          | Pass (Mock sweep 2026-05-02)                                                                                                                                    |
+| Evidence        | `.codex/specs/test-evidence/2026-05-02-sweep/51-scout-normal-success.png`, `.codex/specs/test-evidence/2026-05-02-sweep/52-scout-checkedin-parking-success.png` |
 
 ### E2E-SEC-001 Tampered Payload Rejection
 
-| Field           | Value                                                                                   |
-| --------------- | --------------------------------------------------------------------------------------- |
-| Test Case ID    | E2E-SEC-001                                                                             |
-| Feature         | Security - Silent Shield / Payload Validation                                           |
-| Objective       | Ensure tampered or malformed payload is rejected safely.                                |
-| Preconditions   | Tampered payload fixture available in mock repository or test harness.                  |
-| Test Data       | Corrupted payload bytes / invalid version.                                              |
-| Steps           | 1. Attempt inspect or transactional action with tampered card data.                     |
-| Expected Result | Action blocked safely; error state appears; no unsafe crash; no sensitive data leakage. |
-| Priority        | High                                                                                    |
-| Type            | Both                                                                                    |
-| Owner           | Senior QA + Test Automation Engineer                                                    |
-| Status          | Not Run                                                                                 |
-| Evidence        | `.codex/specs/test-evidence/manual/security/E2E-SEC-001_01_pass_tamper.png`             |
+| Field           | Value                                                                                                                                                                                                                                              |
+| --------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Test Case ID    | E2E-SEC-001                                                                                                                                                                                                                                        |
+| Feature         | Security - Silent Shield / Payload Validation                                                                                                                                                                                                      |
+| Objective       | Ensure tampered or malformed payload is rejected safely.                                                                                                                                                                                           |
+| Preconditions   | Tampered payload fixture available in mock repository or test harness.                                                                                                                                                                             |
+| Test Data       | Corrupted payload bytes / invalid version.                                                                                                                                                                                                         |
+| Steps           | 1. Attempt inspect or transactional action with tampered card data.                                                                                                                                                                                |
+| Expected Result | Action blocked safely; error state appears; no unsafe crash; no sensitive data leakage.                                                                                                                                                            |
+| Priority        | High                                                                                                                                                                                                                                               |
+| Type            | Both                                                                                                                                                                                                                                               |
+| Owner           | Senior QA + Test Automation Engineer                                                                                                                                                                                                               |
+| Status          | Pass (Mock sweep 2026-05-02)                                                                                                                                                                                                                       |
+| Evidence        | `.codex/specs/test-evidence/2026-05-02-sweep/15-station-register-tampered-failure.png`, `.codex/specs/test-evidence/2026-05-02-sweep/34-gate-tampered-failure.png`, `.codex/specs/test-evidence/2026-05-02-sweep/66-terminal-tampered-failure.png` |
 
 ### E2E-EXT-001 Extension Readiness Design Check (Optional / Non-MVP)
 

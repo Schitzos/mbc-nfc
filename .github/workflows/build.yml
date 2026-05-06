@@ -7,7 +7,6 @@ on:
       - develop
   push:
     branches:
-      - develop
       - main
 
 env:
@@ -96,10 +95,24 @@ jobs:
       - unit_test
       - lint
       - vulnerability_scan
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+
+      - name: Preflight secret check (build)
+        env:
+          GOOGLE_SERVICES_JSON: ${{ secrets.GOOGLE_SERVICES_JSON }}
+        run: |
+          missing=0
+          if [ -z "$GOOGLE_SERVICES_JSON" ]; then
+            echo "::error::Missing required secret: GOOGLE_SERVICES_JSON"
+            missing=1
+          fi
+          if [ "$missing" -ne 0 ]; then
+            exit 1
+          fi
 
       - name: Set up Node.js
         uses: actions/setup-node@v4
@@ -174,17 +187,62 @@ jobs:
           name: debug-apk
           path: android/app/build/outputs/apk/debug/app-debug.apk
 
+      - name: Build job summary
+        run: |
+          {
+            echo "## Build Summary"
+            echo ""
+            echo "- Workflow: \`${{ github.workflow }}\`"
+            echo "- Branch/Ref: \`${{ github.ref_name }}\`"
+            echo "- Commit: \`${{ github.sha }}\`"
+            echo "- APK artifact: \`debug-apk\`"
+          } >> "$GITHUB_STEP_SUMMARY"
+
   distribute_apk:
     runs-on: ubuntu-latest
     needs:
       - build_apk
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
 
     steps:
+      - name: Preflight secret check (distribution)
+        env:
+          FIREBASE_APP_ID: ${{ secrets.FIREBASE_APP_ID }}
+          FIREBASE_SERVICE_ACCOUNT_JSON: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_JSON }}
+        run: |
+          missing=0
+          if [ -z "$FIREBASE_APP_ID" ]; then
+            echo "::error::Missing required secret: FIREBASE_APP_ID"
+            missing=1
+          fi
+          if [ -z "$FIREBASE_SERVICE_ACCOUNT_JSON" ]; then
+            echo "::error::Missing required secret: FIREBASE_SERVICE_ACCOUNT_JSON"
+            missing=1
+          fi
+          if [ "$missing" -ne 0 ]; then
+            exit 1
+          fi
+
       - name: Download APK artifact
         uses: actions/download-artifact@v4
         with:
           name: debug-apk
           path: android/app/build/outputs/apk/debug
+
+      - name: Generate release notes
+        id: release_notes
+        run: |
+          {
+            echo "notes<<EOF"
+            echo "MBC NFC debug distribution"
+            echo ""
+            echo "- Workflow: ${{ github.workflow }}"
+            echo "- Ref: ${{ github.ref_name }}"
+            echo "- Commit: ${{ github.sha }}"
+            echo "- Trigger: ${{ github.event_name }}"
+            echo "- Run: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+            echo "EOF"
+          } >> "$GITHUB_OUTPUT"
 
       - name: Upload artifact to Firebase App Distribution
         id: testing_outputs
@@ -194,3 +252,13 @@ jobs:
           serviceCredentialsFileContent: ${{secrets.FIREBASE_SERVICE_ACCOUNT_JSON}}
           groups: testers
           file: android/app/build/outputs/apk/debug/app-debug.apk
+          releaseNotes: ${{ steps.release_notes.outputs.notes }}
+
+      - name: Distribution job summary
+        run: |
+          {
+            echo "## Distribution Summary"
+            echo ""
+            echo "- Artifact: \`android/app/build/outputs/apk/debug/app-debug.apk\`"
+            echo "- Release notes: generated from workflow metadata"
+          } >> "$GITHUB_STEP_SUMMARY"

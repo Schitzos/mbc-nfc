@@ -90,6 +90,7 @@ src/
     stores/
       role.store.ts
       mbc-flow.store.ts
+      nfc-log.store.ts
     hooks/
       useMbcCardScan.ts
     screens/
@@ -125,6 +126,7 @@ src/
       LedgerSummaryPanel.tsx
       TransactionLogList.tsx
       NfcActionButton.tsx
+      NfcLogPanel.tsx
       SimulationTimePicker.tsx
   shared/
     utils/
@@ -345,6 +347,14 @@ Before any real card operation, the presentation layer checks NFC availability t
 - Gate: default parking indicator, check-in action, simulation time control, NFC write action, status result.
 - Terminal: checkout action, fixed tariff display, duration/fee summary, insufficient balance guidance, NFC write action, status result.
 - Scout: one-tap read-only card summary, balance, visit status, last five logs.
+- Shared troubleshooting: NFC log panel can be toggled on/off and cleared by the operator. It records safe operational events only (no sensitive payload data).
+
+NFC operational log design rules:
+
+- Keep log state in presentation store, isolated from domain/application business state.
+- Use bounded in-memory list (for example latest 100-200 lines) to avoid unbounded growth.
+- Log format should be concise (`HH.mm.ss [NFC:*] message`).
+- Logs must never include raw decrypted payload, private keys, full internal member IDs, or security secrets.
 
 The UI should apply the Signal UI design system direction, stay simple and direct, and be usable by cooperative staff. Avoid unnecessary dashboard complexity.
 
