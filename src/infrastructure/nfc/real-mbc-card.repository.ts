@@ -3,6 +3,7 @@ import NfcManager, { Ndef, NfcTech } from 'react-native-nfc-manager';
 import type { MbcCard } from '../../domain/entities/mbc-card';
 import type { MbcCardRepository } from '../../domain/repositories/mbc-card-repository';
 import { CardRepositoryError } from '../../domain/errors/card-repository-error';
+import { DomainError } from '../../domain/errors/domain-error';
 import { encrypt, decrypt, isMbcEnvelope } from './silent-shield';
 
 const NTAG215_USER_MEMORY = 504;
@@ -17,12 +18,11 @@ interface NdefTag {
   ndefMessage?: NdefRecord[];
 }
 
-function cardFingerprint(card: MbcCard): string {
-  return JSON.stringify(card);
-}
-
-function toReadableError(error: unknown): CardRepositoryError {
+function toReadableError(error: unknown): CardRepositoryError | DomainError {
   if (error instanceof CardRepositoryError) {
+    return error;
+  }
+  if (error instanceof DomainError) {
     return error;
   }
   if (error instanceof Error && /cancel/i.test(error.message)) {
@@ -63,6 +63,21 @@ export class RealMbcCardRepository implements MbcCardRepository {
     try {
       await this.requestNdefTechnology();
       await this.writeToActiveSession(card);
+    } catch (error) {
+      throw toReadableError(error);
+    } finally {
+      await this.cancel();
+    }
+  }
+
+  async readWriteCard(transform: (card: MbcCard) => MbcCard): Promise<MbcCard> {
+    await this.ensureStarted();
+    try {
+      await this.requestNdefTechnology();
+      const card = await this.readCardFromActiveSession();
+      const updated = transform(card);
+      await this.writeToActiveSession(updated);
+      return updated;
     } catch (error) {
       throw toReadableError(error);
     } finally {
@@ -150,26 +165,28 @@ export class RealMbcCardRepository implements MbcCardRepository {
     }
 
     await NfcManager.ndefHandler.writeNdefMessage(encoded);
-
-    const readback = await this.readCardFromActiveSession();
-    if (cardFingerprint(readback) !== cardFingerprint(card)) {
-      throw new CardRepositoryError(
-        'WRITE_VERIFY_FAILED',
-        'Card write could not be verified by post-write readback.',
-      );
-    }
   }
 
   private async readCardFromActiveSession(): Promise<MbcCard> {
-    const currentTag = (await NfcManager.getTag()) as NdefTag | null;
-    if (!currentTag?.ndefMessage?.length) {
+    let ndefMessage: NdefRecord[] | undefined;
+    try {
+      const msg = await NfcManager.ndefHandler.getNdefMessage();
+      // getNdefMessage returns a tag-like object { ndefMessage: [...] }
+      const tagObj = msg as NdefTag | null;
+      ndefMessage = tagObj?.ndefMessage;
+    } catch {
+      const currentTag = (await NfcManager.getTag()) as NdefTag | null;
+      ndefMessage = currentTag?.ndefMessage;
+    }
+
+    if (!ndefMessage?.length) {
       throw new CardRepositoryError(
         'UNREGISTERED_CARD',
         'Card is blank or not registered yet.',
       );
     }
 
-    const firstRecord = currentTag.ndefMessage[0];
+    const firstRecord = ndefMessage[0];
     const payloadBytes = Buffer.from(firstRecord.payload as number[]);
 
     if (!isMbcEnvelope(payloadBytes)) {

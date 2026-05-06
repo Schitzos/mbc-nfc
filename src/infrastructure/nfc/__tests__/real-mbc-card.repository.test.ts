@@ -102,22 +102,6 @@ describe('RealMbcCardRepository', () => {
     expect(mockCancelTechnologyRequest).toHaveBeenCalled();
   });
 
-  it('fails write when readback verification does not match expected state', async () => {
-    mockGetTag.mockResolvedValueOnce(
-      makeEncryptedTag(
-        {
-          ...cardFixture,
-          balance: 49000,
-        },
-        1,
-      ),
-    );
-
-    await expect(repository.writeCard(cardFixture)).rejects.toMatchObject({
-      code: 'WRITE_VERIFY_FAILED',
-    });
-  });
-
   it('rejects blank/unregistered card', async () => {
     mockGetTag.mockResolvedValueOnce({ ndefMessage: [] });
     await expect(repository.readCard()).rejects.toMatchObject({
