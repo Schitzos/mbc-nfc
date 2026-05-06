@@ -1,9 +1,10 @@
 # CI/CD Setup Notes
 
-This repository uses two GitHub Actions workflows:
+This repository uses three GitHub Actions workflows:
 
 - `.github/workflows/quality.yml`
 - `.github/workflows/release-main.yml`
+- `.github/workflows/distribute.yml`
 
 ## Quality Workflow
 
@@ -49,13 +50,36 @@ It performs:
 
 If these are not configured, the workflow still builds and uploads the APK artifact and logs that distribution was skipped.
 
+## Firebase Distribution Workflow (Signed Release)
+
+The `distribute.yml` workflow is the production-ready path for signed release APK distribution.
+
+It performs:
+
+- dependency install and quality checks
+- keystore decode from GitHub Secrets
+- signed release APK build (falls back to debug if signing secrets are missing)
+- APK artifact upload
+- dynamic release notes generation
+- Firebase App Distribution publish
+
+### Required secrets for signed release
+
+- `FIREBASE_APP_ID`
+- `FIREBASE_SERVICE_ACCOUNT`
+- `ANDROID_KEYSTORE_BASE64`
+- `ANDROID_KEYSTORE_PASSWORD`
+- `ANDROID_KEY_ALIAS`
+- `ANDROID_KEY_PASSWORD`
+
+### Required variable
+
+- `FIREBASE_TESTER_GROUPS`
+
+For full setup instructions, see `.codex/specs/FIREBASE_DISTRIBUTION_SETUP.md`.
+
 ## Current Prototype Choice
 
-The workflow currently builds `assembleDebug` for reviewer distribution readiness.
+The `release-main.yml` workflow currently builds `assembleDebug` for quick reviewer distribution readiness.
 
-When signing and store/reviewer requirements are finalized, this can be upgraded to:
-
-- `assembleRelease`
-- or a signed `bundleRelease` / `assembleRelease` path
-
-without changing the branch-promotion model.
+The `distribute.yml` workflow provides the upgrade path to signed release builds without changing the branch-promotion model. Both workflows coexist and trigger on `main` push.
