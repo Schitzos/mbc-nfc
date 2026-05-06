@@ -9,6 +9,10 @@ jobs:
   build-and-distribute:
     runs-on: ubuntu-latest
 
+    env:
+      FIREBASE_APP_ID: ${{ secrets.FIREBASE_APP_ID }}
+      FIREBASE_SERVICE_ACCOUNT_JSON: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_JSON }}
+
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
@@ -47,15 +51,15 @@ jobs:
           path: android/app/build/outputs/apk/debug/app-debug.apk
 
       - name: Publish to Firebase App Distribution
-        if: ${{ secrets.FIREBASE_APP_ID != '' && secrets.FIREBASE_SERVICE_ACCOUNT_JSON != '' && vars.FIREBASE_TESTER_GROUPS != '' }}
+        if: env.FIREBASE_APP_ID != '' && env.FIREBASE_SERVICE_ACCOUNT_JSON != ''
         uses: wzieba/Firebase-Distribution-Github-Action@v1
         with:
           appId: ${{ secrets.FIREBASE_APP_ID }}
           serviceCredentialsFileContent: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_JSON }}
-          groups: ${{ vars.FIREBASE_TESTER_GROUPS }}
+          groups: mbc-testers
           file: android/app/build/outputs/apk/debug/app-debug.apk
           releaseNotesFile: .github/release-notes-template.md
 
       - name: Distribution skipped
-        if: ${{ secrets.FIREBASE_APP_ID == '' || secrets.FIREBASE_SERVICE_ACCOUNT_JSON == '' || vars.FIREBASE_TESTER_GROUPS == '' }}
-        run: echo "Firebase App Distribution secrets or variables are not configured yet; APK artifact was built and uploaded only."
+        if: env.FIREBASE_APP_ID == '' || env.FIREBASE_SERVICE_ACCOUNT_JSON == ''
+        run: echo "Firebase App Distribution secrets are not configured yet; APK artifact was built and uploaded only."

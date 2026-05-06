@@ -10,6 +10,9 @@ on:
       - develop
       - main
 
+env:
+  SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+
 jobs:
   test-and-analysis:
     runs-on: ubuntu-latest
@@ -33,7 +36,7 @@ jobs:
         run: npm run lint
 
       - name: Unit and use-case coverage
-        run: npm run test:quality
+        run: npm run test:ci
 
       - name: Dependency vulnerability gate
         run: npm audit --audit-level=low
@@ -51,11 +54,11 @@ jobs:
           path: test-results/junit
 
       - name: SonarCloud scan
-        if: ${{ secrets.SONAR_TOKEN != '' }}
+        if: env.SONAR_TOKEN != ''
         uses: SonarSource/sonarqube-scan-action@v5
         env:
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: SonarCloud skipped
-        if: ${{ secrets.SONAR_TOKEN == '' }}
-        run: echo "SONAR_TOKEN is not configured yet; SonarCloud scan is skipped."
+      - name: SonarCloud skipped notice
+        if: env.SONAR_TOKEN == ''
+        run: echo "⚠️ SONAR_TOKEN is not configured — SonarCloud scan skipped. Add it as a repository secret."

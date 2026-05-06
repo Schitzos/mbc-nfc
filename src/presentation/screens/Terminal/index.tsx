@@ -5,10 +5,6 @@ import { appContainer } from '../../../app/container';
 import type { RootStackParamList } from '../../../app/navigation';
 import type { CheckNfcAvailabilityResultDto } from '../../../application/dto/check-nfc-availability-result-dto';
 import type { RoleActionResultDto } from '../../../application/dto/role-action-result-dto';
-import type {
-  ActivityTariffRule,
-  BenefitActivityType,
-} from '../../../domain/entities/mbc-card';
 import type { MockCardScenario } from '../../../infrastructure/nfc/mock-mbc-card.repository';
 import { SignalButton } from '../../components/SignalButton';
 import { useAppStore } from '../../stores/app-store';
@@ -24,19 +20,6 @@ const terminalScenarios: Array<{ key: MockCardScenario; label: string }> = [
   { key: 'unregistered', label: 'Unregistered' },
   { key: 'tampered', label: 'Tampered' },
 ];
-
-const tariffRulesByType: Record<BenefitActivityType, ActivityTariffRule> = {
-  PARKING: {
-    activityType: 'PARKING',
-    feePerStartedHour: 2000,
-    currency: 'IDR',
-  },
-  GENERIC: {
-    activityType: 'GENERIC',
-    feePerStartedHour: 3000,
-    currency: 'IDR',
-  },
-};
 
 export function TerminalScreen({ navigation }: Props): React.JSX.Element {
   const setSelectedRole = useAppStore(state => state.setSelectedRole);
@@ -68,12 +51,7 @@ export function TerminalScreen({ navigation }: Props): React.JSX.Element {
   const handleCheckout = async () => {
     setBusy(true);
     try {
-      const currentCard = await services.mockRepository.readCard();
-      const activityType = currentCard.activeSession?.activityType ?? 'PARKING';
-      const tariffRule = tariffRulesByType[activityType];
-      const result = await services.checkOutActivityUseCase.execute({
-        tariffRule,
-      });
+      const result = await services.checkOutActivityUseCase.execute({});
       setLatestResult(result);
     } catch (error) {
       if (error instanceof Error) {
@@ -115,6 +93,14 @@ export function TerminalScreen({ navigation }: Props): React.JSX.Element {
           <Text className="text-xl font-bold text-foreground">
             Checkout action
           </Text>
+          <View className="mt-3 rounded-xl border border-[#2A8BFF] bg-[#EAF4FF] p-3">
+            <Text className="text-sm font-semibold text-muted">
+              Fixed tariff
+            </Text>
+            <Text className="text-lg font-bold text-foreground">
+              Rp 2.000 / started hour
+            </Text>
+          </View>
           <View className="mt-3 rounded-xl border border-amber-300 bg-[#FFF7DB] p-3">
             <Text className="text-sm font-semibold text-amber-900">
               Required card state
