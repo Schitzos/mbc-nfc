@@ -8,9 +8,9 @@ import { RegisterMemberCardUseCase } from '../application/use-cases/register-mem
 import { TopUpMemberCardUseCase } from '../application/use-cases/top-up-member-card.use-case';
 import { SqliteLedgerRepository } from '../infrastructure/local-ledger/sqlite-ledger.repository';
 import { DeviceNfcStatusRepository } from '../infrastructure/nfc/device-nfc-status.repository';
-import { MockMbcCardRepository } from '../infrastructure/nfc/mock-mbc-card.repository';
+import { RealMbcCardRepository } from '../infrastructure/nfc/real-mbc-card.repository';
 
-let mockCardRepository: MockMbcCardRepository | null = null;
+let realMbcCardRepository: RealMbcCardRepository | null = null;
 let deviceNfcStatusRepository: DeviceNfcStatusRepository | null = null;
 let sqliteLedgerRepository: SqliteLedgerRepository | null = null;
 
@@ -21,12 +21,12 @@ function createLedgerConnection() {
   });
 }
 
-function getMockCardRepository() {
-  if (!mockCardRepository) {
-    mockCardRepository = new MockMbcCardRepository();
+function getRealMbcCardRepository() {
+  if (!realMbcCardRepository) {
+    realMbcCardRepository = new RealMbcCardRepository();
   }
 
-  return mockCardRepository;
+  return realMbcCardRepository;
 }
 
 function getDeviceNfcStatusRepository() {
@@ -48,11 +48,11 @@ function getSqliteLedgerRepository() {
 }
 
 export const appContainer = {
-  getMockCardRepository,
+  getRealMbcCardRepository,
   getDeviceNfcStatusRepository,
   getSqliteLedgerRepository,
   getStationServices() {
-    const mockRepository = getMockCardRepository();
+    const cardRepository = getRealMbcCardRepository();
     const ledgerRepository = getSqliteLedgerRepository();
 
     return {
@@ -60,43 +60,40 @@ export const appContainer = {
         getDeviceNfcStatusRepository(),
       ),
       registerMemberCardUseCase: new RegisterMemberCardUseCase(
-        mockRepository,
+        cardRepository,
         ledgerRepository,
       ),
       topUpMemberCardUseCase: new TopUpMemberCardUseCase(
-        mockRepository,
+        cardRepository,
         ledgerRepository,
       ),
       getStationLedgerSummaryUseCase: new GetStationLedgerSummaryUseCase(
         ledgerRepository,
       ),
-      mockRepository,
     };
   },
   getGateServices() {
-    const mockRepository = getMockCardRepository();
+    const cardRepository = getRealMbcCardRepository();
 
     return {
       checkNfcAvailabilityUseCase: new CheckNfcAvailabilityUseCase(
         getDeviceNfcStatusRepository(),
       ),
-      checkInActivityUseCase: new CheckInActivityUseCase(mockRepository),
-      mockRepository,
+      checkInActivityUseCase: new CheckInActivityUseCase(cardRepository),
     };
   },
   getScoutServices() {
-    const mockRepository = getMockCardRepository();
+    const cardRepository = getRealMbcCardRepository();
 
     return {
       checkNfcAvailabilityUseCase: new CheckNfcAvailabilityUseCase(
         getDeviceNfcStatusRepository(),
       ),
-      inspectMemberCardUseCase: new InspectMemberCardUseCase(mockRepository),
-      mockRepository,
+      inspectMemberCardUseCase: new InspectMemberCardUseCase(cardRepository),
     };
   },
   getTerminalServices() {
-    const mockRepository = getMockCardRepository();
+    const cardRepository = getRealMbcCardRepository();
     const ledgerRepository = getSqliteLedgerRepository();
 
     return {
@@ -104,10 +101,9 @@ export const appContainer = {
         getDeviceNfcStatusRepository(),
       ),
       checkOutActivityUseCase: new CheckOutActivityUseCase(
-        mockRepository,
+        cardRepository,
         ledgerRepository,
       ),
-      mockRepository,
     };
   },
 };

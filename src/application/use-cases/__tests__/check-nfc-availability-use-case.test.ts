@@ -25,7 +25,6 @@ describe('CheckNfcAvailabilityUseCase', () => {
     await expect(useCase.execute()).resolves.toMatchObject({
       supported: true,
       status: 'SUPPORTED',
-      shouldUseMockMode: false,
     });
   });
 
@@ -37,7 +36,6 @@ describe('CheckNfcAvailabilityUseCase', () => {
     await expect(useCase.execute()).resolves.toMatchObject({
       supported: false,
       status: 'UNSUPPORTED',
-      shouldUseMockMode: true,
     });
   });
 
@@ -49,7 +47,6 @@ describe('CheckNfcAvailabilityUseCase', () => {
     await expect(useCase.execute()).resolves.toMatchObject({
       supported: false,
       status: 'DISABLED',
-      shouldUseMockMode: true,
     });
   });
 
@@ -61,7 +58,6 @@ describe('CheckNfcAvailabilityUseCase', () => {
     await expect(useCase.execute()).resolves.toMatchObject({
       supported: false,
       status: 'UNAVAILABLE',
-      shouldUseMockMode: true,
     });
   });
 

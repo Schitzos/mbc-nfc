@@ -22,7 +22,6 @@ const GUIDANCE_BY_STATUS: Record<NfcAvailabilityStatus, GuidanceContent> = {
       'Keep NFC enabled during read or write actions.',
       'Retry the scan if the card is moved too early.',
     ],
-    shouldUseMockMode: false,
   },
   UNSUPPORTED: {
     title: 'NFC is not supported',
@@ -30,9 +29,8 @@ const GUIDANCE_BY_STATUS: Record<NfcAvailabilityStatus, GuidanceContent> = {
       'This device cannot run real card operations because NFC hardware is not available.',
     guidance: [
       'Use an NFC-capable Android device for real card operations.',
-      'Use mock or demo mode until a supported device is available.',
+      'Real card workflows require supported NFC hardware.',
     ],
-    shouldUseMockMode: true,
   },
   DISABLED: {
     title: 'NFC is turned off',
@@ -40,9 +38,8 @@ const GUIDANCE_BY_STATUS: Record<NfcAvailabilityStatus, GuidanceContent> = {
     guidance: [
       'Enable NFC in device settings.',
       'Return to the app and retry the scan.',
-      'Use mock or demo mode if NFC cannot be enabled right now.',
+      'Real card workflows are blocked until NFC is enabled.',
     ],
-    shouldUseMockMode: true,
   },
   UNAVAILABLE: {
     title: 'NFC is temporarily unavailable',
@@ -50,9 +47,8 @@ const GUIDANCE_BY_STATUS: Record<NfcAvailabilityStatus, GuidanceContent> = {
     guidance: [
       'Retry the scan after closing any other NFC session.',
       'Make sure NFC is enabled on the device.',
-      'Use mock or demo mode if real card operations are blocked.',
+      'Real card workflows are blocked until NFC becomes available.',
     ],
-    shouldUseMockMode: true,
   },
 };
 

@@ -345,19 +345,6 @@ describe('role screens – extended branch coverage', () => {
     );
   });
 
-  it('Terminal scenario selector changes scenario', async () => {
-    render(<TerminalScreen navigation={navigation} />);
-    await waitFor(() =>
-      expect(mockCheckNfcAvailabilityUseCase.execute).toHaveBeenCalled(),
-    );
-
-    fireEvent.press(screen.getByText('Not checked in'));
-    expect(setScenario).toHaveBeenCalledWith('normal');
-
-    fireEvent.press(screen.getByText('Unregistered'));
-    expect(setScenario).toHaveBeenCalledWith('unregistered');
-  });
-
   it('Station NFC log panel can be toggled and cleared', async () => {
     render(<StationScreen navigation={navigation} />);
     await waitFor(() =>

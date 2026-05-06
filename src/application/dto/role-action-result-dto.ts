@@ -8,4 +8,5 @@ export type RoleActionResultDto = {
   card?: CardSummaryDto;
   chargedHours?: number;
   chargedAmount?: number;
+  requiresReset?: boolean;
 };

@@ -191,10 +191,10 @@ describe('role screens', () => {
         }));
     });
 
-    fireEvent.press(screen.getByText('Low balance'));
-    expect(setScenario).toHaveBeenCalledWith('low-balance');
     fireEvent.changeText(screen.getByPlaceholderText('50000'), '75000');
 
+    // Expand ledger accordion then refresh
+    fireEvent.press(screen.getByText('Local Station ledger'));
     fireEvent.press(screen.getByText('Refresh'));
     await waitFor(() =>
       expect(mockGetStationLedgerSummaryUseCase.execute).toHaveBeenCalled(),
@@ -229,9 +229,6 @@ describe('role screens', () => {
       expect(mockCheckNfcAvailabilityUseCase.execute).toHaveBeenCalled(),
     );
 
-    fireEvent.press(screen.getByText('Already checked in'));
-    expect(setScenario).toHaveBeenCalledWith('checked-in');
-
     fireEvent.press(screen.getByText('Tap Card to Check In'));
     await waitFor(() =>
       expect(mockCheckInActivityUseCase.execute).toHaveBeenCalled(),
@@ -245,8 +242,6 @@ describe('role screens', () => {
     await waitFor(() =>
       expect(mockCheckNfcAvailabilityUseCase.execute).toHaveBeenCalled(),
     );
-    fireEvent.press(screen.getByText('Checked-in parking card'));
-    expect(setScenario).toHaveBeenCalledWith('checked-in');
     fireEvent.press(screen.getByText('Tap Card to Check Out'));
     await waitFor(() =>
       expect(mockCheckOutActivityUseCase.execute).toHaveBeenCalled(),
@@ -279,8 +274,6 @@ describe('role screens', () => {
     await waitFor(() =>
       expect(mockCheckNfcAvailabilityUseCase.execute).toHaveBeenCalled(),
     );
-    fireEvent.press(screen.getByText('Unregistered'));
-    expect(setScenario).toHaveBeenCalledWith('unregistered');
     fireEvent.press(screen.getByText('Tap Card to Inspect'));
     await waitFor(() =>
       expect(mockInspectMemberCardUseCase.execute).toHaveBeenCalled(),

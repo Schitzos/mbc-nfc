@@ -278,8 +278,10 @@ export interface ParkingTariffRule {
 
 ### Registration Safety### Registration Safety
 
-- Station registration must reject a valid already registered MBC card with `ALREADY_REGISTERED_CARD`.
-- MVP does not include overwrite/reset. Adding reset requires a new explicit requirement and audit trail.
+- Station registration detects already-registered or tampered cards and offers a reset confirmation to the user.
+- If the user confirms reset, the card is erased and registered fresh with a new member ID and zero balance.
+- If the user declines, no modification is made to the card.
+- The reset flow generates a new card ID and member ID (does not reuse old ones).
 
 ### Visit State
 

@@ -146,7 +146,8 @@ Acceptance criteria:
 - The registration form does not require staff to type a member ID.
 - Normal member/operator screens do not expose the full internal member ID; if a support reference is needed, the app may show a masked or short reference only. Scout may show a safe member reference after successful decode, not the raw full identifier.
 - App writes a valid MBC payload to the NFC card.
-- Registration must reject an already registered valid MBC card to prevent accidental overwrite. MVP has no overwrite/reset flow unless explicitly added later.
+- If the card is already registered, the app shows a confirmation prompt offering to reset and re-register. If the user confirms, the card is erased and registered fresh. If the user declines, no modification is made.
+- If the card has an unrecognized or tampered payload, the app shows a confirmation prompt offering to reset and re-register. If the user confirms, the card is erased and registered fresh. If the user declines, no modification is made.
 - New card starts with a known visit status and balance.
 - Registration writes a transaction log entry.
 
