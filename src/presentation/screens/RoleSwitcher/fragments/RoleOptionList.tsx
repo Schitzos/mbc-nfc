@@ -71,10 +71,6 @@ export function RoleOptionList({
           );
         })}
       </View>
-
-      <Text className="mt-4 text-xs text-muted">
-        Default demo: Parking. Reusable activity model stays available.
-      </Text>
     </View>
   );
 }

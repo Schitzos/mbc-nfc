@@ -6,18 +6,11 @@ type Props = {
   latestResult: RoleActionResultDto | null;
 };
 
-export function GateResultState({ latestResult }: Props): React.JSX.Element {
+export function GateResultState({
+  latestResult,
+}: Props): React.JSX.Element | null {
   if (!latestResult) {
-    return (
-      <View className="rounded-xl border border-slate-200 bg-white p-3">
-        <Text className="text-sm font-semibold text-foreground">
-          Expected card state
-        </Text>
-        <Text className="mt-1 text-xs text-muted">
-          NOT_CHECKED_IN. Double check-in must be blocked.
-        </Text>
-      </View>
-    );
+    return null;
   }
 
   if (latestResult.success) {

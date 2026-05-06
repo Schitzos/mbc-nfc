@@ -4,74 +4,94 @@ import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { appContainer } from '../../../app/container';
 import type { RootStackParamList } from '../../../app/navigation';
-import type { CheckNfcAvailabilityResultDto } from '../../../application/dto/check-nfc-availability-result-dto';
 import type { RoleActionResultDto } from '../../../application/dto/role-action-result-dto';
-import type { MockCardScenario } from '../../../infrastructure/nfc/mock-mbc-card.repository';
 import { SignalButton } from '../../components/SignalButton';
 import { NfcLogPanel } from '../../components/NfcLogPanel';
+import { NfcActionSheet } from '../../components/NfcActionSheet';
+import type { NfcActionState } from '../../components/NfcActionSheet';
 import { useAppStore } from '../../stores/app-store';
 import { TerminalHeader } from './fragments/TerminalHeader';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'terminal'>;
 
-const terminalScenarios: Array<{ key: MockCardScenario; label: string }> = [
-  { key: 'checked-in', label: 'Checked-in parking card' },
-  { key: 'checked-in-generic', label: 'Checked-in generic card' },
-  { key: 'checked-in-low-balance', label: 'Checked-in low-balance card' },
-  { key: 'normal', label: 'Not checked in' },
-  { key: 'unregistered', label: 'Unregistered' },
-  { key: 'tampered', label: 'Tampered' },
+const MONTHS = [
+  'Jan',
+  'Feb',
+  'Mar',
+  'Apr',
+  'May',
+  'Jun',
+  'Jul',
+  'Aug',
+  'Sep',
+  'Oct',
+  'Nov',
+  'Dec',
 ];
+function formatTime(d: Date): string {
+  const dd = String(d.getDate()).padStart(2, '0');
+  const mmm = MONTHS[d.getMonth()];
+  const yyyy = d.getFullYear();
+  const hh = String(d.getHours()).padStart(2, '0');
+  const mm = String(d.getMinutes()).padStart(2, '0');
+  return `${dd}-${mmm}-${yyyy} ${hh}:${mm}`;
+}
 
 export function TerminalScreen({ navigation }: Props): React.JSX.Element {
   const insets = useSafeAreaInsets();
   const setSelectedRole = useAppStore(state => state.setSelectedRole);
   const appendNfcLog = useAppStore(state => state.appendNfcLog);
   const services = useMemo(() => appContainer.getTerminalServices(), []);
-  const [nfcStatus, setNfcStatus] =
-    useState<CheckNfcAvailabilityResultDto | null>(null);
   const [latestResult, setLatestResult] = useState<RoleActionResultDto | null>(
     null,
   );
-  const [selectedScenario, setSelectedScenario] =
-    useState<MockCardScenario>('checked-in');
   const [busy, setBusy] = useState(false);
+  const [nfcSheet, setNfcSheet] = useState<NfcActionState>({ phase: 'idle' });
+  const [checkoutTime, setCheckoutTime] = useState('');
 
   useEffect(() => {
     setSelectedRole('terminal');
   }, [setSelectedRole]);
 
   useEffect(() => {
-    services.mockRepository.setScenario(selectedScenario);
-  }, [selectedScenario, services]);
-
-  useEffect(() => {
     services.checkNfcAvailabilityUseCase
       .execute()
-      .then(status => {
-        setNfcStatus(status);
-        appendNfcLog(`[NFC] Availability result: ${status.status}`);
-      })
+      .then(status =>
+        appendNfcLog(`[NFC] Availability result: ${status.status}`),
+      )
       .catch(() => undefined);
   }, [appendNfcLog, services]);
 
   const handleCheckout = async () => {
     setBusy(true);
+    setNfcSheet({
+      phase: 'scanning',
+      message: 'Hold your NFC card to check out',
+    });
     try {
       appendNfcLog('[NFC] Checkout flow started');
       const result = await services.checkOutActivityUseCase.execute({});
       setLatestResult(result);
-      appendNfcLog(
-        result.success
-          ? '[NFC] Checkout succeeded'
-          : `[NFC] Checkout failed: ${result.message}`,
-      );
+      if (result.success) {
+        setCheckoutTime(formatTime(new Date()));
+        setNfcSheet({
+          phase: 'success',
+          title: 'Checkout Complete',
+          message: result.message,
+        });
+        appendNfcLog('[NFC] Checkout succeeded');
+      } else {
+        setNfcSheet({
+          phase: 'error',
+          title: 'Checkout Failed',
+          message: result.message,
+        });
+        appendNfcLog(`[NFC] Checkout failed: ${result.message}`);
+      }
     } catch (error) {
-      appendNfcLog(
-        `[NFC] Checkout error: ${
-          error instanceof Error ? error.message : 'Unknown error'
-        }`,
-      );
+      const msg = error instanceof Error ? error.message : 'Unknown error';
+      setNfcSheet({ phase: 'error', title: 'Error', message: msg });
+      appendNfcLog(`[NFC] Checkout error: ${msg}`);
       if (error instanceof Error) {
         setLatestResult({
           success: false,
@@ -113,47 +133,21 @@ export function TerminalScreen({ navigation }: Props): React.JSX.Element {
           onBack={() => navigation.goBack()}
         />
 
-        <View className="rounded-2xl bg-white p-4">
-          <Text className="text-xl font-bold text-foreground">
-            Checkout action
-          </Text>
-          <View className="mt-3 rounded-xl border border-[#2A8BFF] bg-[#EAF4FF] p-3">
-            <Text className="text-sm font-semibold text-muted">
-              Fixed tariff
+        {!latestResult && (
+          <View className="rounded-2xl bg-white p-4">
+            <Text className="text-xl font-bold text-foreground">
+              Checkout action
             </Text>
-            <Text className="text-lg font-bold text-foreground">
-              Rp 2.000 / started hour
-            </Text>
+            <View className="mt-3 rounded-xl border border-[#2A8BFF] bg-[#EAF4FF] p-3">
+              <Text className="text-sm font-semibold text-muted">
+                Fixed tariff
+              </Text>
+              <Text className="text-lg font-bold text-foreground">
+                Rp 2.000 / started hour
+              </Text>
+            </View>
           </View>
-          <View className="mt-3 rounded-xl border border-amber-300 bg-[#FFF7DB] p-3">
-            <Text className="text-sm font-semibold text-amber-900">
-              Required card state
-            </Text>
-            <Text className="text-sm font-bold text-foreground">
-              CHECKED_IN with active activity
-            </Text>
-          </View>
-
-          <View className="mt-3 flex-row flex-wrap gap-2">
-            {terminalScenarios.map(option => {
-              const active = option.key === selectedScenario;
-              return (
-                <SignalButton
-                  key={option.key}
-                  label={option.label}
-                  variant={active ? 'primary' : 'secondary'}
-                  size="small"
-                  fullWidth={false}
-                  onPress={() => {
-                    services.mockRepository.setScenario(option.key);
-                    setSelectedScenario(option.key);
-                    setLatestResult(null);
-                  }}
-                />
-              );
-            })}
-          </View>
-        </View>
+        )}
 
         <SignalButton
           label={busy ? 'Processing...' : 'Tap Card to Check Out'}
@@ -169,7 +163,11 @@ export function TerminalScreen({ navigation }: Props): React.JSX.Element {
               Success
             </Text>
             <View className="mt-2 rounded-xl border border-green-400 bg-white p-3">
-              <Text className="text-xs text-muted">Duration</Text>
+              <Text className="text-xs text-muted">Tap out</Text>
+              <Text className="text-base font-bold text-foreground">
+                {checkoutTime}
+              </Text>
+              <Text className="mt-2 text-xs text-muted">Duration</Text>
               <Text className="text-xl font-bold text-foreground">
                 {latestResult.chargedHours ?? 0}h
               </Text>
@@ -177,7 +175,7 @@ export function TerminalScreen({ navigation }: Props): React.JSX.Element {
               <Text className="text-xl font-bold text-foreground">
                 Rp {latestResult.chargedAmount?.toLocaleString('id-ID') ?? '0'}
               </Text>
-              <Text className="mt-2 text-xs text-muted">After</Text>
+              <Text className="mt-2 text-xs text-muted">Current balance</Text>
               <Text className="text-xl font-bold text-foreground">
                 Rp {latestResult.card?.balance.toLocaleString('id-ID') ?? '0'}
               </Text>
@@ -228,26 +226,13 @@ export function TerminalScreen({ navigation }: Props): React.JSX.Element {
           </View>
         ) : null}
 
-        {!latestResult ? (
-          <View className="rounded-xl border border-slate-200 bg-white p-3">
-            <Text className="text-sm font-semibold text-foreground">
-              Calculation preview
-            </Text>
-            <Text className="mt-1 text-xs text-muted">
-              Show duration, charged hours, fee, before balance, and after
-              balance before final success.
-            </Text>
-          </View>
-        ) : null}
-
-        <View className="rounded-xl border border-slate-200 bg-white p-3">
-          <Text className="text-xs text-muted">
-            {nfcStatus?.title ?? 'Checking device NFC'}
-          </Text>
-        </View>
-
         <NfcLogPanel />
       </View>
+
+      <NfcActionSheet
+        state={nfcSheet}
+        onDismiss={() => setNfcSheet({ phase: 'idle' })}
+      />
     </ScrollView>
   );
 }
