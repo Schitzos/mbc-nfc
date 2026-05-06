@@ -33,9 +33,9 @@ Domain: MbcCard, MemberProfile, ActivitySession, TransactionLog, ActivityTariffR
 
 Application: Register, Top up, Check in, Check out, Inspect, Check NFC availability.
 
-Infrastructure: MbcCardRepository, NFC reader/writer, Card codec, Silent Shield, Payload validator, Audit logger.
+Infrastructure: MbcCardRepository (readCard, writeCard, registerCard, cancel), RealMbcCardRepository, MockMbcCardRepository, mbc-card-codec (compact payload encode/decode), silent-shield (AES-256-GCM encrypt/decrypt), DeviceNfcStatusRepository, SqliteLedgerRepository.
 
-Presentation: Role switcher, Station/Gate/Terminal/Scout screens, Shared NFC components.
+Presentation: Role switcher, Station/Gate/Terminal/Scout screens, NfcActionSheet (scan/success/error/confirm bottom sheet), NfcLogPanel, SignalButton, SignalBottomSheet.
 
 ## Guardrails
 
