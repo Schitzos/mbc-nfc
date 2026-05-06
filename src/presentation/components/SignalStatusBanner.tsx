@@ -1,4 +1,4 @@
-import React, { ReactNode } from 'react';
+import React, { ReactNode, useMemo } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { signalColorTokens } from '../theme/colors';
 import { radius } from '../theme/radius';
@@ -52,17 +52,21 @@ export function SignalStatusBanner({
 }: Readonly<SignalStatusBannerProps>): React.JSX.Element {
   const toneToken = toneMap[tone];
 
-  return (
-    <View
-      style={[
-        styles.root,
-        {
+  const dynamicStyles = useMemo(
+    () =>
+      StyleSheet.create({
+        rootTone: {
           borderColor: toneToken.borderColor,
           backgroundColor: toneToken.backgroundColor,
         },
-      ]}
-    >
-      <Text style={[styles.eyebrow, { color: toneToken.eyebrowColor }]}>
+        eyebrowColor: { color: toneToken.eyebrowColor },
+      }),
+    [toneToken],
+  );
+
+  return (
+    <View style={[styles.root, dynamicStyles.rootTone]}>
+      <Text style={[styles.eyebrow, dynamicStyles.eyebrowColor]}>
         {eyebrow}
       </Text>
       <Text style={styles.title}>{title}</Text>

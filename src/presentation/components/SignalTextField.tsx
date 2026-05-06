@@ -1,4 +1,4 @@
-import React, { ReactNode, useState } from 'react';
+import React, { ReactNode, useMemo, useState } from 'react';
 import {
   StyleProp,
   StyleSheet,
@@ -48,6 +48,19 @@ export function SignalTextField({
   }
   const stateToken = componentTokens.textField.states[visualState];
 
+  const dynamicStyles = useMemo(
+    () =>
+      StyleSheet.create({
+        shell: {
+          backgroundColor: stateToken.backgroundColor,
+          borderColor: stateToken.borderColor,
+        },
+        inputColor: { color: stateToken.textColor },
+        helperColor: { color: stateToken.helperColor },
+      }),
+    [stateToken],
+  );
+
   return (
     <View style={[styles.root, style]}>
       {label ? (
@@ -57,21 +70,13 @@ export function SignalTextField({
         </View>
       ) : null}
 
-      <View
-        style={[
-          styles.inputShell,
-          {
-            backgroundColor: stateToken.backgroundColor,
-            borderColor: stateToken.borderColor,
-          },
-        ]}
-      >
+      <View style={[styles.inputShell, dynamicStyles.shell]}>
         <TextInput
           value={value}
           editable={editable && state !== 'load'}
           placeholder={placeholder}
           placeholderTextColor={stateToken.placeholderColor}
-          style={[styles.input, { color: stateToken.textColor }]}
+          style={[styles.input, dynamicStyles.inputColor]}
           onFocus={event => {
             setFocused(true);
             onFocus?.(event);
@@ -86,7 +91,7 @@ export function SignalTextField({
       </View>
 
       {helperText ? (
-        <Text style={[styles.helper, { color: stateToken.helperColor }]}>
+        <Text style={[styles.helper, dynamicStyles.helperColor]}>
           {helperText}
         </Text>
       ) : null}

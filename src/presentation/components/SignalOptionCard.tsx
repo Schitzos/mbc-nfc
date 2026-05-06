@@ -1,4 +1,4 @@
-import React, { ReactNode, useState } from 'react';
+import React, { ReactNode, useMemo, useState } from 'react';
 import {
   Pressable,
   PressableProps,
@@ -36,27 +36,32 @@ export function SignalOptionCard({
   const stateToken =
     componentTokens.optionCard.states[disabled ? 'disabled' : state];
 
+  const dynamicStyles = useMemo(
+    () =>
+      StyleSheet.create({
+        pressable: {
+          backgroundColor: stateToken.backgroundColor,
+          borderColor: stateToken.borderColor,
+          opacity: pressed ? 0.86 : 1,
+        },
+        titleColor: { color: stateToken.textColor },
+      }),
+    [stateToken, pressed],
+  );
+
   return (
     <Pressable
       accessibilityRole="button"
       disabled={disabled}
       onPressIn={() => setPressed(true)}
       onPressOut={() => setPressed(false)}
-      style={[
-        styles.base,
-        {
-          backgroundColor: stateToken.backgroundColor,
-          borderColor: stateToken.borderColor,
-          opacity: pressed ? 0.86 : 1,
-        },
-        style,
-      ]}
+      style={[styles.base, dynamicStyles.pressable, style]}
       {...pressableProps}
     >
       <View style={styles.content}>
         <Text
           numberOfLines={1}
-          style={[styles.title, { color: stateToken.textColor }]}
+          style={[styles.title, dynamicStyles.titleColor]}
         >
           {title}
         </Text>
