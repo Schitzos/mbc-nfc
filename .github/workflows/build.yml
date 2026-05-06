@@ -10,6 +10,9 @@ on:
       - develop
       - main
 
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
 jobs:
   sonarcloud:
     runs-on: ubuntu-latest
@@ -63,7 +66,7 @@ jobs:
           distribution: 'temurin'
 
       - name: Validate Gradle wrapper
-        uses: gradle/wrapper-validation-action@v1
+        uses: gradle/actions/wrapper-validation@v3
 
       - name: Install dependencies
         run: npm ci
@@ -80,7 +83,7 @@ jobs:
       - name: Create Google Services JSON File
         env:
           GOOGLE_SERVICES_JSON: ${{secrets.GOOGLE_SERVICES_JSON}}
-        run: echo $GOOGLE_SERVICES_JSON | base64 -di > ./android/app/google-services.json
+        run: printf '%s' "$GOOGLE_SERVICES_JSON" | base64 --decode > ./android/app/google-services.json
 
       - name: Build application
         run: |
