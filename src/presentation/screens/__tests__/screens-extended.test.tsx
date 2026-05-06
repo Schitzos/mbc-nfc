@@ -49,6 +49,17 @@ const mockRegisterMemberCardUseCase = {
       transactionLogs: [],
     },
   }),
+  executeWithReset: jest.fn().mockResolvedValue({
+    success: true,
+    role: 'STATION',
+    message: 'Member card registered successfully.',
+    card: {
+      maskedMemberReference: 'MBC-***-0002',
+      balance: 0,
+      visitStatus: 'NOT_CHECKED_IN',
+      transactionLogs: [],
+    },
+  }),
 };
 
 const mockTopUpMemberCardUseCase = {
@@ -353,5 +364,50 @@ describe('role screens – extended branch coverage', () => {
 
     fireEvent.press(screen.getByText('Clear'));
     expect(screen.getByText('No NFC log lines yet.')).toBeTruthy();
+  });
+
+  it('Station shows wipe confirm when card already registered, then re-registers', async () => {
+    mockRegisterMemberCardUseCase.execute.mockResolvedValueOnce({
+      success: false,
+      role: 'STATION',
+      message: 'This card is already registered.',
+    });
+
+    render(<StationScreen navigation={navigation} />);
+    await waitFor(() =>
+      expect(mockCheckNfcAvailabilityUseCase.execute).toHaveBeenCalled(),
+    );
+
+    fireEvent.press(screen.getByText('Tap NFC Card to Register'));
+    await waitFor(() =>
+      expect(mockRegisterMemberCardUseCase.execute).toHaveBeenCalled(),
+    );
+
+    // Confirm sheet should show wipe option
+    expect(screen.getByText('Card Already Registered')).toBeTruthy();
+    expect(screen.getByText('Wipe & Re-register')).toBeTruthy();
+    expect(screen.getByText('Skip')).toBeTruthy();
+
+    // Tap wipe
+    fireEvent.press(screen.getByText('Wipe & Re-register'));
+    await waitFor(() =>
+      expect(mockRegisterMemberCardUseCase.executeWithReset).toHaveBeenCalled(),
+    );
+  });
+
+  it('Station top-up with preset amount selection', async () => {
+    render(<StationScreen navigation={navigation} />);
+    await waitFor(() =>
+      expect(mockCheckNfcAvailabilityUseCase.execute).toHaveBeenCalled(),
+    );
+
+    fireEvent.press(screen.getByText('Switch to Top Up'));
+    fireEvent.press(screen.getByText('Rp 100.000'));
+    fireEvent.press(screen.getByText('Tap NFC Card to Top Up'));
+    await waitFor(() =>
+      expect(mockTopUpMemberCardUseCase.execute).toHaveBeenCalledWith({
+        amount: 100000,
+      }),
+    );
   });
 });

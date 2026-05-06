@@ -49,6 +49,11 @@ const mockRegisterMemberCardUseCase = {
       transactionLogs: [],
     },
   }),
+  executeWithReset: jest.fn().mockResolvedValue({
+    success: true,
+    role: 'STATION',
+    message: 'Member card registered successfully.',
+  }),
 };
 
 const mockTopUpMemberCardUseCase = {
