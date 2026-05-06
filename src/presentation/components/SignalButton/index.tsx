@@ -1,32 +1,14 @@
-import React, { ReactNode, useMemo, useState } from 'react';
-import {
-  Pressable,
-  PressableProps,
-  StyleProp,
-  StyleSheet,
-  Text,
-  TextStyle,
-  View,
-  ViewStyle,
-} from 'react-native';
-import { componentTokens } from '../theme/components';
+import React, { useMemo, useState } from 'react';
+import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { componentTokens } from '../../theme/components';
+import type { SignalButtonProps } from './types';
+import { styles } from './styles';
 
-export type SignalButtonVariant = keyof typeof componentTokens.button.variants;
-export type SignalButtonSize = keyof typeof componentTokens.button.sizes;
-
-export interface SignalButtonProps extends Omit<
-  PressableProps,
-  'style' | 'children'
-> {
-  label: string;
-  variant?: SignalButtonVariant;
-  size?: SignalButtonSize;
-  leftIcon?: ReactNode;
-  rightIcon?: ReactNode;
-  fullWidth?: boolean;
-  style?: StyleProp<ViewStyle>;
-  textStyle?: StyleProp<TextStyle>;
-}
+export type {
+  SignalButtonProps,
+  SignalButtonVariant,
+  SignalButtonSize,
+} from './types';
 
 function resolveOpacity(
   disabled: boolean | null | undefined,
@@ -115,26 +97,3 @@ export function SignalButton({
     </Pressable>
   );
 }
-
-const styles = StyleSheet.create({
-  base: {
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderWidth: 2,
-    shadowColor: '#9E9E9E',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.2,
-    shadowRadius: 3,
-    elevation: 3,
-  },
-  fullWidth: {
-    alignSelf: 'stretch',
-    width: '100%',
-  },
-  content: {
-    alignItems: 'center',
-    flexDirection: 'row',
-    justifyContent: 'center',
-  },
-});

@@ -1,6 +1,7 @@
 import React from 'react';
-import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
-import { useAppStore } from '../stores/app-store';
+import { Pressable, ScrollView, Text, View } from 'react-native';
+import { useAppStore } from '../../stores/app-store';
+import { styles } from './styles';
 
 const formatTime = (iso: string): string => {
   const date = new Date(iso);
@@ -31,11 +32,10 @@ export function NfcLogPanel(): React.JSX.Element {
           </Pressable>
         </View>
       </View>
-
       {nfcLogEnabled ? (
         <ScrollView
           className="mt-2 rounded-lg bg-[#111827] p-2"
-          style={logPanelStyles.scrollContainer}
+          style={styles.scrollContainer}
           nestedScrollEnabled
         >
           {nfcLogs.length === 0 ? (
@@ -58,7 +58,3 @@ export function NfcLogPanel(): React.JSX.Element {
     </View>
   );
 }
-
-const logPanelStyles = StyleSheet.create({
-  scrollContainer: { maxHeight: 160 },
-});

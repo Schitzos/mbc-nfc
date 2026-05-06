@@ -1,20 +1,10 @@
-import React, { ReactNode, useMemo } from 'react';
+import React, { useMemo } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
-import { signalColorTokens } from '../theme/colors';
-import { radius } from '../theme/radius';
-import { spacing } from '../theme/spacing';
-import { typography } from '../theme/typography';
+import { signalColorTokens } from '../../theme/colors';
+import type { SignalStatusBannerProps, Tone } from './types';
+import { styles } from './styles';
 
-type Tone = 'info' | 'warning' | 'error' | 'success';
-
-interface SignalStatusBannerProps {
-  tone: Tone;
-  eyebrow: string;
-  title: string;
-  body: string;
-  items?: string[];
-  children?: ReactNode;
-}
+export type { SignalStatusBannerProps, Tone } from './types';
 
 const toneMap = {
   info: {
@@ -84,31 +74,3 @@ export function SignalStatusBanner({
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  root: {
-    borderWidth: 1,
-    borderRadius: radius.card,
-    padding: spacing.xl,
-    gap: spacing.sm,
-  },
-  eyebrow: {
-    ...typography.labelBold,
-    textTransform: 'uppercase',
-  },
-  title: {
-    ...typography.mobileHeadline2,
-    color: signalColorTokens.text.primary,
-  },
-  body: {
-    ...typography.body1Regular,
-    color: signalColorTokens.text.secondary,
-  },
-  list: {
-    gap: spacing.xxs,
-  },
-  listItem: {
-    ...typography.body2Regular,
-    color: signalColorTokens.text.secondary,
-  },
-});

@@ -1,25 +1,10 @@
 import React from 'react';
 import { ActivityIndicator, Text, View } from 'react-native';
-import { SignalBottomSheet } from './SignalBottomSheet';
-import { SignalButton } from './SignalButton';
+import { SignalBottomSheet } from '../SignalBottomSheet';
+import { SignalButton } from '../SignalButton';
+import type { NfcActionSheetProps } from './types';
 
-export type NfcActionState =
-  | { phase: 'idle' }
-  | { phase: 'scanning'; message?: string }
-  | { phase: 'success'; title: string; message: string }
-  | { phase: 'error'; title: string; message: string }
-  | {
-      phase: 'confirm';
-      title: string;
-      message: string;
-      confirmLabel: string;
-      onConfirm: () => void;
-    };
-
-interface NfcActionSheetProps {
-  state: NfcActionState;
-  onDismiss: () => void;
-}
+export type { NfcActionState, NfcActionSheetProps } from './types';
 
 export function NfcActionSheet({
   state,
@@ -57,7 +42,6 @@ export function NfcActionSheet({
           </Text>
         </View>
       )}
-
       {state.phase === 'success' && (
         <View className="gap-3 pb-6">
           <View className="rounded-xl bg-[#EAFBF2] p-4">
@@ -69,7 +53,6 @@ export function NfcActionSheet({
           <SignalButton label="Done" onPress={onDismiss} />
         </View>
       )}
-
       {state.phase === 'error' && (
         <View className="gap-3 pb-6">
           <View className="rounded-xl bg-[#FFECEC] p-4">
@@ -81,7 +64,6 @@ export function NfcActionSheet({
           <SignalButton label="Dismiss" onPress={onDismiss} />
         </View>
       )}
-
       {state.phase === 'confirm' && (
         <View className="gap-3 pb-6">
           <View className="rounded-xl bg-[#FFF7DB] p-4">

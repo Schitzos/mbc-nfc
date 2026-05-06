@@ -1,11 +1,9 @@
 import React, { useMemo } from 'react';
 import { StyleSheet, useWindowDimensions, View } from 'react-native';
+import type { BackgroundDecorProps, Variant } from './types';
+import { styles } from './styles';
 
-type Variant = 'roleSwitcher' | 'station' | 'gate' | 'terminal' | 'scout';
-
-interface BackgroundDecorProps {
-  variant?: Variant;
-}
+export type { BackgroundDecorProps, Variant } from './types';
 
 function getDiamondColor(variant: Variant): string {
   if (variant === 'gate') {
@@ -69,8 +67,3 @@ export function BackgroundDecor({
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  bottomCircle: { backgroundColor: '#001A41', opacity: 0.04 },
-  dotAccent: { backgroundColor: '#001A41', opacity: 0.07 },
-});

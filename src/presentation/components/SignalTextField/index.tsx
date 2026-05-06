@@ -1,28 +1,10 @@
-import React, { ReactNode, useMemo, useState } from 'react';
-import {
-  StyleProp,
-  StyleSheet,
-  Text,
-  TextInput,
-  TextInputProps,
-  View,
-  ViewStyle,
-} from 'react-native';
-import { signalColorTokens } from '../theme/colors';
-import { componentTokens } from '../theme/components';
-import { typography } from '../theme/typography';
+import React, { useMemo, useState } from 'react';
+import { StyleSheet, Text, TextInput, View } from 'react-native';
+import { componentTokens } from '../../theme/components';
+import type { SignalTextFieldProps, SignalTextFieldState } from './types';
+import { styles } from './styles';
 
-export type SignalTextFieldState =
-  keyof typeof componentTokens.textField.states;
-
-export interface SignalTextFieldProps extends Omit<TextInputProps, 'style'> {
-  label?: string;
-  required?: boolean;
-  helperText?: string;
-  state?: Exclude<SignalTextFieldState, 'disabled'>;
-  rightElement?: ReactNode;
-  style?: StyleProp<ViewStyle>;
-}
+export type { SignalTextFieldProps, SignalTextFieldState } from './types';
 
 export function SignalTextField({
   label,
@@ -69,7 +51,6 @@ export function SignalTextField({
           {required ? <Text style={styles.required}>*</Text> : null}
         </View>
       ) : null}
-
       <View style={[styles.inputShell, dynamicStyles.shell]}>
         <TextInput
           value={value}
@@ -89,7 +70,6 @@ export function SignalTextField({
         />
         {rightElement}
       </View>
-
       {helperText ? (
         <Text style={[styles.helper, dynamicStyles.helperColor]}>
           {helperText}
@@ -98,41 +78,3 @@ export function SignalTextField({
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  root: {
-    width: componentTokens.textField.width,
-  },
-  labelRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: componentTokens.textField.labelGap,
-  },
-  label: {
-    ...typography.body1Regular,
-  },
-  required: {
-    ...typography.body1Regular,
-    color: signalColorTokens.brand.primary,
-  },
-  inputShell: {
-    height: componentTokens.textField.height,
-    borderWidth: componentTokens.textField.borderWidth,
-    borderRadius: componentTokens.textField.radius,
-    paddingHorizontal: componentTokens.textField.inputPaddingHorizontal,
-    paddingVertical: componentTokens.textField.inputPaddingVertical,
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: componentTokens.button.sizes.large.gap,
-  },
-  input: {
-    ...typography.body1Regular,
-    flex: 1,
-    minWidth: 0,
-    padding: 0,
-  },
-  helper: {
-    ...typography.body2Regular,
-    marginTop: componentTokens.textField.helperGap,
-  },
-});

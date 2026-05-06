@@ -1,36 +1,8 @@
-import React from 'react';
-import { StyleProp, StyleSheet, View, ViewStyle } from 'react-native';
-import { colors, signalColorTokens } from '../theme/colors';
-import { componentTokens } from '../theme/components';
+import { StyleSheet } from 'react-native';
+import { colors, signalColorTokens } from '../../theme/colors';
+import { componentTokens } from '../../theme/components';
 
-export type SignalSkeletonVariant = 'title' | 'button' | 'card';
-
-export interface SignalSkeletonProps {
-  variant?: SignalSkeletonVariant;
-  style?: StyleProp<ViewStyle>;
-}
-
-export function SignalSkeleton({
-  variant = 'title',
-  style,
-}: Readonly<SignalSkeletonProps>) {
-  if (variant === 'button') {
-    return <View style={[styles.button, style]} />;
-  }
-
-  if (variant === 'card') {
-    return (
-      <View style={[styles.card, style]}>
-        <View style={styles.cardAvatar} />
-        <View style={styles.cardLine} />
-      </View>
-    );
-  }
-
-  return <View style={[styles.title, style]} />;
-}
-
-const styles = StyleSheet.create({
+export const styles = StyleSheet.create({
   title: {
     width: componentTokens.skeleton.title.width,
     height: componentTokens.skeleton.title.height,
