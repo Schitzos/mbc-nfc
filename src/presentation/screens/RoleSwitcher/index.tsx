@@ -1,6 +1,7 @@
 import React from 'react';
 import { ScrollView, View } from 'react-native';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import type { RootStackParamList } from '../../../app/navigation';
 import { roleOptions } from '../../config/role-options';
 import { useAppStore } from '../../stores/app-store';
@@ -12,6 +13,7 @@ type Props = Partial<
 >;
 
 export function RoleSwitcherScreen({ navigation }: Props): React.JSX.Element {
+  const insets = useSafeAreaInsets();
   const selectedRole = useAppStore(state => state.selectedRole);
   const setSelectedRole = useAppStore(state => state.setSelectedRole);
 
@@ -21,7 +23,13 @@ export function RoleSwitcherScreen({ navigation }: Props): React.JSX.Element {
   };
 
   return (
-    <ScrollView className="flex-1 bg-background px-6 py-6">
+    <ScrollView
+      className="flex-1 bg-background px-6"
+      contentContainerStyle={{
+        paddingTop: insets.top + 8,
+        paddingBottom: insets.bottom + 24,
+      }}
+    >
       <View className="gap-4">
         <AppHeaderCard />
         <RoleOptionList

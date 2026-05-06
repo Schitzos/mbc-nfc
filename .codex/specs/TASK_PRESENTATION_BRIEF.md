@@ -10,19 +10,19 @@ This brief explains the KDX Membership Benefit Card project in a format suitable
 
 One mobile app. Four cooperative roles. One NFC card as the portable source of truth.
 
-| Fact         | Value                                                                     |
-| ------------ | ------------------------------------------------------------------------- |
-| App type     | Single React Native app with role switcher                                |
-| Roles        | Station · Gate · Terminal · Scout                                         |
-| Card truth   | NFC card stores identity, balance, status, 5 logs                         |
-| Local DB     | SQLite — device-local audit only, never overrides card                    |
-| Target tag   | NTAG215                                                                   |
-| Tariff       | Fixed Rp 2.000 per started hour (parking MVP)                             |
-| Security     | Silent Shield — AES-256-GCM authenticated encryption                      |
-| Architecture | Clean Architecture (Domain → Application → Infrastructure → Presentation) |
-| Tests        | 194 automated tests, 97%+ line coverage                                   |
-| CI/CD        | SonarCloud quality gate + GitHub Actions → Firebase App Distribution      |
-| Offline      | All core flows work without internet or backend                           |
+| Fact         | Value                                                                      |
+| ------------ | -------------------------------------------------------------------------- |
+| App type     | Single React Native app with role switcher                                 |
+| Roles        | Station · Gate · Terminal · Scout                                          |
+| Card truth   | NFC card stores identity, balance, status, 5 logs                          |
+| Local DB     | SQLite — device-local audit only, never overrides card                     |
+| Target tag   | NTAG215                                                                    |
+| Tariff       | Fixed Rp 2.000 per started hour (parking MVP)                              |
+| Security     | Silent Shield — AES-256-GCM authenticated encryption                       |
+| Architecture | Clean Architecture (Domain → Application → Infrastructure → Presentation)  |
+| Tests        | 194 automated tests, 97%+ line coverage                                    |
+| CI/CD        | Single `build.yml`: PR validation gates + `main` Firebase App Distribution |
+| Offline      | All core flows work without internet or backend                            |
 
 ---
 
@@ -55,13 +55,13 @@ One mobile app. Four cooperative roles. One NFC card as the portable source of t
 
 ### Phase 7 Detail
 
-| Task                                            | Status                                      |
-| ----------------------------------------------- | ------------------------------------------- |
-| T-027 Unit and Use-Case Tests                   | ✅ Done — 194 tests, 97%+ coverage          |
-| T-027A SonarCloud Quality Gate                  | ✅ Done — integrated with coverage import   |
-| T-027B GitHub Actions Firebase App Distribution | ✅ Done — `main` merge triggers APK publish |
-| T-027C Feature PR QA Screenshot Evidence        | ⏳ Pending manual QA execution              |
-| T-026D Task Presentation Brief                  | 🔄 This task                                |
+| Task                                            | Status                                                                              |
+| ----------------------------------------------- | ----------------------------------------------------------------------------------- |
+| T-027 Unit and Use-Case Tests                   | ✅ Done — 194 tests, 97%+ coverage                                                  |
+| T-027A SonarCloud Quality Gate                  | ✅ Done — integrated with coverage import                                           |
+| T-027B GitHub Actions Firebase App Distribution | ✅ Done — single `build.yml` handles validation and `main` publish                  |
+| T-027C Feature PR QA Screenshot Evidence        | 🔄 In progress — mock sweep evidence captured; real NFC must-case set still pending |
+| T-026D Task Presentation Brief                  | 🔄 This task                                                                        |
 
 ---
 
@@ -211,15 +211,15 @@ Use this table to find which tasks support each required presentation section:
 
 ## Quality Evidence (for Software Quality slide)
 
-| Metric           | Value                                             |
-| ---------------- | ------------------------------------------------- |
-| Automated tests  | 194                                               |
-| Line coverage    | 97%+                                              |
-| Coverage policy  | ≥90% for all executable source                    |
-| Static analysis  | SonarCloud quality gate integrated                |
-| Dependency audit | `npm audit` = 0 vulnerabilities                   |
-| QA evidence      | Screenshot proof per feature PR (T-027C)          |
-| CI pipeline      | GitHub Actions builds + publishes on `main` merge |
+| Metric           | Value                                                       |
+| ---------------- | ----------------------------------------------------------- |
+| Automated tests  | 194                                                         |
+| Line coverage    | 97%+                                                        |
+| Coverage policy  | ≥90% for all executable source                              |
+| Static analysis  | SonarCloud quality gate integrated                          |
+| Dependency audit | `npm audit` = 0 vulnerabilities                             |
+| QA evidence      | Screenshot proof per feature PR (T-027C)                    |
+| CI pipeline      | Single `build.yml`: PR validates, `main` builds + publishes |
 
 ### Quality Improvement Beyond Requirements
 

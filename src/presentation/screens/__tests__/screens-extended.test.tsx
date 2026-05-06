@@ -10,6 +10,11 @@ import { GateScreen } from '../GateScreen';
 import { TerminalScreen } from '../TerminalScreen';
 import { StationScreen } from '../StationScreen';
 import { ScoutScreen } from '../ScoutScreen';
+import { useAppStore } from '../../stores/app-store';
+
+jest.mock('react-native-safe-area-context', () => ({
+  useSafeAreaInsets: () => ({ top: 0, bottom: 0, left: 0, right: 0 }),
+}));
 
 const setScenario = jest.fn();
 const getScenario = jest.fn<MockCardScenario, []>(() => 'normal');
@@ -157,6 +162,7 @@ describe('role screens – extended branch coverage', () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
+    useAppStore.setState({ nfcLogEnabled: false, nfcLogs: [] });
     getScenario.mockReturnValue('normal');
     readCard.mockResolvedValue({
       activeSession: { activityType: 'PARKING' },
@@ -185,7 +191,7 @@ describe('role screens – extended branch coverage', () => {
     );
 
     // Toggle simulation off
-    fireEvent.press(screen.getByText('Clear'));
+    fireEvent.press(screen.getByText('Clear simulation'));
     expect(screen.getByText('Off')).toBeTruthy();
   });
 
@@ -350,5 +356,25 @@ describe('role screens – extended branch coverage', () => {
 
     fireEvent.press(screen.getByText('Unregistered'));
     expect(setScenario).toHaveBeenCalledWith('unregistered');
+  });
+
+  it('Station NFC log panel can be toggled and cleared', async () => {
+    render(<StationScreen navigation={navigation} />);
+    await waitFor(() =>
+      expect(mockCheckNfcAvailabilityUseCase.execute).toHaveBeenCalled(),
+    );
+
+    expect(screen.getByText('NFC Log')).toBeTruthy();
+    expect(
+      screen.getByText(
+        'Log panel hidden. Tap ON to view NFC operational events.',
+      ),
+    ).toBeTruthy();
+
+    fireEvent.press(screen.getByText('OFF'));
+    expect(screen.getAllByText(/\[NFC\]/).length).toBeGreaterThan(0);
+
+    fireEvent.press(screen.getByText('Clear'));
+    expect(screen.getByText('No NFC log lines yet.')).toBeTruthy();
   });
 });

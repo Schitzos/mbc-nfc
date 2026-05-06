@@ -37,6 +37,7 @@
 | R-017 | Local ledger totals diverge from card-side truth after partial failure or device-specific data loss | Medium     | High   | Keep card as member-state truth, make ledger secondary, test failure handling, and surface ledger-write issues clearly                             | Open   |
 | R-018 | Automated coverage stays below 90% near deadline                                                    | Medium     | High   | Track coverage from the start, expand tests across the whole executable repository, and fail quality checks when coverage drops below target       | Open   |
 | R-019 | SonarCloud quality gate fails because of code smells, bugs, or missing analysis setup               | Medium     | Medium | Configure SonarCloud early, publish coverage reports, and fix quality findings continuously instead of at the end                                  | Open   |
+| R-020 | NFC troubleshooting log leaks sensitive technical/card data if not redacted                         | Medium     | High   | Log only safe operational events, never log full payload/keys/full member identity, and keep clear/toggle controls in presentation layer           | Open   |
 
 ## Production Blockers
 

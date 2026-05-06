@@ -14,7 +14,7 @@ The official Android delivery channel is Firebase App Distribution.
 Required release automation:
 
 - Push/merge to `main` triggers GitHub Actions.
-- GitHub Actions builds the Android release APK/AAB.
+- GitHub Actions builds the Android distributable APK (current path: debug APK with bundled JS via `build.yml`).
 - GitHub Actions uploads the build to Firebase App Distribution.
 - Required GitHub secrets must be documented by the Demo/Release Engineer.
 - Workflow failure must be visible in GitHub Actions logs.
@@ -171,7 +171,7 @@ Scope:
 - Device test matrix.
 - SonarCloud quality analysis.
 - Husky commit/lint enforcement.
-- GitHub Actions publish workflow for `main`.
+- GitHub Actions publish workflow for `main` in `.github/workflows/build.yml`.
 - Submission package.
 
 Exit criteria:

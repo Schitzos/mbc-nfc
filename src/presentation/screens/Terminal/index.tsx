@@ -1,12 +1,14 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { ScrollView, Text, View } from 'react-native';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { appContainer } from '../../../app/container';
 import type { RootStackParamList } from '../../../app/navigation';
 import type { CheckNfcAvailabilityResultDto } from '../../../application/dto/check-nfc-availability-result-dto';
 import type { RoleActionResultDto } from '../../../application/dto/role-action-result-dto';
 import type { MockCardScenario } from '../../../infrastructure/nfc/mock-mbc-card.repository';
 import { SignalButton } from '../../components/SignalButton';
+import { NfcLogPanel } from '../../components/NfcLogPanel';
 import { useAppStore } from '../../stores/app-store';
 import { TerminalHeader } from './fragments/TerminalHeader';
 
@@ -22,7 +24,9 @@ const terminalScenarios: Array<{ key: MockCardScenario; label: string }> = [
 ];
 
 export function TerminalScreen({ navigation }: Props): React.JSX.Element {
+  const insets = useSafeAreaInsets();
   const setSelectedRole = useAppStore(state => state.setSelectedRole);
+  const appendNfcLog = useAppStore(state => state.appendNfcLog);
   const services = useMemo(() => appContainer.getTerminalServices(), []);
   const [nfcStatus, setNfcStatus] =
     useState<CheckNfcAvailabilityResultDto | null>(null);
@@ -44,16 +48,30 @@ export function TerminalScreen({ navigation }: Props): React.JSX.Element {
   useEffect(() => {
     services.checkNfcAvailabilityUseCase
       .execute()
-      .then(setNfcStatus)
+      .then(status => {
+        setNfcStatus(status);
+        appendNfcLog(`[NFC] Availability result: ${status.status}`);
+      })
       .catch(() => undefined);
-  }, [services]);
+  }, [appendNfcLog, services]);
 
   const handleCheckout = async () => {
     setBusy(true);
     try {
+      appendNfcLog('[NFC] Checkout flow started');
       const result = await services.checkOutActivityUseCase.execute({});
       setLatestResult(result);
+      appendNfcLog(
+        result.success
+          ? '[NFC] Checkout succeeded'
+          : `[NFC] Checkout failed: ${result.message}`,
+      );
     } catch (error) {
+      appendNfcLog(
+        `[NFC] Checkout error: ${
+          error instanceof Error ? error.message : 'Unknown error'
+        }`,
+      );
       if (error instanceof Error) {
         setLatestResult({
           success: false,
@@ -82,7 +100,13 @@ export function TerminalScreen({ navigation }: Props): React.JSX.Element {
       : 'Activity checkout';
 
   return (
-    <ScrollView className="flex-1 bg-background px-6 py-6">
+    <ScrollView
+      className="flex-1 bg-background px-6"
+      contentContainerStyle={{
+        paddingTop: insets.top + 8,
+        paddingBottom: insets.bottom + 24,
+      }}
+    >
       <View className="gap-4">
         <TerminalHeader
           subtitle={subtitle}
@@ -221,6 +245,8 @@ export function TerminalScreen({ navigation }: Props): React.JSX.Element {
             {nfcStatus?.title ?? 'Checking device NFC'}
           </Text>
         </View>
+
+        <NfcLogPanel />
       </View>
     </ScrollView>
   );

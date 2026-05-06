@@ -23,6 +23,7 @@ The PDF uses member parking as the concrete required assessment scenario. Parkin
 | BR-009 | Sensitive member identity and balance must not be plainly readable by external NFC apps.                                                       |
 | BR-010 | The assessment submission must include source code, working app demo, documentation, and presentation material.                                |
 | BR-011 | Cooperative staff need an offline device-side audit trail and income summary for Station operations.                                           |
+| BR-012 | Operators need optional on-screen NFC operational logs for troubleshooting during demo/field support.                                          |
 
 ## 3. System Requirements
 
@@ -41,6 +42,7 @@ The PDF uses member parking as the concrete required assessment scenario. Parkin
 | SR-011 | The system shall require an NFC-capable device with NFC enabled for real card scan, read, and write operations.                                                                                                   |
 | SR-012 | The system shall clearly inform users when NFC is required, unsupported, disabled, scanning, cancelled, or timed out.                                                                                             |
 | SR-013 | The system shall maintain a local offline SQLite ledger for audit/reporting without replacing the NFC card as member-state authority.                                                                             |
+| SR-014 | The system shall provide an optional user-visible NFC operational log panel that can be toggled on/off and cleared by the operator.                                                                               |
 
 ## 4. Scope
 
@@ -119,6 +121,7 @@ The PDF uses member parking as the concrete required assessment scenario. Parkin
 | US-012 | As an evaluator, I can review source code, demo evidence, documentation, and presentation material.            | Must     |
 | US-013 | As a developer, I can reuse the check-in/check-out flow for activities beyond parking.                         | Should   |
 | US-014 | As a cooperative admin, I can view offline income and transaction summaries on the device used at The Station. | Must     |
+| US-015 | As an operator, I can enable or disable an NFC log panel and clear log lines for troubleshooting.              | Should   |
 
 ## 7. Functional Requirements
 
@@ -315,6 +318,19 @@ Acceptance criteria:
 - The app must not remove required identity, balance, active visit, or latest five transaction history data to fit capacity.
 - If the payload still cannot fit, the app blocks write with `CARD_CAPACITY_INSUFFICIENT`.
 
+### FR-017 NFC Operational Log Panel (Toggleable)
+
+The app shall provide a user-visible NFC operational log panel for troubleshooting and demo support.
+
+Acceptance criteria:
+
+- The log panel is available in role screens that execute NFC actions (Station, Gate, Terminal, Scout).
+- The log panel can be toggled on/off by the user without restarting the app.
+- The log panel provides a clear action to remove current log lines.
+- Log lines include timestamp and short operational event text (scan start, read, write, cancel, success, error).
+- Log lines must not expose sensitive secrets, raw decrypted payloads, full private identifiers, or private keys.
+- The log panel is an operator troubleshooting aid; it does not replace card transaction logs and does not mutate card business state.
+
 ## 8. Non-Functional Requirements
 
 | ID      | Category                         | Requirement                                                                                                                                                                 |
@@ -337,6 +353,7 @@ Acceptance criteria:
 | NFR-016 | Dependency vulnerability gate    | After installing or changing libraries, `npm audit` shall report 0 known vulnerabilities before the task is considered done.                                                |
 | NFR-017 | NTAG215 capacity compatibility   | NTAG215 is the MVP target tag. The protected compact payload must fit NTAG215 or fail safely with `CARD_CAPACITY_INSUFFICIENT`.                                             |
 | NFR-018 | Write verification               | Every real NFC write must be followed by readback verification: decrypt/authenticate, validate schema, and confirm expected counter/state before showing success.           |
+| NFR-023 | Troubleshooting observability    | NFC operational logging in UI must be concise, optional (toggleable), clearable, and safe (no sensitive payload disclosure).                                                |
 
 ## 9. Security Requirements
 

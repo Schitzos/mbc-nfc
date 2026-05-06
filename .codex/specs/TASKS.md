@@ -300,6 +300,13 @@ Refs: `SIGNAL_UI_GUIDE.md`
 Do: Polish spacing, buttons, badges, bottom sheets, icons, hierarchy; do not add scope.  
 Done: Screens are clean and demo-ready.
 
+### T-026E — NFC Log Panel and Toggle
+
+Owner: Senior RN FE / Software Architect / System Analyst / Product Owner  
+Refs: `REQUIREMENTS.md`, `DESIGN.md`, `SECURITY.md`  
+Do: Add shared NFC operational log panel in Station/Gate/Terminal/Scout with toggle on/off and clear action; ensure safe redaction/no sensitive payload disclosure.  
+Done: Operator can enable/disable log panel, see timestamped NFC events, clear current lines, and run core flows without business-state side effects.
+
 ---
 
 ## Phase 7 — Quality, Release, and Submission
@@ -329,7 +336,7 @@ Done: Quality gate runs or manual/deferred plan is documented.
 
 Owner: Release Engineer  
 Refs: `RELEASE_PLAN.md`, `DONE.md`  
-Do: Configure GitHub Actions on `main` to build Android release artifact and upload to Firebase App Distribution with secrets/tester notes documented.  
+Do: Maintain single GitHub Actions workflow (`.github/workflows/build.yml`) where PR to `develop` runs validation gates and push/merge to `main` builds APK and uploads to Firebase App Distribution with secrets/tester notes documented.  
 Done: `main` trigger distributes build or has documented dry-run evidence.
 
 ### T-027C — QA Screenshot Evidence Gate
