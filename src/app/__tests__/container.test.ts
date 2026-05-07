@@ -45,4 +45,14 @@ describe('createAppServices', () => {
     expect(services.scout.checkNfcAvailabilityUseCase).toBeTruthy();
     expect(mockOpen).toHaveBeenCalledTimes(1);
   });
+
+  it('returns cached singleton instances on subsequent calls', () => {
+    const first = createAppServices();
+    const second = createAppServices();
+
+    expect(first.station.registerMemberCardUseCase).toBe(
+      second.station.registerMemberCardUseCase,
+    );
+    expect(mockOpen).toHaveBeenCalledTimes(1);
+  });
 });

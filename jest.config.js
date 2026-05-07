@@ -27,7 +27,7 @@ module.exports = {
       statements: 100,
       lines: 100,
       functions: 100,
-      branches: 90,
+      branches: 100,
     },
   },
   transformIgnorePatterns: [
