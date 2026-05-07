@@ -53,7 +53,7 @@ export class ErrorBoundary extends React.Component<
     return { hasError: true };
   }
 
-  private handleReset = (): void => {
+  private readonly handleReset = (): void => {
     this.setState({ hasError: false });
   };
 
