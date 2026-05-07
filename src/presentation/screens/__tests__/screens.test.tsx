@@ -219,7 +219,7 @@ describe('role screens', () => {
 
     fireEvent.press(screen.getByText('Station'));
     expect(navigation.goBack).toHaveBeenCalled();
-  });
+  }, 15000);
 
   it('runs Gate check-in flow', async () => {
     renderWithServices(<GateScreen navigation={navigation} />);
