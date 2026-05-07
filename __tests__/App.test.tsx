@@ -4,7 +4,7 @@
 
 import React from 'react';
 import { fireEvent, render, screen } from '@testing-library/react-native';
-import { RoleSwitcherScreen } from '../src/presentation/screens/RoleSwitcherScreen';
+import { RoleSwitcherScreen } from '../src/presentation/screens/RoleSwitcher';
 import { useAppStore } from '../src/presentation/stores/app-store';
 
 jest.mock('react-native-safe-area-context', () => ({

@@ -1,6 +1,6 @@
 # MBC Task Presentation Brief
 
-> Last updated: Phase 7 in progress | 194 tests | 97%+ coverage | SonarCloud + Firebase configured
+> Last updated: 2025-05-07 | Phases 0–9 complete | Phase 10 pending (T-029, T-030 only) | 194 tests | 97%+ coverage | SonarCloud + Firebase configured
 
 This brief explains the KDX Membership Benefit Card project in a format suitable for assessment presentation slides, stakeholder updates, and technical reviewers.
 
@@ -39,29 +39,26 @@ One mobile app. Four cooperative roles. One NFC card as the portable source of t
 
 ## Current Phase Status
 
-| Phase | Name                     | Status                      |
-| ----- | ------------------------ | --------------------------- |
-| 0     | Project Baseline         | ✅ Complete                 |
-| 1     | Core Business Foundation | ✅ Complete                 |
-| 2     | Station Feature          | ✅ Complete                 |
-| 3     | Gate Feature             | ✅ Complete                 |
-| 4     | Terminal Feature         | ✅ Complete                 |
-| 5     | Scout Feature            | ✅ Complete                 |
-| 6     | Shared App Experience    | ✅ Complete                 |
-| 7     | Quality and Verification | 🔄 In Progress              |
-| 8     | Real NFC Integration     | ⏳ Next (requires hardware) |
-| 9     | Design Hardening         | ⏳ Blocked (requires Figma) |
-| 10    | Demo and Submission      | ⏳ Last                     |
+| Phase | Name                     | Status                         |
+| ----- | ------------------------ | ------------------------------ |
+| 0     | Project Baseline         | ✅ Complete                    |
+| 1     | Core Business Foundation | ✅ Complete                    |
+| 2     | Station Feature          | ✅ Complete                    |
+| 3     | Gate Feature             | ✅ Complete                    |
+| 4     | Terminal Feature         | ✅ Complete                    |
+| 5     | Scout Feature            | ✅ Complete                    |
+| 6     | Shared App Experience    | ✅ Complete                    |
+| 7     | Quality and Verification | ✅ Complete                    |
+| 8     | Real NFC Integration     | ✅ Complete                    |
+| 9     | Design Hardening         | ✅ Complete                    |
+| 10    | Demo and Submission      | ⏳ Pending (T-029, T-030 only) |
 
-### Phase 7 Detail
+### Phase 10 Detail
 
-| Task                                            | Status                                                                              |
-| ----------------------------------------------- | ----------------------------------------------------------------------------------- |
-| T-027 Unit and Use-Case Tests                   | ✅ Done — 194 tests, 97%+ coverage                                                  |
-| T-027A SonarCloud Quality Gate                  | ✅ Done — integrated with coverage import                                           |
-| T-027B GitHub Actions Firebase App Distribution | ✅ Done — single `build.yml` handles validation and `main` publish                  |
-| T-027C Feature PR QA Screenshot Evidence        | 🔄 In progress — mock sweep evidence captured; real NFC must-case set still pending |
-| T-026D Task Presentation Brief                  | 🔄 This task                                                                        |
+| Task                     | Status                                                    |
+| ------------------------ | --------------------------------------------------------- |
+| T-029 Demo Capture       | ⏳ Pending — capture Station/Gate/Terminal/Scout evidence |
+| T-030 Submission Package | ⏳ Pending — final packaging for PO GO/NO-GO review       |
 
 ---
 
@@ -135,7 +132,7 @@ Use this table to find which tasks support each required presentation section:
 | --------------------------------- | ----------------------------------------------- | ----------------------------------------- | --------------------------------------------------------------- | ------------------------------------------------------------- |
 | T-021 Role Switcher               | Let one app play four roles                     | Senior React Native FE / UI UX Designer   | Station, Gate, Terminal, Scout selection                        | Shows the assessment runs as one multi-role app               |
 | T-022 Station Screen              | Register, top up, and review local summaries    | Senior React Native FE / UI UX Designer   | Registration, top-up, ledger summary, NFC action, result states | Shows cooperative staff workflow plus offline reporting value |
-| T-023 Gate Screen                 | Check in members to parking                     | Senior React Native FE / UI UX Designer   | Parking activity indicator, check-in, result states             | Shows entry flow with real device time                         |
+| T-023 Gate Screen                 | Check in members to parking                     | Senior React Native FE / UI UX Designer   | Parking activity indicator, check-in, result states             | Shows entry flow with real device time                        |
 | T-024 Terminal Screen             | Check out and deduct balance                    | Senior React Native FE / UI UX Designer   | Fee summary, balance result, insufficient balance guidance      | Shows exit flow and fee calculation                           |
 | T-025 Scout Screen                | Inspect card safely                             | Senior React Native FE / UI UX Designer   | Read-only summary, balance, status, latest logs                 | Shows members can inspect card state without mutation         |
 | T-026 Signal UI Direction         | Apply the selected design system                | UI UX Designer / Senior React Native FE   | Signal tokens, components, and role screen styling              | Shows the app follows the required Signal UI direction        |
@@ -285,12 +282,18 @@ The architecture uses reusable activity abstractions (activity type, tariff rule
 
 ## Remaining Work
 
-| Phase      | What's Needed                                         | Blocker                        |
-| ---------- | ----------------------------------------------------- | ------------------------------ |
-| 7 (finish) | T-027C manual QA screenshots                          | QA execution time              |
-| 8          | Real NFC read/write, codec, Silent Shield on hardware | NTAG215 cards + Android device |
-| 9          | Figma hi-fi refinement and visual QA                  | Figma access and design time   |
-| 10         | Demo capture, submission package                      | Phases 7–9 completion          |
+| Phase | What's Needed            | Blocker          |
+| ----- | ------------------------ | ---------------- |
+| 10    | T-029 Demo capture       | Execution time   |
+| 10    | T-030 Submission package | T-029 completion |
+
+All other phases (0–9) are complete. PO confirmed 2025-05-07.
+
+---
+
+## UI Styling Note
+
+The current Signal-inspired styling implemented in the app is sufficient for assessment submission. No Figma token extraction or additional design system migration is needed. The in-code theme tokens (colors, spacing, typography) already deliver a clean, consistent, demo-ready experience across all role screens. PO confirmed 2025-05-07.
 
 ---
 

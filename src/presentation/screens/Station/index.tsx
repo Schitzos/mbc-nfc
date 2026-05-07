@@ -137,9 +137,9 @@ export function StationScreen({ navigation }: Props): React.JSX.Element {
               disabled={actions.busyAction !== null}
               onPress={() => {
                 if (actions.registerMode) {
-                  actions.handleRegister().catch(() => undefined);
+                  void actions.handleRegister();
                 } else {
-                  actions.handleTopUp().catch(() => undefined);
+                  void actions.handleTopUp();
                 }
               }}
             />
@@ -183,7 +183,7 @@ export function StationScreen({ navigation }: Props): React.JSX.Element {
                 {actions.latestResult.message}
               </Text>
               <Text className="mt-1 text-xs text-muted">
-                {actions.resultTime ? formatResultDate(actions.resultTime) : ''}
+                {formatResultDate(actions.resultTime!)}
               </Text>
             </View>
           )}
@@ -199,7 +199,7 @@ export function StationScreen({ navigation }: Props): React.JSX.Element {
               <View className="flex-row items-center gap-3">
                 <Pressable
                   onPress={() => {
-                    actions.refreshSummary().catch(() => undefined);
+                    void actions.refreshSummary();
                   }}
                 >
                   <Text className="text-sm font-semibold text-[#0050AE]">

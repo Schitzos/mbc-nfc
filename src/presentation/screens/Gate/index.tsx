@@ -72,7 +72,7 @@ export function GateScreen({ navigation }: Props): React.JSX.Element {
             label={actions.busy ? 'Processing...' : 'Tap Card to Check In'}
             disabled={actions.busy}
             onPress={() => {
-              actions.handleCheckIn().catch(() => undefined);
+              void actions.handleCheckIn();
             }}
           />
 

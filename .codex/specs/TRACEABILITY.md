@@ -91,9 +91,9 @@ When a requirement changes:
 
 | Requirement                                    | Requirement doc                                         | Design/spec                                                                     | Task                                               | Test/E2E                                        |
 | ---------------------------------------------- | ------------------------------------------------------- | ------------------------------------------------------------------------------- | -------------------------------------------------- | ----------------------------------------------- |
-| NFR-017 Changed-file unit-test rule            | `REQUIREMENTS.md` Software Quality Requirement Addendum | `UNIT_TEST_COVERAGE_POLICY.md`; `DONE.md` Quality Definition of Done            | `TASKS.md` T-000C, T-027; all implementation tasks | `TEST_PLAN.md` Changed-File Unit Test Policy    |
-| NFR-018 90% executable-source coverage         | `REQUIREMENTS.md` Software Quality Requirement Addendum | `UNIT_TEST_COVERAGE_POLICY.md`; `RELEASE_PLAN.md` Release Quality Gate Addendum | `TASKS.md` T-000C, T-027, T-027A                   | Coverage report / CI quality gate               |
-| NFR-019 No feature push without matching tests | `REQUIREMENTS.md` Software Quality Requirement Addendum | `AGENT_OPERATING_PROTOCOL.md` Test Obligation Rule                              | All feature tasks in `EXECUTION_ORDER.md`          | Merge review checklist and task result evidence |
+| NFR-024 Changed-file unit-test rule            | `REQUIREMENTS.md` Software Quality Requirement Addendum | `UNIT_TEST_COVERAGE_POLICY.md`; `DONE.md` Quality Definition of Done            | `TASKS.md` T-000C, T-027; all implementation tasks | `TEST_PLAN.md` Changed-File Unit Test Policy    |
+| NFR-025 90% executable-source coverage         | `REQUIREMENTS.md` Software Quality Requirement Addendum | `UNIT_TEST_COVERAGE_POLICY.md`; `RELEASE_PLAN.md` Release Quality Gate Addendum | `TASKS.md` T-000C, T-027, T-027A                   | Coverage report / CI quality gate               |
+| NFR-026 No feature push without matching tests | `REQUIREMENTS.md` Software Quality Requirement Addendum | `AGENT_OPERATING_PROTOCOL.md` Test Obligation Rule                              | All feature tasks in `EXECUTION_ORDER.md`          | Merge review checklist and task result evidence |
 
 ## QA and Release Automation Traceability Addendum
 

@@ -5,10 +5,10 @@ import {
   screen,
   waitFor,
 } from '@testing-library/react-native';
-import { GateScreen } from '../GateScreen';
-import { TerminalScreen } from '../TerminalScreen';
-import { StationScreen } from '../StationScreen';
-import { ScoutScreen } from '../ScoutScreen';
+import { GateScreen } from '../Gate';
+import { TerminalScreen } from '../Terminal';
+import { StationScreen } from '../Station';
+import { ScoutScreen } from '../Scout';
 import { useAppStore } from '../../stores/app-store';
 
 jest.mock('react-native-safe-area-context', () => ({

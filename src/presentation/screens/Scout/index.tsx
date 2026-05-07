@@ -76,7 +76,7 @@ export function ScoutScreen({ navigation }: Props): React.JSX.Element {
             label={actions.busy ? 'Inspecting...' : 'Tap Card to Inspect'}
             disabled={actions.busy}
             onPress={() => {
-              actions.handleInspect().catch(() => undefined);
+              void actions.handleInspect();
             }}
           />
 

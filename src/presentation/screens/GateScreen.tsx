@@ -1,1 +1,0 @@
-export { GateScreen } from './Gate';
