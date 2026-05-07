@@ -1,4 +1,4 @@
-import { maskMemberReference } from '../mask-member-reference';
+import { maskMemberReference } from '@shared/utils/mask-member-reference';
 
 describe('maskMemberReference', () => {
   it('masks a standard member ID showing only last 4 characters', () => {

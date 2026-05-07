@@ -1,9 +1,9 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import type { RoleActionResultDto } from '../../../application/dto/role-action-result-dto';
-import type { NfcActionState } from '../../components/NfcActionSheet';
-import { useAppStore } from '../../stores/app-store';
-import { UNKNOWN_ERROR_MESSAGE } from '../../../shared/constants';
-import type { ScoutServices } from '../../context/service-context';
+import type { RoleActionResultDto } from '@application/dto/role-action-result-dto';
+import type { NfcActionState } from '@presentation/components/NfcActionSheet';
+import { useAppStore } from '@presentation/stores/app-store';
+import { UNKNOWN_ERROR_MESSAGE } from '@shared/constants';
+import type { ScoutServices } from '@presentation/context/service-context';
 
 const noop = () => {};
 

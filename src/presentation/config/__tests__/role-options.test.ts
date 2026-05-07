@@ -1,4 +1,4 @@
-import { roleOptions } from '../role-options';
+import { roleOptions } from '@presentation/config/role-options';
 
 describe('roleOptions config', () => {
   it('defines exactly four roles', () => {

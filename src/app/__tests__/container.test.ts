@@ -1,4 +1,4 @@
-import { createAppServices } from '../container';
+import { createAppServices } from '@app/container';
 
 const mockOpen = jest.fn().mockReturnValue({
   execute: jest.fn(),

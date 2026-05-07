@@ -1,6 +1,6 @@
 import { StyleSheet } from 'react-native';
-import { colors, signalColorTokens } from '../../theme/colors';
-import { componentTokens } from '../../theme/components';
+import { colors, signalColorTokens } from '@presentation/theme/colors';
+import { componentTokens } from '@presentation/theme/components';
 
 export const styles = StyleSheet.create({
   title: {

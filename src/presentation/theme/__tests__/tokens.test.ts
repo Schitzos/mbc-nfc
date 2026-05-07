@@ -1,10 +1,10 @@
-import { colors, signalColorTokens } from '../colors';
-import { componentTokens } from '../components';
-import { signalIconTokens } from '../icons';
-import { radius } from '../radius';
-import { shadows } from '../shadows';
-import { spacing } from '../spacing';
-import { typography } from '../typography';
+import { colors, signalColorTokens } from '@presentation/theme/colors';
+import { componentTokens } from '@presentation/theme/components';
+import { signalIconTokens } from '@presentation/theme/icons';
+import { radius } from '@presentation/theme/radius';
+import { shadows } from '@presentation/theme/shadows';
+import { spacing } from '@presentation/theme/spacing';
+import { typography } from '@presentation/theme/typography';
 
 describe('theme tokens', () => {
   it('exposes signal color and semantic aliases', () => {

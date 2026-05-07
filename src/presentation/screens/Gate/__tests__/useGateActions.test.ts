@@ -1,7 +1,7 @@
 import { renderHook, act, waitFor } from '@testing-library/react-native';
 import { useGateActions } from '../useGateActions';
-import { useAppStore } from '../../../stores/app-store';
-import type { GateServices } from '../../../context/service-context';
+import { useAppStore } from '@presentation/stores/app-store';
+import type { GateServices } from '@presentation/context/service-context';
 
 const mockServices: GateServices = {
   checkNfcAvailabilityUseCase: {

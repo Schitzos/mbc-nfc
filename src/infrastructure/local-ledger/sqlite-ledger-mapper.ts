@@ -1,4 +1,4 @@
-import type { LedgerEntry } from '../../domain/entities/mbc-card';
+import type { LedgerEntry } from '@domain/entities/mbc-card';
 
 interface LedgerRow {
   id: string;

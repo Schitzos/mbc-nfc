@@ -5,11 +5,13 @@ import {
   screen,
   waitFor,
 } from '@testing-library/react-native';
-import { GateScreen } from '../Gate';
-import { ScoutScreen } from '../Scout';
-import { StationScreen } from '../Station';
-import { TerminalScreen } from '../Terminal';
-import { useAppStore } from '../../stores/app-store';
+import { GateScreen } from '@presentation/screens/Gate';
+import { ScoutScreen } from '@presentation/screens/Scout';
+import { StationScreen } from '@presentation/screens/Station';
+import { TerminalScreen } from '@presentation/screens/Terminal';
+import { useAppStore } from '@presentation/stores/app-store';
+
+const { __mockNavigation } = require('@react-navigation/native');
 
 jest.mock('react-native-safe-area-context', () => ({
   useSafeAreaInsets: () => ({ top: 0, bottom: 0, left: 0, right: 0 }),
@@ -179,6 +181,7 @@ describe('role screens', () => {
   } as never;
 
   beforeEach(() => {
+    __mockNavigation.goBack.mockClear();
     mockCheckNfcAvailabilityUseCase.execute.mockClear();
     mockRegisterMemberCardUseCase.execute.mockClear();
     mockRegisterMemberCardUseCase.executeWithReset.mockClear();
@@ -217,8 +220,8 @@ describe('role screens', () => {
       expect(mockGetStationLedgerSummaryUseCase.execute).toHaveBeenCalled(),
     );
 
-    fireEvent.press(screen.getByText('Station'));
-    expect(navigation.goBack).toHaveBeenCalled();
+    fireEvent.press(screen.getByLabelText('Go back'));
+    expect(__mockNavigation.goBack).toHaveBeenCalled();
   }, 15000);
 
   it('runs Gate check-in flow', async () => {
@@ -230,8 +233,8 @@ describe('role screens', () => {
     await waitFor(() =>
       expect(mockCheckInActivityUseCase.execute).toHaveBeenCalled(),
     );
-    fireEvent.press(screen.getByText('Gate'));
-    expect(navigation.goBack).toHaveBeenCalled();
+    fireEvent.press(screen.getByLabelText('Go back'));
+    expect(__mockNavigation.goBack).toHaveBeenCalled();
   });
 
   it('shows Gate blocked state for failed check-in', async () => {
@@ -263,8 +266,8 @@ describe('role screens', () => {
     await waitFor(() =>
       expect(mockCheckOutActivityUseCase.execute).toHaveBeenCalled(),
     );
-    fireEvent.press(screen.getByText('Terminal'));
-    expect(navigation.goBack).toHaveBeenCalled();
+    fireEvent.press(screen.getByLabelText('Go back'));
+    expect(__mockNavigation.goBack).toHaveBeenCalled();
   });
 
   it('shows Terminal insufficient-balance guidance', async () => {
@@ -295,7 +298,7 @@ describe('role screens', () => {
     await waitFor(() =>
       expect(mockInspectMemberCardUseCase.execute).toHaveBeenCalled(),
     );
-    fireEvent.press(screen.getByText('Scout'));
-    expect(navigation.goBack).toHaveBeenCalled();
+    fireEvent.press(screen.getByLabelText('Go back'));
+    expect(__mockNavigation.goBack).toHaveBeenCalled();
   });
 });

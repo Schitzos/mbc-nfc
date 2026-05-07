@@ -105,35 +105,28 @@ src/
       RoleSwitcher/
         index.tsx
         fragments/
-          AppHeaderCard.tsx
           RoleOptionList.tsx
       Station/
         index.tsx
         useStationActions.ts
-        fragments/
-          StationHeader.tsx
       Gate/
         index.tsx
         useGateActions.ts
         fragments/
-          GateHeader.tsx
           GateResultState.tsx
       Terminal/
         index.tsx
         useTerminalActions.ts
-        fragments/
-          TerminalHeader.tsx
       Scout/
         index.tsx
         useScoutActions.ts
-        fragments/
-          ScoutHeader.tsx
       RoleSwitcherScreen.tsx
       StationScreen.tsx
       GateScreen.tsx
       TerminalScreen.tsx
       ScoutScreen.tsx
     components/
+      AppHeaderCard/
       NfcActionSheet/
       NfcLogPanel/
       SignalButton/

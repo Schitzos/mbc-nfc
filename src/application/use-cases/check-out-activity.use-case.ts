@@ -1,17 +1,17 @@
-import type { MbcCardRepository } from '../../domain/repositories/mbc-card-repository';
-import { CardRepositoryError } from '../../domain/errors/card-repository-error';
-import { DomainError } from '../../domain/errors/domain-error';
-import { applyCheckOutState } from '../../domain/services/activity-state-policy';
-import { calculateActivityTariff } from '../../domain/services/activity-tariff-calculator';
+import type { MbcCardRepository } from '@domain/repositories/mbc-card-repository';
+import { CardRepositoryError } from '@domain/errors/card-repository-error';
+import { DomainError } from '@domain/errors/domain-error';
+import { applyCheckOutState } from '@domain/services/activity-state-policy';
+import { calculateActivityTariff } from '@domain/services/activity-tariff-calculator';
 import {
   appendTransactionLog,
   createTransactionLog,
-} from '../../domain/services/transaction-log-policy';
-import { createRandomId } from '../../shared/utils/create-random-id';
-import type { RoleActionResultDto } from '../dto/role-action-result-dto';
-import { toCardSummaryDto } from '../dto/card-summary-mapper';
-import type { LocalLedgerRepository } from '../../domain/repositories/local-ledger-repository';
-import { maskMemberReference } from '../../shared/utils/mask-member-reference';
+} from '@domain/services/transaction-log-policy';
+import { createRandomId } from '@shared/utils/create-random-id';
+import type { RoleActionResultDto } from '@application/dto/role-action-result-dto';
+import { toCardSummaryDto } from '@application/dto/card-summary-mapper';
+import type { LocalLedgerRepository } from '@domain/repositories/local-ledger-repository';
+import { maskMemberReference } from '@shared/utils/mask-member-reference';
 
 export type CheckOutActivityRequest = {
   checkedOutAt?: string;

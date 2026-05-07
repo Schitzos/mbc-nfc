@@ -1,4 +1,4 @@
-import type { MbcCard } from '../entities/mbc-card';
+import type { MbcCard } from '@domain/entities/mbc-card';
 
 export interface MbcCardRepository {
   isSupported(): Promise<boolean>;

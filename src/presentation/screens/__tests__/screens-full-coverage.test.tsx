@@ -5,11 +5,11 @@ import {
   screen,
   waitFor,
 } from '@testing-library/react-native';
-import { ScoutScreen } from '../Scout';
-import { StationScreen } from '../Station';
-import { TerminalScreen } from '../Terminal';
-import { GateScreen } from '../Gate';
-import { useAppStore } from '../../stores/app-store';
+import { ScoutScreen } from '@presentation/screens/Scout';
+import { StationScreen } from '@presentation/screens/Station';
+import { TerminalScreen } from '@presentation/screens/Terminal';
+import { GateScreen } from '@presentation/screens/Gate';
+import { useAppStore } from '@presentation/stores/app-store';
 
 jest.mock('react-native-safe-area-context', () => ({
   useSafeAreaInsets: () => ({ top: 0, bottom: 0, left: 0, right: 0 }),
@@ -256,7 +256,7 @@ describe('screens – full branch coverage', () => {
       expect(mockInspectMemberCardUseCase.execute).toHaveBeenCalled(),
     );
 
-    expect(screen.getByText(/CHECK_IN/)).toBeTruthy();
+    expect(screen.getByText(/CHECK IN/)).toBeTruthy();
   });
 
   it('Station handleRegister in register mode triggers NFC flow', async () => {

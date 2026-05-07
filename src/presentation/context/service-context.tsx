@@ -1,11 +1,11 @@
 import React, { createContext, useContext } from 'react';
-import type { CheckNfcAvailabilityUseCase } from '../../application/use-cases/check-nfc-availability-use-case';
-import type { RegisterMemberCardUseCase } from '../../application/use-cases/register-member-card.use-case';
-import type { TopUpMemberCardUseCase } from '../../application/use-cases/top-up-member-card.use-case';
-import type { GetStationLedgerSummaryUseCase } from '../../application/use-cases/get-station-ledger-summary.use-case';
-import type { CheckInActivityUseCase } from '../../application/use-cases/check-in-activity.use-case';
-import type { CheckOutActivityUseCase } from '../../application/use-cases/check-out-activity.use-case';
-import type { InspectMemberCardUseCase } from '../../application/use-cases/inspect-member-card.use-case';
+import type { CheckNfcAvailabilityUseCase } from '@application/use-cases/check-nfc-availability-use-case';
+import type { RegisterMemberCardUseCase } from '@application/use-cases/register-member-card.use-case';
+import type { TopUpMemberCardUseCase } from '@application/use-cases/top-up-member-card.use-case';
+import type { GetStationLedgerSummaryUseCase } from '@application/use-cases/get-station-ledger-summary.use-case';
+import type { CheckInActivityUseCase } from '@application/use-cases/check-in-activity.use-case';
+import type { CheckOutActivityUseCase } from '@application/use-cases/check-out-activity.use-case';
+import type { InspectMemberCardUseCase } from '@application/use-cases/inspect-member-card.use-case';
 
 export type StationServices = {
   checkNfcAvailabilityUseCase: CheckNfcAvailabilityUseCase;

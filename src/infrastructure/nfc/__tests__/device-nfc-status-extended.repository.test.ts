@@ -1,5 +1,5 @@
 import NfcManager from 'react-native-nfc-manager';
-import { DeviceNfcStatusRepository } from '../device-nfc-status.repository';
+import { DeviceNfcStatusRepository } from '@infrastructure/nfc/device-nfc-status.repository';
 
 jest.mock('react-native-nfc-manager', () => ({
   start: jest.fn().mockResolvedValue(undefined),

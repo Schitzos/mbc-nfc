@@ -1,6 +1,6 @@
 import React from 'react';
 import { Pressable, ScrollView, Text, View } from 'react-native';
-import { useAppStore } from '../../stores/app-store';
+import { useAppStore } from '@presentation/stores/app-store';
 import { styles } from './styles';
 
 const formatTime = (iso: string): string => {

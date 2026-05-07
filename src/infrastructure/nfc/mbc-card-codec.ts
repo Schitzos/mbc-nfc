@@ -2,7 +2,7 @@ import type {
   MbcCard,
   MbcActivity,
   VisitStatus,
-} from '../../domain/entities/mbc-card';
+} from '@domain/entities/mbc-card';
 
 const SUPPORTED_VERSION = 1;
 const MAX_TRANSACTION_LOGS = 5;

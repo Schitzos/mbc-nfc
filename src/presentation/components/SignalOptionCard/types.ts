@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react';
 import type { PressableProps, StyleProp, ViewStyle } from 'react-native';
-import { componentTokens } from '../../theme/components';
+import { componentTokens } from '@presentation/theme/components';
 
 export type SignalOptionCardState =
   keyof typeof componentTokens.optionCard.states;

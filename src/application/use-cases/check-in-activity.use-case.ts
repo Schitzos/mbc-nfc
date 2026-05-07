@@ -1,18 +1,18 @@
 import type {
   BenefitActivityType,
   MbcCard,
-} from '../../domain/entities/mbc-card';
-import type { MbcCardRepository } from '../../domain/repositories/mbc-card-repository';
-import { applyCheckInState } from '../../domain/services/activity-state-policy';
+} from '@domain/entities/mbc-card';
+import type { MbcCardRepository } from '@domain/repositories/mbc-card-repository';
+import { applyCheckInState } from '@domain/services/activity-state-policy';
 import {
   appendTransactionLog,
   createTransactionLog,
-} from '../../domain/services/transaction-log-policy';
-import { CardRepositoryError } from '../../domain/errors/card-repository-error';
-import { DomainError } from '../../domain/errors/domain-error';
-import { createRandomId } from '../../shared/utils/create-random-id';
-import type { RoleActionResultDto } from '../dto/role-action-result-dto';
-import { toCardSummaryDto } from '../dto/card-summary-mapper';
+} from '@domain/services/transaction-log-policy';
+import { CardRepositoryError } from '@domain/errors/card-repository-error';
+import { DomainError } from '@domain/errors/domain-error';
+import { createRandomId } from '@shared/utils/create-random-id';
+import type { RoleActionResultDto } from '@application/dto/role-action-result-dto';
+import { toCardSummaryDto } from '@application/dto/card-summary-mapper';
 
 export type CheckInActivityRequest = {
   activityId: string;

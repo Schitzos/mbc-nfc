@@ -1,8 +1,8 @@
 import { Dimensions, StyleSheet } from 'react-native';
-import { colors, signalColorTokens } from '../../theme/colors';
-import { componentTokens } from '../../theme/components';
-import { shadows } from '../../theme/shadows';
-import { typography } from '../../theme/typography';
+import { colors, signalColorTokens } from '@presentation/theme/colors';
+import { componentTokens } from '@presentation/theme/components';
+import { shadows } from '@presentation/theme/shadows';
+import { typography } from '@presentation/theme/typography';
 
 const SCREEN_HEIGHT = Dimensions.get('window').height;
 

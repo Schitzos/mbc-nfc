@@ -5,11 +5,11 @@ import {
   screen,
   waitFor,
 } from '@testing-library/react-native';
-import { StationScreen } from '../Station';
-import { GateScreen } from '../Gate';
-import { TerminalScreen } from '../Terminal';
-import { ScoutScreen } from '../Scout';
-import { useAppStore } from '../../stores/app-store';
+import { StationScreen } from '@presentation/screens/Station';
+import { GateScreen } from '@presentation/screens/Gate';
+import { TerminalScreen } from '@presentation/screens/Terminal';
+import { ScoutScreen } from '@presentation/screens/Scout';
+import { useAppStore } from '@presentation/stores/app-store';
 
 jest.mock('react-native-safe-area-context', () => ({
   useSafeAreaInsets: () => ({ top: 0, bottom: 0, left: 0, right: 0 }),
@@ -269,5 +269,220 @@ describe('Station — resultTime null branch', () => {
     await waitFor(() => expect(screen.getByText('Latest result')).toBeTruthy());
     // The resultTime branch is covered — formatResultDate is called
     expect(screen.getByText('Success')).toBeTruthy();
+  });
+});
+
+describe('Station — TextInput custom amount', () => {
+  it('covers onChangeText for custom top-up amount', async () => {
+    renderWithServices(<StationScreen navigation={navigation} />);
+    await waitFor(() => expect(mockCheckNfc.execute).toHaveBeenCalled());
+    fireEvent.press(screen.getByText('Switch to Top Up'));
+    const input = screen.getByDisplayValue('50.000');
+    fireEvent.changeText(input, '75000');
+    expect(screen.getByDisplayValue('75.000')).toBeTruthy();
+  });
+
+  it('covers onChangeText with empty string defaults to 0', async () => {
+    renderWithServices(<StationScreen navigation={navigation} />);
+    await waitFor(() => expect(mockCheckNfc.execute).toHaveBeenCalled());
+    fireEvent.press(screen.getByText('Switch to Top Up'));
+    const input = screen.getByDisplayValue('50.000');
+    fireEvent.changeText(input, '');
+    expect(screen.getByDisplayValue('0')).toBeTruthy();
+  });
+});
+
+describe('Terminal — handleCheckout void wrapper', () => {
+  it('covers the void handleCheckout onPress', async () => {
+    renderWithServices(<TerminalScreen navigation={navigation} />);
+    await waitFor(() => expect(mockCheckNfc.execute).toHaveBeenCalled());
+    fireEvent.press(screen.getByText('Tap Card to Check Out'));
+    await waitFor(() => expect(mockCheckOut.execute).toHaveBeenCalled());
+  });
+});
+
+describe('Scout — activeSession branch', () => {
+  it('covers activeSession checkedInAt rendering', async () => {
+    mockInspect.execute.mockResolvedValueOnce({
+      success: true,
+      role: 'SCOUT',
+      message: 'Read.',
+      card: {
+        balance: 48000,
+        visitStatus: 'CHECKED_IN',
+        activeSession: { checkedInAt: '2026-05-01T08:00:00.000Z' },
+        transactionLogs: [],
+      },
+    });
+    renderWithServices(<ScoutScreen navigation={navigation} />);
+    await waitFor(() => expect(mockCheckNfc.execute).toHaveBeenCalled());
+    fireEvent.press(screen.getByText('Tap Card to Inspect'));
+    await waitFor(() => expect(screen.getByText(/Checked in/)).toBeTruthy());
+    expect(screen.getByText('Since')).toBeTruthy();
+  });
+});
+
+describe('Station — Switch to Register from top-up mode', () => {
+  it('covers setRegisterMode(true) onPress in top-up mode', async () => {
+    renderWithServices(<StationScreen navigation={navigation} />);
+    await waitFor(() => expect(mockCheckNfc.execute).toHaveBeenCalled());
+    // Switch to top-up mode first
+    fireEvent.press(screen.getByText('Switch to Top Up'));
+    // Now switch back to register
+    fireEvent.press(screen.getByText('Switch to Register'));
+    expect(screen.getByText('Tap NFC Card to Register')).toBeTruthy();
+  });
+});
+
+describe('GateResultState — invalid date branch', () => {
+  it('covers formatCheckinDate with invalid ISO string', async () => {
+    const { GateScreen: GateScreenLocal } = require('../Gate');
+    mockCheckIn.execute.mockResolvedValueOnce({
+      success: true,
+      role: 'GATE',
+      message: 'In.',
+      card: {
+        balance: 50000,
+        visitStatus: 'CHECKED_IN',
+        activeSession: { checkedInAt: 'invalid-date' },
+      },
+    });
+    renderWithServices(<GateScreenLocal navigation={navigation} />);
+    await waitFor(() => expect(mockCheckNfc.execute).toHaveBeenCalled());
+    fireEvent.press(screen.getByText('Tap Card to Check In'));
+    await waitFor(() => expect(mockCheckIn.execute).toHaveBeenCalled());
+    expect(screen.getByText('invalid-date')).toBeTruthy();
+  });
+});
+
+describe('AppHeaderCard — no subTitle branch', () => {
+  it('renders without subTitle prop', () => {
+    const { AppHeaderCard } = require('../../components/AppHeaderCard');
+    render(<AppHeaderCard title="Test" />);
+    expect(screen.getByText('Test')).toBeTruthy();
+  });
+});
+
+describe('Terminal — genericFailure branch', () => {
+  it('renders generic failure message when checkout fails without insufficient', async () => {
+    mockCheckOut.execute.mockResolvedValueOnce({
+      success: false,
+      role: 'TERMINAL',
+      message: 'Card tampered',
+    });
+    renderWithServices(<TerminalScreen navigation={navigation} />);
+    await waitFor(() => expect(mockCheckNfc.execute).toHaveBeenCalled());
+    fireEvent.press(screen.getByText('Tap Card to Check Out'));
+    await waitFor(() => expect(mockCheckOut.execute).toHaveBeenCalled());
+    fireEvent.press(screen.getByText('Dismiss'));
+    await waitFor(() =>
+      expect(screen.getByText('Card cannot be processed')).toBeTruthy(),
+    );
+    expect(screen.getByText('Card tampered')).toBeTruthy();
+  });
+});
+
+describe('Terminal — insufficient navigate and retry', () => {
+  beforeEach(() => jest.clearAllMocks());
+
+  it('covers navigate to station and retry checkout in insufficient state', async () => {
+    mockCheckOut.execute.mockResolvedValueOnce({
+      success: false,
+      role: 'TERMINAL',
+      message: 'Insufficient balance',
+      chargedAmount: 2000,
+      card: { balance: 500 },
+    });
+    renderWithServices(<TerminalScreen navigation={navigation} />);
+    await waitFor(() => expect(mockCheckNfc.execute).toHaveBeenCalled());
+    fireEvent.press(screen.getByText('Tap Card to Check Out'));
+    await waitFor(() => expect(mockCheckOut.execute).toHaveBeenCalled());
+    fireEvent.press(screen.getByText('Dismiss'));
+    await waitFor(() =>
+      expect(screen.getByText('Go to Station Top Up')).toBeTruthy(),
+    );
+    fireEvent.press(screen.getByText('Go to Station Top Up'));
+    expect(navigation.navigate).toHaveBeenCalledWith('station');
+    mockCheckOut.execute.mockResolvedValueOnce({
+      success: true,
+      role: 'TERMINAL',
+      message: 'Out.',
+      card: { balance: 48000 },
+    });
+    fireEvent.press(screen.getByText('Retry Checkout'));
+    await waitFor(() =>
+      expect(mockCheckOut.execute).toHaveBeenCalledTimes(2),
+    );
+  });
+});
+
+describe('Station — memberName and CHECKED_IN branches', () => {
+  it('renders memberName when present in card result', async () => {
+    mockRegister.execute.mockResolvedValueOnce({
+      success: true,
+      role: 'STATION',
+      message: 'Registered.',
+      card: {
+        balance: 10000,
+        maskedMemberReference: 'MBR-1234',
+        memberName: 'John Doe',
+        visitStatus: 'CHECKED_IN',
+      },
+    });
+    renderWithServices(<StationScreen navigation={navigation} />);
+    await waitFor(() => expect(mockCheckNfc.execute).toHaveBeenCalled());
+    fireEvent.press(screen.getByText('Tap NFC Card to Register'));
+    await waitFor(() => expect(mockRegister.execute).toHaveBeenCalled());
+    fireEvent.press(screen.getByText('Done'));
+    await waitFor(() =>
+      expect(screen.getByText('John Doe')).toBeTruthy(),
+    );
+    expect(screen.getByText(/Checked in/)).toBeTruthy();
+  });
+});
+
+describe('Terminal — success without card (null card branch)', () => {
+  beforeEach(() => jest.clearAllMocks());
+
+  it('renders 0 when card is undefined in success result', async () => {
+    mockCheckOut.execute.mockResolvedValueOnce({
+      success: true,
+      role: 'TERMINAL',
+      message: 'Out.',
+      chargedAmount: 2000,
+      durationMs: 3600000,
+    });
+    renderWithServices(<TerminalScreen navigation={navigation} />);
+    await waitFor(() => expect(mockCheckNfc.execute).toHaveBeenCalled());
+    fireEvent.press(screen.getByText('Tap Card to Check Out'));
+    await waitFor(() => expect(mockCheckOut.execute).toHaveBeenCalled());
+    fireEvent.press(screen.getByText('Done'));
+    await waitFor(() =>
+      expect(screen.getByText('Checkout Summary')).toBeTruthy(),
+    );
+  });
+});
+
+describe('Scout — MemberCardInfo invalid date branch', () => {
+  beforeEach(() => jest.clearAllMocks());
+
+  it('renders raw ISO string when checkedInAt is invalid', async () => {
+    mockInspect.execute.mockResolvedValueOnce({
+      success: true,
+      role: 'SCOUT',
+      message: 'Read.',
+      card: {
+        balance: 48000,
+        visitStatus: 'CHECKED_IN',
+        activeSession: { checkedInAt: 'not-a-date' },
+        transactionLogs: [],
+      },
+    });
+    renderWithServices(<ScoutScreen navigation={navigation} />);
+    await waitFor(() => expect(mockCheckNfc.execute).toHaveBeenCalled());
+    fireEvent.press(screen.getByText('Tap Card to Inspect'));
+    await waitFor(() =>
+      expect(screen.getByText('not-a-date')).toBeTruthy(),
+    );
   });
 });

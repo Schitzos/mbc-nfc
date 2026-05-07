@@ -1,32 +1,13 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import type { RoleActionResultDto } from '../../../application/dto/role-action-result-dto';
-import type { NfcActionState } from '../../components/NfcActionSheet';
-import { useAppStore } from '../../stores/app-store';
-import { UNKNOWN_ERROR_MESSAGE } from '../../../shared/constants';
-import type { TerminalServices } from '../../context/service-context';
-
-const MONTHS = [
-  'Jan',
-  'Feb',
-  'Mar',
-  'Apr',
-  'May',
-  'Jun',
-  'Jul',
-  'Aug',
-  'Sep',
-  'Oct',
-  'Nov',
-  'Dec',
-];
+import dayjs from 'dayjs';
+import type { RoleActionResultDto } from '@application/dto/role-action-result-dto';
+import type { NfcActionState } from '@presentation/components/NfcActionSheet';
+import { useAppStore } from '@presentation/stores/app-store';
+import { UNKNOWN_ERROR_MESSAGE } from '@shared/constants';
+import type { TerminalServices } from '@presentation/context/service-context';
 
 function formatTime(d: Date): string {
-  const dd = String(d.getDate()).padStart(2, '0');
-  const mmm = MONTHS[d.getMonth()];
-  const yyyy = d.getFullYear();
-  const hh = String(d.getHours()).padStart(2, '0');
-  const mm = String(d.getMinutes()).padStart(2, '0');
-  return `${dd}-${mmm}-${yyyy} ${hh}:${mm}`;
+  return dayjs(d).format('DD-MMM-YYYY HH:mm');
 }
 
 const noop = () => {};

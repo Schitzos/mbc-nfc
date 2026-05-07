@@ -1,4 +1,4 @@
-import { useAppStore } from '../app-store';
+import { useAppStore } from '@presentation/stores/app-store';
 
 describe('useAppStore', () => {
   beforeEach(() => {

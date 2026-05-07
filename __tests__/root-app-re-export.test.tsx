@@ -3,11 +3,11 @@
  * This test exercises the actual import path to cover the re-export file.
  */
 
-jest.mock('../src/app/navigation', () => ({
+jest.mock('@app/navigation', () => ({
   AppNavigator: () => null,
 }));
 
-jest.mock('../src/app/providers', () => ({
+jest.mock('@app/providers', () => ({
   AppProviders: ({ children }: { children: React.ReactNode }) => children,
 }));
 

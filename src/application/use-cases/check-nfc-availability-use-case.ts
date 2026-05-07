@@ -1,8 +1,8 @@
-import type { CheckNfcAvailabilityResultDto } from '../dto/check-nfc-availability-result-dto';
+import type { CheckNfcAvailabilityResultDto } from '@application/dto/check-nfc-availability-result-dto';
 import type {
   NfcAvailabilityRepository,
   NfcAvailabilityStatus,
-} from '../../domain/repositories/nfc-availability-repository';
+} from '@domain/repositories/nfc-availability-repository';
 
 type GuidanceContent = Omit<
   CheckNfcAvailabilityResultDto,

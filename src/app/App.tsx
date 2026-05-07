@@ -2,7 +2,7 @@ import React from 'react';
 import { StatusBar } from 'react-native';
 import { AppNavigator } from './navigation';
 import { AppProviders } from './providers';
-import { ErrorBoundary } from '../presentation/components/ErrorBoundary';
+import { ErrorBoundary } from '@presentation/components/ErrorBoundary';
 
 function App(): React.JSX.Element {
   return (
