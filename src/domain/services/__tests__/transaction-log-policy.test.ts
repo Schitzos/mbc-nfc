@@ -1,8 +1,8 @@
-import type { MbcCard } from '../../entities/mbc-card';
+import type { MbcCard } from '@domain/entities/mbc-card';
 import {
   appendTransactionLog,
   createTransactionLog,
-} from '../transaction-log-policy';
+} from '@domain/services/transaction-log-policy';
 
 const baseCard: MbcCard = {
   version: 1,

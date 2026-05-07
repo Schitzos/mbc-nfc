@@ -1,7 +1,7 @@
 import React from 'react';
 import { Text } from 'react-native';
 import { fireEvent, render, screen } from '@testing-library/react-native';
-import { SignalTextField } from '../SignalTextField';
+import { SignalTextField } from '@presentation/components/SignalTextField';
 
 describe('SignalTextField', () => {
   it('renders with label and required indicator', () => {

@@ -1,6 +1,6 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react-native';
-import { AppNavigator } from '../navigation';
+import { AppNavigator } from '@app/navigation';
 
 jest.mock('../../presentation/screens/Gate', () => ({
   GateScreen: () => null,

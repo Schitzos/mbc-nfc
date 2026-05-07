@@ -1,4 +1,4 @@
-import { createRandomId } from '../create-random-id';
+import { createRandomId } from '@shared/utils/create-random-id';
 
 describe('createRandomId', () => {
   it('generates an ID with the given prefix', () => {

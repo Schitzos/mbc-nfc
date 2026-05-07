@@ -7,7 +7,7 @@ import {
   useGateServices,
   useTerminalServices,
   useScoutServices,
-} from '../service-context';
+} from '@presentation/context/service-context';
 
 const mockServices = {
   station: { checkNfcAvailabilityUseCase: { execute: jest.fn() } },

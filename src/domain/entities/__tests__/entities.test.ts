@@ -10,8 +10,8 @@ import {
   type MemberProfile,
   type TransactionLog,
   type LedgerEntry,
-} from '../mbc-card';
-import type { StationLedgerSummary } from '../station-ledger-summary';
+} from '@domain/entities/mbc-card';
+import type { StationLedgerSummary } from '@domain/entities/station-ledger-summary';
 
 describe('domain/entities/mbc-card', () => {
   it('exports PARKING_TARIFF_PER_STARTED_HOUR as 2000', () => {

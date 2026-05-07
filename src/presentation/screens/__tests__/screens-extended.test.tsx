@@ -5,11 +5,11 @@ import {
   screen,
   waitFor,
 } from '@testing-library/react-native';
-import { GateScreen } from '../Gate';
-import { TerminalScreen } from '../Terminal';
-import { StationScreen } from '../Station';
-import { ScoutScreen } from '../Scout';
-import { useAppStore } from '../../stores/app-store';
+import { GateScreen } from '@presentation/screens/Gate';
+import { TerminalScreen } from '@presentation/screens/Terminal';
+import { StationScreen } from '@presentation/screens/Station';
+import { ScoutScreen } from '@presentation/screens/Scout';
+import { useAppStore } from '@presentation/stores/app-store';
 
 jest.mock('react-native-safe-area-context', () => ({
   useSafeAreaInsets: () => ({ top: 0, bottom: 0, left: 0, right: 0 }),
@@ -416,7 +416,7 @@ describe('role screens – extended branch coverage', () => {
     );
 
     fireEvent.press(screen.getByText('Switch to Top Up'));
-    fireEvent.press(screen.getByText('Rp 100.000'));
+    fireEvent.press(screen.getByText('100.000'));
     fireEvent.press(screen.getByText('Tap NFC Card to Top Up'));
     await waitFor(() =>
       expect(mockTopUpMemberCardUseCase.execute).toHaveBeenCalledWith({

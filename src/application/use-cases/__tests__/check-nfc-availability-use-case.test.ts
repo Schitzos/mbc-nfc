@@ -1,8 +1,8 @@
-import { CheckNfcAvailabilityUseCase } from '../check-nfc-availability-use-case';
+import { CheckNfcAvailabilityUseCase } from '@application/use-cases/check-nfc-availability-use-case';
 import type {
   NfcAvailabilityRepository,
   NfcAvailabilityStatus,
-} from '../../../domain/repositories/nfc-availability-repository';
+} from '@domain/repositories/nfc-availability-repository';
 
 function createRepository(
   status: NfcAvailabilityStatus,

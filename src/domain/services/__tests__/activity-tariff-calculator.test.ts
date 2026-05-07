@@ -1,6 +1,6 @@
-import { calculateActivityTariff } from '../activity-tariff-calculator';
-import { DomainError } from '../../errors/domain-error';
-import { PARKING_TARIFF_PER_STARTED_HOUR } from '../../entities/mbc-card';
+import { calculateActivityTariff } from '@domain/services/activity-tariff-calculator';
+import { DomainError } from '@domain/errors/domain-error';
+import { PARKING_TARIFF_PER_STARTED_HOUR } from '@domain/entities/mbc-card';
 
 describe('calculateActivityTariff', () => {
   it('uses the fixed parking tariff constant of Rp 2.000', () => {

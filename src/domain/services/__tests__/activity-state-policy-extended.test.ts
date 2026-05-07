@@ -1,9 +1,9 @@
 import {
   applyCheckInState,
   applyCheckOutState,
-} from '../activity-state-policy';
-import type { MbcCard } from '../../entities/mbc-card';
-import { DomainError } from '../../errors/domain-error';
+} from '@domain/services/activity-state-policy';
+import type { MbcCard } from '@domain/entities/mbc-card';
+import { DomainError } from '@domain/errors/domain-error';
 
 const baseCard: MbcCard = {
   version: 1,

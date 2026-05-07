@@ -1,7 +1,7 @@
-import { TopUpMemberCardUseCase } from '../top-up-member-card.use-case';
-import type { MbcCardRepository } from '../../../domain/repositories/mbc-card-repository';
-import type { LocalLedgerRepository } from '../../../domain/repositories/local-ledger-repository';
-import { CardRepositoryError } from '../../../domain/errors/card-repository-error';
+import { TopUpMemberCardUseCase } from '@application/use-cases/top-up-member-card.use-case';
+import type { MbcCardRepository } from '@domain/repositories/mbc-card-repository';
+import type { LocalLedgerRepository } from '@domain/repositories/local-ledger-repository';
+import { CardRepositoryError } from '@domain/errors/card-repository-error';
 
 function createCardRepository(
   overrides?: Partial<MbcCardRepository>,

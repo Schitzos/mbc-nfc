@@ -1,4 +1,4 @@
-import { mapLedgerRowToEntry } from '../sqlite-ledger-mapper';
+import { mapLedgerRowToEntry } from '@infrastructure/local-ledger/sqlite-ledger-mapper';
 
 describe('sqlite ledger mapper – extended branch coverage', () => {
   it('maps null optional fields to undefined', () => {
