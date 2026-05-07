@@ -7,6 +7,8 @@ import { useAppStore } from '../../stores/app-store';
 import { UNKNOWN_ERROR_MESSAGE } from '../../../shared/constants';
 import type { StationServices } from '../../context/service-context';
 
+const noop = () => {};
+
 const emptySummary: StationLedgerSummaryDto = {
   topUpTotal: 0,
   checkoutTotal: 0,
@@ -55,7 +57,7 @@ export function useStationActions(services: StationServices) {
       appendNfcLog(`[NFC] Availability result: ${status.status}`);
       await refreshSummary();
     };
-    load().catch(() => undefined);
+    load().catch(noop);
   }, [appendNfcLog, refreshSummary, services]);
 
   const handleWipeAndRegister = useCallback(async () => {
@@ -127,7 +129,7 @@ export function useStationActions(services: StationServices) {
             'This card has existing data. Wipe and register as a new member?',
           confirmLabel: 'Wipe & Re-register',
           onConfirm: () => {
-            handleWipeAndRegister().catch(() => undefined);
+            handleWipeAndRegister().catch(noop);
           },
         });
         appendNfcLog('[NFC] Card already registered — awaiting user decision');

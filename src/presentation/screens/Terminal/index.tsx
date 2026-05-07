@@ -84,7 +84,7 @@ export function TerminalScreen({ navigation }: Props): React.JSX.Element {
             label={actions.busy ? 'Processing...' : 'Tap Card to Check Out'}
             disabled={actions.busy}
             onPress={() => {
-              actions.handleCheckout().catch(() => undefined);
+              void actions.handleCheckout();
             }}
           />
 
@@ -101,7 +101,7 @@ export function TerminalScreen({ navigation }: Props): React.JSX.Element {
                 <Text className="mt-2 text-xs text-muted">Duration</Text>
                 <Text className="text-xl font-bold text-foreground">
                   {(() => {
-                    const ms = actions.latestResult.durationMs ?? 0;
+                    const ms = actions.latestResult.durationMs!;
                     const totalSec = Math.floor(ms / 1000);
                     const h = Math.floor(totalSec / 3600);
                     const m = Math.floor((totalSec % 3600) / 60);
@@ -109,19 +109,25 @@ export function TerminalScreen({ navigation }: Props): React.JSX.Element {
                     return `${h}h ${m}m ${s}s`;
                   })()}
                 </Text>
+                <Text className="mt-2 text-xs text-muted">Charged hours</Text>
+                <Text className="text-xl font-bold text-foreground">
+                  {actions.latestResult.chargedHours!} hr
+                </Text>
+                <Text className="mt-2 text-xs text-muted">Tariff per hour</Text>
+                <Text className="text-xl font-bold text-foreground">
+                  Rp 2.000/hr
+                </Text>
                 <Text className="mt-2 text-xs text-muted">Fee</Text>
                 <Text className="text-xl font-bold text-foreground">
                   Rp{' '}
-                  {actions.latestResult.chargedAmount?.toLocaleString(
+                  {actions.latestResult.chargedAmount!.toLocaleString(
                     LOCALE_ID,
-                  ) ?? '0'}
+                  )}
                 </Text>
                 <Text className="mt-2 text-xs text-muted">Current balance</Text>
                 <Text className="text-xl font-bold text-foreground">
                   Rp{' '}
-                  {actions.latestResult.card?.balance.toLocaleString(
-                    LOCALE_ID,
-                  ) ?? '0'}
+                  {actions.latestResult.card!.balance.toLocaleString(LOCALE_ID)}
                 </Text>
               </View>
             </View>
