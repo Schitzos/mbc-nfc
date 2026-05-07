@@ -9,8 +9,8 @@ Frontend mobile application for the KDX Membership Benefit Card (MBC) assessment
 
 ## App Screenshots
 
-| Role Switcher | Station | Gate | Terminal | Scout |
-|:---:|:---:|:---:|:---:|:---:|
+|                      Role Switcher                      |                     Station                      |                    Gate                    |                      Terminal                      |                    Scout                     |
+| :-----------------------------------------------------: | :----------------------------------------------: | :----------------------------------------: | :------------------------------------------------: | :------------------------------------------: |
 | ![Role Switcher](docs/screenshots/00-role-switcher.png) | ![Station](docs/screenshots/10-station-open.png) | ![Gate](docs/screenshots/30-gate-open.png) | ![Terminal](docs/screenshots/60-terminal-open.png) | ![Scout](docs/screenshots/50-scout-open.png) |
 
 ## Current Status

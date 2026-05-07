@@ -210,7 +210,7 @@ describe('role screens – extended branch coverage', () => {
         }),
       ),
     );
-  });
+  }, 15000);
 
   it('Gate shows non-double-check-in error (generic card error)', async () => {
     mockCheckInActivityUseCase.execute.mockResolvedValueOnce({

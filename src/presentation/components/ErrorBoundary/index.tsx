@@ -65,9 +65,7 @@ export class ErrorBoundary extends React.Component<
           <Text style={styles.message}>
             The app encountered an unexpected error. Please try again.
           </Text>
-          <TouchableOpacity
-            onPress={this.handleReset}
-            style={styles.button}>
+          <TouchableOpacity onPress={this.handleReset} style={styles.button}>
             <Text style={styles.buttonText}>Try Again</Text>
           </TouchableOpacity>
         </View>
