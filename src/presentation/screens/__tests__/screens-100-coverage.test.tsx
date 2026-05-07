@@ -27,63 +27,53 @@ const mockRegister = {
     .mockResolvedValue({ success: true, role: 'STATION', message: 'Reset.' }),
 };
 const mockTopUp = {
-  execute: jest
-    .fn()
-    .mockResolvedValue({
-      success: true,
-      role: 'STATION',
-      message: 'Top-up.',
-      card: { balance: 50000 },
-    }),
+  execute: jest.fn().mockResolvedValue({
+    success: true,
+    role: 'STATION',
+    message: 'Top-up.',
+    card: { balance: 50000 },
+  }),
 };
 const mockLedger = {
-  execute: jest
-    .fn()
-    .mockResolvedValue({
-      topUpTotal: 0,
-      checkoutTotal: 0,
-      registerCount: 0,
-      topUpCount: 0,
-      checkoutCount: 0,
-      latestEntries: [],
-    }),
+  execute: jest.fn().mockResolvedValue({
+    topUpTotal: 0,
+    checkoutTotal: 0,
+    registerCount: 0,
+    topUpCount: 0,
+    checkoutCount: 0,
+    latestEntries: [],
+  }),
 };
 const mockCheckIn = {
-  execute: jest
-    .fn()
-    .mockResolvedValue({
-      success: true,
-      role: 'GATE',
-      message: 'In.',
-      card: { balance: 50000 },
-    }),
+  execute: jest.fn().mockResolvedValue({
+    success: true,
+    role: 'GATE',
+    message: 'In.',
+    card: { balance: 50000 },
+  }),
 };
 const mockCheckOut = {
-  execute: jest
-    .fn()
-    .mockResolvedValue({
-      success: true,
-      role: 'TERMINAL',
-      message: 'Out.',
-      chargedHours: 1,
-      chargedAmount: 2000,
-      durationMs: 3600000,
-      card: { balance: 48000 },
-    }),
+  execute: jest.fn().mockResolvedValue({
+    success: true,
+    role: 'TERMINAL',
+    message: 'Out.',
+    chargedHours: 1,
+    chargedAmount: 2000,
+    durationMs: 3600000,
+    card: { balance: 48000 },
+  }),
 };
 const mockInspect = {
-  execute: jest
-    .fn()
-    .mockResolvedValue({
-      success: true,
-      role: 'SCOUT',
-      message: 'Read.',
-      card: {
-        balance: 48000,
-        visitStatus: 'NOT_CHECKED_IN',
-        transactionLogs: [],
-      },
-    }),
+  execute: jest.fn().mockResolvedValue({
+    success: true,
+    role: 'SCOUT',
+    message: 'Read.',
+    card: {
+      balance: 48000,
+      visitStatus: 'NOT_CHECKED_IN',
+      transactionLogs: [],
+    },
+  }),
 };
 
 jest.mock('../../../app/container', () => ({
@@ -147,8 +137,6 @@ describe('screen index.tsx — 100% function coverage', () => {
 
   describe('Station', () => {
     it('covers resultTime empty branch (no resultTime)', async () => {
-      // Register returns success but resultTime is set by the hook
-      // We need to trigger a result that shows the result section
       mockRegister.execute.mockResolvedValueOnce({
         success: true,
         role: 'STATION',
@@ -159,8 +147,12 @@ describe('screen index.tsx — 100% function coverage', () => {
       await waitFor(() => expect(mockCheckNfc.execute).toHaveBeenCalled());
       fireEvent.press(screen.getByText('Tap NFC Card to Register'));
       await waitFor(() => expect(mockRegister.execute).toHaveBeenCalled());
-      // Result section should render with formatted time
-      expect(screen.getByText('Latest result')).toBeTruthy();
+      // Dismiss the success sheet to reveal the result section
+      await waitFor(() => expect(screen.getByText('Done')).toBeTruthy());
+      fireEvent.press(screen.getByText('Done'));
+      await waitFor(() =>
+        expect(screen.getByText('Latest result')).toBeTruthy(),
+      );
     });
 
     it('covers .catch(() => undefined) on handleRegister onPress', async () => {
