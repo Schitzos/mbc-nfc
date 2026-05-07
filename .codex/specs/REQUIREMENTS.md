@@ -112,7 +112,7 @@ The PDF uses member parking as the concrete required assessment scenario. Parkin
 | US-003 | As a gate operator, I can check in a member to an activity by tapping the card at The Gate.                    | Must     |
 | US-004 | As a gate operator, I can check in a member using real device time (simulation mode removed).                  | Must     |
 | US-005 | As a terminal operator, I can check out a member from an activity by tapping the card at The Terminal.         | Must     |
-| US-006 | As a terminal operator, I can see activity duration and fee before/after deduction.                            | Must     |
+| US-006 | As a terminal operator, I can see activity duration and fee after successful checkout tap.                            | Must     |
 | US-007 | As a terminal operator, I can block checkout when balance is insufficient and show clear top-up guidance.      | Must     |
 | US-008 | As a member, I can inspect my card through The Scout to see balance, status, and history.                      | Must     |
 | US-009 | As the system, I prevent double check-in and double check-out.                                                 | Must     |
@@ -189,7 +189,7 @@ Acceptance criteria:
 - App rejects checkout with `INVALID_TIME` / `INVALID_DURATION` when exit time is not after entry time.
 - For the parking MVP, the default tariff is Rp 2.000 per started hour.
 - The MVP parking tariff is fixed at Rp 2.000 per started hour and must be implemented through one isolated tariff constant/module, not repeated magic numbers across checkout code.
-- Terminal must display the fixed MVP tariff, charged hours, and calculated fee before deduction.
+- Terminal must display the fixed MVP tariff, charged hours, and calculated fee immediately after successful checkout tap (single-session NFC model: read+calculate+deduct+write is atomic).
 - Example: 1 hour 5 minutes 1 second is charged as 2 hours.
 - App deducts fee from card balance when balance is sufficient.
 - App clears visit status after successful checkout.
@@ -287,7 +287,7 @@ Acceptance criteria:
 - Parking is the only MVP tariff scenario.
 - Fee calculation rounds up to the next started hour.
 - The Rp 2.000 rate is defined in one isolated tariff module/constant, not duplicated as hidden magic numbers across UI code.
-- Terminal checkout displays the fixed tariff, charged started hours, and calculated fee before deduction.
+- Terminal checkout displays the fixed tariff, charged started hours, and calculated fee immediately after successful tap.
 
 ### FR-015 Operational Edge Case Handling
 
@@ -394,7 +394,7 @@ Acceptance criteria:
 - Station can register a card.
 - Station can top up a card.
 - Gate can check in a card to an activity using real device time.
-- Terminal can check out a card, calculate activity duration, use the fixed Rp 2.000 per started hour tariff, show the calculated fee before deduction, and deduct balance.
+- Terminal can check out a card, calculate activity duration, use the fixed Rp 2.000 per started hour tariff, show the calculated fee after successful tap, and deduct balance.
 - Terminal clearly blocks checkout if balance is insufficient.
 - Scout can read balance, status, and last five logs.
 - Sequential loop prevents double check-in and double check-out.

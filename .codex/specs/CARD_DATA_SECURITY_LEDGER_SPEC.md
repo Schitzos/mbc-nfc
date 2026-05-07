@@ -39,7 +39,6 @@ Use short keys and compact values before encryption. The app may expose readable
   "c": "C000001",
   "m": "M000001",
   "b": 50000,
-  "s": "A",
   "i": { "a": 1, "t": "2026-05-06T10:00:00+07:00" },
   "x": [
     ["R", 0, "2026-05-06T09:00:00+07:00"],
@@ -58,8 +57,7 @@ Use short keys and compact values before encryption. The app may expose readable
 | `c`           | Card ID/reference               | Yes                        | Short internal ID, not full profile data.                                       |
 | `m`           | Member ID/reference             | Yes                        | Short generated member ID/reference.                                            |
 | `b`           | Balance in rupiah               | Yes                        | Integer, never negative.                                                        |
-| `s`           | Card status                     | Yes                        | `A` active; `B` blocked/reserved.                                               |
-| `i`           | Active visit state              | Yes                        | Use `null` when not checked in, or object when checked in.                      |
+| `i`           | Active visit state              | Yes                        | Use `null` when not checked in, or object when checked in. Visit status is derived from presence of `i`. |
 | `i.a`         | Active visit flag               | Yes when `i` object exists | `1` checked in. If checked out, prefer `i:null`.                                |
 | `i.t`         | Check-in time                   | Yes when checked in        | ISO timestamp is allowed for MVP readability if protected payload fits NTAG215. |
 | `x`           | Latest card transaction records | Yes                        | Max 5, FIFO rolling window, stored oldest-to-newest among retained records.     |
@@ -184,7 +182,7 @@ Write flow:
 4. Canonicalize with stable key order.
 5. Encrypt/authenticate with AES-256-GCM or equivalent authenticated encryption.
 6. Write only the protected `MBC1` envelope to NFC.
-7. Read the card back, decrypt/authenticate, and confirm expected counter/state before showing success.
+7. `writeNdefMessage` throws on failure; no post-write readback is performed.
 
 Failure message:
 
@@ -303,9 +301,8 @@ Rules:
 4. Add REGISTER transaction.
 5. Increment ctr.
 6. Sign/protect payload with Silent Shield.
-7. Write card.
-8. Read back the card and verify expected counter/state/authentication.
-9. Insert SQLite ledger record for the successful registration.
+7. Write card (`writeNdefMessage` throws on failure).
+8. Insert SQLite ledger record for the successful registration.
 ```
 
 ### Station Top-Up
@@ -317,9 +314,8 @@ Rules:
 4. Add TOPUP transaction.
 5. Increment ctr.
 6. Sign/protect payload with Silent Shield.
-7. Write card.
-8. Read back the card and verify expected counter/state/authentication.
-9. Insert SQLite ledger record for the successful top-up.
+7. Write card (`writeNdefMessage` throws on failure).
+8. Insert SQLite ledger record for the successful top-up.
 ```
 
 ### Gate Check-In
@@ -329,12 +325,11 @@ Rules:
 2. Reject invalid/tampered/blocked card.
 3. Reject if already checked in.
 4. Set active parking context and check-in timestamp.
-7. Add CHECKIN transaction.
-8. Increment ctr.
-9. Sign/protect payload with Silent Shield.
-10. Write card.
-9. Read back the card and verify expected counter/state/authentication.
-12. Insert SQLite ledger record for the successful check-in with amount `0`.
+5. Add CHECKIN transaction.
+6. Increment ctr.
+7. Sign/protect payload with Silent Shield.
+8. Write card (`writeNdefMessage` throws on failure).
+9. Insert SQLite ledger record for the successful check-in with amount `0`.
 ```
 
 ### Terminal Check-Out
@@ -345,16 +340,15 @@ Rules:
 3. Reject if not checked in.
 4. Calculate charged started hours from check-in and checkout time.
 5. Calculate fee using the fixed MVP tariff Rp 2.000 per started hour.
-6. Display tariff, charged hours, and calculated fee before deduction.
-8. Reject if balance is insufficient.
-9. Deduct fee.
-10. Clear active check-in state.
-11. Add CHECKOUT transaction.
-12. Increment ctr.
-13. Sign/protect payload with Silent Shield.
-14. Write card.
-15. Read back the card and verify expected counter/state/authentication.
-16. Insert SQLite ledger record for the successful checkout.
+6. Reject if balance is insufficient.
+7. Deduct fee.
+8. Clear active check-in state.
+9. Add CHECKOUT transaction.
+10. Increment ctr.
+11. Sign/protect payload with Silent Shield.
+12. Write card (`writeNdefMessage` throws on failure).
+13. Display tariff, charged hours, and calculated fee immediately after successful checkout tap.
+14. Insert SQLite ledger record for the successful checkout.
 ```
 
 If card write succeeds but ledger write fails, the member operation remains successful because the card is the operational source of truth. The app must show or record a clear local reporting warning so the reporting gap is not hidden.

@@ -38,7 +38,6 @@ flowchart LR
   Admin --> UC3["View Station Ledger Summary"]
 
   GateOp["Gate Operator"] --> UC4["Check In Parking"]
-  GateOp --> UC5["Run Simulation Mode"]
 
   TerminalOp["Terminal Operator"] --> UC6["Check Out Parking"]
   TerminalOp --> UC7["Handle Insufficient Balance"]
@@ -49,7 +48,6 @@ flowchart LR
   UC2 --> SYS
   UC3 --> SYS
   UC4 --> SYS
-  UC5 --> SYS
   UC6 --> SYS
   UC7 --> SYS
   UC8 --> SYS

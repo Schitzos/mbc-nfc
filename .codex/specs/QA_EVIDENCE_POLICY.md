@@ -34,7 +34,7 @@ Screenshots should prove the visible behavior, not only the final screen.
 For role features, capture at least:
 
 - Station: register/top-up success and relevant validation/error state.
-- Gate: successful check-in, simulation indicator if simulation is used.
+- Gate: successful check-in.
 - Scout: read-only card status, balance, active visit, and recent logs.
 - Error flows: representative errors such as already checked-in, insufficient balance, invalid card, or write failure when applicable.
 

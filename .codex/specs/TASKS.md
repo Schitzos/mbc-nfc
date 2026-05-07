@@ -165,7 +165,7 @@ Done: Registration creates valid protected card and rejects overwrite.
 
 Owner: Senior RN FE  
 Refs: `EDGE_CASES.md`, `CARD_DATA_SECURITY_LEDGER_SPEC.md`  
-Do: Validate card/amount, increase balance, add top-up log, preserve active visit, verify write, append ledger.  
+Do: Validate card/amount, increase balance, add top-up log, preserve active visit, write card with capacity/error handling (`writeNdefMessage` throws on failure), append ledger.  
 Done: Top-up works for normal and checked-in cards.
 
 ### T-014 — Gate Check-In Use Case
@@ -180,7 +180,7 @@ Done: Gate check-in works with real NFC repository path and unit tests.
 
 Owner: Senior RN FE  
 Refs: `EDGE_CASES.md`, `CARD_DATA_SECURITY_LEDGER_SPEC.md`  
-Do: Read checked-in card, calculate duration and fee using fixed Rp 2.000 per started hour, reject insufficient balance without mutation, deduct/clear/log/write/verify/append ledger.  
+Do: Read checked-in card, calculate duration and fee using fixed Rp 2.000 per started hour, reject insufficient balance without mutation, deduct/clear/log/write with capacity/error handling (`writeNdefMessage` throws on failure), append ledger.  
 Done: Checkout uses fixed MVP tariff and unit tests cover rounding/insufficient balance.
 
 ### T-016 — Scout Inspect Use Case

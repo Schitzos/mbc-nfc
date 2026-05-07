@@ -36,7 +36,7 @@ NTAG215 is the MVP target tag. Measured payload sizes confirm the card stores id
 - NTAG215 usable memory: 504 bytes.
 - Result: fits with margin.
 
-Compact codec format (`v,c,m,b,s,i,x,n`) ensures minimal payload size by:
+Compact codec format (`v,c,m,b,i,x,n`) ensures minimal payload size by:
 
 - use compact field names;
 - use ISO timestamp strings by default if the encrypted/protected payload still fits NTAG215;

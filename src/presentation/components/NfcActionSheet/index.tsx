@@ -14,8 +14,6 @@ export function NfcActionSheet({
     return null;
   }
 
-  const canClose = true;
-
   let sheetTitle = '✕ Failed';
   if (state.phase === 'scanning') {
     sheetTitle = 'Ready to Scan';
