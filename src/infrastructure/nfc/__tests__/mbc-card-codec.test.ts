@@ -48,7 +48,6 @@ describe('mbc-card-codec', () => {
       expect(parsed.c).toBe('C000001');
       expect(parsed.m).toBe('M000001');
       expect(parsed.b).toBe(50000);
-      expect(parsed.s).toBe('A');
       expect(parsed.i).toEqual({ a: 1, t: '2026-05-06T10:00:00+07:00' });
       expect(parsed.x).toHaveLength(3);
       expect(parsed.x[0]).toEqual(['R', 0, '2026-05-06T09:00:00+07:00']);
@@ -273,20 +272,6 @@ describe('mbc-card-codec', () => {
         n: 0,
       });
       expect(decode(payload)).toEqual({ ok: false, error: 'INVALID_BALANCE' });
-    });
-
-    it('rejects invalid status', () => {
-      const payload = JSON.stringify({
-        v: 1,
-        c: 'C1',
-        m: 'M1',
-        b: 0,
-        s: 'Z',
-        i: null,
-        x: [],
-        n: 0,
-      });
-      expect(decode(payload)).toEqual({ ok: false, error: 'INVALID_STATUS' });
     });
 
     it('rejects invalid counter', () => {

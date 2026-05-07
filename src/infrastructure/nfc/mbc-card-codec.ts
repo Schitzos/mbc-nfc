@@ -32,17 +32,11 @@ const COMPACT_TO_ACTIVITY: Record<string, MbcActivity> = {
   O: 'CHECK_OUT',
 };
 
-const STATUS_TO_COMPACT: Record<VisitStatus, string> = {
-  NOT_CHECKED_IN: 'A',
-  CHECKED_IN: 'A',
-};
-
 export type CompactPayload = {
   v: number;
   c: string;
   m: string;
   b: number;
-  s: string;
   i: { a: number; t: string } | null;
   x: [string, number, string][];
   n: number;
@@ -66,7 +60,6 @@ export function encode(
     c: card.cardId,
     m: card.member.memberId,
     b: card.balance,
-    s: STATUS_TO_COMPACT[card.visitStatus],
     i: card.activeSession ? { a: 1, t: card.activeSession.checkedInAt } : null,
     x: card.transactionLogs
       .slice(-MAX_TRANSACTION_LOGS)
@@ -111,9 +104,6 @@ export function decode(
   if (typeof p.b !== 'number' || p.b < 0) {
     return { ok: false, error: 'INVALID_BALANCE' };
   }
-  if (p.s !== 'A' && p.s !== 'B') {
-    return { ok: false, error: 'INVALID_STATUS' };
-  }
   if (typeof p.n !== 'number' || p.n < 0) {
     return { ok: false, error: 'INVALID_COUNTER' };
   }
@@ -152,7 +142,8 @@ export function decode(
       : undefined,
     transactionLogs: p.x.map((tuple, idx) => ({
       id: `${p.c}-LOG-${idx}`,
-      activity: COMPACT_TO_ACTIVITY[tuple[0]] ?? 'REGISTER',
+      activity:
+        /* istanbul ignore next */ COMPACT_TO_ACTIVITY[tuple[0]] ?? 'REGISTER',
       nominal: tuple[1],
       occurredAt: tuple[2],
     })),

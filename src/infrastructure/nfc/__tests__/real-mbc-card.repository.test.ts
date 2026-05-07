@@ -119,7 +119,7 @@ describe('RealMbcCardRepository', () => {
       ndefMessage: [{ payload: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9] }],
     });
     await expect(repository.readCard()).rejects.toMatchObject({
-      code: 'TAMPERED_CARD',
+      code: 'CARD_TAMPERED',
     });
   });
 
@@ -135,7 +135,7 @@ describe('RealMbcCardRepository', () => {
       ndefMessage: [{ payload: corrupted }],
     });
     await expect(repository.readCard()).rejects.toMatchObject({
-      code: 'TAMPERED_CARD',
+      code: 'CARD_TAMPERED',
     });
   });
 
@@ -254,7 +254,7 @@ describe('RealMbcCardRepository – additional error paths', () => {
     const originalEncrypt = silentShield.encrypt;
     silentShield.encrypt = () => ({ ok: false, error: 'TEST_ERROR' });
     await expect(repository.writeCard(cardFixture)).rejects.toMatchObject({
-      code: 'TAMPERED_CARD',
+      code: 'CARD_TAMPERED',
     });
     silentShield.encrypt = originalEncrypt;
   });
@@ -263,5 +263,33 @@ describe('RealMbcCardRepository – additional error paths', () => {
     mockGetNdefMessage.mockRejectedValueOnce(new Error('not supported'));
     const card = await repository.readCard();
     expect(card.cardId).toBe('C000001');
+  });
+
+  it('registerCard proceeds when MBC envelope exists but decrypt fails', async () => {
+    // Create a valid MBC envelope but corrupt the ciphertext so decrypt returns ok:false
+    const silentShield = require('../silent-shield');
+    const result = silentShield.encrypt(cardFixture, 1);
+    if (!result.ok) {
+      return;
+    }
+    const corrupted = Buffer.from(result.value);
+    // Corrupt multiple bytes in the auth tag area to ensure decrypt fails
+    for (let i = corrupted.length - 16; i < corrupted.length; i++) {
+      // eslint-disable-next-line no-bitwise
+      corrupted[i] ^= 0xff;
+    }
+    mockGetTag.mockResolvedValueOnce({
+      ndefMessage: [{ payload: Array.from(corrupted) }],
+    });
+    // Should NOT throw CARD_ALREADY_REGISTERED since decrypt failed
+    await expect(repository.registerCard(cardFixture)).resolves.toBeUndefined();
+  });
+
+  it('registerCard proceeds when card has non-MBC NDEF data', async () => {
+    // Card has NDEF data but not an MBC envelope
+    mockGetTag.mockResolvedValueOnce({
+      ndefMessage: [{ payload: [0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07] }],
+    });
+    await expect(repository.registerCard(cardFixture)).resolves.toBeUndefined();
   });
 });

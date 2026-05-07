@@ -139,7 +139,7 @@ export class RealMbcCardRepository implements MbcCardRepository {
     const shieldResult = encrypt(card, this.writeCounter);
     if (!shieldResult.ok) {
       throw new CardRepositoryError(
-        'TAMPERED_CARD',
+        'CARD_TAMPERED',
         `Payload error: ${shieldResult.error}`,
       );
     }
@@ -191,7 +191,7 @@ export class RealMbcCardRepository implements MbcCardRepository {
 
     if (!isMbcEnvelope(payloadBytes)) {
       throw new CardRepositoryError(
-        'TAMPERED_CARD',
+        'CARD_TAMPERED',
         'Card payload is not a valid MBC Silent Shield envelope.',
       );
     }
@@ -199,7 +199,7 @@ export class RealMbcCardRepository implements MbcCardRepository {
     const decryptResult = decrypt(payloadBytes);
     if (!decryptResult.ok) {
       throw new CardRepositoryError(
-        'TAMPERED_CARD',
+        'CARD_TAMPERED',
         'Card data is invalid or modified. Please go to Station.',
       );
     }

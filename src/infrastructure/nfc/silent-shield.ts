@@ -109,7 +109,7 @@ export function decrypt(
     const json = decrypted.toString('utf8');
     return decode(json);
   } catch {
-    return { ok: false, error: 'TAMPERED_CARD' };
+    return { ok: false, error: 'CARD_TAMPERED' };
   }
 }
 
