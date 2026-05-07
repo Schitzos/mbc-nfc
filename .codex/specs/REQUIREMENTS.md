@@ -112,7 +112,7 @@ The PDF uses member parking as the concrete required assessment scenario. Parkin
 | US-003 | As a gate operator, I can check in a member to an activity by tapping the card at The Gate.                    | Must     |
 | US-004 | As a gate operator, I can check in a member using real device time (simulation mode removed).                  | Must     |
 | US-005 | As a terminal operator, I can check out a member from an activity by tapping the card at The Terminal.         | Must     |
-| US-006 | As a terminal operator, I can see activity duration and fee after successful checkout tap.                            | Must     |
+| US-006 | As a terminal operator, I can see activity duration and fee after successful checkout tap.                     | Must     |
 | US-007 | As a terminal operator, I can block checkout when balance is insufficient and show clear top-up guidance.      | Must     |
 | US-008 | As a member, I can inspect my card through The Scout to see balance, status, and history.                      | Must     |
 | US-009 | As the system, I prevent double check-in and double check-out.                                                 | Must     |
@@ -420,6 +420,12 @@ Acceptance criteria:
 - Real NFC writes rely on `writeNdefMessage` throwing on failure. Capacity guard is enforced before write.
 - NTAG215 payload capacity must be validated before claiming real-card support.
 - Device time correctness is an operational dependency and must be visible in Gate/Terminal flows.
+
+### PO Clarifications (2026-05-07)
+
+- **Minimum parking duration (FR-006/FR-014):** PO confirms 1 second already counts as 1 started hour = Rp 2.000. Any non-zero duration rounds up to the next whole hour. This is correct per spec.
+- **Max balance cap (FR-003):** PO confirms there is no maximum balance cap. Unlimited top-up is acceptable; no upper-bound validation is required on card balance.
+- **Re-registration behavior (FR-002):** Current prompt-to-overwrite behavior is canonical. Operator must confirm before wipe and re-register. `ALREADY_REGISTERED_CARD` is the detection state, not a hard rejection. PO confirmed 2026-05-07.
 
 ## Additional Delivery Requirements
 

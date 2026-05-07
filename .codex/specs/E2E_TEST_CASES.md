@@ -179,19 +179,20 @@ Use this format for every test case:
 
 ### E2E-TERM-001 Check-Out Success (Fixed Parking Tariff)
 
-| Field         | Value                                                                                   |
-| ------------- | --------------------------------------------------------------------------------------- |
-| Test Case ID  | E2E-TERM-001                                                                            |
-| Feature       | Terminal - Check Out                                                                    |
-| Objective     | Ensure checkout deducts correct parking started-hour fee and clears status.             |
-| Preconditions | Card checked-in with known start time and sufficient balance.                           |
-| Test Data     | Start time such that duration is 1h 5m 1s.                                              |
-| Steps         | 1. Open Terminal. 2. Tap checkout action. 3. Tap checked-in card.                       |
-| Priority      | High                                                                                    |
-| Type          | Both                                                                                    |
-| Owner         | Senior QA + Test Automation Engineer                                                    |
-| Status        | Pass (Mock sweep 2026-05-02)                                                            |
-| Evidence      | `.codex/specs/test-evidence/2026-05-02-sweep/61-terminal-checkedin-parking-success.png` |
+| Field           | Value                                                                                   |
+| --------------- | --------------------------------------------------------------------------------------- |
+| Test Case ID    | E2E-TERM-001                                                                            |
+| Feature         | Terminal - Check Out                                                                    |
+| Objective       | Ensure checkout deducts correct parking started-hour fee and clears status.             |
+| Preconditions   | Card checked-in with known start time and sufficient balance.                           |
+| Test Data       | Start time such that duration is 1h 5m 1s.                                              |
+| Steps           | 1. Open Terminal. 2. Tap checkout action. 3. Tap checked-in card.                       |
+| Expected Result | Fee charged as 2 started hours (Rp 4.000); balance deducted; status cleared; log added. |
+| Priority        | High                                                                                    |
+| Type            | Both                                                                                    |
+| Owner           | Senior QA + Test Automation Engineer                                                    |
+| Status          | Pass (Mock sweep 2026-05-02)                                                            |
+| Evidence        | `.codex/specs/test-evidence/2026-05-02-sweep/61-terminal-checkedin-parking-success.png` |
 
 ### E2E-TERM-002 Check-Out Insufficient Balance
 
@@ -282,6 +283,7 @@ Use this format for every test case:
 
 | Field           | Value                                                                                                               |
 | --------------- | ------------------------------------------------------------------------------------------------------------------- |
+| Test Case ID    | E2E-REG-003                                                                                                         |
 | Feature         | Station Registration                                                                                                |
 | Objective       | Prevent accidental overwrite of a valid registered MBC card.                                                        |
 | Preconditions   | A valid MBC card is already registered.                                                                             |
@@ -298,6 +300,7 @@ Use this format for every test case:
 
 | Field           | Value                                                                                                                                                        |
 | --------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Test Case ID    | E2E-TERM-004                                                                                                                                                 |
 | Feature         | Terminal / Station Recovery                                                                                                                                  |
 | Objective       | Confirm low-balance checkout can recover through Station top-up without losing checked-in state.                                                             |
 | Preconditions   | Card is checked in and balance is below calculated parking fee.                                                                                              |
@@ -314,6 +317,7 @@ Use this format for every test case:
 
 | Field           | Value                                                                                                                  |
 | --------------- | ---------------------------------------------------------------------------------------------------------------------- |
+| Test Case ID    | E2E-NFC-001                                                                                                            |
 | Feature         | Real NFC Write Safety                                                                                                  |
 | Objective       | Confirm selected NFC tag/card capacity guard is enforced and write errors are handled.                                 |
 | Preconditions   | Real NFC repository available on target device; automated test harness may use repository test doubles.                |
@@ -330,6 +334,7 @@ Use this format for every test case:
 
 | Field           | Value                                                                                                         |
 | --------------- | ------------------------------------------------------------------------------------------------------------- |
+| Test Case ID    | E2E-TIME-001                                                                                                  |
 | Feature         | Terminal Checkout                                                                                             |
 | Objective       | Prevent invalid duration and fee calculation.                                                                 |
 | Preconditions   | Card is checked in.                                                                                           |
@@ -345,6 +350,17 @@ Use this format for every test case:
 ## 5. Coverage Summary
 
 Additional Must coverage added: E2E-REG-003, E2E-TERM-004, E2E-NFC-001, and E2E-TIME-001.
+
+### PO Decision — 2026-05-07
+
+Per Product Owner decision, the following E2E cases are satisfied by existing unit and application (use-case) test coverage as equivalent evidence. No separate real-device E2E execution is required:
+
+- **E2E-REG-003** — Covered by `RegisterMemberCardUseCase` tests (already-registered rejection).
+- **E2E-TERM-004** — Covered by `CheckOutActivityUseCase` + `TopUpMemberCardUseCase` tests (insufficient balance recovery).
+- **E2E-NFC-001** — Covered by NFC repository and codec capacity-guard unit tests.
+- **E2E-TIME-001** — Covered by `CheckOutActivityUseCase` tests (invalid duration rejection).
+
+Real-device NFC screenshots for these scenarios will be provided by PO separately.
 
 - Station: `E2E-REG-001` to `E2E-TOP-002`
 - Gate: `E2E-GATE-001` to `E2E-GATE-003`

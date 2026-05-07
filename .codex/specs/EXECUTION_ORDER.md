@@ -27,7 +27,7 @@ Rule:
 
 ## 3. Execution Sequence
 
-### Phase 0 Project Baseline
+### Phase 0 Project Baseline ✅ COMPLETE
 
 Goal:
 
@@ -35,14 +35,14 @@ Goal:
 
 Order:
 
-1. `T-000A` Create UML and System Design Diagrams
-2. `T-000` Set Up Git Repository and Submission Baseline
-3. `T-000B` Configure GitHub Repository Governance
-4. `T-001` Create React Native TypeScript Project
-5. `T-002` Install Core Dependencies
-6. `T-000C` Configure Unit Test and Coverage Gate
-7. `T-003` Configure iOS NFC
-8. `T-004` Configure Android NFC
+1. `T-000A` Create UML and System Design Diagrams ✅ DONE
+2. `T-000` Set Up Git Repository and Submission Baseline ✅ DONE
+3. `T-000B` Configure GitHub Repository Governance ✅ DONE
+4. `T-001` Create React Native TypeScript Project ✅ DONE
+5. `T-002` Install Core Dependencies ✅ DONE
+6. `T-000C` Configure Unit Test and Coverage Gate ✅ DONE
+7. `T-003` Configure iOS NFC ✅ DONE
+8. `T-004` Configure Android NFC ✅ DONE
 
 Expected outcome:
 
@@ -50,6 +50,8 @@ Expected outcome:
 - Repo baseline, branch workflow, and GitHub governance are ready.
 - App skeleton runs.
 - Core libraries, tests, local Git hooks, coverage output, analysis prerequisites, and platform NFC configuration are prepared.
+
+PO confirmed all Phase 0 tasks complete 2025-05-07.
 
 Branch rule for all later phases:
 
@@ -59,7 +61,7 @@ Branch rule for all later phases:
 - Promotion from `develop` to `main` is prepared by Demo/Release Engineer and merged by the Project Owner.
 - Merge to `main` is the controlled trigger for GitHub Actions APK distribution publishing.
 
-### Phase 1 Core Business Foundation
+### Phase 1 Core Business Foundation ✅ COMPLETE
 
 Goal:
 
@@ -67,37 +69,41 @@ Goal:
 
 Order:
 
-1. `T-005` Create MBC Domain Entities
-2. `T-006` Create MBC Repository Interface
-3. `T-007` Create Activity Tariff Calculator
-4. `T-008` Create Activity State Policy
-5. `T-009` Create Transaction Log Policy
-6. `T-010` Create Card DTOs
-7. `T-011` Create Check NFC Availability Use Case
+1. `T-005` Create MBC Domain Entities ✅ DONE
+2. `T-006` Create MBC Repository Interface ✅ DONE
+3. `T-007` Create Activity Tariff Calculator ✅ DONE
+4. `T-008` Create Activity State Policy ✅ DONE
+5. `T-009` Create Transaction Log Policy ✅ DONE
+6. `T-010` Create Card DTOs ✅ DONE
+7. `T-011` Create Check NFC Availability Use Case ✅ DONE
 
 Expected outcome:
 
 - Core domain rules are stable and reusable.
 - No UI or NFC implementation depends on ad hoc business logic.
 
-### Phase 2 Station Feature
+PO confirmed all Phase 1 tasks complete 2025-05-07.
+
+### Phase 2 Station Feature ✅ COMPLETE
 
 Goal:
 
 Order:
 
-1. `T-012` Create Register Member Card Use Case
-2. `T-013` Create Top-Up Member Card Use Case
-3. `T-017` Implement Mock Card Repository
-4. `T-017A` Implement Local SQLite Ledger Repository
-5. `T-020A` Integrate Ledger Writes Into Role Flows
-6. `T-022` Build Station Screen
+1. `T-012` Create Register Member Card Use Case ✅ DONE
+2. `T-013` Create Top-Up Member Card Use Case ✅ DONE
+3. `T-017` Implement Mock Card Repository ✅ DONE
+4. `T-017A` Implement Local SQLite Ledger Repository ✅ DONE
+5. `T-020A` Integrate Ledger Writes Into Role Flows ✅ DONE
+6. `T-022` Build Station Screen ✅ DONE
 
 Expected outcome:
 
 - Station can register cards, top up balances, and show local device-side reporting on real NFC devices.
 
-### Phase 3 Gate Feature
+PO confirmed all Phase 2 tasks complete 2025-05-07.
+
+### Phase 3 Gate Feature ✅ COMPLETE
 
 Goal:
 
@@ -105,14 +111,16 @@ Goal:
 
 Order:
 
-1. `T-014` Create Check-In Activity Use Case
-2. `T-023` Build Gate Screen
+1. `T-014` Create Check-In Activity Use Case ✅ DONE
+2. `T-023` Build Gate Screen ✅ DONE
 
 Expected outcome:
 
 - Gate can check members into the required parking MVP activity using real device time.
 
-### Phase 4 Terminal Feature
+PO confirmed all Phase 3 tasks complete 2025-05-07.
+
+### Phase 4 Terminal Feature ✅ COMPLETE
 
 Goal:
 
@@ -120,12 +128,16 @@ Goal:
 
 Order:
 
-1. `T-015` Create Check-Out Activity Use Case
-2. `T-024` Build Terminal Screen
+1. `T-015` Create Check-Out Activity Use Case ✅ DONE
+2. `T-024` Build Terminal Screen ✅ DONE
 
 Expected outcome:
 
-### Phase 5 Scout Feature
+- Terminal delivers exit/checkout flow with fee deduction using fixed MVP tariff.
+
+PO confirmed all Phase 4 tasks complete 2025-05-07.
+
+### Phase 5 Scout Feature ✅ COMPLETE
 
 Goal:
 
@@ -133,14 +145,16 @@ Goal:
 
 Order:
 
-1. `T-016` Create Inspect Member Card Use Case
-2. `T-025` Build Scout Screen
+1. `T-016` Create Inspect Member Card Use Case ✅ DONE
+2. `T-025` Build Scout Screen ✅ DONE
 
 Expected outcome:
 
 - Scout provides one-tap read-only inspection for balance, status, and logs.
 
-### Phase 6 Shared App Experience
+PO confirmed all Phase 5 tasks complete 2025-05-07.
+
+### Phase 6 Shared App Experience ✅ COMPLETE
 
 Goal:
 
@@ -148,14 +162,16 @@ Goal:
 
 Order:
 
-1. `T-021` Build Role Switcher
-2. `T-026` Apply Signal UI Direction
+1. `T-021` Build Role Switcher ✅ DONE
+2. `T-026` Apply Signal UI Direction ✅ DONE
 
 Expected outcome:
 
 - All four roles can be accessed in one app and the shared UI direction is in place.
 
-### Phase 7 Quality And Verification
+PO confirmed all Phase 6 tasks complete 2025-05-07.
+
+### Phase 7 Quality And Verification ✅ COMPLETE
 
 Goal:
 
@@ -163,11 +179,13 @@ Goal:
 
 Order:
 
-1. `T-027` Unit and Use-Case Tests
-2. `T-027A` Integrate SonarCloud Quality Analysis
-3. `T-027B` Configure GitHub Actions Firebase App Distribution
-4. `T-027C` Enforce Feature PR QA Screenshot Evidence
-5. `T-026D` Maintain Presentation-Friendly Task Brief
+1. `T-027` Unit and Use-Case Tests ✅ DONE
+2. `T-027A` Integrate SonarCloud Quality Analysis ✅ DONE
+3. `T-027B` Configure GitHub Actions Firebase App Distribution ✅ DONE
+4. `T-027C` Enforce Feature PR QA Screenshot Evidence ✅ DONE
+5. `T-026D` Maintain Presentation-Friendly Task Brief ✅ DONE
+
+PO confirmed physical validation complete 2025-05-07.
 
 Expected outcome:
 
@@ -177,7 +195,7 @@ Expected outcome:
 - Feature PRs have QA screenshot evidence or approved exceptions.
 - Presentation-friendly task documentation stays current.
 
-### Phase 8 Real NFC Integration
+### Phase 8 Real NFC Integration ✅ COMPLETE
 
 Goal:
 
@@ -185,21 +203,23 @@ Goal:
 
 Dependency:
 
-- Requires real NFC card/tag details and supported Android test device.
+- ~~Requires real NFC card/tag details and supported Android test device.~~ Resolved — PO confirmed physical validation complete 2025-05-07.
 
 Order:
 
-1. `T-018` Implement NFC Card Repository
-2. `T-019` Implement MBC Card Codec
-3. `T-020` Implement Silent Shield
-4. `T-028` Device Tests
+1. `T-018` Implement NFC Card Repository ✅ DONE
+2. `T-019` Implement MBC Card Codec ✅ DONE
+3. `T-020` Implement Silent Shield ✅ DONE
+4. `T-028` Device Tests ✅ DONE
+
+PO confirmed physical validation complete 2025-05-07.
 
 Expected outcome:
 
 - Real Android NFC flows work where supported.
 - Payload, privacy, and device behavior are validated honestly.
 
-### Phase 9 Design Hardening
+### Phase 9 Design Hardening ✅ COMPLETE
 
 Goal:
 
@@ -207,13 +227,13 @@ Goal:
 
 Dependency:
 
-- Requires Figma refinement and design access.
+- ~~Requires Figma refinement and design access.~~ Resolved — PO confirmed all Figma tasks DONE 2025-05-07.
 
 Order:
 
-1. `T-026A` Create Low-Fi E2E Figma Flow
-2. `T-026B` Create Hi-Fi Implementation-Ready Figma Screens
-3. `T-026C` Polish Hi-Fi Spacing, Icons, and Visual QA
+1. `T-026A` Create Low-Fi E2E Figma Flow ✅ DONE
+2. `T-026B` Create Hi-Fi Implementation-Ready Figma Screens ✅ DONE
+3. `T-026C` Polish Hi-Fi Spacing, Icons, and Visual QA ✅ DONE
 
 Expected outcome:
 
@@ -238,20 +258,20 @@ Expected outcome:
 
 ### Figma-dependent work
 
-Usually blocked or limited:
+~~Usually blocked or limited~~ — **Resolved: PO confirmed DONE 2025-05-07.**
 
-- `T-026A`
-- `T-026B`
-- `T-026C`
+- ~~`T-026A`~~ ✅ DONE
+- ~~`T-026B`~~ ✅ DONE
+- ~~`T-026C`~~ ✅ DONE
 
 ### Real NFC tag/card-dependent work
 
-Usually blocked or limited:
+~~Usually blocked or limited~~ — **Resolved: PO confirmed physical validation complete 2025-05-07.**
 
-- `T-018`
-- `T-019`
-- `T-020`
-- `T-028`
+- ~~`T-018`~~ ✅ DONE
+- ~~`T-019`~~ ✅ DONE
+- ~~`T-020`~~ ✅ DONE
+- ~~`T-028`~~ ✅ DONE
 
 ### GitHub-dependent work
 

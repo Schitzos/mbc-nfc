@@ -59,6 +59,8 @@ Supporting roles:
 
 ## 6. Notes
 
+- **iOS formally excluded from assessment scope** (PO decision 2026-05-07). No iOS testing or evidence is required for this deliverable.
+- Real-device NFC screenshots will be provided by PO separately; emulator screenshots are not sufficient for NFC evidence.
 - ASUS ROG Phone 9 FE is the validated MVP real-device NFC read/write baseline (Android 14+).
 - iOS NFC write is out of MVP and may be documented as deferred or best-effort/read-only only if separately validated later.
 - MVP target tag is NTAG215; validated with standard NTAG215 tags (504 bytes user memory).
