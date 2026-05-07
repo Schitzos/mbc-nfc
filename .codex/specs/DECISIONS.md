@@ -303,20 +303,31 @@ Use the compact NFC Card Payload v1 schema and Silent Shield v1 rules defined in
 
 The NFC card remains the operational source of truth for member balance and check-in/activity state. SQLite is used only as a device-local reporting and audit ledger for transactions processed by the current app/device.
 
-Silent Shield v1 uses HMAC-SHA256 over a canonical payload without `sig`, stores the Base64Url signature in `sig`, encrypts the signed payload with AES-256-GCM or equivalent authenticated encryption, stores only a protected `mbc1` envelope on NFC, increments `ctr` after each successful card-state write, and rejects invalid decrypt/authentication/signature failures as tampered/corrupted cards.
+Silent Shield v1 uses AES-256-GCM authenticated encryption over the compact canonical payload, stores only a protected `MBC1` binary envelope on NFC, increments `ctr` after each successful card-state write, and rejects invalid decrypt/authentication failures as `CARD_TAMPERED`.
 
 Reason:
 
-The previous documents described card payload, Silent Shield, and local ledger behavior at a high level. A precise schema and signing rule prevents implementation drift, reduces Codex guessing, and keeps Station/Gate/Terminal/Scout behavior consistent.
+The previous documents described card payload, Silent Shield, and local ledger behavior at a high level. A precise schema and encryption rule prevents implementation drift, reduces Codex guessing, and keeps Station/Gate/Terminal/Scout behavior consistent.
 
 Consequences:
 
 - Card codec, domain validation, tests, and UI DTOs must follow Payload v1.
-- HMAC provides explicit integrity validation while authenticated encryption provides confidentiality; plain JSON, Base64-only, and weak obfuscation are not allowed.
+- AES-256-GCM provides both confidentiality and integrity via authenticated encryption; plain JSON, Base64-only, and weak obfuscation are not allowed.
 - SQLite reporting totals are device-local, not global cooperative totals.
 - Ledger write failure after successful card write is a reporting/audit warning, not a rollback of the member operation.
 
-## ADR-021 Firebase App Distribution as Android Release Channel## ADR-021 Firebase App Distribution as Android Release Channel
+## ADR-019 Keep Runtime Rate Changes Out of MVP
+
+Status: Accepted
+
+Decision: Runtime rate changes, tariff schedules, and non-parking tariff fixtures are excluded from MVP scope. The fixed Rp 2.000 per started hour tariff is defined in one isolated constant.
+
+Consequences:
+
+- MVP stays closer to the original requirement.
+- Codex has less scope and fewer edge cases.
+
+## ADR-021 Firebase App Distribution as Android Release Channel
 
 Decision: Controlled push/merge to `main` must trigger GitHub Actions to build the Android release artifact and distribute it through Firebase App Distribution.
 
@@ -332,19 +343,3 @@ Reason: The project needs visible proof that delivered features match the requir
 
 Impact: Feature delivery includes both automated tests and QA evidence. Final delivery requires a use-case evidence package with screenshots.
 
-## ADR-019 Keep Runtime Rate Changes Out of MVP
-
-### Status
-
-Accepted
-
-### Context
-
-The original PDF defines the MVP parking tariff as Rp 2.000 per started hour. Previous non-MVP pricing alternatives were considered, but the current product decision is to focus only on the required MVP.
-
-### Decision
-
-### Consequences
-
-- MVP stays closer to the original requirement.
-- Codex has less scope and fewer edge cases.

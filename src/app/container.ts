@@ -11,43 +11,19 @@ import { DeviceNfcStatusRepository } from '../infrastructure/nfc/device-nfc-stat
 import { RealMbcCardRepository } from '../infrastructure/nfc/real-mbc-card.repository';
 import type { AppServices } from '../presentation/context/service-context';
 
-let realMbcCardRepository: RealMbcCardRepository | null = null;
-let deviceNfcStatusRepository: DeviceNfcStatusRepository | null = null;
-let sqliteLedgerRepository: SqliteLedgerRepository | null = null;
-
-function createLedgerConnection() {
-  return open({ name: 'mbc-ledger.db', location: 'default' });
-}
-
-function getRealMbcCardRepository() {
-  if (!realMbcCardRepository) {
-    realMbcCardRepository = new RealMbcCardRepository();
-  }
-  return realMbcCardRepository;
-}
-
-function getDeviceNfcStatusRepository() {
-  if (!deviceNfcStatusRepository) {
-    deviceNfcStatusRepository = new DeviceNfcStatusRepository();
-  }
-  return deviceNfcStatusRepository;
-}
-
-function getSqliteLedgerRepository() {
-  if (!sqliteLedgerRepository) {
-    sqliteLedgerRepository = new SqliteLedgerRepository(
-      createLedgerConnection(),
-    );
-  }
-  return sqliteLedgerRepository;
-}
+let cachedServices: AppServices | null = null;
 
 export function createAppServices(): AppServices {
-  const cardRepository = getRealMbcCardRepository();
-  const nfcStatusRepository = getDeviceNfcStatusRepository();
-  const ledgerRepository = getSqliteLedgerRepository();
+  if (cachedServices) {
+    return cachedServices;
+  }
 
-  return {
+  const db = open({ name: 'mbc-ledger.db', location: 'default' });
+  const cardRepository = new RealMbcCardRepository();
+  const nfcStatusRepository = new DeviceNfcStatusRepository();
+  const ledgerRepository = new SqliteLedgerRepository(db);
+
+  cachedServices = {
     station: {
       checkNfcAvailabilityUseCase: new CheckNfcAvailabilityUseCase(
         nfcStatusRepository,
@@ -86,4 +62,6 @@ export function createAppServices(): AppServices {
       inspectMemberCardUseCase: new InspectMemberCardUseCase(cardRepository),
     },
   };
+
+  return cachedServices;
 }

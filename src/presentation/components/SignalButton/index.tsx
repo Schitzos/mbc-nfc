@@ -38,9 +38,9 @@ export function SignalButton({
   const [pressed, setPressed] = useState(false);
   const sizeToken = componentTokens.button.sizes[size];
   const variantToken = componentTokens.button.variants[variant];
-  const resolvedBackgroundColor = variantToken?.backgroundColor ?? '#ED0226';
-  const resolvedBorderColor = variantToken?.borderColor ?? '#ED0226';
-  const resolvedTextColor = variantToken?.textColor ?? '#FFFFFF';
+  const resolvedBackgroundColor = variantToken.backgroundColor;
+  const resolvedBorderColor = variantToken.borderColor;
+  const resolvedTextColor = variantToken.textColor;
 
   const pressableStyle = useMemo(
     () =>

@@ -14,8 +14,6 @@ export function NfcActionSheet({
     return null;
   }
 
-  const canClose = true;
-
   let sheetTitle = '✕ Failed';
   if (state.phase === 'scanning') {
     sheetTitle = 'Ready to Scan';
@@ -29,7 +27,7 @@ export function NfcActionSheet({
     <SignalBottomSheet
       visible
       title={sheetTitle}
-      onClose={canClose ? onDismiss : undefined}
+      onClose={onDismiss}
     >
       {state.phase === 'scanning' && (
         <View className="items-center gap-4 pb-8">

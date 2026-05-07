@@ -48,7 +48,7 @@ describe('CardRepositoryError', () => {
   it('supports all defined error codes', () => {
     const codes = [
       'UNREGISTERED_CARD',
-      'TAMPERED_CARD',
+      'CARD_TAMPERED',
       'CARD_ALREADY_REGISTERED',
       'NFC_UNSUPPORTED',
       'NFC_DISABLED',

@@ -13,9 +13,14 @@ export function StationHeader({
   return (
     <View className="rounded-2xl bg-[#001A41] p-4">
       <View className="flex-row items-center justify-between">
-        <View>
-          <Text className="text-2xl font-bold text-white">The Station</Text>
-          <Text className="text-sm text-slate-200">{modeLabel}</Text>
+        <View className="flex-row items-center">
+          <View className="mr-3 h-8 w-8 items-center justify-center rounded-full bg-[#EAF4FF]">
+            <Text className="text-base font-bold text-[#0050AE]">+</Text>
+          </View>
+          <View>
+            <Text className="text-2xl font-bold text-white">The Station</Text>
+            <Text className="text-sm text-slate-200">{modeLabel}</Text>
+          </View>
         </View>
         <Pressable
           accessibilityRole="button"

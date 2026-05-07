@@ -11,7 +11,7 @@ Completed:
 - Full parking MVP flow: Register → Top-Up → Check-In → Check-Out → Scout inspect
 - All NFC operations complete in a single tap (single-session read+write)
 - Silent Shield AES-256-GCM encryption via `react-native-quick-crypto`
-- Compact card codec (`v,c,m,b,s,i,x,n` format) fits NTAG215 (362 bytes worst-case)
+- Compact card codec (`v,c,m,b,i,x,n` format) fits NTAG215 (362 bytes worst-case)
 - NfcActionSheet bottom sheet (50% height, dark overlay, dismissable) for scan/success/error feedback
 - Local SQLite ledger for device-side audit and reporting
 - No simulation mode or mock scenario selectors — all flows use real NFC

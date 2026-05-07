@@ -185,7 +185,14 @@ describe('role screens – extended branch coverage', () => {
   } as never;
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    mockCheckNfcAvailabilityUseCase.execute.mockClear();
+    mockRegisterMemberCardUseCase.execute.mockClear();
+    mockRegisterMemberCardUseCase.executeWithReset.mockClear();
+    mockTopUpMemberCardUseCase.execute.mockClear();
+    mockGetStationLedgerSummaryUseCase.execute.mockClear();
+    mockCheckInActivityUseCase.execute.mockClear();
+    mockCheckOutActivityUseCase.execute.mockClear();
+    mockInspectMemberCardUseCase.execute.mockClear();
     useAppStore.setState({ nfcLogEnabled: false, nfcLogs: [] });
   });
 
@@ -416,5 +423,35 @@ describe('role screens – extended branch coverage', () => {
         amount: 100000,
       }),
     );
+  });
+
+  it('Gate shows checkedInAt timestamp when present', async () => {
+    mockCheckInActivityUseCase.execute.mockResolvedValueOnce({
+      success: true,
+      role: 'GATE',
+      message: 'Card checked in successfully.',
+      card: {
+        maskedMemberReference: 'MBC-***-0001',
+        balance: 50000,
+        visitStatus: 'CHECKED_IN',
+        activeSession: {
+          activityType: 'PARKING',
+          checkedInAt: '2026-05-02T10:30:00.000Z',
+        },
+        transactionLogs: [],
+      },
+    });
+
+    renderWithServices(<GateScreen navigation={navigation} />);
+    await waitFor(() =>
+      expect(mockCheckNfcAvailabilityUseCase.execute).toHaveBeenCalled(),
+    );
+
+    fireEvent.press(screen.getByText('Tap Card to Check In'));
+    await waitFor(() =>
+      expect(mockCheckInActivityUseCase.execute).toHaveBeenCalled(),
+    );
+
+    expect(screen.getByText(/Checked in at:/)).toBeTruthy();
   });
 });

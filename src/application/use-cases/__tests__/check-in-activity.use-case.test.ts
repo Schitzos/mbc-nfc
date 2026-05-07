@@ -58,7 +58,7 @@ describe('CheckInActivityUseCase', () => {
 
     const result = await useCase.execute({
       activityId: 'coop-event-hall',
-      activityType: 'GENERIC',
+      activityType: 'PARKING',
       simulatedCheckedInAt: '2026-05-01T08:30:00.000Z',
     });
 

@@ -227,7 +227,7 @@ Use this format for every test case:
 | Status          | Pass (Mock sweep 2026-05-02, recovery/failure handling)                                                                                                            |
 | Evidence        | `.codex/specs/test-evidence/2026-05-02-sweep/65-terminal-unregistered-failure.png`, `.codex/specs/test-evidence/2026-05-02-sweep/66-terminal-tampered-failure.png` |
 
-### E2E-SCOUT-001### E2E-SCOUT-001 One-Tap Read-Only Inspect
+### E2E-SCOUT-001 One-Tap Read-Only Inspect
 
 | Field           | Value                                                                                                                                                           |
 | --------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------- |

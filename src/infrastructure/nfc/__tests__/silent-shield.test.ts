@@ -86,7 +86,7 @@ describe('Silent Shield', () => {
     tampered[tampered.length - 1] ^= 0xff;
 
     const decResult = decrypt(tampered);
-    expect(decResult).toEqual({ ok: false, error: 'TAMPERED_CARD' });
+    expect(decResult).toEqual({ ok: false, error: 'CARD_TAMPERED' });
   });
 
   it('detects tampered auth tag', () => {
@@ -102,7 +102,7 @@ describe('Silent Shield', () => {
     tampered[19] ^= 0xff;
 
     const decResult = decrypt(tampered);
-    expect(decResult).toEqual({ ok: false, error: 'TAMPERED_CARD' });
+    expect(decResult).toEqual({ ok: false, error: 'CARD_TAMPERED' });
   });
 
   it('rejects envelope too short', () => {

@@ -202,9 +202,6 @@ Must test:
 - SonarCloud analysis passes the configured quality gate.
 - Demo capture, documentation, and presentation material are ready.
 
-| ID  | Area | Scenario | Expected Result |
-| --- | ---- | -------- | --------------- |
-
 ## QA Screenshot Evidence Gate
 
 Every feature PR must include Senior QA validation evidence before merge unless an approved exception is documented.

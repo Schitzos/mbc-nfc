@@ -57,17 +57,17 @@ describe('CheckInActivityUseCase – extended coverage', () => {
     expect(result.message).toContain('not registered');
   });
 
-  it('supports GENERIC activity type (not hardcoded to parking)', async () => {
+  it('supports custom activityId (not hardcoded)', async () => {
     const cardRepository = createCardRepository();
     const useCase = new CheckInActivityUseCase(cardRepository);
 
     const result = await useCase.execute({
       activityId: 'co-working-space',
-      activityType: 'GENERIC',
+      activityType: 'PARKING',
     });
 
     expect(result.success).toBe(true);
-    expect(result.card?.activeSession?.activityType).toBe('GENERIC');
+    expect(result.card?.activeSession?.activityType).toBe('PARKING');
     expect(result.card?.activeSession?.activityId).toBe('co-working-space');
   });
 
@@ -106,7 +106,7 @@ describe('CheckInActivityUseCase – extended coverage', () => {
       visitStatus: 'CHECKED_IN',
       activeSession: {
         activityId: 'existing-activity',
-        activityType: 'GENERIC',
+        activityType: 'PARKING',
         checkedInAt: '2026-05-01T08:00:00.000Z',
       },
     });

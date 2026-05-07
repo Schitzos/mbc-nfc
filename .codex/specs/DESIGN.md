@@ -50,21 +50,21 @@ src/
   domain/
     entities/
       mbc-card.ts
-      member-profile.ts
-      transaction-log.ts
-      activity-session.ts
+      station-ledger-summary.ts
     repositories/
-      mbc-card.repository.ts
-      local-ledger.repository.ts
+      mbc-card-repository.ts
+      local-ledger-repository.ts
+      nfc-availability-repository.ts
     services/
       activity-tariff-calculator.ts
       activity-state-policy.ts
       transaction-log-policy.ts
     errors/
-      mbc-errors.ts
+      domain-error.ts
+      card-repository-error.ts
   application/
     use-cases/
-      check-nfc-availability.use-case.ts
+      check-nfc-availability-use-case.ts
       register-member-card.use-case.ts
       top-up-member-card.use-case.ts
       check-in-activity.use-case.ts
@@ -72,29 +72,35 @@ src/
       inspect-member-card.use-case.ts
       get-station-ledger-summary.use-case.ts
     dto/
-      card-summary.dto.ts
-      role-action-result.dto.ts
+      card-summary-dto.ts
+      card-summary-mapper.ts
+      role-action-result-dto.ts
+      station-ledger-summary-dto.ts
+      check-nfc-availability-result-dto.ts
   infrastructure/
     nfc/
-      react-native-mbc-card-reader.ts
-      react-native-mbc-card-writer.ts
-    card-codec/
+      real-mbc-card.repository.ts
       mbc-card-codec.ts
-      mbc-card-shield.ts
-      mbc-card-validator.ts
-    security/
-      audit-logger.ts
-      data-redactor.ts
+      silent-shield.ts
+      device-nfc-status.repository.ts
     local-ledger/
       sqlite-ledger.repository.ts
       sqlite-ledger-mapper.ts
   presentation/
     stores/
-      role.store.ts
-      mbc-flow.store.ts
-      nfc-log.store.ts
-    hooks/
-      useMbcCardScan.ts
+      app-store.ts
+    context/
+      service-context.tsx
+    config/
+      role-options.ts
+    theme/
+      colors.ts
+      typography.ts
+      spacing.ts
+      radius.ts
+      shadows.ts
+      icons.ts
+      components.ts
     screens/
       RoleSwitcher/
         index.tsx
@@ -103,19 +109,23 @@ src/
           RoleOptionList.tsx
       Station/
         index.tsx
+        useStationActions.ts
         fragments/
           StationHeader.tsx
       Gate/
         index.tsx
+        useGateActions.ts
         fragments/
           GateHeader.tsx
           GateResultState.tsx
       Terminal/
         index.tsx
+        useTerminalActions.ts
         fragments/
           TerminalHeader.tsx
       Scout/
         index.tsx
+        useScoutActions.ts
         fragments/
           ScoutHeader.tsx
       RoleSwitcherScreen.tsx
@@ -124,14 +134,24 @@ src/
       TerminalScreen.tsx
       ScoutScreen.tsx
     components/
-      BalancePanel.tsx
-      LedgerSummaryPanel.tsx
-      TransactionLogList.tsx
-      NfcActionButton.tsx
-      NfcLogPanel.tsx
-      SimulationTimePicker.tsx
+      NfcActionSheet/
+      NfcLogPanel/
+      SignalButton/
+      SignalTextField/
+      SignalOptionCard/
+      SignalBottomSheet/
+      SignalStatusBanner/
+      SignalSurfaceCard/
+      SignalJelajahCard/
+      SignalSkeleton/
+      BackgroundDecor/
+    assets/
+      icons/
   shared/
+    constants.ts
     utils/
+      create-random-id.ts
+      mask-member-reference.ts
     types/
 ```
 
@@ -156,10 +176,9 @@ export type MbcActivity = 'REGISTER' | 'TOP_UP' | 'CHECK_IN' | 'CHECK_OUT';
 
 export type BenefitActivityType = 'PARKING';
 
-// Future extension note:
-// Non-parking activities are not required for MVP. Add them later by extending
-// an ActivityDefinition/TariffRule registry, not by scattering new activity
-// constants across UI, NFC codec, SQLite ledger, and use cases.
+export type MbcRole = 'STATION' | 'GATE' | 'TERMINAL' | 'SCOUT';
+
+export type CurrencyCode = 'IDR';
 
 export type ActivitySession = {
   activityId: string;
@@ -168,11 +187,6 @@ export type ActivitySession = {
 };
 
 export type MemberProfile = {
-  /**
-   * Internal system-generated identifier.
-   * This is written to the protected card payload, but normal presentation DTOs
-   * should not expose the full value on member/operator screens.
-   */
   memberId: string;
   displayName?: string;
 };
@@ -186,8 +200,8 @@ export type TransactionLog = {
 
 export type LedgerEntry = {
   id: string;
-  role: 'STATION' | 'GATE' | 'TERMINAL' | 'SCOUT';
-  action: 'REGISTER' | 'TOP_UP' | 'CHECK_IN' | 'CHECK_OUT';
+  role: MbcRole;
+  action: MbcActivity;
   maskedMemberReference?: string;
   activityType?: BenefitActivityType;
   amount?: number;
@@ -200,11 +214,13 @@ export type MbcCard = {
   cardId: string;
   member: MemberProfile;
   balance: number;
-  currency: 'IDR';
+  currency: CurrencyCode;
   visitStatus: VisitStatus;
   activeSession?: ActivitySession;
   transactionLogs: TransactionLog[];
 };
+
+export const PARKING_TARIFF_PER_STARTED_HOUR = 2000;
 ```
 
 ## 6. Application DTOs
@@ -215,29 +231,26 @@ export type CardSummaryDto = {
   memberName?: string;
   maskedMemberReference?: string;
   balance: number;
-  currency: 'IDR';
-  visitStatus: 'NOT_CHECKED_IN' | 'CHECKED_IN';
+  currency: CurrencyCode;
+  visitStatus: VisitStatus;
   activeSession?: ActivitySession;
   transactionLogs: TransactionLog[];
 };
 
 export type RoleActionResultDto = {
   success: boolean;
-  role: 'STATION' | 'GATE' | 'TERMINAL' | 'SCOUT';
+  role: MbcRole;
   message: string;
   card?: CardSummaryDto;
   chargedHours?: number;
   chargedAmount?: number;
+  durationMs?: number;
+  requiresReset?: boolean;
 };
 
-export type StationLedgerSummaryDto = {
-  topUpTotal: number;
-  checkoutTotal: number;
-  registerCount: number;
-  topUpCount: number;
-  checkoutCount: number;
-  latestEntries: LedgerEntry[];
-};
+export type StationLedgerSummaryDto = StationLedgerSummary;
+// StationLedgerSummary is defined in domain/entities/station-ledger-summary.ts:
+// { topUpTotal, checkoutTotal, registerCount, topUpCount, checkoutCount, latestEntries }
 ```
 
 ## 7. Repository Interface
@@ -254,12 +267,21 @@ export interface MbcCardRepository {
 
 export interface LocalLedgerRepository {
   append(entry: LedgerEntry): Promise<void>;
-  getStationSummary(): Promise<StationLedgerSummaryDto>;
+  getStationSummary(): Promise<StationLedgerSummary>;
 }
 
-export interface ParkingTariffRule {
-  calculateFee(input: { checkInAt: string; checkOutAt: string }): number;
-}
+// Tariff calculation is a standalone function, not an interface:
+export type ActivityTariffCalculation = {
+  chargedHours: number;
+  chargedAmount: number;
+  durationMs: number;
+};
+
+export function calculateActivityTariff(input: {
+  checkedInAt: string;
+  checkedOutAt: string;
+}): ActivityTariffCalculation;
+// Throws DomainError('INVALID_TIMESTAMP') or DomainError('INVALID_DURATION')
 ```
 
 ## 8. Business Rules
@@ -277,7 +299,7 @@ export interface ParkingTariffRule {
 - Parking MVP fee is fixed at Rp 2.000 per started hour.
 - Duration is rounded up to the next started hour.
 - Keep the rate in one isolated tariff module/constant; do not scatter `2000` magic numbers across screens.
-- Terminal checkout displays tariff, charged hours, and fee before deduction.
+- Terminal checkout displays tariff, charged hours, and fee immediately after successful tap (single-session atomic NFC model).
 - Runtime rate editing, tariff schedules, and non-parking tariff fixtures are out of MVP scope.
 
 ### Registration Safety### Registration Safety
@@ -332,7 +354,7 @@ Design rules:
 
 - Logical card payload remains a compact domain object for tests and business logic. Use compact NFC DTOs for NTAG215 writes.
 - NFC storage is a protected `MBC1` binary envelope, not direct JSON.
-- Card codec encodes `MbcCard` to a compact payload using the format: `v,c,m,b,s,i,x,n` (version, cardId, memberId, balance, visitStatus, activityId, checkInTimestamp, transaction log entries as compact tuples).
+- Card codec encodes `MbcCard` to a compact payload using the format: `v,c,m,b,i,x,n` (version, cardId, memberId, balance, activeSession, transaction log tuples, writeCounter).
 - Silent Shield envelope structure: `MBC1` magic (4 bytes) + version (1 byte) + kid (1 byte) + alg (1 byte) + IV (12 bytes) + authTag (16 bytes) + ciphertext.
 - Encryption uses AES-256-GCM via `react-native-quick-crypto`.
 - Do not commit real keys or secrets. MVP uses a documented demo key.
@@ -395,7 +417,7 @@ The implementation should be shaped so the final submission can include:
 
 The architecture separates readable domain models from compact NFC DTOs. Screens and use cases use readable names, but the NFC repository normalizes card state into the compact NTAG215 payload before Silent Shield protection.
 
-Compact codec format: `v,c,m,b,s,i,x,n` where fields are pipe/comma-separated values for version, cardId, memberId, balance, visitStatus, activityId, checkInTimestamp, and transaction log tuples.
+Compact codec format: `v,c,m,b,i,x,n` where fields are comma-separated values for version, cardId, memberId, balance, activeSession (object or null), transaction log tuples, and writeCounter.
 
 Compact rules:
 

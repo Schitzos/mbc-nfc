@@ -33,7 +33,6 @@ Recommended compact fields:
 | `c`   | card ID/ref                   |
 | `m`   | member ID/ref                 |
 | `b`   | balance                       |
-| `s`   | status                        |
 | `i`   | active visit object or `null` |
 | `x`   | latest 5 transaction tuples   |
 | `n`   | write counter                 |

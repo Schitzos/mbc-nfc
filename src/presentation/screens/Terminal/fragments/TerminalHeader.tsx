@@ -13,9 +13,14 @@ export function TerminalHeader({
   return (
     <View className="rounded-2xl bg-[#001A41] p-4">
       <View className="flex-row items-center justify-between">
-        <View>
-          <Text className="text-2xl font-bold text-white">The Terminal</Text>
-          <Text className="text-sm text-slate-200">{subtitle}</Text>
+        <View className="flex-row items-center">
+          <View className="mr-3 h-8 w-8 items-center justify-center rounded-full bg-[#FFF2D8]">
+            <Text className="text-base font-bold text-[#8A5B00]">✓</Text>
+          </View>
+          <View>
+            <Text className="text-2xl font-bold text-white">The Terminal</Text>
+            <Text className="text-sm text-slate-200">{subtitle}</Text>
+          </View>
         </View>
         <Pressable
           accessibilityRole="button"

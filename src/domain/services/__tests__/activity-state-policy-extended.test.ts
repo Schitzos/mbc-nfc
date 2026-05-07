@@ -26,14 +26,14 @@ describe('activityStatePolicy – extended branch coverage', () => {
     ).toThrow(DomainError);
   });
 
-  it('supports GENERIC activity type for check-in (not hardcoded to parking)', () => {
+  it('supports custom activityId for check-in (not hardcoded)', () => {
     const result = applyCheckInState(baseCard, {
       activityId: 'co-working-space',
-      activityType: 'GENERIC',
+      activityType: 'PARKING',
       checkedInAt: '2026-05-01T10:00:00.000Z',
     });
 
-    expect(result.activeSession?.activityType).toBe('GENERIC');
+    expect(result.activeSession?.activityType).toBe('PARKING');
     expect(result.activeSession?.activityId).toBe('co-working-space');
   });
 
@@ -116,5 +116,32 @@ describe('activityStatePolicy – extended branch coverage', () => {
       expect(error).toBeInstanceOf(DomainError);
       expect((error as DomainError).code).toBe('INSUFFICIENT_BALANCE');
     }
+  });
+});
+
+describe('applyCheckInState – activeSession guard', () => {
+  it('throws ACTIVE_SESSION_EXISTS when card has activeSession but NOT_CHECKED_IN status', () => {
+    const card: MbcCard = {
+      version: 1,
+      cardId: 'C1',
+      member: { memberId: 'M1' },
+      balance: 5000,
+      currency: 'IDR',
+      visitStatus: 'NOT_CHECKED_IN',
+      activeSession: {
+        activityId: 'existing',
+        activityType: 'PARKING',
+        checkedInAt: '2026-05-01T08:00:00.000Z',
+      },
+      transactionLogs: [],
+    };
+
+    expect(() =>
+      applyCheckInState(card, {
+        activityId: 'new',
+        activityType: 'PARKING',
+        checkedInAt: '2026-05-01T09:00:00.000Z',
+      }),
+    ).toThrow(DomainError);
   });
 });

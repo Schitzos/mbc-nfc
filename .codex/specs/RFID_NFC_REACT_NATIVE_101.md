@@ -83,11 +83,9 @@ Top-up must not clear an active parking visit. If a member is checked in and has
 
 ### Gate Check-In
 
-### Gate Simulation Mode
+### Gate Simulation Mode (Removed)
 
-For testing, the Gate can write an entry timestamp in the past so the Terminal can validate duration and fee calculation without waiting in real time.
-
-Simulation mode must not create a future check-in time. If checkout time is earlier than check-in time, Terminal must reject checkout as invalid duration.
+Removed in Phase 9. Gate uses real device time only for check-in timestamps.
 
 ### Terminal Check-Out
 
@@ -163,8 +161,8 @@ Minimum expectations:
 | Mobile framework | React Native CLI                   |
 | Language         | TypeScript                         |
 | NFC library      | `react-native-nfc-manager`         |
-| Local ledger     | SQLite                             |
-| State management | Zustand or React Context           |
+| Local ledger     | SQLite (`@op-engineering/op-sqlite`) |
+| State management | Zustand                            |
 | Testing          | Jest, React Native Testing Library |
 | Architecture     | Clean Architecture                 |
 | UI system        | Signal UI                          |

@@ -27,7 +27,7 @@ This folder is the cleaned evidence set for the emulator mock-flow sweep.
 
 - Happy:
   - Check in `Normal card` (`31-gate-normal-success.png`)
-  - Check in with simulation time (`35-gate-simulation-success.png`)
+  - Check in with simulation time (`35-gate-simulation-success.png`) — legacy; simulation mode removed in Phase 9
 - Failure:
   - `Already checked in` (`32-gate-checkedin-failure.png`)
   - `Unregistered` (`33-gate-unregistered-failure.png`)
@@ -37,7 +37,7 @@ This folder is the cleaned evidence set for the emulator mock-flow sweep.
 
 - Happy:
   - Checkout `Checked-in parking card` (`61-terminal-checkedin-parking-success.png`)
-  - Checkout `Checked-in generic card` (`62-terminal-checkedin-generic-success.png`)
+  - Checkout `Checked-in card` (`62-terminal-checkedin-generic-success.png`) — legacy filename; MVP uses PARKING only
 - Failure:
   - `Checked-in low-balance card` (`63-terminal-low-balance-failure.png`)
   - `Not checked in` (`64-terminal-not-checkedin-failure.png`)
@@ -49,7 +49,7 @@ This folder is the cleaned evidence set for the emulator mock-flow sweep.
 - Happy:
   - `Normal card` (`51-scout-normal-success.png`)
   - `Checked-in parking card` (`52-scout-checkedin-parking-success.png`)
-  - `Checked-in generic card` (`53-scout-checkedin-generic-success.png`)
+  - `Checked-in card` (`53-scout-checkedin-generic-success.png`) — legacy filename; MVP uses PARKING only
   - `Low balance` (`54-scout-low-balance-success.png`)
 - Failure:
   - `Unregistered` (`55-scout-unregistered-failure.png`)

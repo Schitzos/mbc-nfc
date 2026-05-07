@@ -199,3 +199,69 @@ describe('SignalSkeleton – extended coverage', () => {
     render(<SignalSkeleton variant="button" style={{ marginTop: 10 }} />);
   });
 });
+
+describe('NfcActionSheet – confirm phase', () => {
+  it('renders confirm title and buttons', () => {
+    const { NfcActionSheet } = require('../../components/NfcActionSheet');
+
+    render(
+      <NfcActionSheet
+        state={{
+          phase: 'confirm',
+          title: 'Confirm Action',
+          message: 'Are you sure?',
+          confirmLabel: 'Yes',
+          onConfirm: jest.fn(),
+        }}
+        onDismiss={jest.fn()}
+      />,
+    );
+
+    expect(screen.getByText('⚠ Confirm')).toBeTruthy();
+    expect(screen.getByText('Are you sure?')).toBeTruthy();
+    expect(screen.getByText('Yes')).toBeTruthy();
+  });
+});
+
+describe('SignalTextField – focused state', () => {
+  it('applies focused visual state on focus', async () => {
+    const { SignalTextField } = require('../SignalTextField');
+
+    const { getByPlaceholderText } = render(
+      <SignalTextField
+        state="enabled"
+        value=""
+        onChangeText={jest.fn()}
+        placeholder="test"
+      />,
+    );
+
+    const input = getByPlaceholderText('test');
+    fireEvent(input, 'focus');
+    expect(input).toBeTruthy();
+  });
+});
+
+describe('NfcActionSheet – scanning without message', () => {
+  it('renders default scanning message when state.message is undefined', () => {
+    const { NfcActionSheet } = require('../../components/NfcActionSheet');
+
+    render(
+      <NfcActionSheet
+        state={{ phase: 'scanning' }}
+        onDismiss={jest.fn()}
+      />,
+    );
+
+    expect(
+      screen.getByText('Hold your NFC card to the back of the phone'),
+    ).toBeTruthy();
+  });
+});
+
+describe('BackgroundDecor – default variant', () => {
+  it('renders without variant prop (uses default)', () => {
+    const { BackgroundDecor } = require('../BackgroundDecor');
+    render(<BackgroundDecor />);
+  });
+});

@@ -49,7 +49,7 @@ A feature is not release-ready without:
 | Technical Writer / Presentation Specialist | Confirms docs and presentation material.                                                                                                                                                                    |
 | Demo/Release Engineer                      | Confirms Git/repository baseline, branch promotion rules, GitHub Actions distribution pipeline, APK app distribution path, demo path, capture, run instructions, known limitations, and submission package. |
 
-## 3. Milestones
+## 5. Milestones
 
 ### M0 Repository Baseline
 
@@ -190,7 +190,7 @@ Exit criteria:
 - Demo/Release Engineer confirms capture, APK distribution path, run instructions, and known limitations.
 - Technical Writer / Presentation Specialist confirms final documentation and presentation sections.
 
-## 4. Demo Readiness Checklist
+## 6. Demo Readiness Checklist
 
 - Writable NFC card/tag prepared.
 - Android device prepared.
@@ -210,7 +210,7 @@ Exit criteria:
 - Presentation covers UI/UX design, software design, construction, quality, deployment, and security.
 - Known limitations ready to explain.
 
-## 5. Remaining Production Readiness Gap
+## 7. Remaining Production Readiness Gap
 
 The assessment build must implement production-grade NFC payload confidentiality/integrity. A real cooperative production rollout still needs:
 
@@ -222,7 +222,7 @@ The assessment build must implement production-grade NFC payload confidentiality
 - Privacy and retention policy.
 - Release signing and CI/CD.
 
-## Release Quality Gate Addendum
+## 8. Release Quality Gate Addendum
 
 Before any feature branch is merged into `develop`:
 
@@ -236,7 +236,7 @@ Before final release/submission:
 - Full coverage report must show at least 90% executable-source unit coverage.
 - SonarCloud or equivalent CI quality evidence should include the coverage result when available.
 
-## Final Release Evidence Requirement
+## 9. Final Release Evidence Requirement
 
 Before final submission, Senior QA must provide a use-case testing evidence package with screenshots proving that the delivered app satisfies the parking MVP requirements.
 

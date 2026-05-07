@@ -2,7 +2,7 @@ export class CardRepositoryError extends Error {
   constructor(
     public readonly code:
       | 'UNREGISTERED_CARD'
-      | 'TAMPERED_CARD'
+      | 'CARD_TAMPERED'
       | 'CARD_ALREADY_REGISTERED'
       | 'CARD_CAPACITY_INSUFFICIENT'
       | 'NFC_UNSUPPORTED'
