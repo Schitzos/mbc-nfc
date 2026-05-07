@@ -1,5 +1,5 @@
 jest.mock('react-native-quick-crypto', () => {
-  const nodeCrypto = require('crypto');
+  const nodeCrypto = require('node:crypto');
   return {
     __esModule: true,
     default: {

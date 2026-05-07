@@ -8,7 +8,7 @@ interface GateResultStateProps {
 
 export function GateResultState({
   latestResult,
-}: GateResultStateProps): React.JSX.Element | null {
+}: Readonly<GateResultStateProps>): React.JSX.Element | null {
   if (!latestResult) {
     return null;
   }

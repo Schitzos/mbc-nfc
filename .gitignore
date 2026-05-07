@@ -75,3 +75,4 @@ vendor/bundle/
 **/fastlane/screenshots
 **/fastlane/test_output
 
+.kiro/preferences/

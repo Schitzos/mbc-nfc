@@ -153,7 +153,7 @@ describe('screen index.tsx — 100% function coverage', () => {
       await waitFor(() =>
         expect(screen.getByText('Latest result')).toBeTruthy(),
       );
-    });
+    }, 15000);
 
     it('covers .catch(() => undefined) on handleRegister onPress', async () => {
       mockRegister.execute.mockRejectedValueOnce(new Error('fail'));

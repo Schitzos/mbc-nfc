@@ -1,4 +1,4 @@
-import { Buffer } from 'buffer';
+import { Buffer } from 'node:buffer';
 import NfcManager, { Ndef, NfcTech } from 'react-native-nfc-manager';
 import type { MbcCard } from '../../domain/entities/mbc-card';
 import type { MbcCardRepository } from '../../domain/repositories/mbc-card-repository';
