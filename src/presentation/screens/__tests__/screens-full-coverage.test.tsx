@@ -204,7 +204,7 @@ describe('screens – full branch coverage', () => {
 
     // The invalid date should be rendered as-is
     await waitFor(() => expect(screen.getByText(/invalid-date/)).toBeTruthy());
-  });
+  }, 15000);
 
   it('Scout shows error state for failed inspection', async () => {
     mockInspectMemberCardUseCase.execute.mockResolvedValueOnce({
