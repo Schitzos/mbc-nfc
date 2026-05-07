@@ -26,14 +26,14 @@ describe('activityStatePolicy – extended branch coverage', () => {
     ).toThrow(DomainError);
   });
 
-  it('supports GENERIC activity type for check-in (not hardcoded to parking)', () => {
+  it('supports custom activityId for check-in (not hardcoded)', () => {
     const result = applyCheckInState(baseCard, {
       activityId: 'co-working-space',
-      activityType: 'GENERIC',
+      activityType: 'PARKING',
       checkedInAt: '2026-05-01T10:00:00.000Z',
     });
 
-    expect(result.activeSession?.activityType).toBe('GENERIC');
+    expect(result.activeSession?.activityType).toBe('PARKING');
     expect(result.activeSession?.activityId).toBe('co-working-space');
   });
 

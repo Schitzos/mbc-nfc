@@ -111,11 +111,11 @@ describe('CheckOutActivityUseCase – extended coverage', () => {
     );
   });
 
-  it('handles GENERIC activity type checkout (not hardcoded to parking)', async () => {
+  it('handles custom activityId checkout (not hardcoded)', async () => {
     const card = createCheckedInCard({
       activeSession: {
         activityId: 'co-working',
-        activityType: 'GENERIC',
+        activityType: 'PARKING',
         checkedInAt: '2026-05-01T08:00:00.000Z',
       },
     });
@@ -135,7 +135,7 @@ describe('CheckOutActivityUseCase – extended coverage', () => {
     expect(result.success).toBe(true);
     expect(ledgerRepository.append).toHaveBeenCalledWith(
       expect.objectContaining({
-        activityType: 'GENERIC',
+        activityType: 'PARKING',
       }),
     );
   });

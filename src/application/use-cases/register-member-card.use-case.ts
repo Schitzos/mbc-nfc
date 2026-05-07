@@ -63,36 +63,18 @@ export class RegisterMemberCardUseCase {
   async executeWithReset(): Promise<RoleActionResultDto> {
     const card = createInitialCard();
     await this.cardRepository.writeCard(card);
-
-    let message = 'Member card registered successfully.';
-
-    if (this.localLedgerRepository) {
-      try {
-        await this.localLedgerRepository.append({
-          id: createRandomId('LEDGER'),
-          role: 'STATION',
-          action: 'REGISTER',
-          maskedMemberReference: maskMemberReference(card.member.memberId),
-          occurredAt: new Date().toISOString(),
-        });
-      } catch {
-        message =
-          'Member card registered, but the local audit ledger could not be updated.';
-      }
-    }
-
-    return {
-      success: true,
-      role: 'STATION',
-      message,
-      card: toCardSummaryDto(card),
-    };
+    return this.buildSuccessResult(card);
   }
 
   private async performRegistration(): Promise<RoleActionResultDto> {
     const card = createInitialCard();
     await this.cardRepository.registerCard(card);
+    return this.buildSuccessResult(card);
+  }
 
+  private async buildSuccessResult(
+    card: MbcCard,
+  ): Promise<RoleActionResultDto> {
     let message = 'Member card registered successfully.';
 
     if (this.localLedgerRepository) {

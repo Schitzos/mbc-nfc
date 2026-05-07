@@ -72,7 +72,7 @@ export class CheckOutActivityUseCase {
             maskedMemberReference: maskMemberReference(
               updatedCard.member.memberId,
             ),
-            activityType: sessionActivityType as 'PARKING' | 'GENERIC',
+            activityType: sessionActivityType as 'PARKING',
             amount: tariffResult.chargedAmount,
             occurredAt,
           });
