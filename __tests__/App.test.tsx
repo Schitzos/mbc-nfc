@@ -7,6 +7,10 @@ import { fireEvent, render, screen } from '@testing-library/react-native';
 import { RoleSwitcherScreen } from '../src/presentation/screens/RoleSwitcherScreen';
 import { useAppStore } from '../src/presentation/stores/app-store';
 
+jest.mock('react-native-safe-area-context', () => ({
+  useSafeAreaInsets: () => ({ top: 0, bottom: 0, left: 0, right: 0 }),
+}));
+
 beforeEach(() => {
   useAppStore.setState({ selectedRole: null });
 });

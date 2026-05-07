@@ -8,106 +8,60 @@ import { RegisterMemberCardUseCase } from '../application/use-cases/register-mem
 import { TopUpMemberCardUseCase } from '../application/use-cases/top-up-member-card.use-case';
 import { SqliteLedgerRepository } from '../infrastructure/local-ledger/sqlite-ledger.repository';
 import { DeviceNfcStatusRepository } from '../infrastructure/nfc/device-nfc-status.repository';
-import { MockMbcCardRepository } from '../infrastructure/nfc/mock-mbc-card.repository';
+import { RealMbcCardRepository } from '../infrastructure/nfc/real-mbc-card.repository';
+import type { AppServices } from '../presentation/context/service-context';
 
-let mockCardRepository: MockMbcCardRepository | null = null;
-let deviceNfcStatusRepository: DeviceNfcStatusRepository | null = null;
-let sqliteLedgerRepository: SqliteLedgerRepository | null = null;
+let cachedServices: AppServices | null = null;
 
-function createLedgerConnection() {
-  return open({
-    name: 'mbc-ledger.db',
-    location: 'default',
-  });
-}
-
-function getMockCardRepository() {
-  if (!mockCardRepository) {
-    mockCardRepository = new MockMbcCardRepository();
+export function createAppServices(): AppServices {
+  if (cachedServices) {
+    return cachedServices;
   }
 
-  return mockCardRepository;
-}
+  const db = open({ name: 'mbc-ledger.db', location: 'default' });
+  const cardRepository = new RealMbcCardRepository();
+  const nfcStatusRepository = new DeviceNfcStatusRepository();
+  const ledgerRepository = new SqliteLedgerRepository(db);
 
-function getDeviceNfcStatusRepository() {
-  if (!deviceNfcStatusRepository) {
-    deviceNfcStatusRepository = new DeviceNfcStatusRepository();
-  }
-
-  return deviceNfcStatusRepository;
-}
-
-function getSqliteLedgerRepository() {
-  if (!sqliteLedgerRepository) {
-    sqliteLedgerRepository = new SqliteLedgerRepository(
-      createLedgerConnection(),
-    );
-  }
-
-  return sqliteLedgerRepository;
-}
-
-export const appContainer = {
-  getMockCardRepository,
-  getDeviceNfcStatusRepository,
-  getSqliteLedgerRepository,
-  getStationServices() {
-    const mockRepository = getMockCardRepository();
-    const ledgerRepository = getSqliteLedgerRepository();
-
-    return {
+  cachedServices = {
+    station: {
       checkNfcAvailabilityUseCase: new CheckNfcAvailabilityUseCase(
-        getDeviceNfcStatusRepository(),
+        nfcStatusRepository,
       ),
       registerMemberCardUseCase: new RegisterMemberCardUseCase(
-        mockRepository,
+        cardRepository,
         ledgerRepository,
       ),
       topUpMemberCardUseCase: new TopUpMemberCardUseCase(
-        mockRepository,
+        cardRepository,
         ledgerRepository,
       ),
       getStationLedgerSummaryUseCase: new GetStationLedgerSummaryUseCase(
         ledgerRepository,
       ),
-      mockRepository,
-    };
-  },
-  getGateServices() {
-    const mockRepository = getMockCardRepository();
-
-    return {
+    },
+    gate: {
       checkNfcAvailabilityUseCase: new CheckNfcAvailabilityUseCase(
-        getDeviceNfcStatusRepository(),
+        nfcStatusRepository,
       ),
-      checkInActivityUseCase: new CheckInActivityUseCase(mockRepository),
-      mockRepository,
-    };
-  },
-  getScoutServices() {
-    const mockRepository = getMockCardRepository();
-
-    return {
+      checkInActivityUseCase: new CheckInActivityUseCase(cardRepository),
+    },
+    terminal: {
       checkNfcAvailabilityUseCase: new CheckNfcAvailabilityUseCase(
-        getDeviceNfcStatusRepository(),
-      ),
-      inspectMemberCardUseCase: new InspectMemberCardUseCase(mockRepository),
-      mockRepository,
-    };
-  },
-  getTerminalServices() {
-    const mockRepository = getMockCardRepository();
-    const ledgerRepository = getSqliteLedgerRepository();
-
-    return {
-      checkNfcAvailabilityUseCase: new CheckNfcAvailabilityUseCase(
-        getDeviceNfcStatusRepository(),
+        nfcStatusRepository,
       ),
       checkOutActivityUseCase: new CheckOutActivityUseCase(
-        mockRepository,
+        cardRepository,
         ledgerRepository,
       ),
-      mockRepository,
-    };
-  },
-};
+    },
+    scout: {
+      checkNfcAvailabilityUseCase: new CheckNfcAvailabilityUseCase(
+        nfcStatusRepository,
+      ),
+      inspectMemberCardUseCase: new InspectMemberCardUseCase(cardRepository),
+    },
+  };
+
+  return cachedServices;
+}

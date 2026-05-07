@@ -1,18 +1,15 @@
 import { CheckNfcAvailabilityUseCase } from '../check-nfc-availability-use-case';
-import type { MbcCardRepository } from '../../../domain/repositories/mbc-card-repository';
-import type { NfcAvailabilityStatus } from '../../dto/check-nfc-availability-result-dto';
+import type {
+  NfcAvailabilityRepository,
+  NfcAvailabilityStatus,
+} from '../../../domain/repositories/nfc-availability-repository';
 
-function createRepository(status?: NfcAvailabilityStatus): MbcCardRepository & {
-  getAvailabilityStatus?: () => Promise<NfcAvailabilityStatus>;
-} {
+function createRepository(
+  status: NfcAvailabilityStatus,
+): NfcAvailabilityRepository {
   return {
-    isSupported: jest.fn().mockResolvedValue(status !== 'UNSUPPORTED'),
-    readCard: jest.fn(),
-    writeCard: jest.fn(),
-    cancel: jest.fn(),
-    getAvailabilityStatus: status
-      ? jest.fn().mockResolvedValue(status)
-      : undefined,
+    isSupported: jest.fn().mockResolvedValue(status === 'SUPPORTED'),
+    getAvailabilityStatus: jest.fn().mockResolvedValue(status),
   };
 }
 
@@ -25,7 +22,6 @@ describe('CheckNfcAvailabilityUseCase', () => {
     await expect(useCase.execute()).resolves.toMatchObject({
       supported: true,
       status: 'SUPPORTED',
-      shouldUseMockMode: false,
     });
   });
 
@@ -37,7 +33,6 @@ describe('CheckNfcAvailabilityUseCase', () => {
     await expect(useCase.execute()).resolves.toMatchObject({
       supported: false,
       status: 'UNSUPPORTED',
-      shouldUseMockMode: true,
     });
   });
 
@@ -49,7 +44,6 @@ describe('CheckNfcAvailabilityUseCase', () => {
     await expect(useCase.execute()).resolves.toMatchObject({
       supported: false,
       status: 'DISABLED',
-      shouldUseMockMode: true,
     });
   });
 
@@ -61,21 +55,6 @@ describe('CheckNfcAvailabilityUseCase', () => {
     await expect(useCase.execute()).resolves.toMatchObject({
       supported: false,
       status: 'UNAVAILABLE',
-      shouldUseMockMode: true,
-    });
-  });
-
-  it('falls back to isSupported when detailed availability is not provided', async () => {
-    const useCase = new CheckNfcAvailabilityUseCase({
-      isSupported: jest.fn().mockResolvedValue(true),
-      readCard: jest.fn(),
-      writeCard: jest.fn(),
-      cancel: jest.fn(),
-    });
-
-    await expect(useCase.execute()).resolves.toMatchObject({
-      supported: true,
-      status: 'SUPPORTED',
     });
   });
 });

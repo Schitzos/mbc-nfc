@@ -1,6 +1,5 @@
 import NfcManager from 'react-native-nfc-manager';
 import { DeviceNfcStatusRepository } from '../device-nfc-status.repository';
-import { CardRepositoryError } from '../../../domain/errors/card-repository-error';
 
 jest.mock('react-native-nfc-manager', () => ({
   start: jest.fn().mockResolvedValue(undefined),
@@ -40,15 +39,8 @@ describe('DeviceNfcStatusRepository', () => {
     );
   });
 
-  it('throws for read/write operations and supports cancel', async () => {
+  it('isSupported delegates to NfcManager', async () => {
     const repository = new DeviceNfcStatusRepository();
-
-    await expect(repository.readCard()).rejects.toBeInstanceOf(
-      CardRepositoryError,
-    );
-    await expect(repository.writeCard()).rejects.toBeInstanceOf(
-      CardRepositoryError,
-    );
-    await expect(repository.cancel()).resolves.toBeUndefined();
+    await expect(repository.isSupported()).resolves.toBe(true);
   });
 });

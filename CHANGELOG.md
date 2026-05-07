@@ -14,6 +14,7 @@ Changes:
 - Added registration overwrite protection: valid existing MBC cards must be rejected during registration.
 - Added NFC capacity guard with `CARD_CAPACITY_INSUFFICIENT`.
 - Added post-write readback verification with `WRITE_VERIFY_FAILED`.
+- Updated later: removed post-write readback verification and `WRITE_VERIFY_FAILED`; runtime relies on capacity guard + `writeNdefMessage` failure handling (documented in `.codex/specs/CHANGE_NOTE.md` and current specs).
 - Standardized card transaction logs as newest-first, max five entries.
 - Added invalid checkout time/duration handling.
 - Added insufficient-balance recovery flow: top-up while checked in, then retry checkout.

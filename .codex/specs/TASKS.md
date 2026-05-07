@@ -16,7 +16,7 @@ Purpose: compact, Codex-friendly task cards. Execute task order from `EXECUTION_
 - Work on one task ID only.
 - Build parking MVP only; no non-parking runtime flow.
 - Keep future extension possible through interfaces.
-- Verify every successful card write by readback.
+- Capacity guard enforced before every write. writeNdefMessage throws on failure.
 - For every changed executable source file, create/update unit tests.
 - Keep executable-source coverage >=90% or document approved exception.
 
@@ -151,21 +151,21 @@ Done: UI can render from DTOs only.
 
 Owner: Senior RN FE / NFC Specialist  
 Refs: `RFID_NFC_REACT_NATIVE_101.md`  
-Do: Return supported/unsupported/disabled/unavailable/timeout/mock states with user guidance.  
+Do: Return supported/unsupported/disabled/unavailable/timeout states with user guidance.  
 Done: Screens can show clear NFC readiness messages.
 
 ### T-012 — Register Card Use Case
 
 Owner: Senior RN FE  
 Refs: `REQUIREMENTS.md`, `CARD_DATA_SECURITY_LEDGER_SPEC.md`, `SECURITY.md`  
-Do: Reject existing MBC overwrite, generate member ID, initialize balance/status/log, write protected card, verify readback, then append ledger.  
+Do: Reject existing MBC overwrite, generate member ID, initialize balance/status/log, write protected card, confirm write success, then append ledger.  
 Done: Registration creates valid protected card and rejects overwrite.
 
 ### T-013 — Top-Up Use Case
 
 Owner: Senior RN FE  
 Refs: `EDGE_CASES.md`, `CARD_DATA_SECURITY_LEDGER_SPEC.md`  
-Do: Validate card/amount, increase balance, add top-up log, preserve active visit, verify write, append ledger.  
+Do: Validate card/amount, increase balance, add top-up log, preserve active visit, write card with capacity/error handling (`writeNdefMessage` throws on failure), append ledger.  
 Done: Top-up works for normal and checked-in cards.
 
 ### T-014 — Gate Check-In Use Case
@@ -173,14 +173,14 @@ Done: Top-up works for normal and checked-in cards.
 Owner: Senior RN FE  
 Refs: `REQUIREMENTS.md`, `EDGE_CASES.md`, `CARD_DATA_SECURITY_LEDGER_SPEC.md`
 
-Do: Read registered card, reject double check-in, write active visit timestamp/status, verify write with readback, log CHECKIN amount 0.  
-Done: Gate check-in works in mock/real repository path with unit tests.
+Do: Read registered card, reject double check-in, write active visit timestamp/status, confirm write success, log CHECKIN amount 0.  
+Done: Gate check-in works with real NFC repository path and unit tests.
 
 ### T-015 — Terminal Check-Out Use Case
 
 Owner: Senior RN FE  
 Refs: `EDGE_CASES.md`, `CARD_DATA_SECURITY_LEDGER_SPEC.md`  
-Do: Read checked-in card, calculate duration and fee using fixed Rp 2.000 per started hour, reject insufficient balance without mutation, deduct/clear/log/write/verify/append ledger.  
+Do: Read checked-in card, calculate duration and fee using fixed Rp 2.000 per started hour, reject insufficient balance without mutation, deduct/clear/log/write with capacity/error handling (`writeNdefMessage` throws on failure), append ledger.  
 Done: Checkout uses fixed MVP tariff and unit tests cover rounding/insufficient balance.
 
 ### T-016 — Scout Inspect Use Case
@@ -198,7 +198,7 @@ Done: Scout is read-only.
 Owner: Senior RN FE / Test Automation  
 Refs: `DESIGN.md`, `EDGE_CASES.md`  
 Do: Implement mock card repository with fixtures for unregistered, registered, low balance, checked-in, tampered, oversized.  
-Done: All role flows run without real NFC.
+Done: Test doubles are available for automated tests only; production runtime uses real NFC repository.
 
 ### T-017A — SQLite Ledger Repository
 
@@ -211,7 +211,7 @@ Done: Station shows current-device transaction count/income.
 
 Owner: NFC/Mobile Specialist  
 Refs: `RFID_NFC_REACT_NATIVE_101.md`, `CARD_DATA_SECURITY_LEDGER_SPEC.md`  
-Do: Implement NFC read/write/cancel/session cleanup, handle errors, and verify writes by readback.  
+Do: Implement NFC read/write/cancel/session cleanup, handle errors, and handle write errors.  
 Done: Supported cards read/write safely on tested devices.
 
 ### T-019 — MBC Card Codec
@@ -232,7 +232,7 @@ Done: Generic NFC reader cannot plainly read identity, balance, status, or logs.
 
 Owner: Senior RN FE / Architect  
 Refs: `CARD_DATA_SECURITY_LEDGER_SPEC.md`  
-Do: Append ledger only after card write-readback for register/top-up/check-in/checkout; warn if ledger fails after card success.  
+Do: Append ledger only after card write success for register/top-up/check-in/checkout; warn if ledger fails after card success.  
 Done: Local reports reflect successful operations on this device only.
 
 ---
@@ -257,7 +257,7 @@ Done: Station supports required MVP actions without extra pricing settings.
 
 Owner: Senior RN FE / UI Designer  
 Refs: `REQUIREMENTS.md`, `EDGE_CASES.md`  
-Do: Implement check-in, optional past simulation.
+Do: Implement check-in using real device time only.
 
 ### T-024 — Terminal Screen
 
@@ -300,6 +300,13 @@ Refs: `SIGNAL_UI_GUIDE.md`
 Do: Polish spacing, buttons, badges, bottom sheets, icons, hierarchy; do not add scope.  
 Done: Screens are clean and demo-ready.
 
+### T-026E — NFC Log Panel and Toggle
+
+Owner: Senior RN FE / Software Architect / System Analyst / Product Owner  
+Refs: `REQUIREMENTS.md`, `DESIGN.md`, `SECURITY.md`  
+Do: Add shared NFC operational log panel in Station/Gate/Terminal/Scout with toggle on/off and clear action; ensure safe redaction/no sensitive payload disclosure.  
+Done: Operator can enable/disable log panel, see timestamped NFC events, clear current lines, and run core flows without business-state side effects.
+
 ---
 
 ## Phase 7 — Quality, Release, and Submission
@@ -329,7 +336,7 @@ Done: Quality gate runs or manual/deferred plan is documented.
 
 Owner: Release Engineer  
 Refs: `RELEASE_PLAN.md`, `DONE.md`  
-Do: Configure GitHub Actions on `main` to build Android release artifact and upload to Firebase App Distribution with secrets/tester notes documented.  
+Do: Maintain single GitHub Actions workflow (`.github/workflows/build.yml`) where PR to `develop` runs validation gates and push/merge to `main` builds APK and uploads to Firebase App Distribution with secrets/tester notes documented.  
 Done: `main` trigger distributes build or has documented dry-run evidence.
 
 ### T-027C — QA Screenshot Evidence Gate

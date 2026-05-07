@@ -38,7 +38,7 @@ An MBC role flow is done when:
 - Station, Gate, Terminal, and Scout do not expose the full internal member ID in normal screens.
 - Station can show a local device-side ledger summary for audit/reporting.
 - Gate can check in to an activity and reject double check-in.
-- Gate simulation mode can write a past activity entry timestamp.
+- Gate uses real device time to write activity entry timestamp.
 - Terminal can calculate activity fee and checkout.
 - Terminal rejects double checkout and insufficient balance safely.
 - Scout can inspect balance, status, and latest logs without modifying card data.
@@ -103,7 +103,7 @@ Submission is done when:
 - Repository is ready for GitHub or GitLab sharing.
 - Branching, merge-request, and promotion rules for `feature/*`, `develop`, and `main` are documented.
 - `.gitignore` excludes generated build output, dependency folders, local environment files, logs, and secrets.
-- README contains setup/run instructions, NFC device requirement, mock/demo path, and known limitations.
+- README contains setup/run instructions, NFC device requirement, and known limitations.
 - No sensitive payloads, keys, credentials, or local-only files are committed.
 - Working frontend app has no crash in the main demo flows.
 - Image or short video demo evidence is ready.

@@ -1,10 +1,3 @@
-import type { LedgerEntry } from '../../domain/entities/mbc-card';
+import type { StationLedgerSummary } from '../../domain/entities/station-ledger-summary';
 
-export type StationLedgerSummaryDto = {
-  topUpTotal: number;
-  checkoutTotal: number;
-  registerCount: number;
-  topUpCount: number;
-  checkoutCount: number;
-  latestEntries: LedgerEntry[];
-};
+export type StationLedgerSummaryDto = StationLedgerSummary;

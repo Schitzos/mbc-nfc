@@ -28,3 +28,48 @@ This patch applies the final platform/security/device decisions after the NTAG21
 - `TRACEABILITY.md`
 - `RISKS.md`
 - `TASK_PRESENTATION_BRIEF.md`
+
+---
+
+# Change Note — NFC Single-Tap and UI Polish (2026-05-07)
+
+## Decisions applied
+
+- Post-write readback verification removed. The compact codec does not preserve transaction log IDs round-trip, making JSON fingerprint comparison unreliable. `writeNdefMessage` throws on write failure, which is sufficient.
+- `readWriteCard(transform)` added to `MbcCardRepository` interface. Performs read, transform, and write in a single NFC session (one tap). Used by top-up, check-in, and check-out.
+- `getNdefMessage()` on Android returns a tag-like object `{ ndefMessage: [...] }`, not a records array. Fixed to extract `.ndefMessage` property.
+- `DomainError` now passes through `toReadableError` in the repository so domain validation errors (e.g., `ACTIVE_SESSION_MISSING`, `INSUFFICIENT_BALANCE`) propagate correctly from `readWriteCard` transforms.
+- `durationMs` added to `ActivityTariffCalculation` return type for exact duration display.
+
+## UI changes
+
+- Bottom sheet height set to 50% of device screen.
+- Dark overlay (`rgba(0,0,0,0.5)`) shown when bottom sheet is open.
+- Bottom sheet dismissable in all states including scanning (tap overlay to cancel).
+- Dismissed scanning state suppresses subsequent error sheet (all screens use `dismissedRef` pattern).
+- Check-in result card shows current balance and check-in time.
+- Terminal screen shows exact duration as `Xh Ym Zs` instead of rounded hours.
+- Top-up and check-in success bottom sheets show current balance.
+- Station screen: removed "Real NFC mode" info card, moved refresh inline with ledger header, latest result clears on mode switch.
+- Gate screen: removed recovery guidance card from error state.
+
+## Files changed
+
+- `src/infrastructure/nfc/real-mbc-card.repository.ts`
+- `src/domain/repositories/mbc-card-repository.ts`
+- `src/domain/services/activity-tariff-calculator.ts`
+- `src/application/dto/role-action-result-dto.ts`
+- `src/application/use-cases/top-up-member-card.use-case.ts`
+- `src/application/use-cases/check-in-activity.use-case.ts`
+- `src/application/use-cases/check-out-activity.use-case.ts`
+- `src/presentation/components/SignalBottomSheet/styles.ts`
+- `src/presentation/components/NfcActionSheet/index.tsx`
+- `src/presentation/screens/Station/useStationActions.ts`
+- `src/presentation/screens/Station/index.tsx`
+- `src/presentation/screens/Gate/useGateActions.ts`
+- `src/presentation/screens/Gate/index.tsx`
+- `src/presentation/screens/Gate/fragments/GateResultState.tsx`
+- `src/presentation/screens/Terminal/useTerminalActions.ts`
+- `src/presentation/screens/Terminal/index.tsx`
+- `src/presentation/screens/Scout/useScoutActions.ts`
+- `src/presentation/screens/Scout/index.tsx`

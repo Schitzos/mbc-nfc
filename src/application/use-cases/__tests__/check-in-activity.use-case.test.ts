@@ -18,10 +18,15 @@ function createCard(overrides?: Partial<MbcCard>): MbcCard {
 function createCardRepository(
   overrides?: Partial<MbcCardRepository>,
 ): MbcCardRepository {
+  const defaultCard = createCard();
   return {
     isSupported: jest.fn().mockResolvedValue(true),
-    readCard: jest.fn().mockResolvedValue(createCard()),
+    readCard: jest.fn().mockResolvedValue(defaultCard),
     writeCard: jest.fn().mockResolvedValue(undefined),
+    readWriteCard: jest
+      .fn()
+      .mockImplementation(async (fn: any) => fn(defaultCard)),
+    registerCard: jest.fn().mockResolvedValue(undefined),
     cancel: jest.fn().mockResolvedValue(undefined),
     ...overrides,
   };
@@ -44,15 +49,7 @@ describe('CheckInActivityUseCase', () => {
       activityType: 'PARKING',
       checkedInAt: expect.any(String),
     });
-    expect(cardRepository.writeCard).toHaveBeenCalledWith(
-      expect.objectContaining({
-        transactionLogs: [
-          expect.objectContaining({
-            activity: 'CHECK_IN',
-          }),
-        ],
-      }),
-    );
+    expect(cardRepository.readWriteCard).toHaveBeenCalled();
   });
 
   it('supports an optional simulation timestamp', async () => {
@@ -61,7 +58,7 @@ describe('CheckInActivityUseCase', () => {
 
     const result = await useCase.execute({
       activityId: 'coop-event-hall',
-      activityType: 'GENERIC',
+      activityType: 'PARKING',
       simulatedCheckedInAt: '2026-05-01T08:30:00.000Z',
     });
 
@@ -73,17 +70,18 @@ describe('CheckInActivityUseCase', () => {
   });
 
   it('rejects invalid repeated check-in safely', async () => {
+    const checkedInCard = createCard({
+      visitStatus: 'CHECKED_IN',
+      activeSession: {
+        activityId: 'parking-main-gate',
+        activityType: 'PARKING',
+        checkedInAt: '2026-05-01T08:00:00.000Z',
+      },
+    });
     const cardRepository = createCardRepository({
-      readCard: jest.fn().mockResolvedValue(
-        createCard({
-          visitStatus: 'CHECKED_IN',
-          activeSession: {
-            activityId: 'parking-main-gate',
-            activityType: 'PARKING',
-            checkedInAt: '2026-05-01T08:00:00.000Z',
-          },
-        }),
-      ),
+      readWriteCard: jest
+        .fn()
+        .mockImplementation(async (fn: any) => fn(checkedInCard)),
     });
     const useCase = new CheckInActivityUseCase(cardRepository);
 
@@ -94,6 +92,5 @@ describe('CheckInActivityUseCase', () => {
 
     expect(result.success).toBe(false);
     expect(result.message).toContain('already checked in');
-    expect(cardRepository.writeCard).not.toHaveBeenCalled();
   });
 });

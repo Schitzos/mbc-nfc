@@ -2,7 +2,7 @@ export type VisitStatus = 'NOT_CHECKED_IN' | 'CHECKED_IN';
 
 export type MbcActivity = 'REGISTER' | 'TOP_UP' | 'CHECK_IN' | 'CHECK_OUT';
 
-export type BenefitActivityType = 'PARKING' | 'GENERIC';
+export type BenefitActivityType = 'PARKING';
 
 export type MbcRole = 'STATION' | 'GATE' | 'TERMINAL' | 'SCOUT';
 
@@ -48,8 +48,8 @@ export type MbcCard = {
   transactionLogs: TransactionLog[];
 };
 
-export type ActivityTariffRule = {
-  activityType: BenefitActivityType;
-  feePerStartedHour: number;
-  currency: CurrencyCode;
-};
+/**
+ * Fixed parking tariff: Rp 2.000 per started hour.
+ * Defined once in the domain layer — import where needed.
+ */
+export const PARKING_TARIFF_PER_STARTED_HOUR = 2000;

@@ -3,7 +3,6 @@ export class DomainError extends Error {
     public readonly code:
       | 'INVALID_TIMESTAMP'
       | 'INVALID_DURATION'
-      | 'INVALID_TARIFF_RULE'
       | 'CARD_ALREADY_CHECKED_IN'
       | 'CARD_NOT_CHECKED_IN'
       | 'ACTIVE_SESSION_EXISTS'

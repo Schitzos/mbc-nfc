@@ -1,18 +1,18 @@
 import React from 'react';
-import { Pressable, Text, View } from 'react-native';
+import { Image, Pressable, Text, View } from 'react-native';
 import type { RoleOption } from '../../../config/role-options';
 
-type Props = {
-  activeRoleKey: RoleOption['key'];
+interface RoleOptionListProps {
+  activeRoleKey: RoleOption['key'] | null;
   roles: RoleOption[];
   onSelect: (roleKey: RoleOption['key']) => void;
-};
+}
 
 const roleIcon: Record<RoleOption['key'], string> = {
-  station: 'S',
-  gate: 'G',
-  terminal: 'T',
-  scout: 'R',
+  station: '+',
+  gate: '↦',
+  terminal: '✓',
+  scout: '◎',
 };
 
 const roleHint: Record<RoleOption['key'], string> = {
@@ -26,22 +26,31 @@ export function RoleOptionList({
   activeRoleKey,
   roles,
   onSelect,
-}: Props): React.JSX.Element {
+}: Readonly<RoleOptionListProps>): React.JSX.Element {
   return (
-    <View className="rounded-2xl bg-white p-4">
+    <View className="rounded-2xl bg-white p-4 shadow-sm">
       <Text className="text-2xl font-bold text-foreground">Choose role</Text>
+      <Text className="mt-1 text-sm text-muted">
+        Single app, four operational roles.
+      </Text>
 
       <View className="mt-4 rounded-xl border border-[#2A8BFF] bg-[#EAF4FF] p-4">
-        <Text className="text-lg font-semibold text-foreground">
-          Offline NFC source of truth
-        </Text>
+        <View className="flex-row items-center">
+          <Image
+            source={require('../../../assets/icons/nfc-tap.png')}
+            className="mr-2 h-5 w-5"
+          />
+          <Text className="text-lg font-semibold text-foreground">
+            Offline NFC source of truth
+          </Text>
+        </View>
         <Text className="mt-1 text-sm leading-5 text-muted">
           Member identity, balance, activity status, and latest logs live on
           card.
         </Text>
       </View>
 
-      <View className="mt-4 gap-3">
+      <View className="mt-4 gap-2.5">
         {roles.map(role => {
           const active = role.key === activeRoleKey;
           return (
@@ -55,8 +64,16 @@ export function RoleOptionList({
               }`}
               onPress={() => onSelect(role.key)}
             >
-              <View className="mr-3 h-6 w-6 items-center justify-center rounded-full bg-[#EAF4FF]">
-                <Text className="text-xs font-bold text-[#2A8BFF]">
+              <View
+                className={`mr-3 h-7 w-7 items-center justify-center rounded-full ${
+                  active ? 'bg-[#2A8BFF]' : 'bg-[#EAF4FF]'
+                }`}
+              >
+                <Text
+                  className={`text-xs font-bold ${
+                    active ? 'text-white' : 'text-[#2A8BFF]'
+                  }`}
+                >
                   {roleIcon[role.key]}
                 </Text>
               </View>
@@ -71,10 +88,6 @@ export function RoleOptionList({
           );
         })}
       </View>
-
-      <Text className="mt-4 text-xs text-muted">
-        Default demo: Parking. Reusable activity model stays available.
-      </Text>
     </View>
   );
 }

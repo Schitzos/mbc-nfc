@@ -51,7 +51,7 @@ The receiving owner must update or request updates to the relevant `.codex/specs
 | Senior React Native FE                     | React Native implementation, role screens, state management, UI integration, and feature-branch delivery into `develop`.                            |
 | UI/UX Designer                             | Signal UI alignment, role UX, screen states, and usability.                                                                                         |
 | NFC/Mobile Native Specialist               | Android/iOS NFC setup, card/tag behavior, and native lifecycle.                                                                                     |
-| Test Automation Engineer                   | Automated tests, mocked repository coverage, and CI-friendly regression.                                                                            |
+| Test Automation Engineer                   | Automated tests, repository test-double coverage, and CI-friendly regression.                                                                       |
 | Senior QA                                  | Manual QA, acceptance validation, edge cases, and release confidence.                                                                               |
 | Security Pentester                         | Silent Shield, tamper handling, NFC payload abuse cases, and privacy checks.                                                                        |
 | Technical Writer / Presentation Specialist | README, docs, demo script, assumptions, limitations, and presentation.                                                                              |
@@ -100,7 +100,7 @@ Minimum agent self-check before claiming a task is clear:
 - Silent Shield protects identity and balance from plain NFC reads and includes tamper/integrity validation.
 - Mock card repository must support progress before real NFC hardware is available.
 - Registration must reject already registered valid MBC cards.
-- Real NFC writes must include capacity guard and post-write readback verification.
+- Real NFC writes must include capacity guard. writeNdefMessage throws on failure (no post-write readback).
 - Real NFC findings must be recorded in `.codex/specs/DEVICE_TEST_MATRIX.md`.
 - Every changed executable source file must have a created or updated unit test unless an approved exception is documented.
 - Feature work must preserve at least 90% automated unit-test coverage for executable source.

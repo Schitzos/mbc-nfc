@@ -43,8 +43,8 @@ Do not use community libraries such as Material, iOS, or Simple Design System as
 - Use `Signal - Web 1.1` and `Signal - Web Kit` to guide spacing, density, component hierarchy, and typography when mobile-specific patterns are unavailable.
 - Keep Station simple for cooperative staff: short labels, direct validation, clear NFC action.
 - Keep Scout visually read-only: no write-style call to action.
-- Terminal must clearly show duration, charged hours, fee, balance before, and balance after.
-- Gate simulation mode must be visibly active when enabled.
+- Terminal must clearly show duration, charged hours, fee, and updated balance after successful checkout tap.
+- Gate check-in uses real device time; simulation controls are not shown in production flow.
 
 ## 4. Screen Mapping
 
@@ -52,7 +52,7 @@ Do not use community libraries such as Material, iOS, or Simple Design System as
 | ------------- | ----------------------------------------------------------------------------------------------------------------------- |
 | Role Switcher | Use clear navigation or selector patterns; each role should have a distinct label, icon, and short operational purpose. |
 | Station       | Use form/input patterns, primary action button, validation/error states, and success result summary.                    |
-| Gate          | Use activity selector, NFC scan action, active simulation state, and member validation result.                          |
+| Gate          | Use activity selector, NFC scan action, and member validation result.                                                   |
 | Terminal      | Use fee summary, status/result panels, warning/error state, and insufficient balance recovery guidance.                 |
 | Scout         | Use read-only summary, balance/status surface, and compact transaction history list.                                    |
 
@@ -327,7 +327,7 @@ Text-field implementation:
 
 MBC usage:
 
-- Use for Station member registration fields, top-up amount, simulation-time input, and filter/search fields if needed.
+- Use for Station member registration fields, top-up amount, and filter/search fields if needed.
 - Use error state for invalid amount, invalid member data, or required fields.
 - Use load state while a field is locked during NFC read/write processing.
 
@@ -386,7 +386,7 @@ Open-source implementation fallback:
 - Lucide is preferred for first implementation because it provides a React Native package and uses a clean 24px stroke style that is close to the extracted Signal system-icon behavior.
 - Keep icon use supportive: icons may clarify role, NFC action, status, balance, history, and recovery states, but must not replace required text labels.
 - Use one icon style per screen; do not mix filled, duotone, and stroke icons in the same control group.
-- Use icons with clear operational meaning: NFC/card for tap actions, user for member display, wallet for balance/top-up, check for success, alert for blocked/error, search for Scout inspect, clock/history for logs and simulation, lock/shield for protected/internal values.
+- Use icons with clear operational meaning: NFC/card for tap actions, user for member display, wallet for balance/top-up, check for success, alert for blocked/error, search for Scout inspect, clock/history for logs, lock/shield for protected/internal values.
 
 Mobile app component decision:
 

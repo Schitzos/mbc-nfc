@@ -23,7 +23,7 @@ For this project, the NFC implementation must follow these decisions:
 4. SQLite is only a local device reporting/audit ledger. It is not the global member-state source of truth.
 5. The MVP parking tariff is fixed at Rp2.000 per started hour.
 6. Silent Shield must use production-grade protection: authenticated encryption/integrity validation, not plain JSON, Base64-only encoding, or weak obfuscation.
-7. Every successful NFC write must be verified using readback before showing success.
+7. Every NFC write relies on writeNdefMessage throwing on failure. Capacity is checked before write.
 8. Card payload size must be validated against the selected NFC tag/card capacity.
 
 ## 3. Core Idea
@@ -83,11 +83,9 @@ Top-up must not clear an active parking visit. If a member is checked in and has
 
 ### Gate Check-In
 
-### Gate Simulation Mode
+### Gate Simulation Mode (Removed)
 
-For testing, the Gate can write an entry timestamp in the past so the Terminal can validate duration and fee calculation without waiting in real time.
-
-Simulation mode must not create a future check-in time. If checkout time is earlier than check-in time, Terminal must reject checkout as invalid duration.
+Removed in Phase 9. Gate uses real device time only for check-in timestamps.
 
 ### Terminal Check-Out
 
@@ -154,7 +152,7 @@ Minimum expectations:
 - Verify payload authenticity/integrity before trusting balance or visit status.
 - Reject tampered payloads with a clear card authentication failure.
 - Validate payload size before write.
-- After every NFC write, read back the card and verify the expected state before showing success.
+- writeNdefMessage throws on write failure. No post-write readback is performed (compact codec is lossy for log IDs).
 
 ## 11. Recommended Tech Stack
 
@@ -163,8 +161,8 @@ Minimum expectations:
 | Mobile framework | React Native CLI                   |
 | Language         | TypeScript                         |
 | NFC library      | `react-native-nfc-manager`         |
-| Local ledger     | SQLite                             |
-| State management | Zustand or React Context           |
+| Local ledger     | SQLite (`@op-engineering/op-sqlite`) |
+| State management | Zustand                            |
 | Testing          | Jest, React Native Testing Library |
 | Architecture     | Clean Architecture                 |
 | UI system        | Signal UI                          |

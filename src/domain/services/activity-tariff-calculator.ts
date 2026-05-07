@@ -1,16 +1,16 @@
 import { DomainError } from '../errors/domain-error';
-import type { ActivityTariffRule } from '../entities/mbc-card';
+import { PARKING_TARIFF_PER_STARTED_HOUR } from '../entities/mbc-card';
 
 export type ActivityTariffCalculation = {
   chargedHours: number;
   chargedAmount: number;
+  durationMs: number;
 };
 
-type CalculateActivityTariffInput = {
+interface CalculateActivityTariffInput {
   checkedInAt: string;
   checkedOutAt: string;
-  rule: ActivityTariffRule;
-};
+}
 
 function parseIsoDate(value: string): Date {
   const parsedDate = new Date(value);
@@ -28,15 +28,7 @@ function parseIsoDate(value: string): Date {
 export function calculateActivityTariff({
   checkedInAt,
   checkedOutAt,
-  rule,
 }: CalculateActivityTariffInput): ActivityTariffCalculation {
-  if (rule.feePerStartedHour <= 0) {
-    throw new DomainError(
-      'INVALID_TARIFF_RULE',
-      'Activity tariff must be a positive per-hour amount.',
-    );
-  }
-
   const startedAt = parseIsoDate(checkedInAt);
   const finishedAt = parseIsoDate(checkedOutAt);
   const durationMs = finishedAt.getTime() - startedAt.getTime();
@@ -53,6 +45,7 @@ export function calculateActivityTariff({
 
   return {
     chargedHours,
-    chargedAmount: chargedHours * rule.feePerStartedHour,
+    chargedAmount: chargedHours * PARKING_TARIFF_PER_STARTED_HOUR,
+    durationMs,
   };
 }

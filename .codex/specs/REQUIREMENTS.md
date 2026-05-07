@@ -23,6 +23,7 @@ The PDF uses member parking as the concrete required assessment scenario. Parkin
 | BR-009 | Sensitive member identity and balance must not be plainly readable by external NFC apps.                                                       |
 | BR-010 | The assessment submission must include source code, working app demo, documentation, and presentation material.                                |
 | BR-011 | Cooperative staff need an offline device-side audit trail and income summary for Station operations.                                           |
+| BR-012 | Operators need optional on-screen NFC operational logs for troubleshooting during demo/field support.                                          |
 
 ## 3. System Requirements
 
@@ -41,6 +42,7 @@ The PDF uses member parking as the concrete required assessment scenario. Parkin
 | SR-011 | The system shall require an NFC-capable device with NFC enabled for real card scan, read, and write operations.                                                                                                   |
 | SR-012 | The system shall clearly inform users when NFC is required, unsupported, disabled, scanning, cancelled, or timed out.                                                                                             |
 | SR-013 | The system shall maintain a local offline SQLite ledger for audit/reporting without replacing the NFC card as member-state authority.                                                                             |
+| SR-014 | The system shall provide an optional user-visible NFC operational log panel that can be toggled on/off and cleared by the operator.                                                                               |
 
 ## 4. Scope
 
@@ -62,7 +64,7 @@ The PDF uses member parking as the concrete required assessment scenario. Parkin
 - Member benefit fee deduction.
 - Parking activity as the required MVP activity, with configurable activity context treated as future-friendly design support.
 - Sequential flow integrity, with no double check-in or double check-out.
-- Simulation mode at The Gate to set entry time in the past for testing.
+- Simulation mode at The Gate to set entry time in the past for testing (removed in Phase 9; Gate uses real device time only).
 - Last five transaction logs stored on card.
 - Local SQLite ledger for offline reporting and audit on the device.
 - Sensitive data protection so identity and balance are not readable in plain form by generic NFC apps.
@@ -87,8 +89,8 @@ The PDF uses member parking as the concrete required assessment scenario. Parkin
 
 - Target cards are NFC/HF RFID cards readable and writable by supported phones.
 - Real card scan, read, and write flows require a physical device with NFC hardware enabled.
-- Devices without NFC may open the app and may use mock/simulation flows during development or demo, but they cannot perform real MBC card operations.
-- Android is the primary MVP NFC read/write validation target, using Android 9 FE as the initial real-device test baseline.
+- Devices without NFC cannot perform real MBC card operations. No simulation mode or mock scenario selectors are included in the production app.
+- Android is the primary MVP NFC read/write validation target, using ASUS ROG Phone 9 FE (Android 14+) as the validated real-device test baseline.
 - iOS NFC read/write is out of MVP and may be treated as best-effort/read-only unless validated later on real device.
 - The MVP target NFC tag is NTAG215. NFC payload design, card capacity validation, and real-card tests must be validated against NTAG215 behavior and capacity.
 - The app is allowed to simulate card data during development, but final validation should use real NFC hardware.
@@ -108,9 +110,9 @@ The PDF uses member parking as the concrete required assessment scenario. Parkin
 | US-001 | As a cooperative admin, I can register a member card at The Station.                                           | Must     |
 | US-002 | As a cooperative admin, I can top up a member balance at The Station.                                          | Must     |
 | US-003 | As a gate operator, I can check in a member to an activity by tapping the card at The Gate.                    | Must     |
-| US-004 | As a gate operator, I can simulate an older entry time for duration/tariff testing.                            | Must     |
+| US-004 | As a gate operator, I can check in a member using real device time (simulation mode removed).                  | Must     |
 | US-005 | As a terminal operator, I can check out a member from an activity by tapping the card at The Terminal.         | Must     |
-| US-006 | As a terminal operator, I can see activity duration and fee before/after deduction.                            | Must     |
+| US-006 | As a terminal operator, I can see activity duration and fee after successful checkout tap.                            | Must     |
 | US-007 | As a terminal operator, I can block checkout when balance is insufficient and show clear top-up guidance.      | Must     |
 | US-008 | As a member, I can inspect my card through The Scout to see balance, status, and history.                      | Must     |
 | US-009 | As the system, I prevent double check-in and double check-out.                                                 | Must     |
@@ -119,6 +121,7 @@ The PDF uses member parking as the concrete required assessment scenario. Parkin
 | US-012 | As an evaluator, I can review source code, demo evidence, documentation, and presentation material.            | Must     |
 | US-013 | As a developer, I can reuse the check-in/check-out flow for activities beyond parking.                         | Should   |
 | US-014 | As a cooperative admin, I can view offline income and transaction summaries on the device used at The Station. | Must     |
+| US-015 | As an operator, I can enable or disable an NFC log panel and clear log lines for troubleshooting.              | Should   |
 
 ## 7. Functional Requirements
 
@@ -143,8 +146,9 @@ Acceptance criteria:
 - The registration form does not require staff to type a member ID.
 - Normal member/operator screens do not expose the full internal member ID; if a support reference is needed, the app may show a masked or short reference only. Scout may show a safe member reference after successful decode, not the raw full identifier.
 - App writes a valid MBC payload to the NFC card.
-- Registration must reject an already registered valid MBC card to prevent accidental overwrite. MVP has no overwrite/reset flow unless explicitly added later.
-- New card starts with a known visit status and balance.
+- If the card is already registered with a valid MBC payload, the app shows a confirmation prompt offering to wipe and re-register with a new member ID. If the user confirms, the card is erased and registered fresh. If the user declines (Skip), no modification is made.
+- If the card has an unrecognized or tampered payload, the app shows the same confirmation prompt offering to wipe and re-register. If the user confirms, the card is erased and registered fresh. If the user declines, no modification is made.
+- New card starts with zero balance and `NOT_CHECKED_IN` visit status. No initial balance field is presented.
 - Registration writes a transaction log entry.
 
 ### FR-003 Station Top-Up
@@ -153,7 +157,7 @@ The Station shall top up member balance.
 
 Acceptance criteria:
 
-- Admin can input a top-up amount.
+- Admin selects a preset top-up amount (10.000, 20.000, 50.000, or 100.000 IDR).
 - Amount must be positive.
 - App reads current balance, adds the amount, and writes the new balance to card.
 - Top-up writes a transaction log entry with nominal, time, and activity.
@@ -170,15 +174,9 @@ Acceptance criteria:
 - If the card is already checked in, app rejects the action as double check-in.
 - Check-in writes a transaction log entry.
 
-### FR-005 Gate Simulation Mode
+### FR-005 Gate Simulation Mode (Removed)
 
-The Gate shall support simulation mode for testing.
-
-Acceptance criteria:
-
-- Operator can set entry time to a past timestamp.
-- Simulated entry time is written as the card activity check-in timestamp.
-- UI clearly indicates simulation mode is active.
+Gate simulation mode was removed in Phase 9. The Gate now uses real device time for check-in timestamps. This simplifies the Gate flow and removes mock scenario selectors from all screens.
 
 ### FR-006 Terminal Check-Out
 
@@ -191,7 +189,7 @@ Acceptance criteria:
 - App rejects checkout with `INVALID_TIME` / `INVALID_DURATION` when exit time is not after entry time.
 - For the parking MVP, the default tariff is Rp 2.000 per started hour.
 - The MVP parking tariff is fixed at Rp 2.000 per started hour and must be implemented through one isolated tariff constant/module, not repeated magic numbers across checkout code.
-- Terminal must display the fixed MVP tariff, charged hours, and calculated fee before deduction.
+- Terminal must display the fixed MVP tariff, charged hours, and calculated fee immediately after successful checkout tap (single-session NFC model: read+calculate+deduct+write is atomic).
 - Example: 1 hour 5 minutes 1 second is charged as 2 hours.
 - App deducts fee from card balance when balance is sufficient.
 - App clears visit status after successful checkout.
@@ -289,7 +287,7 @@ Acceptance criteria:
 - Parking is the only MVP tariff scenario.
 - Fee calculation rounds up to the next started hour.
 - The Rp 2.000 rate is defined in one isolated tariff module/constant, not duplicated as hidden magic numbers across UI code.
-- Terminal checkout displays the fixed tariff, charged started hours, and calculated fee before deduction.
+- Terminal checkout displays the fixed tariff, charged started hours, and calculated fee immediately after successful tap.
 
 ### FR-015 Operational Edge Case Handling
 
@@ -297,9 +295,9 @@ The app shall explicitly handle common offline/NFC operational edge cases so fie
 
 Acceptance criteria:
 
-- Gate simulation must only allow a past entry timestamp.
+- Gate uses real device time for check-in; simulation mode is not part of production flow.
 - If the device clock causes checkout time to be earlier than or equal to check-in time, checkout is rejected before any balance deduction.
-- If a card is removed too early or write-readback cannot verify the expected state, success is not shown.
+- If a card is removed during write, `writeNdefMessage` throws and success is not shown.
 - If SQLite/local reporting data is deleted, the card remains operational source of truth but local reports for that device may be incomplete.
 - Unsupported card, unsupported payload version, tampered payload, capacity failure, and write verification failure must produce clear recovery guidance.
 
@@ -314,6 +312,19 @@ Acceptance criteria:
 - If protected/encrypted payload cannot fit NTAG215, the app reduces optional payload size before reducing security.
 - The app must not remove required identity, balance, active visit, or latest five transaction history data to fit capacity.
 - If the payload still cannot fit, the app blocks write with `CARD_CAPACITY_INSUFFICIENT`.
+
+### FR-017 NFC Operational Log Panel (Toggleable)
+
+The app shall provide a user-visible NFC operational log panel for troubleshooting and demo support.
+
+Acceptance criteria:
+
+- The log panel is available in role screens that execute NFC actions (Station, Gate, Terminal, Scout).
+- The log panel can be toggled on/off by the user without restarting the app.
+- The log panel provides a clear action to remove current log lines.
+- Log lines include timestamp and short operational event text (scan start, read, write, cancel, success, error).
+- Log lines must not expose sensitive secrets, raw decrypted payloads, full private identifiers, or private keys.
+- The log panel is an operator troubleshooting aid; it does not replace card transaction logs and does not mutate card business state.
 
 ## 8. Non-Functional Requirements
 
@@ -336,7 +347,8 @@ Acceptance criteria:
 | NFR-015 | Branching and release automation | The project shall use feature branches with controlled promotion to `develop` and `main`, and merging to `main` shall trigger automated APK app-distribution publishing.    |
 | NFR-016 | Dependency vulnerability gate    | After installing or changing libraries, `npm audit` shall report 0 known vulnerabilities before the task is considered done.                                                |
 | NFR-017 | NTAG215 capacity compatibility   | NTAG215 is the MVP target tag. The protected compact payload must fit NTAG215 or fail safely with `CARD_CAPACITY_INSUFFICIENT`.                                             |
-| NFR-018 | Write verification               | Every real NFC write must be followed by readback verification: decrypt/authenticate, validate schema, and confirm expected counter/state before showing success.           |
+| NFR-018 | Write verification               | Every real NFC write relies on `writeNdefMessage` throwing on failure. Capacity is checked before write. No post-write readback (codec lossy round-trip).                   |
+| NFR-023 | Troubleshooting observability    | NFC operational logging in UI must be concise, optional (toggleable), clearable, and safe (no sensitive payload disclosure).                                                |
 
 ## 9. Security Requirements
 
@@ -359,6 +371,7 @@ Acceptance criteria:
 | SCAN_CANCELLED             | Operator cancelled scan.                                         |
 | SCAN_TIMEOUT               | No tag found in time.                                            |
 | CARD_UNREGISTERED          | Card does not contain a valid registered MBC payload.            |
+| ALREADY_REGISTERED_CARD    | Card is already registered; registration is rejected.            |
 | CARD_UNSUPPORTED           | Card technology or payload format is unsupported.                |
 | CARD_TAMPERED              | Card payload cannot be verified or decoded safely.               |
 | DOUBLE_CHECK_IN            | Card is already checked in.                                      |
@@ -369,7 +382,7 @@ Acceptance criteria:
 | AMOUNT_INVALID             | Top-up or calculated amount is invalid.                          |
 | WRITE_FAILED               | NFC card write failed.                                           |
 | READ_FAILED                | NFC card read failed.                                            |
-| WRITE_VERIFY_FAILED        | NFC write could not be verified by post-write readback.          |
+| WRITE_VERIFY_FAILED        | Removed — no post-write readback performed.                      |
 | CARD_CAPACITY_INSUFFICIENT | Protected payload does not fit the selected NFC tag/card.        |
 | INVALID_TIME               | Device or simulated time is invalid for the requested operation. |
 | INVALID_DURATION           | Checkout time is not after check-in time.                        |
@@ -380,9 +393,8 @@ Acceptance criteria:
 - App can switch between Station, Gate, Terminal, and Scout.
 - Station can register a card.
 - Station can top up a card.
-- Gate can check in a card to an activity.
-- Gate can simulate past entry time.
-- Terminal can check out a card, calculate activity duration, use the fixed Rp 2.000 per started hour tariff, show the calculated fee before deduction, and deduct balance.
+- Gate can check in a card to an activity using real device time.
+- Terminal can check out a card, calculate activity duration, use the fixed Rp 2.000 per started hour tariff, show the calculated fee after successful tap, and deduct balance.
 - Terminal clearly blocks checkout if balance is insufficient.
 - Scout can read balance, status, and last five logs.
 - Sequential loop prevents double check-in and double check-out.
@@ -404,8 +416,8 @@ Acceptance criteria:
 - The PDF requirement remains the source of truth for MVP scope.
 - Parking is the required acceptance path; non-parking activity support is future-friendly design, not required demo scope.
 - SQLite is a device-local transaction/reporting ledger only. It does not create global reporting across devices and never overrides card state.
-- Registration rejects already registered valid MBC cards.
-- Real NFC writes require post-write readback verification.
+- Registration rejects already registered valid MBC cards with `ALREADY_REGISTERED_CARD`.
+- Real NFC writes rely on `writeNdefMessage` throwing on failure. Capacity guard is enforced before write.
 - NTAG215 payload capacity must be validated before claiming real-card support.
 - Device time correctness is an operational dependency and must be visible in Gate/Terminal flows.
 

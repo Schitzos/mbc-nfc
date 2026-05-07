@@ -46,10 +46,17 @@ Always align with the project docs:
 
 ## Role UX Guidance
 
-- **Station**: Optimize for cooperative staff simplicity. Support registration and top-up as separate clear tasks.
-- **Gate**: Show selected activity context. Support simulation time for testing. Reject double check-in clearly.
-- **Terminal**: Show duration, charged hours, fee, and remaining balance. If balance is insufficient, do not clear active activity state.
-- **Scout**: One-tap inspection only. Show balance, active status, and latest five logs. Do not mutate card data.
+- **Station**: Optimize for cooperative staff simplicity. Registration and top-up as separate tasks. Preset top-up amounts (10k/20k/50k/100k). Already-registered cards show Wipe & Re-register / Skip confirmation. Accordion ledger.
+- **Gate**: Show selected activity context. Reject double check-in clearly. No simulation mode.
+- **Terminal**: Show tap-out time, duration, charged hours, fee, and current balance. If balance is insufficient, do not clear active activity state.
+- **Scout**: One-tap inspection only. Show balance, active status, and latest five logs with timestamps. Do not mutate card data.
+
+## NFC UX Pattern
+
+- All NFC actions show NfcActionSheet bottom sheet: scanning → success/error/confirm.
+- User taps action button → sheet appears with spinner → hold card → result shown in sheet.
+- Confirm phase used for wipe & re-register decisions.
+- NFC Log panel is scrollable, toggleable, shared across all role screens.
 
 ## Edge Cases To Handle
 

@@ -5,15 +5,15 @@ import type {
 } from '../entities/mbc-card';
 import { DomainError } from '../errors/domain-error';
 
-type CheckInInput = {
+interface CheckInInput {
   activityId: string;
   activityType: BenefitActivityType;
   checkedInAt: string;
-};
+}
 
-type CheckOutInput = {
+interface CheckOutInput {
   chargedAmount: number;
-};
+}
 
 function parseIsoDate(value: string): void {
   const parsedDate = new Date(value);

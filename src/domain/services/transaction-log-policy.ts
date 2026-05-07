@@ -5,12 +5,12 @@ import type {
 } from '../entities/mbc-card';
 import { DomainError } from '../errors/domain-error';
 
-type CreateTransactionLogInput = {
+interface CreateTransactionLogInput {
   id: string;
   activity: MbcActivity;
   nominal: number;
   occurredAt: string;
-};
+}
 
 function parseIsoDate(value: string): void {
   const parsedDate = new Date(value);

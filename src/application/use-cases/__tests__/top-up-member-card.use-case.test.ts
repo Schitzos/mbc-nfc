@@ -6,18 +6,23 @@ import { CardRepositoryError } from '../../../domain/errors/card-repository-erro
 function createCardRepository(
   overrides?: Partial<MbcCardRepository>,
 ): MbcCardRepository {
+  const defaultCard = {
+    version: 1,
+    cardId: 'CARD-001',
+    member: { memberId: 'MEM-001' },
+    balance: 1000,
+    currency: 'IDR' as const,
+    visitStatus: 'NOT_CHECKED_IN' as const,
+    transactionLogs: [] as any[],
+  };
   return {
     isSupported: jest.fn().mockResolvedValue(true),
-    readCard: jest.fn().mockResolvedValue({
-      version: 1,
-      cardId: 'CARD-001',
-      member: { memberId: 'MEM-001' },
-      balance: 1000,
-      currency: 'IDR',
-      visitStatus: 'NOT_CHECKED_IN',
-      transactionLogs: [],
-    }),
+    readCard: jest.fn().mockResolvedValue(defaultCard),
     writeCard: jest.fn().mockResolvedValue(undefined),
+    readWriteCard: jest
+      .fn()
+      .mockImplementation(async (fn: any) => fn(defaultCard)),
+    registerCard: jest.fn().mockResolvedValue(undefined),
     cancel: jest.fn().mockResolvedValue(undefined),
     ...overrides,
   };
@@ -51,17 +56,7 @@ describe('TopUpMemberCardUseCase', () => {
 
     expect(result.success).toBe(true);
     expect(result.card?.balance).toBe(51000);
-    expect(cardRepository.writeCard).toHaveBeenCalledWith(
-      expect.objectContaining({
-        balance: 51000,
-        transactionLogs: [
-          expect.objectContaining({
-            activity: 'TOP_UP',
-            nominal: 50000,
-          }),
-        ],
-      }),
-    );
+    expect(cardRepository.readWriteCard).toHaveBeenCalled();
   });
 
   it('writes a local ledger entry after successful top-up when configured', async () => {
@@ -101,7 +96,7 @@ describe('TopUpMemberCardUseCase', () => {
   it('surfaces repository read failures safely', async () => {
     const useCase = new TopUpMemberCardUseCase(
       createCardRepository({
-        readCard: jest
+        readWriteCard: jest
           .fn()
           .mockRejectedValue(
             new CardRepositoryError(

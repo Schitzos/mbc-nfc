@@ -43,19 +43,38 @@ export class RegisterMemberCardUseCase {
   ) {}
 
   async execute(): Promise<RoleActionResultDto> {
-    const registerState = await this.validateInitialCardState();
-
-    if (!registerState.canRegister) {
-      return {
-        success: false,
-        role: 'STATION',
-        message: registerState.message,
-      };
+    try {
+      return await this.performRegistration();
+    } catch (error) {
+      if (
+        error instanceof CardRepositoryError &&
+        error.code === 'CARD_ALREADY_REGISTERED'
+      ) {
+        return {
+          success: false,
+          role: 'STATION',
+          message: error.message,
+        };
+      }
+      throw error;
     }
+  }
 
+  async executeWithReset(): Promise<RoleActionResultDto> {
     const card = createInitialCard();
     await this.cardRepository.writeCard(card);
+    return this.buildSuccessResult(card);
+  }
 
+  private async performRegistration(): Promise<RoleActionResultDto> {
+    const card = createInitialCard();
+    await this.cardRepository.registerCard(card);
+    return this.buildSuccessResult(card);
+  }
+
+  private async buildSuccessResult(
+    card: MbcCard,
+  ): Promise<RoleActionResultDto> {
     let message = 'Member card registered successfully.';
 
     if (this.localLedgerRepository) {
@@ -78,46 +97,6 @@ export class RegisterMemberCardUseCase {
       role: 'STATION',
       message,
       card: toCardSummaryDto(card),
-    };
-  }
-
-  private async validateInitialCardState(): Promise<{
-    canRegister: boolean;
-    message: string;
-  }> {
-    try {
-      const existingCard = await this.cardRepository.readCard();
-
-      if (existingCard.member.memberId) {
-        return {
-          canRegister: false,
-          message: 'Card is already registered and cannot be registered again.',
-        };
-      }
-    } catch (error) {
-      if (
-        error instanceof CardRepositoryError &&
-        error.code === 'UNREGISTERED_CARD'
-      ) {
-        return {
-          canRegister: true,
-          message: 'Blank or reusable card is ready for registration.',
-        };
-      }
-
-      if (error instanceof CardRepositoryError) {
-        return {
-          canRegister: false,
-          message: error.message,
-        };
-      }
-
-      throw error;
-    }
-
-    return {
-      canRegister: true,
-      message: 'Card is ready for registration.',
     };
   }
 }

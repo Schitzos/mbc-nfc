@@ -15,7 +15,7 @@ The original PDF remains the business source of truth for the required MBC asses
 - Offline-first operation without central database/API dependency.
 - Parking member tariff defaults to Rp2.000 per started hour.
 - Sequential loop: no double tap-in or double tap-out.
-- Gate simulation mode for past entry time.
+- Gate uses real device time for check-in in current production flow.
 - Silent Shield: sensitive identity and balance must not be plainly readable by other NFC apps.
 - Guest flow is out of scope.
 

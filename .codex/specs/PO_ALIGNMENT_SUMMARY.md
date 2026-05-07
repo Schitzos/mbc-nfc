@@ -13,7 +13,7 @@ This bundle has been aligned against `KDX#1 - Membership Benefit Card (MBC).pdf`
 | Income reports  | Only money-related rows count as income. `CHECKIN` has amount `0`.                                                                               |
 | Registration    | Station registration rejects valid already registered MBC cards.                                                                                 |
 | Silent Shield   | v1 requires production-grade authenticated encryption plus integrity validation. Plain JSON, Base64-only, or weak obfuscation is not acceptable. |
-| NFC safety      | Real writes require capacity guard and post-write readback verification.                                                                         |
+| NFC safety      | Real writes require capacity guard. writeNdefMessage throws on failure (no post-write readback).                                                 |
 | Logs            | Card transaction logs are newest-first, max five entries.                                                                                        |
 | Checkout        | Invalid duration/time is rejected before deduction.                                                                                              |
 | Recovery        | Insufficient balance keeps checked-in state; Station top-up then Terminal retry must succeed.                                                    |

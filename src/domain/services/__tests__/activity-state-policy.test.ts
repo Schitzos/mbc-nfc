@@ -47,7 +47,7 @@ describe('activityStatePolicy', () => {
         },
         {
           activityId: 'other-activity',
-          activityType: 'GENERIC',
+          activityType: 'PARKING',
           checkedInAt: '2026-05-01T09:00:00.000Z',
         },
       ),

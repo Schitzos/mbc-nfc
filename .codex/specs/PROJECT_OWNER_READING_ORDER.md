@@ -79,7 +79,7 @@ You should use this file to answer:
 
 ### 4. `DESIGN.md`
 
-Read this third.
+Read this fourth.
 
 Purpose:
 
@@ -92,9 +92,9 @@ You should use this file to answer:
 - Where does member state live?
 - Where does admin reporting live?
 
-### 4. `EXECUTION_ORDER.md`
+### 5. `EXECUTION_ORDER.md`
 
-Read this fourth.
+Read this fifth.
 
 Purpose:
 
@@ -107,7 +107,7 @@ You should use this file to answer:
 - What is blocked by missing Figma or real NFC card?
 - What sequence should we use day to day?
 
-### 5. `TASKS.md`
+### 6. `TASKS.md`
 
 Read this fifth.
 
@@ -122,7 +122,7 @@ You should use this file to answer:
 - What does success look like for each task?
 - What is the full scope of delivery?
 
-### 6. `RELEASE_PLAN.md`
+### 7. `RELEASE_PLAN.md`
 
 Read this sixth.
 
@@ -135,7 +135,7 @@ You should use this file to answer:
 - What must be complete before we move to the next stage?
 - What is needed for demo and submission readiness?
 
-### 7. `DONE.md`
+### 8. `DONE.md`
 
 Read this seventh.
 
@@ -148,7 +148,7 @@ You should use this file to answer:
 - When can we say the project is really done?
 - What quality bar must be met?
 
-### 8. `TRACEABILITY.md`
+### 9. `TRACEABILITY.md`
 
 Read this after the core flow above.
 
@@ -161,7 +161,7 @@ You should use this file to answer:
 - Is anything missing?
 - Is each requirement covered by design and delivery?
 
-### 9. `TEST_PLAN.md`
+### 10. `TEST_PLAN.md`
 
 Read this when checking delivery quality.
 
@@ -175,7 +175,7 @@ You should use this file to answer:
 - How do we reach the repository-wide 90% target?
 - How is SonarCloud used?
 
-### 10. `E2E_TEST_CASES.md`
+### 11. `E2E_TEST_CASES.md`
 
 Read this when checking operational flows.
 
@@ -189,7 +189,7 @@ You should use this file to answer:
 - What scenarios will QA execute?
 - What evidence will be collected?
 
-### 11. `SECURITY.md`
+### 12. `SECURITY.md`
 
 Read this before reviewing NFC protection or release risks.
 
@@ -202,7 +202,7 @@ You should use this file to answer:
 - How do we protect card data?
 - How do we handle tampering and exposure risk?
 
-### 12. `RISKS.md`
+### 13. `RISKS.md`
 
 Read this when checking project readiness.
 
@@ -215,7 +215,7 @@ You should use this file to answer:
 - What can still go wrong?
 - What depends on external inputs?
 
-### 13. `DEVICE_TEST_MATRIX.md`
+### 14. `DEVICE_TEST_MATRIX.md`
 
 Read this when real NFC device testing starts.
 
@@ -228,7 +228,7 @@ You should use this file to answer:
 - What devices and conditions must be validated?
 - What depends on the real NFC tag?
 
-### 14. `SIGNAL_UI_GUIDE.md`
+### 15. `SIGNAL_UI_GUIDE.md`
 
 Read this when design refinement becomes active.
 
@@ -240,7 +240,7 @@ You should use this file to answer:
 
 - What design system direction are we following?
 
-### 15. `RFID_NFC_REACT_NATIVE_101.md`
+### 16. `RFID_NFC_REACT_NATIVE_101.md`
 
 Read this as a simple refresher.
 
@@ -252,7 +252,7 @@ You should use this file to answer:
 
 - How does the app work in plain language?
 
-### 16. `TASK_PRESENTATION_BRIEF.md`
+### 17. `TASK_PRESENTATION_BRIEF.md`
 
 Read this when preparing stakeholder communication.
 
@@ -264,7 +264,7 @@ You should use this file to answer:
 
 - How do I explain the project task progress simply?
 
-### 17. `AGENT_OPERATING_PROTOCOL.md`
+### 18. `AGENT_OPERATING_PROTOCOL.md`
 
 Read this when checking team operating discipline.
 
@@ -277,7 +277,7 @@ You should use this file to answer:
 - How should the team work?
 - Which document drives execution order?
 
-### 18. External `CHANGELOG.md`
+### 19. External `CHANGELOG.md`
 
 Read this last if it is provided outside the archive.
 

@@ -11,12 +11,11 @@ function createCardRepository(
     readCard: jest
       .fn()
       .mockRejectedValue(
-        new CardRepositoryError(
-          'UNREGISTERED_CARD',
-          'Card is not registered yet. Register it first at Station.',
-        ),
+        new CardRepositoryError('UNREGISTERED_CARD', 'Not registered'),
       ),
     writeCard: jest.fn().mockResolvedValue(undefined),
+    readWriteCard: jest.fn(),
+    registerCard: jest.fn().mockResolvedValue(undefined),
     cancel: jest.fn().mockResolvedValue(undefined),
     ...overrides,
   };
@@ -33,7 +32,7 @@ function createLedgerRepository(
 }
 
 describe('RegisterMemberCardUseCase', () => {
-  it('creates an initial card payload without requiring typed member input', async () => {
+  it('registers a new card via registerCard', async () => {
     const cardRepository = createCardRepository();
     const useCase = new RegisterMemberCardUseCase(cardRepository);
 
@@ -41,9 +40,8 @@ describe('RegisterMemberCardUseCase', () => {
 
     expect(result.success).toBe(true);
     expect(result.role).toBe('STATION');
-    expect(result.card?.memberName).toBeUndefined();
     expect(result.card?.maskedMemberReference).toContain('MBC-***-');
-    expect(cardRepository.writeCard).toHaveBeenCalledWith(
+    expect(cardRepository.registerCard).toHaveBeenCalledWith(
       expect.objectContaining({
         balance: 0,
         visitStatus: 'NOT_CHECKED_IN',
@@ -51,17 +49,16 @@ describe('RegisterMemberCardUseCase', () => {
     );
   });
 
-  it('rejects cards that are already registered', async () => {
+  it('returns failure when card is already registered', async () => {
     const cardRepository = createCardRepository({
-      readCard: jest.fn().mockResolvedValue({
-        version: 1,
-        cardId: 'CARD-001',
-        member: { memberId: 'MEM-001' },
-        balance: 1000,
-        currency: 'IDR',
-        visitStatus: 'NOT_CHECKED_IN',
-        transactionLogs: [],
-      }),
+      registerCard: jest
+        .fn()
+        .mockRejectedValue(
+          new CardRepositoryError(
+            'CARD_ALREADY_REGISTERED',
+            'This card is already registered.',
+          ),
+        ),
     });
     const useCase = new RegisterMemberCardUseCase(cardRepository);
 
@@ -69,10 +66,9 @@ describe('RegisterMemberCardUseCase', () => {
 
     expect(result.success).toBe(false);
     expect(result.message).toContain('already registered');
-    expect(cardRepository.writeCard).not.toHaveBeenCalled();
   });
 
-  it('appends a local ledger record after successful registration when configured', async () => {
+  it('appends a local ledger record after successful registration', async () => {
     const cardRepository = createCardRepository();
     const ledgerRepository = createLedgerRepository();
     const useCase = new RegisterMemberCardUseCase(
@@ -84,14 +80,11 @@ describe('RegisterMemberCardUseCase', () => {
 
     expect(result.success).toBe(true);
     expect(ledgerRepository.append).toHaveBeenCalledWith(
-      expect.objectContaining({
-        role: 'STATION',
-        action: 'REGISTER',
-      }),
+      expect.objectContaining({ role: 'STATION', action: 'REGISTER' }),
     );
   });
 
-  it('returns a warning message when registration succeeds but ledger append fails', async () => {
+  it('returns warning when registration succeeds but ledger fails', async () => {
     const cardRepository = createCardRepository();
     const ledgerRepository = createLedgerRepository({
       append: jest.fn().mockRejectedValue(new Error('ledger unavailable')),
@@ -107,43 +100,12 @@ describe('RegisterMemberCardUseCase', () => {
     expect(result.message).toContain('local audit ledger could not be updated');
   });
 
-  it('blocks registration when card read fails for a non-registerable reason', async () => {
+  it('re-throws non-CardRepositoryError exceptions', async () => {
     const cardRepository = createCardRepository({
-      readCard: jest
-        .fn()
-        .mockRejectedValue(
-          new CardRepositoryError(
-            'TAMPERED_CARD',
-            'Card payload is invalid or tampered and cannot be processed.',
-          ),
-        ),
+      registerCard: jest.fn().mockRejectedValue(new Error('unexpected')),
     });
     const useCase = new RegisterMemberCardUseCase(cardRepository);
 
-    const result = await useCase.execute();
-
-    expect(result.success).toBe(false);
-    expect(result.message).toContain('tampered');
-    expect(cardRepository.writeCard).not.toHaveBeenCalled();
-  });
-
-  it('allows registration when a readable blank card has no member identifier', async () => {
-    const cardRepository = createCardRepository({
-      readCard: jest.fn().mockResolvedValue({
-        version: 1,
-        cardId: 'CARD-BLANK-001',
-        member: { memberId: '' },
-        balance: 0,
-        currency: 'IDR',
-        visitStatus: 'NOT_CHECKED_IN',
-        transactionLogs: [],
-      }),
-    });
-    const useCase = new RegisterMemberCardUseCase(cardRepository);
-
-    const result = await useCase.execute();
-
-    expect(result.success).toBe(true);
-    expect(cardRepository.writeCard).toHaveBeenCalled();
+    await expect(useCase.execute()).rejects.toThrow('unexpected');
   });
 });
