@@ -1,6 +1,17 @@
 # KDX Membership Benefit Card
 
+![Coverage](https://img.shields.io/badge/coverage-100%25-brightgreen)
+![Tests](https://img.shields.io/badge/tests-256%20passed-brightgreen)
+![Platform](https://img.shields.io/badge/platform-Android-blue)
+![NFC](https://img.shields.io/badge/NFC-NTAG215-orange)
+
 Frontend mobile application for the KDX Membership Benefit Card (MBC) assessment.
+
+## App Screenshots
+
+| Role Switcher | Station | Gate | Terminal | Scout |
+|:---:|:---:|:---:|:---:|:---:|
+| ![Role Switcher](docs/screenshots/00-role-switcher.png) | ![Station](docs/screenshots/10-station-open.png) | ![Gate](docs/screenshots/30-gate-open.png) | ![Terminal](docs/screenshots/60-terminal-open.png) | ![Scout](docs/screenshots/50-scout-open.png) |
 
 ## Current Status
 
