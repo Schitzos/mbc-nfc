@@ -23,7 +23,7 @@ export function TopUpCard({
           keyboardType="numeric"
           value={Number(topUpAmount).toLocaleString(LOCALE_ID)}
           onChangeText={text => {
-            const numeric = text.replace(/\D/g, '');
+            const numeric = text.replaceAll(/\D/g, '');
             setTopUpAmount(numeric || '0');
           }}
         />
