@@ -19,22 +19,6 @@ export function AppHeaderCard(): React.JSX.Element {
           Info
         </Text>
       </View>
-      <Text className="mt-3 text-sm text-slate-200">Select operating role</Text>
-      <View className="mt-3 flex-row flex-wrap gap-2">
-        {[
-          'Offline Ready',
-          'NFC Powered',
-          'Fast Check-In',
-          'Secure Tracking',
-        ].map(chip => (
-          <View
-            key={chip}
-            className="rounded-full border border-slate-500/50 bg-white/10 px-3 py-1.5"
-          >
-            <Text className="text-xs font-semibold text-slate-100">{chip}</Text>
-          </View>
-        ))}
-      </View>
     </View>
   );
 }

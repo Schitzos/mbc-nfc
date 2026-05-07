@@ -155,13 +155,6 @@ export function StationScreen({ navigation }: Props): React.JSX.Element {
                 onPress={() => actions.setRegisterMode(prev => !prev)}
               />
             </View>
-
-            <View className="mt-3 rounded-xl border border-slate-200 bg-slate-50 p-3">
-              <Text className="text-xs text-muted">
-                Member ID is generated automatically and never typed by
-                operator.
-              </Text>
-            </View>
           </View>
 
           {actions.latestResult && (

@@ -66,11 +66,6 @@ export function GateScreen({ navigation }: Props): React.JSX.Element {
                 Rp 2.000 / started hour
               </Text>
             </View>
-            <View className="mt-3 rounded-xl border border-slate-200 bg-slate-50 p-3">
-              <Text className="text-xs text-muted">
-                Expected state: member card is registered and not checked in.
-              </Text>
-            </View>
           </View>
 
           <SignalButton

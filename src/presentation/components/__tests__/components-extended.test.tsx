@@ -241,3 +241,27 @@ describe('SignalTextField – focused state', () => {
     expect(input).toBeTruthy();
   });
 });
+
+describe('NfcActionSheet – scanning without message', () => {
+  it('renders default scanning message when state.message is undefined', () => {
+    const { NfcActionSheet } = require('../../components/NfcActionSheet');
+
+    render(
+      <NfcActionSheet
+        state={{ phase: 'scanning' }}
+        onDismiss={jest.fn()}
+      />,
+    );
+
+    expect(
+      screen.getByText('Hold your NFC card to the back of the phone'),
+    ).toBeTruthy();
+  });
+});
+
+describe('BackgroundDecor – default variant', () => {
+  it('renders without variant prop (uses default)', () => {
+    const { BackgroundDecor } = require('../BackgroundDecor');
+    render(<BackgroundDecor />);
+  });
+});

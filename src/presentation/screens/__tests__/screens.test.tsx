@@ -179,7 +179,14 @@ describe('role screens', () => {
   } as never;
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    mockCheckNfcAvailabilityUseCase.execute.mockClear();
+    mockRegisterMemberCardUseCase.execute.mockClear();
+    mockRegisterMemberCardUseCase.executeWithReset.mockClear();
+    mockTopUpMemberCardUseCase.execute.mockClear();
+    mockGetStationLedgerSummaryUseCase.execute.mockClear();
+    mockCheckInActivityUseCase.execute.mockClear();
+    mockCheckOutActivityUseCase.execute.mockClear();
+    mockInspectMemberCardUseCase.execute.mockClear();
     useAppStore.setState({ nfcLogEnabled: false, nfcLogs: [] });
   });
 

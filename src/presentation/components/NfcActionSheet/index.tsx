@@ -29,7 +29,7 @@ export function NfcActionSheet({
     <SignalBottomSheet
       visible
       title={sheetTitle}
-      onClose={canClose ? onDismiss : undefined}
+      onClose={onDismiss}
     >
       {state.phase === 'scanning' && (
         <View className="items-center gap-4 pb-8">
