@@ -302,7 +302,7 @@ export function calculateActivityTariff(input: {
 - Terminal checkout displays tariff, charged hours, and fee immediately after successful tap (single-session atomic NFC model).
 - Runtime rate editing, tariff schedules, and non-parking tariff fixtures are out of MVP scope.
 
-### Registration Safety### Registration Safety
+### Registration Safety
 
 - Station registration uses `registerCard()` which reads-then-writes in a single NFC session.
 - If the card is already registered or has tampered data, the app shows a confirmation prompt (Wipe & Re-register / Skip).

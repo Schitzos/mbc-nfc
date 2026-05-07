@@ -29,6 +29,8 @@ function formatTime(d: Date): string {
   return `${dd}-${mmm}-${yyyy} ${hh}:${mm}`;
 }
 
+const noop = () => {};
+
 export function useTerminalActions(services: TerminalServices) {
   const appendNfcLog = useAppStore(state => state.appendNfcLog);
   const [latestResult, setLatestResult] = useState<RoleActionResultDto | null>(
@@ -45,7 +47,7 @@ export function useTerminalActions(services: TerminalServices) {
       .then(status =>
         appendNfcLog(`[NFC] Availability result: ${status.status}`),
       )
-      .catch(() => undefined);
+      .catch(noop);
   }, [appendNfcLog, services]);
 
   const handleDismissSheet = useCallback(() => {

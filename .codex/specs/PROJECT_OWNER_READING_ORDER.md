@@ -63,7 +63,7 @@ You should use this file to answer:
 
 ### 3. `CARD_DATA_SECURITY_LEDGER_SPEC.md` and `NTAG215_COMPACT_PAYLOAD_GUIDE.md`
 
-Read this fourth.
+Read this third.
 
 Purpose:
 
@@ -109,7 +109,7 @@ You should use this file to answer:
 
 ### 6. `TASKS.md`
 
-Read this fifth.
+Read this sixth.
 
 Purpose:
 
@@ -124,7 +124,7 @@ You should use this file to answer:
 
 ### 7. `RELEASE_PLAN.md`
 
-Read this sixth.
+Read this seventh.
 
 Purpose:
 
@@ -137,7 +137,7 @@ You should use this file to answer:
 
 ### 8. `DONE.md`
 
-Read this seventh.
+Read this eighth.
 
 Purpose:
 

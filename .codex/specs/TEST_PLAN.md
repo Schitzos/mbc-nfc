@@ -151,10 +151,9 @@ Must test:
 | NFC-010  | Scout inspect            | Scout reads card                                        | Balance, status, and logs appear                                                     |
 | NFC-011  | One-tap Scout            | Member taps card once in Scout                          | Card content appears without write action                                            |
 | NFC-012  | Missing card at checkout | Terminal scan times out or no card is available         | User is directed to Station/manual recovery                                          |
-
-| NFC-013 | NTAG215 payload capacity | Write compact protected payload to NTAG215 | Oversized payload is blocked with `CARD_CAPACITY_INSUFFICIENT` |
-| NFC-014 | Write failure handling | Mock writeNdefMessage rejection | App reports NFC error and does not show success |
-| NFC-015 | Invalid checkout time | Terminal checkout with exit time before/equal entry | App blocks checkout with `INVALID_TIME` / `INVALID_DURATION` |
+| NFC-013  | NTAG215 payload capacity | Write compact protected payload to NTAG215              | Oversized payload is blocked with `CARD_CAPACITY_INSUFFICIENT`                       |
+| NFC-014  | Write failure handling   | Mock writeNdefMessage rejection                         | App reports NFC error and does not show success                                      |
+| NFC-015  | Invalid checkout time    | Terminal checkout with exit time before/equal entry     | App blocks checkout with `INVALID_TIME` / `INVALID_DURATION`                         |
 
 ## 9. End-to-End Documentation Standard
 
@@ -227,6 +226,12 @@ Refer to `QA_EVIDENCE_POLICY.md` for the detailed evidence policy.
 - Silent Shield tests must cover AES-256-GCM encrypt/decrypt success and tamper rejection.
 - The protected payload writer should prefer raw byte/binary NDEF payloads. Base64URL/NDEF text is allowed only as a compatibility fallback and must still fit NTAG215.
 - Assessment key handling may use a clearly labeled app-bundled demo AES key. Production notes must state that secure provisioning or Android hardware-backed Keystore is required outside the MVP assessment.
+
+## PO Scope Decisions — 2026-05-07
+
+1. **iOS formally excluded**: iOS is excluded from the assessment deliverable scope. No iOS testing, evidence, or device validation is required.
+2. **Emulator screenshots insufficient**: Emulator cannot perform real NFC operations. Real-device NFC screenshots will be provided by PO separately.
+3. **E2E equivalent evidence**: E2E-REG-003, E2E-TERM-004, E2E-NFC-001, and E2E-TIME-001 are satisfied by unit/application test coverage per PO decision (see E2E_TEST_CASES.md §5).
 
 ## Android 9 FE / NTAG215 MVP Device Gate
 

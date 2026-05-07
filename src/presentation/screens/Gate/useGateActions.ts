@@ -5,6 +5,8 @@ import { useAppStore } from '../../stores/app-store';
 import { UNKNOWN_ERROR_MESSAGE } from '../../../shared/constants';
 import type { GateServices } from '../../context/service-context';
 
+const noop = () => {};
+
 export function useGateActions(services: GateServices) {
   const appendNfcLog = useAppStore(state => state.appendNfcLog);
   const [latestResult, setLatestResult] = useState<RoleActionResultDto | null>(
@@ -20,7 +22,7 @@ export function useGateActions(services: GateServices) {
       .then(status =>
         appendNfcLog(`[NFC] Availability result: ${status.status}`),
       )
-      .catch(() => undefined);
+      .catch(noop);
   }, [appendNfcLog, services]);
 
   const handleDismissSheet = useCallback(() => {
