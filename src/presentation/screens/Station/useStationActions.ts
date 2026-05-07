@@ -1,11 +1,11 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import type { CheckNfcAvailabilityResultDto } from '../../../application/dto/check-nfc-availability-result-dto';
-import type { RoleActionResultDto } from '../../../application/dto/role-action-result-dto';
-import type { StationLedgerSummaryDto } from '../../../application/dto/station-ledger-summary-dto';
-import type { NfcActionState } from '../../components/NfcActionSheet';
-import { useAppStore } from '../../stores/app-store';
-import { UNKNOWN_ERROR_MESSAGE } from '../../../shared/constants';
-import type { StationServices } from '../../context/service-context';
+import type { CheckNfcAvailabilityResultDto } from '@application/dto/check-nfc-availability-result-dto';
+import type { RoleActionResultDto } from '@application/dto/role-action-result-dto';
+import type { StationLedgerSummaryDto } from '@application/dto/station-ledger-summary-dto';
+import type { NfcActionState } from '@presentation/components/NfcActionSheet';
+import { useAppStore } from '@presentation/stores/app-store';
+import { UNKNOWN_ERROR_MESSAGE } from '@shared/constants';
+import type { StationServices } from '@presentation/context/service-context';
 
 const noop = () => {};
 

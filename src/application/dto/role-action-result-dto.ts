@@ -1,4 +1,4 @@
-import type { MbcRole } from '../../domain/entities/mbc-card';
+import type { MbcRole } from '@domain/entities/mbc-card';
 import type { CardSummaryDto } from './card-summary-dto';
 
 export type RoleActionResultDto = {

@@ -1,5 +1,5 @@
-import { DomainError } from '../errors/domain-error';
-import { PARKING_TARIFF_PER_STARTED_HOUR } from '../entities/mbc-card';
+import { DomainError } from '@domain/errors/domain-error';
+import { PARKING_TARIFF_PER_STARTED_HOUR } from '@domain/entities/mbc-card';
 
 export type ActivityTariffCalculation = {
   chargedHours: number;

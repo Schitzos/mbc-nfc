@@ -1,7 +1,7 @@
-import type { MbcCardRepository } from '../../domain/repositories/mbc-card-repository';
-import { CardRepositoryError } from '../../domain/errors/card-repository-error';
-import type { RoleActionResultDto } from '../dto/role-action-result-dto';
-import { toCardSummaryDto } from '../dto/card-summary-mapper';
+import type { MbcCardRepository } from '@domain/repositories/mbc-card-repository';
+import { CardRepositoryError } from '@domain/errors/card-repository-error';
+import type { RoleActionResultDto } from '@application/dto/role-action-result-dto';
+import { toCardSummaryDto } from '@application/dto/card-summary-mapper';
 
 export class InspectMemberCardUseCase {
   constructor(private readonly cardRepository: MbcCardRepository) {}

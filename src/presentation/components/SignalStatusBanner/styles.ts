@@ -1,8 +1,8 @@
 import { StyleSheet } from 'react-native';
-import { signalColorTokens } from '../../theme/colors';
-import { radius } from '../../theme/radius';
-import { spacing } from '../../theme/spacing';
-import { typography } from '../../theme/typography';
+import { signalColorTokens } from '@presentation/theme/colors';
+import { radius } from '@presentation/theme/radius';
+import { spacing } from '@presentation/theme/spacing';
+import { typography } from '@presentation/theme/typography';
 
 export const styles = StyleSheet.create({
   root: {

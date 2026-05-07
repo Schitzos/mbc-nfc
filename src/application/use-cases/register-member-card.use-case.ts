@@ -1,15 +1,15 @@
-import type { MbcCard } from '../../domain/entities/mbc-card';
+import type { MbcCard } from '@domain/entities/mbc-card';
 import {
   createTransactionLog,
   appendTransactionLog,
-} from '../../domain/services/transaction-log-policy';
-import type { MbcCardRepository } from '../../domain/repositories/mbc-card-repository';
-import type { RoleActionResultDto } from '../dto/role-action-result-dto';
-import { toCardSummaryDto } from '../dto/card-summary-mapper';
-import { CardRepositoryError } from '../../domain/errors/card-repository-error';
-import { createRandomId } from '../../shared/utils/create-random-id';
-import type { LocalLedgerRepository } from '../../domain/repositories/local-ledger-repository';
-import { maskMemberReference } from '../../shared/utils/mask-member-reference';
+} from '@domain/services/transaction-log-policy';
+import type { MbcCardRepository } from '@domain/repositories/mbc-card-repository';
+import type { RoleActionResultDto } from '@application/dto/role-action-result-dto';
+import { toCardSummaryDto } from '@application/dto/card-summary-mapper';
+import { CardRepositoryError } from '@domain/errors/card-repository-error';
+import { createRandomId } from '@shared/utils/create-random-id';
+import type { LocalLedgerRepository } from '@domain/repositories/local-ledger-repository';
+import { maskMemberReference } from '@shared/utils/mask-member-reference';
 
 function createInitialCard(): MbcCard {
   const occurredAt = new Date().toISOString();

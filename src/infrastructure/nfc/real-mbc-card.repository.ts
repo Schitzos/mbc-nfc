@@ -1,8 +1,8 @@
 import NfcManager, { Ndef, NfcTech } from 'react-native-nfc-manager';
-import type { MbcCard } from '../../domain/entities/mbc-card';
-import type { MbcCardRepository } from '../../domain/repositories/mbc-card-repository';
-import { CardRepositoryError } from '../../domain/errors/card-repository-error';
-import { DomainError } from '../../domain/errors/domain-error';
+import type { MbcCard } from '@domain/entities/mbc-card';
+import type { MbcCardRepository } from '@domain/repositories/mbc-card-repository';
+import { CardRepositoryError } from '@domain/errors/card-repository-error';
+import { DomainError } from '@domain/errors/domain-error';
 import { encrypt, decrypt, isMbcEnvelope } from './silent-shield';
 
 const NTAG215_USER_MEMORY = 504;

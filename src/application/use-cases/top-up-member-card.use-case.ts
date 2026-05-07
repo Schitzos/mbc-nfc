@@ -1,14 +1,14 @@
-import type { RoleActionResultDto } from '../dto/role-action-result-dto';
-import type { MbcCardRepository } from '../../domain/repositories/mbc-card-repository';
-import { CardRepositoryError } from '../../domain/errors/card-repository-error';
+import type { RoleActionResultDto } from '@application/dto/role-action-result-dto';
+import type { MbcCardRepository } from '@domain/repositories/mbc-card-repository';
+import { CardRepositoryError } from '@domain/errors/card-repository-error';
 import {
   createTransactionLog,
   appendTransactionLog,
-} from '../../domain/services/transaction-log-policy';
-import { createRandomId } from '../../shared/utils/create-random-id';
-import { toCardSummaryDto } from '../dto/card-summary-mapper';
-import type { LocalLedgerRepository } from '../../domain/repositories/local-ledger-repository';
-import { maskMemberReference } from '../../shared/utils/mask-member-reference';
+} from '@domain/services/transaction-log-policy';
+import { createRandomId } from '@shared/utils/create-random-id';
+import { toCardSummaryDto } from '@application/dto/card-summary-mapper';
+import type { LocalLedgerRepository } from '@domain/repositories/local-ledger-repository';
+import { maskMemberReference } from '@shared/utils/mask-member-reference';
 
 interface TopUpMemberCardRequest {
   amount: number;

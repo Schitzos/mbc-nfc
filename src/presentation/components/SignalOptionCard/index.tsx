@@ -1,6 +1,6 @@
 import React, { useMemo, useState } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
-import { componentTokens } from '../../theme/components';
+import { componentTokens } from '@presentation/theme/components';
 import type { SignalOptionCardProps } from './types';
 import { styles } from './styles';
 

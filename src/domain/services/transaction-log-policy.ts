@@ -2,8 +2,8 @@ import type {
   MbcActivity,
   MbcCard,
   TransactionLog,
-} from '../entities/mbc-card';
-import { DomainError } from '../errors/domain-error';
+} from '@domain/entities/mbc-card';
+import { DomainError } from '@domain/errors/domain-error';
 
 interface CreateTransactionLogInput {
   id: string;
