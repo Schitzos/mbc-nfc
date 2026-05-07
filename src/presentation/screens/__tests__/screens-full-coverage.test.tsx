@@ -198,8 +198,12 @@ describe('screens – full branch coverage', () => {
       expect(mockInspectMemberCardUseCase.execute).toHaveBeenCalled(),
     );
 
+    // Dismiss the success sheet to reveal card data
+    await waitFor(() => expect(screen.getByText('Done')).toBeTruthy());
+    fireEvent.press(screen.getByText('Done'));
+
     // The invalid date should be rendered as-is
-    expect(screen.getByText(/invalid-date/)).toBeTruthy();
+    await waitFor(() => expect(screen.getByText(/invalid-date/)).toBeTruthy());
   });
 
   it('Scout shows error state for failed inspection', async () => {
