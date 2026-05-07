@@ -1,4 +1,3 @@
-import { Buffer } from 'node:buffer';
 import Crypto from 'react-native-quick-crypto';
 import type { MbcCard } from '../../domain/entities/mbc-card';
 import { encode, decode } from './mbc-card-codec';
