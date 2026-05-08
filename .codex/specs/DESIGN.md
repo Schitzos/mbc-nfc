@@ -238,8 +238,18 @@ export type RoleActionResultDto = {
   chargedHours?: number;
   chargedAmount?: number;
   durationMs?: number;
-  requiresReset?: boolean;
 };
+
+export type RoleActionErrorCode =
+  | 'INSUFFICIENT_BALANCE'
+  | 'ALREADY_CHECKED_IN'
+  | 'CARD_TAMPERED'
+  | 'CARD_UNSUPPORTED'
+  | 'UNREGISTERED_CARD'
+  | 'SCAN_TIMEOUT'
+  | 'READ_FAILED'
+  | 'WRITE_FAILED'
+  | 'GENERIC_FAILURE';
 
 export type StationLedgerSummaryDto = StationLedgerSummary;
 // StationLedgerSummary is defined in domain/entities/station-ledger-summary.ts:
@@ -298,7 +308,8 @@ export function calculateActivityTariff(input: {
 ### Registration Safety
 
 - Station registration uses `registerCard()` which reads-then-writes in a single NFC session.
-- If the card is already registered or has tampered data, the app shows a confirmation prompt (Wipe & Re-register / Skip).
+- If the card is already registered or has unrecognized (non-MBC) data, the app shows a confirmation prompt (Wipe & Re-register / Skip).
+- Tampered authenticated payloads (Silent Shield integrity failure) show a `CARD_TAMPERED` error without a reset prompt.
 - If the user confirms, `executeWithReset()` wipes the card and writes a fresh payload with a new member ID.
 - If the user skips, no modification is made.
 - The reset flow generates a new card ID and member ID (does not reuse old ones).
@@ -320,11 +331,11 @@ export function calculateActivityTariff(input: {
 
 ### Local Ledger
 
-- SQLite ledger records every successful card-state operation: `REGISTER`, `TOPUP`, `CHECKIN`, and `CHECKOUT`.
-- Station summaries are current-device/current-installation only and must say so in UI.
-- Income summaries count money-related rows; `CHECKIN` has amount `0` and is audit/activity count only.
+- SQLite ledger records every successful card-state operation: `REGISTER`, `TOPUP`, and `CHECKOUT`. Check-in (CHECKIN) does NOT append a local ledger row.
+- Station summaries reflect operations processed on this device.
+- Income summaries count money-related rows (`TOPUP` and `CHECKOUT`).
 - SQLite ledger is device-local and offline.
-- The ledger stores audit/reporting data for the current device only.
+- The ledger stores audit/reporting data for the device that processed each operation.
 - The ledger does not replace card balance, status, or activity truth.
 - Register, top-up, and checkout actions append ledger entries after successful business completion.
 - A masked or shortened member reference is preferred over full sensitive identity.
@@ -371,7 +382,7 @@ Before any real card operation, the presentation layer checks NFC availability t
 
 All role screens use `NfcActionSheet` — a bottom sheet component that provides scan/success/error feedback during NFC operations.
 
-- Station has preset top-up amounts (10k/20k/50k/100k) instead of a free-text field. The local ledger summary is displayed as a collapsible accordion (collapsed by default).
+- Station top-up accepts numeric input (free-text allowed) with validation to ensure only numbers are entered. Preset buttons (10k/20k/50k/100k) are also available as shortcuts. The local ledger summary is displayed as a collapsible accordion (collapsed by default).
 - Gate: parking check-in action, NFC write action, status result. No simulation mode or mock scenario selectors.
 - Terminal: checkout action, fixed tariff display, duration/fee summary, tap-out time displayed in `dd-MMM-YYYY hh:mm` format, insufficient balance guidance, NFC write action, status result.
 - Scout: one-tap read-only card summary, balance, visit status, last five logs with timestamps on transaction entries.
@@ -381,7 +392,7 @@ NFC operational log design rules:
 
 - Keep log state in presentation store, isolated from domain/application business state.
 - Use bounded in-memory list (for example latest 100-200 lines) to avoid unbounded growth.
-- Log format should be concise (`HH.mm.ss [NFC:*] message`).
+- Log format should be concise. MVP uses plain `[NFC] message` prefix. Categorized format (`HH.mm.ss [NFC:READ]`, `[NFC:WRITE]`, `[NFC:ERROR]`) is a future enhancement.
 - Logs must never include raw decrypted payload, private keys, full internal member IDs, or security secrets.
 
 The UI applies the Signal UI design system direction, stays simple and direct, and is usable by cooperative staff. Avoid unnecessary dashboard complexity.

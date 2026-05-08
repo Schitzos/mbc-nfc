@@ -107,7 +107,7 @@ Required cases:
 - Terminal insufficient balance returns top-up guidance and keeps checked-in status.
 - Insufficient-balance recovery works after Station top-up and Terminal retry.
 - Successful register, Station top-up, Gate check-in, and Terminal checkout actions append local ledger entries.
-- Station local ledger summary returns expected current-device/current-installation totals and labels the scope clearly.
+- Station local ledger summary returns expected totals for operations processed on this device.
 - Scout reads card without writing.
 
 ## 6. Presentation Test Scope
@@ -179,7 +179,7 @@ Must test:
 | SEC-011 | SQLite authority boundary     | SQLite reporting data never overrides card balance, status, or activity state                                                  |
 | SEC-012 | Write failure handling        | Real NFC writes rely on writeNdefMessage throwing on failure; capacity checked before write                                    |
 | SEC-013 | Capacity guard                | Oversized protected payload is rejected before write                                                                           |
-| SEC-014 | Local report scope            | Station summary clearly states current-device/current-installation only                                                        |
+| SEC-014 | Local report scope            | Station summary reflects operations processed on this device                                                                   |
 
 ## 11. Entry Criteria
 
