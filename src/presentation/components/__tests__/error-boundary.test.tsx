@@ -1,7 +1,7 @@
 import React from 'react';
 import { Text } from 'react-native';
 import { fireEvent, render, screen } from '@testing-library/react-native';
-import { ErrorBoundary } from '../ErrorBoundary';
+import { ErrorBoundary } from '@presentation/components/ErrorBoundary';
 
 let shouldThrow = true;
 

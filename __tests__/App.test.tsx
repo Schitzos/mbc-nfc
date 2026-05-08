@@ -4,8 +4,8 @@
 
 import React from 'react';
 import { fireEvent, render, screen } from '@testing-library/react-native';
-import { RoleSwitcherScreen } from '../src/presentation/screens/RoleSwitcher';
-import { useAppStore } from '../src/presentation/stores/app-store';
+import { RoleSwitcherScreen } from '@presentation/screens/RoleSwitcher';
+import { useAppStore } from '@presentation/stores/app-store';
 
 jest.mock('react-native-safe-area-context', () => ({
   useSafeAreaInsets: () => ({ top: 0, bottom: 0, left: 0, right: 0 }),
@@ -20,7 +20,7 @@ test('renders the role switcher baseline screen', () => {
 
   expect(screen.getByText('MBC Card')).toBeTruthy();
   expect(screen.getAllByText('Station').length).toBeGreaterThan(0);
-  expect(screen.getByText('Choose role')).toBeTruthy();
+  expect(screen.getByText('Select Operating Role')).toBeTruthy();
 });
 
 test('navigates immediately when a role is selected', () => {

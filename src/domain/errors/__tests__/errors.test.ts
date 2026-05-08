@@ -1,5 +1,5 @@
-import { DomainError } from '../domain-error';
-import { CardRepositoryError } from '../card-repository-error';
+import { DomainError } from '@domain/errors/domain-error';
+import { CardRepositoryError } from '@domain/errors/card-repository-error';
 
 describe('DomainError', () => {
   it('creates an error with code and message', () => {

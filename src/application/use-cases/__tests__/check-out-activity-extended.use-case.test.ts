@@ -1,7 +1,8 @@
-import { CheckOutActivityUseCase } from '../check-out-activity.use-case';
-import type { MbcCardRepository } from '../../../domain/repositories/mbc-card-repository';
-import type { LocalLedgerRepository } from '../../../domain/repositories/local-ledger-repository';
-import type { MbcCard } from '../../../domain/entities/mbc-card';
+import { CheckOutActivityUseCase } from '@application/use-cases/check-out-activity.use-case';
+import type { MbcCardRepository } from '@domain/repositories/mbc-card-repository';
+import type { LocalLedgerRepository } from '@domain/repositories/local-ledger-repository';
+import { CardRepositoryError } from '@domain/errors/card-repository-error';
+import type { MbcCard } from '@domain/entities/mbc-card';
 
 function createCheckedInCard(overrides?: Partial<MbcCard>): MbcCard {
   return {
@@ -166,4 +167,58 @@ describe('CheckOutActivityUseCase – extended coverage', () => {
     expect(result.success).toBe(false);
     expect(result.message).toContain('later than the check-in time');
   });
+
+  it('returns CARD_TAMPERED errorCode for tampered card', async () => {
+    const cardRepository = createCardRepository({
+      readWriteCard: jest
+        .fn()
+        .mockRejectedValue(
+          new CardRepositoryError('CARD_TAMPERED', 'Card data is tampered.'),
+        ),
+    });
+    const useCase = new CheckOutActivityUseCase(cardRepository);
+
+    const result = await useCase.execute({
+      checkedOutAt: '2026-05-01T09:05:01.000Z',
+    });
+
+    expect(result.success).toBe(false);
+    expect(result.errorCode).toBe('CARD_TAMPERED');
+  });
+});
+
+it('returns UNREGISTERED_CARD errorCode for unregistered card', async () => {
+  const cardRepository = createCardRepository({
+    readWriteCard: jest
+      .fn()
+      .mockRejectedValue(
+        new CardRepositoryError('UNREGISTERED_CARD', 'Card not registered.'),
+      ),
+  });
+  const useCase = new CheckOutActivityUseCase(cardRepository);
+
+  const result = await useCase.execute({
+    checkedOutAt: '2026-05-01T09:05:01.000Z',
+  });
+
+  expect(result.success).toBe(false);
+  expect(result.errorCode).toBe('UNREGISTERED_CARD');
+});
+
+it('returns GENERIC_FAILURE errorCode for other CardRepositoryError codes', async () => {
+  const cardRepository = createCardRepository({
+    readWriteCard: jest
+      .fn()
+      .mockRejectedValue(
+        new CardRepositoryError('SCAN_CANCELLED', 'Scan was cancelled.'),
+      ),
+  });
+  const useCase = new CheckOutActivityUseCase(cardRepository);
+
+  const result = await useCase.execute({
+    checkedOutAt: '2026-05-01T09:05:01.000Z',
+  });
+
+  expect(result.success).toBe(false);
+  expect(result.errorCode).toBe('GENERIC_FAILURE');
 });

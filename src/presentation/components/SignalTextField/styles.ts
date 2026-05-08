@@ -1,7 +1,7 @@
 import { StyleSheet } from 'react-native';
-import { signalColorTokens } from '../../theme/colors';
-import { componentTokens } from '../../theme/components';
-import { typography } from '../../theme/typography';
+import { signalColorTokens } from '@presentation/theme/colors';
+import { componentTokens } from '@presentation/theme/components';
+import { typography } from '@presentation/theme/typography';
 
 export const styles = StyleSheet.create({
   root: { width: componentTokens.textField.width },

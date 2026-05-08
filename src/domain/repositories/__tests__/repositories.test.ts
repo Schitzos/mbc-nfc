@@ -1,10 +1,10 @@
-import type { LocalLedgerRepository } from '../local-ledger-repository';
-import type { MbcCardRepository } from '../mbc-card-repository';
+import type { LocalLedgerRepository } from '@domain/repositories/local-ledger-repository';
+import type { MbcCardRepository } from '@domain/repositories/mbc-card-repository';
 import type {
   NfcAvailabilityRepository,
   NfcAvailabilityStatus,
-} from '../nfc-availability-repository';
-import type { MbcCard } from '../../entities/mbc-card';
+} from '@domain/repositories/nfc-availability-repository';
+import type { MbcCard } from '@domain/entities/mbc-card';
 
 describe('LocalLedgerRepository', () => {
   it('append stores a ledger entry', async () => {

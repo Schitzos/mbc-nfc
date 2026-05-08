@@ -5,11 +5,11 @@ import {
   screen,
   waitFor,
 } from '@testing-library/react-native';
-import { GateScreen } from '../Gate';
-import { TerminalScreen } from '../Terminal';
-import { StationScreen } from '../Station';
-import { ScoutScreen } from '../Scout';
-import { useAppStore } from '../../stores/app-store';
+import { GateScreen } from '@presentation/screens/Gate';
+import { TerminalScreen } from '@presentation/screens/Terminal';
+import { StationScreen } from '@presentation/screens/Station';
+import { ScoutScreen } from '@presentation/screens/Scout';
+import { useAppStore } from '@presentation/stores/app-store';
 
 jest.mock('react-native-safe-area-context', () => ({
   useSafeAreaInsets: () => ({ top: 0, bottom: 0, left: 0, right: 0 }),
@@ -156,18 +156,22 @@ const mockServices = {
     registerMemberCardUseCase: mockRegisterMemberCardUseCase,
     topUpMemberCardUseCase: mockTopUpMemberCardUseCase,
     getStationLedgerSummaryUseCase: mockGetStationLedgerSummaryUseCase,
+    cancelNfc: jest.fn().mockResolvedValue(undefined),
   },
   gate: {
     checkNfcAvailabilityUseCase: mockCheckNfcAvailabilityUseCase,
     checkInActivityUseCase: mockCheckInActivityUseCase,
+    cancelNfc: jest.fn().mockResolvedValue(undefined),
   },
   terminal: {
     checkNfcAvailabilityUseCase: mockCheckNfcAvailabilityUseCase,
     checkOutActivityUseCase: mockCheckOutActivityUseCase,
+    cancelNfc: jest.fn().mockResolvedValue(undefined),
   },
   scout: {
     checkNfcAvailabilityUseCase: mockCheckNfcAvailabilityUseCase,
     inspectMemberCardUseCase: mockInspectMemberCardUseCase,
+    cancelNfc: jest.fn().mockResolvedValue(undefined),
   },
 } as never;
 
@@ -179,11 +183,6 @@ function renderWithServices(ui: React.ReactElement) {
 }
 
 describe('role screens – extended branch coverage', () => {
-  const navigation = {
-    goBack: jest.fn(),
-    navigate: jest.fn(),
-  } as never;
-
   beforeEach(() => {
     mockCheckNfcAvailabilityUseCase.execute.mockClear();
     mockRegisterMemberCardUseCase.execute.mockClear();
@@ -197,7 +196,7 @@ describe('role screens – extended branch coverage', () => {
   });
 
   it('Gate check-in calls use case', async () => {
-    renderWithServices(<GateScreen navigation={navigation} />);
+    renderWithServices(<GateScreen />);
     await waitFor(() =>
       expect(mockCheckNfcAvailabilityUseCase.execute).toHaveBeenCalled(),
     );
@@ -217,9 +216,10 @@ describe('role screens – extended branch coverage', () => {
       success: false,
       role: 'GATE',
       message: 'Card payload is invalid or tampered',
+      errorCode: 'CARD_TAMPERED',
     });
 
-    renderWithServices(<GateScreen navigation={navigation} />);
+    renderWithServices(<GateScreen />);
     await waitFor(() =>
       expect(mockCheckNfcAvailabilityUseCase.execute).toHaveBeenCalled(),
     );
@@ -237,9 +237,10 @@ describe('role screens – extended branch coverage', () => {
       success: false,
       role: 'TERMINAL',
       message: 'Card is not registered yet.',
+      errorCode: 'UNREGISTERED_CARD',
     });
 
-    renderWithServices(<TerminalScreen navigation={navigation} />);
+    renderWithServices(<TerminalScreen />);
     await waitFor(() =>
       expect(mockCheckNfcAvailabilityUseCase.execute).toHaveBeenCalled(),
     );
@@ -257,9 +258,10 @@ describe('role screens – extended branch coverage', () => {
       success: false,
       role: 'TERMINAL',
       message: 'Insufficient balance for checkout',
+      errorCode: 'INSUFFICIENT_BALANCE',
     });
 
-    renderWithServices(<TerminalScreen navigation={navigation} />);
+    renderWithServices(<TerminalScreen />);
     await waitFor(() =>
       expect(mockCheckNfcAvailabilityUseCase.execute).toHaveBeenCalled(),
     );
@@ -270,7 +272,8 @@ describe('role screens – extended branch coverage', () => {
     );
 
     fireEvent.press(screen.getByText('Go to Station Top Up'));
-    expect(navigation.navigate).toHaveBeenCalledWith('station');
+    const { __mockNavigation } = require('@react-navigation/native');
+    expect(__mockNavigation.navigate).toHaveBeenCalledWith('station');
   });
 
   it('Station shows failed registration result', async () => {
@@ -280,7 +283,7 @@ describe('role screens – extended branch coverage', () => {
       message: 'Card is already registered.',
     });
 
-    renderWithServices(<StationScreen navigation={navigation} />);
+    renderWithServices(<StationScreen />);
     await waitFor(() =>
       expect(mockCheckNfcAvailabilityUseCase.execute).toHaveBeenCalled(),
     );
@@ -306,7 +309,7 @@ describe('role screens – extended branch coverage', () => {
       },
     });
 
-    renderWithServices(<ScoutScreen navigation={navigation} />);
+    renderWithServices(<ScoutScreen />);
     await waitFor(() =>
       expect(mockCheckNfcAvailabilityUseCase.execute).toHaveBeenCalled(),
     );
@@ -332,7 +335,7 @@ describe('role screens – extended branch coverage', () => {
       },
     });
 
-    renderWithServices(<ScoutScreen navigation={navigation} />);
+    renderWithServices(<ScoutScreen />);
     await waitFor(() =>
       expect(mockCheckNfcAvailabilityUseCase.execute).toHaveBeenCalled(),
     );
@@ -346,7 +349,7 @@ describe('role screens – extended branch coverage', () => {
   });
 
   it('Scout does not call writeCard (read-only)', async () => {
-    renderWithServices(<ScoutScreen navigation={navigation} />);
+    renderWithServices(<ScoutScreen />);
     await waitFor(() =>
       expect(mockCheckNfcAvailabilityUseCase.execute).toHaveBeenCalled(),
     );
@@ -361,7 +364,7 @@ describe('role screens – extended branch coverage', () => {
   });
 
   it('Station NFC log panel can be toggled and cleared', async () => {
-    renderWithServices(<StationScreen navigation={navigation} />);
+    renderWithServices(<StationScreen />);
     await waitFor(() =>
       expect(mockCheckNfcAvailabilityUseCase.execute).toHaveBeenCalled(),
     );
@@ -387,7 +390,7 @@ describe('role screens – extended branch coverage', () => {
       message: 'This card is already registered.',
     });
 
-    renderWithServices(<StationScreen navigation={navigation} />);
+    renderWithServices(<StationScreen />);
     await waitFor(() =>
       expect(mockCheckNfcAvailabilityUseCase.execute).toHaveBeenCalled(),
     );
@@ -410,13 +413,13 @@ describe('role screens – extended branch coverage', () => {
   });
 
   it('Station top-up with preset amount selection', async () => {
-    renderWithServices(<StationScreen navigation={navigation} />);
+    renderWithServices(<StationScreen />);
     await waitFor(() =>
       expect(mockCheckNfcAvailabilityUseCase.execute).toHaveBeenCalled(),
     );
 
     fireEvent.press(screen.getByText('Switch to Top Up'));
-    fireEvent.press(screen.getByText('Rp 100.000'));
+    fireEvent.press(screen.getByText('100.000'));
     fireEvent.press(screen.getByText('Tap NFC Card to Top Up'));
     await waitFor(() =>
       expect(mockTopUpMemberCardUseCase.execute).toHaveBeenCalledWith({
@@ -442,7 +445,7 @@ describe('role screens – extended branch coverage', () => {
       },
     });
 
-    renderWithServices(<GateScreen navigation={navigation} />);
+    renderWithServices(<GateScreen />);
     await waitFor(() =>
       expect(mockCheckNfcAvailabilityUseCase.execute).toHaveBeenCalled(),
     );

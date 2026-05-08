@@ -1,5 +1,5 @@
 import type { DB } from '@op-engineering/op-sqlite';
-import { SqliteLedgerRepository } from '../sqlite-ledger.repository';
+import { SqliteLedgerRepository } from '@infrastructure/local-ledger/sqlite-ledger.repository';
 
 type ExecuteMock = jest.MockedFunction<DB['execute']>;
 

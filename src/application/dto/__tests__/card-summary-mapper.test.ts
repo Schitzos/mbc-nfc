@@ -1,5 +1,5 @@
-import { toCardSummaryDto } from '../card-summary-mapper';
-import type { MbcCard } from '../../../domain/entities/mbc-card';
+import { toCardSummaryDto } from '@application/dto/card-summary-mapper';
+import type { MbcCard } from '@domain/entities/mbc-card';
 
 describe('toCardSummaryDto', () => {
   const baseCard: MbcCard = {

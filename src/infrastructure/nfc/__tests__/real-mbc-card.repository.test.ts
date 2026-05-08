@@ -43,8 +43,8 @@ jest.mock('react-native-quick-crypto', () => {
   };
 });
 
-import { encrypt } from '../silent-shield';
-import type { MbcCard } from '../../../domain/entities/mbc-card';
+import { encrypt } from '@infrastructure/nfc/silent-shield';
+import type { MbcCard } from '@domain/entities/mbc-card';
 
 const { RealMbcCardRepository } = require('../real-mbc-card.repository');
 
@@ -108,6 +108,7 @@ describe('RealMbcCardRepository', () => {
   });
 
   it('rejects blank/unregistered card', async () => {
+    mockGetTag.mockResolvedValueOnce({});
     mockGetTag.mockResolvedValueOnce({ ndefMessage: [] });
     await expect(repository.readCard()).rejects.toMatchObject({
       code: 'UNREGISTERED_CARD',
@@ -115,6 +116,7 @@ describe('RealMbcCardRepository', () => {
   });
 
   it('rejects non-MBC envelope (tampered)', async () => {
+    mockGetTag.mockResolvedValueOnce({});
     mockGetTag.mockResolvedValueOnce({
       ndefMessage: [{ payload: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9] }],
     });
@@ -131,6 +133,7 @@ describe('RealMbcCardRepository', () => {
     const corrupted = Array.from(result.value);
     // eslint-disable-next-line no-bitwise
     corrupted[corrupted.length - 1] ^= 0xff;
+    mockGetTag.mockResolvedValueOnce({});
     mockGetTag.mockResolvedValueOnce({
       ndefMessage: [{ payload: corrupted }],
     });
@@ -172,7 +175,7 @@ describe('RealMbcCardRepository', () => {
   it('writeCard catch maps errors to readable', async () => {
     mockWriteNdefMessage.mockRejectedValueOnce(new Error('io error'));
     await expect(repository.writeCard(cardFixture)).rejects.toMatchObject({
-      code: 'NFC_UNAVAILABLE',
+      code: 'WRITE_FAILED',
     });
   });
 
@@ -195,11 +198,11 @@ describe('RealMbcCardRepository', () => {
     ).rejects.toMatchObject({ code: 'INSUFFICIENT_BALANCE' });
   });
 
-  it('readWriteCard maps generic errors to NFC_UNAVAILABLE', async () => {
+  it('readWriteCard maps generic errors to WRITE_FAILED', async () => {
     mockRequestTechnology.mockRejectedValueOnce(new Error('unknown'));
     await expect(
       repository.readWriteCard((card: MbcCard) => card),
-    ).rejects.toMatchObject({ code: 'NFC_UNAVAILABLE' });
+    ).rejects.toMatchObject({ code: 'WRITE_FAILED' });
   });
 });
 
@@ -241,11 +244,12 @@ describe('RealMbcCardRepository – additional error paths', () => {
   });
 
   it('registerCard error path maps to readable error', async () => {
-    // Make writeNdefMessage fail after the blank-card check passes
+    // First getTag for assertSupportedTag, second for registerCard's own check
+    mockGetTag.mockResolvedValueOnce({});
     mockGetTag.mockResolvedValueOnce({ ndefMessage: [] });
     mockWriteNdefMessage.mockRejectedValueOnce(new Error('write failed'));
     await expect(repository.registerCard(cardFixture)).rejects.toMatchObject({
-      code: 'NFC_UNAVAILABLE',
+      code: 'WRITE_FAILED',
     });
   });
 
@@ -278,6 +282,8 @@ describe('RealMbcCardRepository – additional error paths', () => {
       // eslint-disable-next-line no-bitwise
       corrupted[i] ^= 0xff;
     }
+    // First getTag for assertSupportedTag, second for registerCard's own check
+    mockGetTag.mockResolvedValueOnce({});
     mockGetTag.mockResolvedValueOnce({
       ndefMessage: [{ payload: Array.from(corrupted) }],
     });
@@ -286,10 +292,95 @@ describe('RealMbcCardRepository – additional error paths', () => {
   });
 
   it('registerCard proceeds when card has non-MBC NDEF data', async () => {
-    // Card has NDEF data but not an MBC envelope
+    // First getTag for assertSupportedTag, second for registerCard's own check
+    mockGetTag.mockResolvedValueOnce({});
     mockGetTag.mockResolvedValueOnce({
       ndefMessage: [{ payload: [0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07] }],
     });
     await expect(repository.registerCard(cardFixture)).resolves.toBeUndefined();
+  });
+});
+
+describe('RealMbcCardRepository – new error codes', () => {
+  let repository: InstanceType<typeof RealMbcCardRepository>;
+
+  beforeEach(() => {
+    repository = new RealMbcCardRepository();
+    jest.clearAllMocks();
+    mockStart.mockResolvedValue(undefined);
+    mockRequestTechnology.mockResolvedValue(undefined);
+    mockCancelTechnologyRequest.mockResolvedValue(undefined);
+    mockWriteNdefMessage.mockResolvedValue(undefined);
+    mockRecord.mockImplementation(
+      (_tnf: number, _type: any, _id: any, payload: any) => payload,
+    );
+    mockEncodeMessage.mockImplementation((records: any[]) => records[0]);
+    mockGetTag.mockResolvedValue(makeEncryptedTag(cardFixture, 1));
+    mockGetNdefMessage.mockRejectedValue(new Error('not available'));
+  });
+
+  it('throws SCAN_TIMEOUT when requestTechnology times out', async () => {
+    mockRequestTechnology.mockRejectedValueOnce(new Error('timeout'));
+    await expect(repository.readCard()).rejects.toMatchObject({
+      code: 'SCAN_TIMEOUT',
+    });
+  });
+
+  it('throws SCAN_TIMEOUT on write when technology request times out', async () => {
+    mockRequestTechnology.mockRejectedValueOnce(new Error('NFC timeout'));
+    await expect(repository.writeCard(cardFixture)).rejects.toMatchObject({
+      code: 'SCAN_TIMEOUT',
+    });
+  });
+
+  it('throws READ_FAILED when readCard encounters generic error after session start', async () => {
+    mockGetTag.mockResolvedValueOnce({});
+    mockGetTag.mockRejectedValueOnce(new Error('io failure'));
+    mockGetNdefMessage.mockRejectedValueOnce(new Error('io failure'));
+    await expect(repository.readCard()).rejects.toMatchObject({
+      code: 'READ_FAILED',
+    });
+  });
+
+  it('throws WRITE_FAILED when writeNdefMessage fails with non-cancel error', async () => {
+    mockWriteNdefMessage.mockRejectedValueOnce(new Error('tag lost'));
+    await expect(repository.writeCard(cardFixture)).rejects.toMatchObject({
+      code: 'WRITE_FAILED',
+    });
+  });
+
+  it('throws CARD_UNSUPPORTED when tag maxSize is below NTAG215 capacity', async () => {
+    mockGetTag.mockResolvedValueOnce({ maxSize: 100 });
+    await expect(repository.readCard()).rejects.toMatchObject({
+      code: 'CARD_UNSUPPORTED',
+    });
+  });
+
+  it('throws CARD_UNSUPPORTED on writeCard when tag is too small', async () => {
+    mockGetTag.mockResolvedValueOnce({ maxSize: 48 });
+    await expect(repository.writeCard(cardFixture)).rejects.toMatchObject({
+      code: 'CARD_UNSUPPORTED',
+    });
+  });
+
+  it('does not throw CARD_UNSUPPORTED when maxSize is sufficient', async () => {
+    mockGetTag.mockResolvedValueOnce({ maxSize: 504 });
+    mockGetTag.mockResolvedValueOnce(makeEncryptedTag(cardFixture, 1));
+    mockGetNdefMessage.mockRejectedValueOnce(new Error('not available'));
+    const card = await repository.readCard();
+    expect(card.cardId).toBe('C000001');
+  });
+
+  it('does not throw CARD_UNSUPPORTED when maxSize is absent', async () => {
+    // Default mock returns tag without maxSize — should pass through
+    const card = await repository.readCard();
+    expect(card.cardId).toBe('C000001');
+  });
+
+  it('throws WRITE_FAILED when a non-Error value is thrown in write context', async () => {
+    mockWriteNdefMessage.mockRejectedValueOnce('string error');
+    await expect(repository.writeCard(cardFixture)).rejects.toMatchObject({
+      code: 'WRITE_FAILED',
+    });
   });
 });

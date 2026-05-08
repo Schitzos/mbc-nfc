@@ -1,5 +1,10 @@
-import { DomainError } from '../errors/domain-error';
-import { PARKING_TARIFF_PER_STARTED_HOUR } from '../entities/mbc-card';
+import { DomainError } from '@domain/errors/domain-error';
+
+export type TariffStrategy = {
+  ratePerUnit: number;
+  unitMs: number;
+  roundUp: boolean;
+};
 
 export type ActivityTariffCalculation = {
   chargedHours: number;
@@ -25,10 +30,16 @@ function parseIsoDate(value: string): Date {
   return parsedDate;
 }
 
-export function calculateActivityTariff({
-  checkedInAt,
-  checkedOutAt,
-}: CalculateActivityTariffInput): ActivityTariffCalculation {
+const DEFAULT_STRATEGY: TariffStrategy = {
+  ratePerUnit: 2000,
+  unitMs: 60 * 60 * 1000,
+  roundUp: true,
+};
+
+export function calculateActivityTariff(
+  { checkedInAt, checkedOutAt }: CalculateActivityTariffInput,
+  strategy: TariffStrategy = DEFAULT_STRATEGY,
+): ActivityTariffCalculation {
   const startedAt = parseIsoDate(checkedInAt);
   const finishedAt = parseIsoDate(checkedOutAt);
   const durationMs = finishedAt.getTime() - startedAt.getTime();
@@ -40,12 +51,14 @@ export function calculateActivityTariff({
     );
   }
 
-  const durationHours = durationMs / (60 * 60 * 1000);
-  const chargedHours = Math.ceil(durationHours);
+  const durationUnits = durationMs / strategy.unitMs;
+  const chargedHours = strategy.roundUp
+    ? Math.ceil(durationUnits)
+    : Math.floor(durationUnits);
 
   return {
     chargedHours,
-    chargedAmount: chargedHours * PARKING_TARIFF_PER_STARTED_HOUR,
+    chargedAmount: chargedHours * strategy.ratePerUnit,
     durationMs,
   };
 }

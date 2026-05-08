@@ -1,7 +1,8 @@
-import { CheckInActivityUseCase } from '../check-in-activity.use-case';
-import type { MbcCardRepository } from '../../../domain/repositories/mbc-card-repository';
-import type { MbcCard } from '../../../domain/entities/mbc-card';
-import { CardRepositoryError } from '../../../domain/errors/card-repository-error';
+import { CheckInActivityUseCase } from '@application/use-cases/check-in-activity.use-case';
+import type { MbcCardRepository } from '@domain/repositories/mbc-card-repository';
+import type { MbcCard } from '@domain/entities/mbc-card';
+import { CardRepositoryError } from '@domain/errors/card-repository-error';
+import { DomainError } from '@domain/errors/domain-error';
 
 function createCard(overrides?: Partial<MbcCard>): MbcCard {
   return {
@@ -125,4 +126,105 @@ describe('CheckInActivityUseCase – extended coverage', () => {
     expect(result.success).toBe(false);
     expect(result.message).toContain('already checked in');
   });
+
+  it('returns CARD_TAMPERED errorCode for tampered card', async () => {
+    const cardRepository = createCardRepository({
+      readWriteCard: jest
+        .fn()
+        .mockRejectedValue(
+          new CardRepositoryError('CARD_TAMPERED', 'Card data is tampered.'),
+        ),
+    });
+    const useCase = new CheckInActivityUseCase(cardRepository);
+
+    const result = await useCase.execute({
+      activityId: 'parking-main-gate',
+      activityType: 'PARKING',
+    });
+
+    expect(result.success).toBe(false);
+    expect(result.errorCode).toBe('CARD_TAMPERED');
+  });
+
+  it('returns UNREGISTERED_CARD errorCode for unregistered card', async () => {
+    const cardRepository = createCardRepository({
+      readWriteCard: jest
+        .fn()
+        .mockRejectedValue(
+          new CardRepositoryError('UNREGISTERED_CARD', 'Not registered.'),
+        ),
+    });
+    const useCase = new CheckInActivityUseCase(cardRepository);
+
+    const result = await useCase.execute({
+      activityId: 'parking-main-gate',
+      activityType: 'PARKING',
+    });
+
+    expect(result.success).toBe(false);
+    expect(result.errorCode).toBe('UNREGISTERED_CARD');
+  });
+
+  it('returns ALREADY_CHECKED_IN errorCode for double check-in', async () => {
+    const checkedInCard2 = createCard({
+      visitStatus: 'CHECKED_IN',
+      activeSession: {
+        activityId: 'existing',
+        activityType: 'PARKING',
+        checkedInAt: '2026-05-01T08:00:00.000Z',
+      },
+    });
+    const cardRepository = createCardRepository({
+      readWriteCard: jest
+        .fn()
+        .mockImplementation(async (fn: any) => fn(checkedInCard2)),
+    });
+    const useCase = new CheckInActivityUseCase(cardRepository);
+
+    const result = await useCase.execute({
+      activityId: 'new-activity',
+      activityType: 'PARKING',
+    });
+
+    expect(result.success).toBe(false);
+    expect(result.errorCode).toBe('ALREADY_CHECKED_IN');
+  });
+});
+
+it('returns GENERIC_FAILURE errorCode for other CardRepositoryError codes', async () => {
+  const cardRepository = createCardRepository({
+    readWriteCard: jest
+      .fn()
+      .mockRejectedValue(
+        new CardRepositoryError('SCAN_CANCELLED', 'Scan was cancelled.'),
+      ),
+  });
+  const useCase = new CheckInActivityUseCase(cardRepository);
+
+  const result = await useCase.execute({
+    activityId: 'parking-main-gate',
+    activityType: 'PARKING',
+  });
+
+  expect(result.success).toBe(false);
+  expect(result.errorCode).toBe('GENERIC_FAILURE');
+});
+
+it('returns ALREADY_CHECKED_IN errorCode for ACTIVE_SESSION_EXISTS DomainError', async () => {
+  const cardRepository = createCardRepository({
+    readWriteCard: jest
+      .fn()
+      .mockRejectedValue(
+        new DomainError('ACTIVE_SESSION_EXISTS', 'Active session exists.'),
+      ),
+  });
+  const useCase = new CheckInActivityUseCase(cardRepository);
+
+  const result = await useCase.execute({
+    activityId: 'parking-main-gate',
+    activityType: 'PARKING',
+  });
+
+  expect(result.success).toBe(false);
+  expect(result.errorCode).toBe('ALREADY_CHECKED_IN');
 });

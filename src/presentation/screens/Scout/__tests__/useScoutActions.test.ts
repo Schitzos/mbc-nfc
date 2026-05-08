@@ -1,7 +1,7 @@
 import { renderHook, act, waitFor } from '@testing-library/react-native';
 import { useScoutActions } from '../useScoutActions';
-import { useAppStore } from '../../../stores/app-store';
-import type { ScoutServices } from '../../../context/service-context';
+import { useAppStore } from '@presentation/stores/app-store';
+import type { ScoutServices } from '@presentation/context/service-context';
 
 const mockServices: ScoutServices = {
   checkNfcAvailabilityUseCase: {
@@ -19,6 +19,7 @@ const mockServices: ScoutServices = {
       },
     }),
   } as never,
+  cancelNfc: jest.fn().mockResolvedValue(undefined),
 };
 
 describe('useScoutActions', () => {

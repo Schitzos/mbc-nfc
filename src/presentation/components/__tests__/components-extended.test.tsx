@@ -1,11 +1,11 @@
 import React from 'react';
 import { Text } from 'react-native';
 import { fireEvent, render, screen } from '@testing-library/react-native';
-import { SignalButton } from '../SignalButton';
-import { SignalOptionCard } from '../SignalOptionCard';
-import { SignalBottomSheet } from '../SignalBottomSheet';
-import { SignalStatusBanner } from '../SignalStatusBanner';
-import { SignalSkeleton } from '../SignalSkeleton';
+import { SignalButton } from '@presentation/components/SignalButton';
+import { SignalOptionCard } from '@presentation/components/SignalOptionCard';
+import { SignalBottomSheet } from '@presentation/components/SignalBottomSheet';
+import { SignalStatusBanner } from '@presentation/components/SignalStatusBanner';
+import { SignalSkeleton } from '@presentation/components/SignalSkeleton';
 
 describe('SignalButton – extended coverage', () => {
   it('renders with secondary variant', () => {
@@ -263,5 +263,31 @@ describe('BackgroundDecor – default variant', () => {
   it('renders without variant prop (uses default)', () => {
     const { BackgroundDecor } = require('../BackgroundDecor');
     render(<BackgroundDecor />);
+  });
+});
+
+describe('BackgroundDecor – variant branches', () => {
+  it('renders gate variant (covers getDiamondColor gate branch)', () => {
+    const { BackgroundDecor } = require('../BackgroundDecor');
+    render(<BackgroundDecor variant="gate" />);
+  });
+
+  it('renders terminal variant (covers getDiamondColor terminal branch)', () => {
+    const { BackgroundDecor } = require('../BackgroundDecor');
+    render(<BackgroundDecor variant="terminal" />);
+  });
+
+  it('renders scout variant (covers getCircleColor scout branch)', () => {
+    const { BackgroundDecor } = require('../BackgroundDecor');
+    render(<BackgroundDecor variant="scout" />);
+  });
+});
+
+describe('SignalBottomSheet – visible false', () => {
+  it('returns null when visible is false', () => {
+    const { toJSON } = render(
+      <SignalBottomSheet visible={false} title="Test" onClose={jest.fn()} />,
+    );
+    expect(toJSON()).toBeNull();
   });
 });

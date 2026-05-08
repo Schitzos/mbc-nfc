@@ -1,7 +1,7 @@
 import { renderHook, act, waitFor } from '@testing-library/react-native';
 import { useTerminalActions } from '../useTerminalActions';
-import { useAppStore } from '../../../stores/app-store';
-import type { TerminalServices } from '../../../context/service-context';
+import { useAppStore } from '@presentation/stores/app-store';
+import type { TerminalServices } from '@presentation/context/service-context';
 
 const mockServices: TerminalServices = {
   checkNfcAvailabilityUseCase: {
@@ -18,6 +18,7 @@ const mockServices: TerminalServices = {
       card: { balance: 46000 },
     }),
   } as never,
+  cancelNfc: jest.fn().mockResolvedValue(undefined),
 };
 
 describe('useTerminalActions', () => {
@@ -65,6 +66,7 @@ describe('useTerminalActions', () => {
       success: false,
       role: 'TERMINAL',
       message: 'Insufficient balance for checkout.',
+      errorCode: 'INSUFFICIENT_BALANCE',
     });
 
     const { result } = renderHook(() => useTerminalActions(mockServices));

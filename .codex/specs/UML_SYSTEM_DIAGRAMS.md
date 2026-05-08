@@ -6,7 +6,7 @@ Scope reflected here:
 
 - one app with four roles: Station, Gate, Terminal, Scout
 - NFC card as member-state source of truth
-- local SQLite ledger as current-device/current-installation reporting and audit store
+- local SQLite ledger as device-local reporting and audit store
 - Android-first real NFC validation
 - parking as the only MVP activity, with reusable activity flow design for future extension
 
@@ -126,8 +126,7 @@ sequenceDiagram
   CheckIn->>CardRepo: writeCard(updatedCard)
   CardRepo->>Card: write updated payload
   Card-->>CardRepo: success
-  CheckIn->>Ledger: append(checkin audit entry amount 0)
-  Ledger-->>CheckIn: success
+  Note over CheckIn,Ledger: CHECKIN does NOT append a local ledger row
   CheckIn-->>UI: success result
   UI-->>Operator: show checked-in status
 ```

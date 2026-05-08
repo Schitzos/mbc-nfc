@@ -1,6 +1,6 @@
 import { StyleSheet } from 'react-native';
-import { componentTokens } from '../../theme/components';
-import { typography } from '../../theme/typography';
+import { componentTokens } from '@presentation/theme/components';
+import { typography } from '@presentation/theme/typography';
 
 export const styles = StyleSheet.create({
   base: {

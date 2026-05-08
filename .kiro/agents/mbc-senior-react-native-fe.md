@@ -68,6 +68,10 @@ Always align with the project docs:
 - Insufficient balance
 - NFC write failure: do not claim success
 
+## Pre-Commit Gate
+
+Before committing and pushing code, ALWAYS run the unit test suite (`npm test` or the project's test command) and verify all tests pass. If any test fails, fix the failure before committing. Never commit or push code with failing tests.
+
 ## Spec Governance
 
 - Treat `.codex/specs/` as the source of truth.

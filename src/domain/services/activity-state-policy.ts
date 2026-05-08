@@ -2,8 +2,8 @@ import type {
   ActivitySession,
   BenefitActivityType,
   MbcCard,
-} from '../entities/mbc-card';
-import { DomainError } from '../errors/domain-error';
+} from '@domain/entities/mbc-card';
+import { DomainError } from '@domain/errors/domain-error';
 
 interface CheckInInput {
   activityId: string;

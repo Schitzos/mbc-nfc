@@ -1,6 +1,6 @@
 import React, { useMemo, useState } from 'react';
 import { StyleSheet, Text, TextInput, View } from 'react-native';
-import { componentTokens } from '../../theme/components';
+import { componentTokens } from '@presentation/theme/components';
 import type { SignalTextFieldProps, SignalTextFieldState } from './types';
 import { styles } from './styles';
 

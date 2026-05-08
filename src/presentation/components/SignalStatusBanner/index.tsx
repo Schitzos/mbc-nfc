@@ -1,6 +1,6 @@
 import React, { useMemo } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
-import { signalColorTokens } from '../../theme/colors';
+import { signalColorTokens } from '@presentation/theme/colors';
 import type { SignalStatusBannerProps, Tone } from './types';
 import { styles } from './styles';
 

@@ -1,6 +1,6 @@
-import { CheckInActivityUseCase } from '../check-in-activity.use-case';
-import type { MbcCardRepository } from '../../../domain/repositories/mbc-card-repository';
-import type { MbcCard } from '../../../domain/entities/mbc-card';
+import { CheckInActivityUseCase } from '@application/use-cases/check-in-activity.use-case';
+import type { MbcCardRepository } from '@domain/repositories/mbc-card-repository';
+import type { MbcCard } from '@domain/entities/mbc-card';
 
 function createCard(overrides?: Partial<MbcCard>): MbcCard {
   return {
@@ -52,21 +52,18 @@ describe('CheckInActivityUseCase', () => {
     expect(cardRepository.readWriteCard).toHaveBeenCalled();
   });
 
-  it('supports an optional simulation timestamp', async () => {
+  it('always uses current timestamp for check-in', async () => {
     const cardRepository = createCardRepository();
     const useCase = new CheckInActivityUseCase(cardRepository);
 
     const result = await useCase.execute({
       activityId: 'coop-event-hall',
       activityType: 'PARKING',
-      simulatedCheckedInAt: '2026-05-01T08:30:00.000Z',
     });
 
     expect(result.success).toBe(true);
-    expect(result.message).toContain('simulation timestamp');
-    expect(result.card?.activeSession?.checkedInAt).toBe(
-      '2026-05-01T08:30:00.000Z',
-    );
+    expect(result.message).toBe('Card checked in successfully.');
+    expect(result.card?.activeSession?.checkedInAt).toEqual(expect.any(String));
   });
 
   it('rejects invalid repeated check-in safely', async () => {

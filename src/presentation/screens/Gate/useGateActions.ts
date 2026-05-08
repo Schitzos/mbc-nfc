@@ -1,9 +1,9 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import type { RoleActionResultDto } from '../../../application/dto/role-action-result-dto';
-import type { NfcActionState } from '../../components/NfcActionSheet';
-import { useAppStore } from '../../stores/app-store';
-import { UNKNOWN_ERROR_MESSAGE } from '../../../shared/constants';
-import type { GateServices } from '../../context/service-context';
+import type { RoleActionResultDto } from '@application/dto/role-action-result-dto';
+import type { NfcActionState } from '@presentation/components/NfcActionSheet';
+import { useAppStore } from '@presentation/stores/app-store';
+import { UNKNOWN_ERROR_MESSAGE } from '@shared/constants';
+import type { GateServices } from '@presentation/context/service-context';
 
 const noop = () => {};
 
@@ -29,7 +29,8 @@ export function useGateActions(services: GateServices) {
     dismissedRef.current = true;
     setNfcSheet({ phase: 'idle' });
     setBusy(false);
-  }, []);
+    services.cancelNfc().catch(noop);
+  }, [services]);
 
   const handleCheckIn = useCallback(async () => {
     dismissedRef.current = false;

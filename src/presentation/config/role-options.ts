@@ -15,8 +15,7 @@ export const roleOptions: RoleOption[] = [
   {
     key: 'gate',
     label: 'Gate',
-    purpose:
-      'Check members into the selected activity with optional simulation.',
+    purpose: 'Check members into the selected activity.',
     note: 'Entry write flow',
   },
   {

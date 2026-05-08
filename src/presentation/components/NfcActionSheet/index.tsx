@@ -1,7 +1,7 @@
 import React from 'react';
 import { ActivityIndicator, Text, View } from 'react-native';
-import { SignalBottomSheet } from '../SignalBottomSheet';
-import { SignalButton } from '../SignalButton';
+import { SignalBottomSheet } from '@presentation/components/SignalBottomSheet';
+import { SignalButton } from '@presentation/components/SignalButton';
 import type { NfcActionSheetProps } from './types';
 
 export type { NfcActionState, NfcActionSheetProps } from './types';

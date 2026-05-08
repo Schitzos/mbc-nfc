@@ -1,7 +1,7 @@
-import { InspectMemberCardUseCase } from '../inspect-member-card.use-case';
-import type { MbcCardRepository } from '../../../domain/repositories/mbc-card-repository';
-import type { MbcCard } from '../../../domain/entities/mbc-card';
-import { CardRepositoryError } from '../../../domain/errors/card-repository-error';
+import { InspectMemberCardUseCase } from '@application/use-cases/inspect-member-card.use-case';
+import type { MbcCardRepository } from '@domain/repositories/mbc-card-repository';
+import type { MbcCard } from '@domain/entities/mbc-card';
+import { CardRepositoryError } from '@domain/errors/card-repository-error';
 
 function createCard(overrides?: Partial<MbcCard>): MbcCard {
   return {

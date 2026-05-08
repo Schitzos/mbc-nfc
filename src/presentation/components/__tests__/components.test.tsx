@@ -1,14 +1,14 @@
 import React from 'react';
 import { Text } from 'react-native';
 import { fireEvent, render, screen } from '@testing-library/react-native';
-import { SignalBottomSheet } from '../SignalBottomSheet';
-import { SignalButton } from '../SignalButton';
-import { SignalJelajahCard } from '../SignalJelajahCard';
-import { SignalOptionCard } from '../SignalOptionCard';
-import { SignalSkeleton } from '../SignalSkeleton';
-import { SignalStatusBanner } from '../SignalStatusBanner';
-import { SignalSurfaceCard } from '../SignalSurfaceCard';
-import { SignalTextField } from '../SignalTextField';
+import { SignalBottomSheet } from '@presentation/components/SignalBottomSheet';
+import { SignalButton } from '@presentation/components/SignalButton';
+import { SignalJelajahCard } from '@presentation/components/SignalJelajahCard';
+import { SignalOptionCard } from '@presentation/components/SignalOptionCard';
+import { SignalSkeleton } from '@presentation/components/SignalSkeleton';
+import { SignalStatusBanner } from '@presentation/components/SignalStatusBanner';
+import { SignalSurfaceCard } from '@presentation/components/SignalSurfaceCard';
+import { SignalTextField } from '@presentation/components/SignalTextField';
 
 describe('presentation components', () => {
   it('renders and presses SignalButton', () => {

@@ -1,8 +1,8 @@
-import { CheckOutActivityUseCase } from '../check-out-activity.use-case';
-import type { MbcCardRepository } from '../../../domain/repositories/mbc-card-repository';
-import type { LocalLedgerRepository } from '../../../domain/repositories/local-ledger-repository';
-import { CardRepositoryError } from '../../../domain/errors/card-repository-error';
-import type { MbcCard } from '../../../domain/entities/mbc-card';
+import { CheckOutActivityUseCase } from '@application/use-cases/check-out-activity.use-case';
+import type { MbcCardRepository } from '@domain/repositories/mbc-card-repository';
+import type { LocalLedgerRepository } from '@domain/repositories/local-ledger-repository';
+import { CardRepositoryError } from '@domain/errors/card-repository-error';
+import type { MbcCard } from '@domain/entities/mbc-card';
 
 function createCheckedInCard(overrides?: Partial<MbcCard>): MbcCard {
   return {

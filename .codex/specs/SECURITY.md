@@ -72,8 +72,8 @@ This project should be implemented in production-grade assessment mode for NFC p
 
 Local ledger report scope:
 
-- SQLite reports are current-device/current-installation only.
-- UI and documentation must not present local summaries as global cooperative totals.
+- SQLite reports are device-local only.
+- No disclaimer label is required in the UI; the ledger simply shows its data.
 - Ledger rows must use masked/short member references where possible.
 
 ## 6. Secure Logging

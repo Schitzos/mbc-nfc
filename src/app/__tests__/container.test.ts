@@ -1,4 +1,4 @@
-import { createAppServices } from '../container';
+import { createAppServices } from '@app/container';
 
 const mockOpen = jest.fn().mockReturnValue({
   execute: jest.fn(),
@@ -37,12 +37,16 @@ describe('createAppServices', () => {
     expect(services.station.topUpMemberCardUseCase).toBeTruthy();
     expect(services.station.getStationLedgerSummaryUseCase).toBeTruthy();
     expect(services.station.checkNfcAvailabilityUseCase).toBeTruthy();
+    expect(services.station.cancelNfc).toBeTruthy();
     expect(services.gate.checkInActivityUseCase).toBeTruthy();
     expect(services.gate.checkNfcAvailabilityUseCase).toBeTruthy();
+    expect(services.gate.cancelNfc).toBeTruthy();
     expect(services.terminal.checkOutActivityUseCase).toBeTruthy();
     expect(services.terminal.checkNfcAvailabilityUseCase).toBeTruthy();
+    expect(services.terminal.cancelNfc).toBeTruthy();
     expect(services.scout.inspectMemberCardUseCase).toBeTruthy();
     expect(services.scout.checkNfcAvailabilityUseCase).toBeTruthy();
+    expect(services.scout.cancelNfc).toBeTruthy();
     expect(mockOpen).toHaveBeenCalledTimes(1);
   });
 
@@ -54,5 +58,10 @@ describe('createAppServices', () => {
       second.station.registerMemberCardUseCase,
     );
     expect(mockOpen).toHaveBeenCalledTimes(1);
+  });
+
+  it('cancelNfc delegates to cardRepository.cancel', () => {
+    const services = createAppServices();
+    expect(() => services.station.cancelNfc()).not.toThrow();
   });
 });

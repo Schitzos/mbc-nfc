@@ -1,4 +1,4 @@
-jest.mock('../src/app/App', () => ({
+jest.mock('@app/App', () => ({
   __esModule: true,
   default: 'MOCK_SRC_APP',
 }));

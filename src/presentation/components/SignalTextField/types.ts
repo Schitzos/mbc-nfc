@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react';
 import type { StyleProp, TextInputProps, ViewStyle } from 'react-native';
-import { componentTokens } from '../../theme/components';
+import { componentTokens } from '@presentation/theme/components';
 
 export type SignalTextFieldState =
   keyof typeof componentTokens.textField.states;

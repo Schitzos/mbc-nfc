@@ -1,8 +1,8 @@
 import NfcManager, { Ndef, NfcTech } from 'react-native-nfc-manager';
-import type { MbcCard } from '../../domain/entities/mbc-card';
-import type { MbcCardRepository } from '../../domain/repositories/mbc-card-repository';
-import { CardRepositoryError } from '../../domain/errors/card-repository-error';
-import { DomainError } from '../../domain/errors/domain-error';
+import type { MbcCard } from '@domain/entities/mbc-card';
+import type { MbcCardRepository } from '@domain/repositories/mbc-card-repository';
+import { CardRepositoryError } from '@domain/errors/card-repository-error';
+import { DomainError } from '@domain/errors/domain-error';
 import { encrypt, decrypt, isMbcEnvelope } from './silent-shield';
 
 const NTAG215_USER_MEMORY = 504;
@@ -17,22 +17,41 @@ interface NdefTag {
   ndefMessage?: NdefRecord[];
 }
 
-function toReadableError(error: unknown): CardRepositoryError | DomainError {
+type ErrorContext = 'read' | 'write';
+
+function toReadableError(
+  error: unknown,
+  context: ErrorContext,
+): CardRepositoryError | DomainError {
   if (error instanceof CardRepositoryError) {
     return error;
   }
   if (error instanceof DomainError) {
     return error;
   }
-  if (error instanceof Error && /cancel/i.test(error.message)) {
+  if (error instanceof Error) {
+    if (/cancel/i.test(error.message)) {
+      return new CardRepositoryError(
+        'SCAN_CANCELLED',
+        'Scan was cancelled before card processing finished.',
+      );
+    }
+    if (/timeout/i.test(error.message)) {
+      return new CardRepositoryError(
+        'SCAN_TIMEOUT',
+        'No NFC tag detected within the timeout period.',
+      );
+    }
+  }
+  if (context === 'read') {
     return new CardRepositoryError(
-      'SCAN_CANCELLED',
-      'Scan was cancelled before card processing finished.',
+      'READ_FAILED',
+      'Failed to read card. Ensure the card is held steady.',
     );
   }
   return new CardRepositoryError(
-    'NFC_UNAVAILABLE',
-    'NFC session failed. Please retry with the card held steady.',
+    'WRITE_FAILED',
+    'Failed to write to card. Ensure the card is held steady.',
   );
 }
 
@@ -49,9 +68,10 @@ export class RealMbcCardRepository implements MbcCardRepository {
     await this.ensureStarted();
     try {
       await this.requestNdefTechnology();
+      await this.assertSupportedTag();
       return await this.readCardFromActiveSession();
     } catch (error) {
-      throw toReadableError(error);
+      throw toReadableError(error, 'read');
     } finally {
       await this.cancel();
     }
@@ -61,9 +81,10 @@ export class RealMbcCardRepository implements MbcCardRepository {
     await this.ensureStarted();
     try {
       await this.requestNdefTechnology();
+      await this.assertSupportedTag();
       await this.writeToActiveSession(card);
     } catch (error) {
-      throw toReadableError(error);
+      throw toReadableError(error, 'write');
     } finally {
       await this.cancel();
     }
@@ -73,12 +94,13 @@ export class RealMbcCardRepository implements MbcCardRepository {
     await this.ensureStarted();
     try {
       await this.requestNdefTechnology();
+      await this.assertSupportedTag();
       const card = await this.readCardFromActiveSession();
       const updated = transform(card);
       await this.writeToActiveSession(updated);
       return updated;
     } catch (error) {
-      throw toReadableError(error);
+      throw toReadableError(error, 'write');
     } finally {
       await this.cancel();
     }
@@ -88,6 +110,7 @@ export class RealMbcCardRepository implements MbcCardRepository {
     await this.ensureStarted();
     try {
       await this.requestNdefTechnology();
+      await this.assertSupportedTag();
 
       // Check if card already has valid MBC data
       const currentTag = (await NfcManager.getTag()) as NdefTag | null;
@@ -108,7 +131,7 @@ export class RealMbcCardRepository implements MbcCardRepository {
 
       await this.writeToActiveSession(card);
     } catch (error) {
-      throw toReadableError(error);
+      throw toReadableError(error, 'write');
     } finally {
       await this.cancel();
     }
@@ -131,6 +154,20 @@ export class RealMbcCardRepository implements MbcCardRepository {
 
   private async requestNdefTechnology(): Promise<void> {
     await NfcManager.requestTechnology(NfcTech.Ndef);
+  }
+
+  private async assertSupportedTag(): Promise<void> {
+    const tag = (await NfcManager.getTag()) as { maxSize?: number } | null;
+    if (
+      tag &&
+      typeof tag.maxSize === 'number' &&
+      tag.maxSize < NTAG215_USER_MEMORY
+    ) {
+      throw new CardRepositoryError(
+        'CARD_UNSUPPORTED',
+        'This tag type is not supported. Use an NTAG215 or compatible card.',
+      );
+    }
   }
 
   private async writeToActiveSession(card: MbcCard): Promise<void> {

@@ -5,7 +5,7 @@ import type {
   TextStyle,
   ViewStyle,
 } from 'react-native';
-import { componentTokens } from '../../theme/components';
+import { componentTokens } from '@presentation/theme/components';
 
 export type SignalButtonVariant = keyof typeof componentTokens.button.variants;
 export type SignalButtonSize = keyof typeof componentTokens.button.sizes;

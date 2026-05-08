@@ -47,9 +47,3 @@ export type MbcCard = {
   activeSession?: ActivitySession;
   transactionLogs: TransactionLog[];
 };
-
-/**
- * Fixed parking tariff: Rp 2.000 per started hour.
- * Defined once in the domain layer — import where needed.
- */
-export const PARKING_TARIFF_PER_STARTED_HOUR = 2000;

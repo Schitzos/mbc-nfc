@@ -1,4 +1,4 @@
-import { mapLedgerRowToEntry } from '../sqlite-ledger-mapper';
+import { mapLedgerRowToEntry } from '@infrastructure/local-ledger/sqlite-ledger-mapper';
 
 describe('sqlite ledger mapper', () => {
   it('maps sqlite row fields into ledger entry shape', () => {

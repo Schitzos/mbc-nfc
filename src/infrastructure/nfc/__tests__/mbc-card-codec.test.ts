@@ -1,5 +1,5 @@
-import { encode, decode } from '../mbc-card-codec';
-import type { MbcCard } from '../../../domain/entities/mbc-card';
+import { encode, decode } from '@infrastructure/nfc/mbc-card-codec';
+import type { MbcCard } from '@domain/entities/mbc-card';
 
 const validCard: MbcCard = {
   version: 1,

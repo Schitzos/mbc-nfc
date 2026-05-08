@@ -1,8 +1,8 @@
 import { StyleSheet } from 'react-native';
-import { colors } from '../../theme/colors';
-import { radius } from '../../theme/radius';
-import { shadows } from '../../theme/shadows';
-import { spacing } from '../../theme/spacing';
+import { colors } from '@presentation/theme/colors';
+import { radius } from '@presentation/theme/radius';
+import { shadows } from '@presentation/theme/shadows';
+import { spacing } from '@presentation/theme/spacing';
 
 export const styles = StyleSheet.create({
   card: {
