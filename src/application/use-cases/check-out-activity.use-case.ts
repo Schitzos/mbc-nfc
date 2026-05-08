@@ -97,6 +97,12 @@ export class CheckOutActivityUseCase {
           success: false,
           role: 'TERMINAL',
           message: error.message,
+          errorCode:
+            error.code === 'CARD_TAMPERED'
+              ? 'CARD_TAMPERED'
+              : error.code === 'UNREGISTERED_CARD'
+                ? 'UNREGISTERED_CARD'
+                : 'GENERIC_FAILURE',
         };
       }
 
@@ -104,6 +110,10 @@ export class CheckOutActivityUseCase {
         return {
           success: false,
           role: 'TERMINAL',
+          errorCode:
+            error.code === 'INSUFFICIENT_BALANCE'
+              ? 'INSUFFICIENT_BALANCE'
+              : 'GENERIC_FAILURE',
           message:
             error.code === 'INSUFFICIENT_BALANCE'
               ? 'Insufficient balance. Direct the member to top up at Station before checkout.'
