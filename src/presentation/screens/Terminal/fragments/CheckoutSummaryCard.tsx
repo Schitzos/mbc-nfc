@@ -38,17 +38,21 @@ export function CheckoutSummaryCard({
           </Text>
         </View>
         <View className="flex-row justify-between">
+          <Text className="text-xs text-muted">Charged Hours</Text>
+          <Text className="text-xs font-semibold text-foreground">
+            {latestResult.chargedHours ?? 0}h
+          </Text>
+        </View>
+        <View className="flex-row justify-between">
           <Text className="text-xs text-muted">Fee</Text>
           <Text className="text-xs font-semibold text-foreground">
-            Rp{' '}
-            {latestResult.chargedAmount?.toLocaleString(LOCALE_ID) ?? '0'}
+            Rp {latestResult.chargedAmount?.toLocaleString(LOCALE_ID) ?? '0'}
           </Text>
         </View>
         <View className="flex-row justify-between">
           <Text className="text-xs text-muted">New Balance</Text>
           <Text className="text-xs font-bold text-foreground">
-            Rp{' '}
-            {latestResult.card?.balance.toLocaleString(LOCALE_ID) ?? '0'}
+            Rp {latestResult.card?.balance.toLocaleString(LOCALE_ID) ?? '0'}
           </Text>
         </View>
       </View>
