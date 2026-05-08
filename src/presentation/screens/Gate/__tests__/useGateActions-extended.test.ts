@@ -15,6 +15,7 @@ const mockServices: GateServices = {
       card: { balance: 50000 },
     }),
   } as never,
+  cancelNfc: jest.fn().mockResolvedValue(undefined),
 };
 
 describe('useGateActions – extended branch coverage', () => {
