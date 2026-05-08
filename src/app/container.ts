@@ -23,6 +23,8 @@ export function createAppServices(): AppServices {
   const nfcStatusRepository = new DeviceNfcStatusRepository();
   const ledgerRepository = new SqliteLedgerRepository(db);
 
+  const cancelNfc = () => cardRepository.cancel();
+
   cachedServices = {
     station: {
       checkNfcAvailabilityUseCase: new CheckNfcAvailabilityUseCase(
@@ -39,12 +41,14 @@ export function createAppServices(): AppServices {
       getStationLedgerSummaryUseCase: new GetStationLedgerSummaryUseCase(
         ledgerRepository,
       ),
+      cancelNfc,
     },
     gate: {
       checkNfcAvailabilityUseCase: new CheckNfcAvailabilityUseCase(
         nfcStatusRepository,
       ),
       checkInActivityUseCase: new CheckInActivityUseCase(cardRepository),
+      cancelNfc,
     },
     terminal: {
       checkNfcAvailabilityUseCase: new CheckNfcAvailabilityUseCase(
@@ -54,12 +58,14 @@ export function createAppServices(): AppServices {
         cardRepository,
         ledgerRepository,
       ),
+      cancelNfc,
     },
     scout: {
       checkNfcAvailabilityUseCase: new CheckNfcAvailabilityUseCase(
         nfcStatusRepository,
       ),
       inspectMemberCardUseCase: new InspectMemberCardUseCase(cardRepository),
+      cancelNfc,
     },
   };
 

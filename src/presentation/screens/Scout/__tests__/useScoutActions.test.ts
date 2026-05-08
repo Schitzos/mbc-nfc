@@ -19,6 +19,7 @@ const mockServices: ScoutServices = {
       },
     }),
   } as never,
+  cancelNfc: jest.fn().mockResolvedValue(undefined),
 };
 
 describe('useScoutActions', () => {

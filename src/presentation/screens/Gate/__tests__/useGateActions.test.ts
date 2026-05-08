@@ -15,6 +15,7 @@ const mockServices: GateServices = {
       card: { balance: 50000 },
     }),
   } as never,
+  cancelNfc: jest.fn().mockResolvedValue(undefined),
 };
 
 describe('useGateActions', () => {
@@ -58,6 +59,7 @@ describe('useGateActions', () => {
       success: false,
       role: 'GATE',
       message: 'Already checked in.',
+      errorCode: 'ALREADY_CHECKED_IN',
     });
 
     const { result } = renderHook(() => useGateActions(mockServices));

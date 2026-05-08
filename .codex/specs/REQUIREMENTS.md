@@ -27,22 +27,22 @@ The PDF uses member parking as the concrete required assessment scenario. Parkin
 
 ## 3. System Requirements
 
-| ID     | System Requirement                                                                                                                                                                                                |
-| ------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| SR-001 | The system shall be one frontend app that can switch between Station, Gate, Terminal, and Scout roles.                                                                                                            |
-| SR-002 | The system shall read and write NFC card data without requiring backend API access.                                                                                                                               |
-| SR-003 | The system shall validate card payload version, structure, integrity, balance, status, and timestamps.                                                                                                            |
-| SR-004 | The system shall reject unregistered, unsupported, malformed, or tampered cards.                                                                                                                                  |
-| SR-005 | The system shall prevent double check-in and double check-out for the active activity.                                                                                                                            |
-| SR-006 | The system shall implement parking as the required MVP activity and may keep activity context configurable for future extension.                                                                                  |
-| SR-007 | The system shall keep the latest five transaction logs on card.                                                                                                                                                   |
-| SR-008 | The system shall protect card confidentiality and integrity with Silent Shield production-grade authenticated encryption plus integrity validation, preventing direct plain NFC exposure of identity and balance. |
-| SR-009 | The system shall show clear top-up guidance when balance is insufficient.                                                                                                                                         |
-| SR-010 | The system shall provide a read-only Scout mode for one-tap member inspection.                                                                                                                                    |
-| SR-011 | The system shall require an NFC-capable device with NFC enabled for real card scan, read, and write operations.                                                                                                   |
-| SR-012 | The system shall clearly inform users when NFC is required, unsupported, disabled, scanning, cancelled, or timed out.                                                                                             |
-| SR-013 | The system shall maintain a local offline SQLite ledger for audit/reporting without replacing the NFC card as member-state authority.                                                                             |
-| SR-014 | The system shall provide an optional user-visible NFC operational log panel that can be toggled on/off and cleared by the operator.                                                                               |
+| ID     | System Requirement                                                                                                                                                                                                                                                              |
+| ------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| SR-001 | The system shall be one frontend app that can switch between Station, Gate, Terminal, and Scout roles.                                                                                                                                                                          |
+| SR-002 | The system shall read and write NFC card data without requiring backend API access.                                                                                                                                                                                             |
+| SR-003 | The system shall validate card payload version, structure, integrity, balance, status, and timestamps.                                                                                                                                                                          |
+| SR-004 | The system shall reject unregistered, unsupported, malformed, or tampered cards.                                                                                                                                                                                                |
+| SR-005 | The system shall prevent double check-in and double check-out for the active activity.                                                                                                                                                                                          |
+| SR-006 | The system shall implement parking as the required MVP activity and may keep activity context configurable for future extension.                                                                                                                                                |
+| SR-007 | The system shall keep the latest five transaction logs on card.                                                                                                                                                                                                                 |
+| SR-008 | The system shall protect card confidentiality and integrity with Silent Shield production-grade authenticated encryption plus integrity validation, preventing direct plain NFC exposure of identity and balance.                                                               |
+| SR-009 | The system shall show clear top-up guidance when balance is insufficient.                                                                                                                                                                                                       |
+| SR-010 | The system shall provide a read-only Scout mode for one-tap member inspection.                                                                                                                                                                                                  |
+| SR-011 | The system shall require an NFC-capable device with NFC enabled for real card scan, read, and write operations.                                                                                                                                                                 |
+| SR-012 | The system shall clearly inform users when NFC is required, unsupported, disabled, scanning, or cancelled. MVP implements four availability states: SUPPORTED, UNSUPPORTED, DISABLED, UNAVAILABLE. SCAN_TIMEOUT is a session-level error code, not a device availability state. |
+| SR-013 | The system shall maintain a local offline SQLite ledger for audit/reporting without replacing the NFC card as member-state authority.                                                                                                                                           |
+| SR-014 | The system shall provide an optional user-visible NFC operational log panel that can be toggled on/off and cleared by the operator.                                                                                                                                             |
 
 ## 4. Scope
 
@@ -147,7 +147,7 @@ Acceptance criteria:
 - Normal member/operator screens do not expose the full internal member ID; if a support reference is needed, the app may show a masked or short reference only. Scout may show a safe member reference after successful decode, not the raw full identifier.
 - App writes a valid MBC payload to the NFC card.
 - If the card is already registered with a valid MBC payload, the app shows a confirmation prompt offering to wipe and re-register with a new member ID. If the user confirms, the card is erased and registered fresh. If the user declines (Skip), no modification is made.
-- If the card has an unrecognized or tampered payload, the app shows the same confirmation prompt offering to wipe and re-register. If the user confirms, the card is erased and registered fresh. If the user declines, no modification is made.
+- If the card has an unrecognized or tampered payload, the app shows an error. At Station, unrecognized (non-MBC) payloads show the confirmation prompt offering to wipe and re-register. Tampered authenticated payloads (Silent Shield integrity failure) show a `CARD_TAMPERED` error without a reset prompt.
 - New card starts with zero balance and `NOT_CHECKED_IN` visit status. No initial balance field is presented.
 - Registration writes a transaction log entry.
 
@@ -157,7 +157,7 @@ The Station shall top up member balance.
 
 Acceptance criteria:
 
-- Admin selects a preset top-up amount (10.000, 20.000, 50.000, or 100.000 IDR).
+- Top-up accepts numeric input (free-text allowed) with validation to ensure only numbers are entered. Preset buttons (10.000, 20.000, 50.000, or 100.000 IDR) are also available as shortcuts.
 - Amount must be positive.
 - App reads current balance, adds the amount, and writes the new balance to card.
 - Top-up writes a transaction log entry with nominal, time, and activity.
@@ -270,10 +270,10 @@ The app shall maintain a device-local SQLite ledger for offline audit and report
 
 Acceptance criteria:
 
-- Successful `REGISTER`, `TOPUP`, `CHECKIN`, and `CHECKOUT` card-state operations append a local ledger record on the device that processed the operation.
+- Successful `REGISTER`, `TOPUP`, and `CHECKOUT` card-state operations append a local ledger record on the device that processed the operation. Check-in (CHECKIN) does NOT append a local ledger row.
 - The ledger stores enough data to produce offline transaction count and income/reporting summaries without reading every card again.
-- Income reports sum only money-related rows, especially `TOPUP` and `CHECKOUT`; `CHECKIN` uses amount `0` and is counted as activity/audit, not income.
-- Station reporting must clearly label summaries as current-device/current-installation only. It is not a global cooperative report when multiple devices are used.
+- Income reports sum only money-related rows, especially `TOPUP` and `CHECKOUT`.
+- Station reporting reflects operations processed on this device. It is not a global cooperative report when multiple devices are used.
 - The ledger does not replace the NFC card as the member-state source of truth.
 - If local ledger write fails after a successful card write, the member operation remains successful but the app reports the reporting/audit gap clearly.
 - Station can view at least a simple local summary of transaction counts, top-up totals, and checkout totals for that device.
@@ -379,10 +379,8 @@ Acceptance criteria:
 | INSUFFICIENT_BALANCE       | Balance is lower than calculated fee.                            |
 | ACTIVITY_ALREADY_ACTIVE    | Card already has an active activity session.                     |
 | ACTIVITY_NOT_ACTIVE        | Card has no active activity session to check out.                |
-| AMOUNT_INVALID             | Top-up or calculated amount is invalid.                          |
 | WRITE_FAILED               | NFC card write failed.                                           |
 | READ_FAILED                | NFC card read failed.                                            |
-| WRITE_VERIFY_FAILED        | Removed — no post-write readback performed.                      |
 | CARD_CAPACITY_INSUFFICIENT | Protected payload does not fit the selected NFC tag/card.        |
 | INVALID_TIME               | Device or simulated time is invalid for the requested operation. |
 | INVALID_DURATION           | Checkout time is not after check-in time.                        |
@@ -426,6 +424,16 @@ Acceptance criteria:
 - **Minimum parking duration (FR-006/FR-014):** PO confirms 1 second already counts as 1 started hour = Rp 2.000. Any non-zero duration rounds up to the next whole hour. This is correct per spec.
 - **Max balance cap (FR-003):** PO confirms there is no maximum balance cap. Unlimited top-up is acceptable; no upper-bound validation is required on card balance.
 - **Re-registration behavior (FR-002):** Current prompt-to-overwrite behavior is canonical. Operator must confirm before wipe and re-register. `ALREADY_REGISTERED_CARD` is the detection state, not a hard rejection. PO confirmed 2026-05-07.
+
+### PO Clarifications (2026-05-08)
+
+- **#5 Write counter regression:** Removed from spec. Silent Shield AES-256-GCM authenticated encryption already catches tampering/replay via integrity validation (`CARD_TAMPERED`), making counter regression detection redundant. Write counter remains as a monotonic sequence number for traceability only.
+- **#6 Error codes implemented:** `SCAN_TIMEOUT`, `WRITE_FAILED`, `READ_FAILED`, `CARD_UNSUPPORTED` are now implemented and no longer annotated as future. `AMOUNT_INVALID` removed from spec entirely (validated in use case as message, not a typed error code).
+- **#9 NFC log format:** MVP uses plain `[NFC] message` prefix. No categories. Confirmed.
+- **#10 NfcAvailabilityStatus:** TIMEOUT is NOT an availability state. `SCAN_TIMEOUT` is a session-level error code in `RoleActionErrorCode`. `NfcAvailabilityStatus` remains four states: SUPPORTED, UNSUPPORTED, DISABLED, UNAVAILABLE.
+- **#11 Tampered card at Station:** Tampered cards (Silent Shield integrity failure) show `CARD_TAMPERED` error at all roles including Station. No reset prompt for tampered authenticated payloads. Only unrecognized/non-MBC payloads get the wipe-and-re-register prompt.
+- **#12 RoleActionErrorCode:** Spec updated to match implementation exactly: `INSUFFICIENT_BALANCE`, `ALREADY_CHECKED_IN`, `CARD_TAMPERED`, `CARD_UNSUPPORTED`, `UNREGISTERED_CARD`, `SCAN_TIMEOUT`, `READ_FAILED`, `WRITE_FAILED`, `GENERIC_FAILURE`.
+- **#13 current-device label:** Confirmed removed. Not present in specs or code.
 
 ## Additional Delivery Requirements
 

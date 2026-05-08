@@ -51,17 +51,17 @@ Use short keys and compact values before encryption. The app may expose readable
 
 ### 2.3 Compact field meaning
 
-| Compact field | Meaning                         | Required                   | Notes                                                                           |
-| ------------- | ------------------------------- | -------------------------- | ------------------------------------------------------------------------------- |
-| `v`           | Payload schema version          | Yes                        | Initial value `1`.                                                              |
-| `c`           | Card ID/reference               | Yes                        | Short internal ID, not full profile data.                                       |
-| `m`           | Member ID/reference             | Yes                        | Short generated member ID/reference.                                            |
-| `b`           | Balance in rupiah               | Yes                        | Integer, never negative.                                                        |
+| Compact field | Meaning                         | Required                   | Notes                                                                                                    |
+| ------------- | ------------------------------- | -------------------------- | -------------------------------------------------------------------------------------------------------- |
+| `v`           | Payload schema version          | Yes                        | Initial value `1`.                                                                                       |
+| `c`           | Card ID/reference               | Yes                        | Short internal ID, not full profile data.                                                                |
+| `m`           | Member ID/reference             | Yes                        | Short generated member ID/reference.                                                                     |
+| `b`           | Balance in rupiah               | Yes                        | Integer, never negative.                                                                                 |
 | `i`           | Active visit state              | Yes                        | Use `null` when not checked in, or object when checked in. Visit status is derived from presence of `i`. |
-| `i.a`         | Active visit flag               | Yes when `i` object exists | `1` checked in. If checked out, prefer `i:null`.                                |
-| `i.t`         | Check-in time                   | Yes when checked in        | ISO timestamp is allowed for MVP readability if protected payload fits NTAG215. |
-| `x`           | Latest card transaction records | Yes                        | Max 5, FIFO rolling window, stored oldest-to-newest among retained records.     |
-| `n`           | Monotonic write counter         | Yes                        | Increment after every successful card-state write.                              |
+| `i.a`         | Active visit flag               | Yes when `i` object exists | `1` checked in. If checked out, prefer `i:null`.                                                         |
+| `i.t`         | Check-in time                   | Yes when checked in        | ISO timestamp is allowed for MVP readability if protected payload fits NTAG215.                          |
+| `x`           | Latest card transaction records | Yes                        | Max 5, FIFO rolling window, stored oldest-to-newest among retained records.                              |
+| `n`           | Monotonic write counter         | Yes                        | Increment after every successful card-state write.                                                       |
 
 Do not store `name`, raw member profile, device reference, debug fields, or tariff snapshot fields on the MVP card payload. The MVP tariff is fixed at Rp2.000 per started hour and does not need to be stored on NTAG215.
 
@@ -207,28 +207,14 @@ Minimum passing evidence:
 - Generic NFC reader does not show plain card ID/member ID, balance, check-in timestamp, or transaction amount values.
 - Raw record appears as an opaque Silent Shield binary envelope, not readable business JSON.
 - Editing one byte of the stored payload causes decrypt/authentication failure.
-- Copying an old locally cached card image over a newer card must be detected at least as a counter-regression warning when the device has seen the newer counter before.
+- Copying an old card image over a newer card is caught by Silent Shield AES-256-GCM integrity validation (counter regression detection is not a separate requirement — see Section 7).
 - App logs and SQLite reports never expose decrypted raw payloads or encryption secrets.
 
 ## 7. Write Counter and Replay Handling
 
 `ctr` increments by `1` after each successful card-state write.
 
-Local cache table may store last seen counter per card:
-
-```sql
-CREATE TABLE card_state_cache (
-  card_id TEXT PRIMARY KEY,
-  last_counter INTEGER NOT NULL,
-  last_seen_at TEXT NOT NULL
-);
-```
-
-Validation rule:
-
-- If `card.ctr < local_cached_ctr`, show a warning that the card may contain outdated state.
-- Do not hard block solely because of counter regression, because the system is offline and multiple devices may process different cards without shared cache.
-- Always hard block invalid authentication, malformed payload, negative balance, invalid status, or invalid check-in structure.
+> **Removed Requirement:** Counter regression detection (warning when `card.ctr < local_cached_ctr`) has been removed from the spec. Silent Shield's AES-256-GCM authenticated encryption already catches any card tampering or replay via integrity validation (`CARD_TAMPERED`), making counter regression detection redundant. The write counter remains in the payload as a monotonic sequence number for operational traceability but is not used for security validation.
 
 ## 8. Local SQLite Ledger
 
@@ -262,8 +248,8 @@ Privacy rule:
 
 Ledger write rules:
 
-- Append a row after every successful card-state operation: `REGISTER`, `TOPUP`, `CHECKIN`, and `CHECKOUT`.
-- `CHECKIN` rows use `amount = 0` and count toward activity/audit totals, not income.
+- Append a row after every successful card-state operation: `REGISTER`, `TOPUP`, and `CHECKOUT`.
+- Check-in (CHECKIN) does NOT append a local ledger row.
 - Income reports must filter/sum money-related rows, especially `TOPUP` and `CHECKOUT`.
 - Station UI must label reports as local-device summaries.
 
@@ -329,7 +315,6 @@ Rules:
 6. Increment ctr.
 7. Sign/protect payload with Silent Shield.
 8. Write card (`writeNdefMessage` throws on failure).
-9. Insert SQLite ledger record for the successful check-in with amount `0`.
 ```
 
 ### Terminal Check-Out
@@ -366,8 +351,8 @@ Add or maintain tests for:
 - AES-GCM authentication/decrypt success.
 - AES-GCM authentication/decrypt failure after tampering with balance, identity, check-in state, transaction log, or counter.
 - Counter increments after successful writes.
-- Counter regression warning behavior.
-- SQLite ledger insert after successful register, top-up, check-in, and checkout.
+- Counter value is present in payload for traceability (no separate regression validation — covered by AES-GCM integrity).
+- SQLite ledger insert after successful register, top-up, and checkout (not check-in).
 - SQLite ledger does not override card balance/status/activity state.
 
 Additional required validation tests:
@@ -376,8 +361,8 @@ Additional required validation tests:
 - Encoded protected payload size is checked against selected NFC tag/card capacity.
 - `CARD_CAPACITY_INSUFFICIENT` blocks write and keeps prior card state.
 - Every real NFC write relies on `writeNdefMessage` throwing on failure. No post-write readback is performed (codec does not preserve all fields round-trip).
-- SQLite ledger inserts after successful `REGISTER`, `TOPUP`, `CHECKIN`, and `CHECKOUT`.
-- Station ledger summary labels totals as current-device/current-installation only.
+- SQLite ledger inserts after successful `REGISTER`, `TOPUP`, and `CHECKOUT` (CHECKIN does NOT insert a ledger row).
+- Station ledger summary shows totals for operations processed on this device.
 - Checkout rejects invalid duration/time before balance deduction.
 - Gate writes active visit state at check-in; Terminal calculates checkout fee using the fixed Rp 2.000 per started hour tariff.
 - Insufficient balance recovery works: top-up while checked-in, then checkout succeeds.

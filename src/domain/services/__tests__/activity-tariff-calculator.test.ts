@@ -1,6 +1,6 @@
 import { calculateActivityTariff } from '@domain/services/activity-tariff-calculator';
 import { DomainError } from '@domain/errors/domain-error';
-import { PARKING_TARIFF_PER_STARTED_HOUR } from '@domain/entities/mbc-card';
+import { PARKING_TARIFF_PER_STARTED_HOUR } from '@domain/config/parking-tariff';
 
 describe('calculateActivityTariff', () => {
   it('uses the fixed parking tariff constant of Rp 2.000', () => {
@@ -53,6 +53,22 @@ describe('calculateActivityTariff', () => {
         checkedOutAt: '2026-05-01T10:15:00.000Z',
       }),
     ).toThrow(DomainError);
+  });
+
+  it('floors partial hours when roundUp is false', () => {
+    expect(
+      calculateActivityTariff(
+        {
+          checkedInAt: '2026-05-01T08:00:00.000Z',
+          checkedOutAt: '2026-05-01T09:30:00.000Z',
+        },
+        { ratePerUnit: 2000, unitMs: 60 * 60 * 1000, roundUp: false },
+      ),
+    ).toEqual({
+      chargedHours: 1,
+      chargedAmount: 2000,
+      durationMs: 5400000,
+    });
   });
 
   it('rejects zero or negative durations', () => {

@@ -63,7 +63,7 @@ export function GateResultState({
   return (
     <View className="rounded-xl border border-red-400 bg-[#FFECEC] p-3">
       <Text className="text-xs font-semibold uppercase text-red-700">
-        {latestResult.message.toLowerCase().includes('already checked in')
+        {latestResult.errorCode === 'ALREADY_CHECKED_IN'
           ? 'Blocked'
           : 'Card cannot be processed'}
       </Text>

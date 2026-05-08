@@ -29,7 +29,8 @@ export function useGateActions(services: GateServices) {
     dismissedRef.current = true;
     setNfcSheet({ phase: 'idle' });
     setBusy(false);
-  }, []);
+    services.cancelNfc().catch(noop);
+  }, [services]);
 
   const handleCheckIn = useCallback(async () => {
     dismissedRef.current = false;

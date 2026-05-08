@@ -8,9 +8,9 @@ This bundle has been aligned against `KDX#1 - Membership Benefit Card (MBC).pdf`
 | --------------- | ------------------------------------------------------------------------------------------------------------------------------------------------ |
 | MVP activity    | Parking is required. Non-parking activity support is future-friendly design only.                                                                |
 | Source of truth | NFC card remains the member-state source of truth.                                                                                               |
-| SQLite          | SQLite is current-device/current-installation reporting and audit only.                                                                          |
-| Ledger coverage | `REGISTER`, `TOPUP`, `CHECKIN`, and `CHECKOUT` write local ledger rows after successful card-state operations.                                   |
-| Income reports  | Only money-related rows count as income. `CHECKIN` has amount `0`.                                                                               |
+| SQLite          | SQLite is device-local reporting and audit only. No disclaimer label required in UI.                                                             |
+| Ledger coverage | `REGISTER`, `TOPUP`, and `CHECKOUT` write local ledger rows after successful card-state operations. CHECKIN does NOT append a ledger row.        |
+| Income reports  | Only money-related rows count as income (`TOPUP` and `CHECKOUT`).                                                                                |
 | Registration    | Station registration rejects valid already registered MBC cards.                                                                                 |
 | Silent Shield   | v1 requires production-grade authenticated encryption plus integrity validation. Plain JSON, Base64-only, or weak obfuscation is not acceptable. |
 | NFC safety      | Real writes require capacity guard. writeNdefMessage throws on failure (no post-write readback).                                                 |

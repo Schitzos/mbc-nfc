@@ -18,6 +18,7 @@ const mockServices: TerminalServices = {
       card: { balance: 46000 },
     }),
   } as never,
+  cancelNfc: jest.fn().mockResolvedValue(undefined),
 };
 
 describe('useTerminalActions', () => {
@@ -65,6 +66,7 @@ describe('useTerminalActions', () => {
       success: false,
       role: 'TERMINAL',
       message: 'Insufficient balance for checkout.',
+      errorCode: 'INSUFFICIENT_BALANCE',
     });
 
     const { result } = renderHook(() => useTerminalActions(mockServices));

@@ -2,7 +2,7 @@ export type { NfcAvailabilityStatus } from '@domain/repositories/nfc-availabilit
 
 export type CheckNfcAvailabilityResultDto = {
   supported: boolean;
-  status: import('../../domain/repositories/nfc-availability-repository').NfcAvailabilityStatus;
+  status: NfcAvailabilityStatus;
   title: string;
   message: string;
   guidance: string[];

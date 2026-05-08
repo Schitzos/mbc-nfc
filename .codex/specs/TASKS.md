@@ -173,7 +173,7 @@ Done: Top-up works for normal and checked-in cards.
 Owner: Senior RN FE  
 Refs: `REQUIREMENTS.md`, `EDGE_CASES.md`, `CARD_DATA_SECURITY_LEDGER_SPEC.md`
 
-Do: Read registered card, reject double check-in, write active visit timestamp/status, confirm write success, log CHECKIN amount 0.  
+Do: Read registered card, reject double check-in, write active visit timestamp/status, confirm write success. CHECKIN does NOT append a local ledger row.  
 Done: Gate check-in works with real NFC repository path and unit tests.
 
 ### T-015 — Terminal Check-Out Use Case ✅ DONE
@@ -205,7 +205,7 @@ Done: Test doubles are available for automated tests only; production runtime us
 Owner: Senior RN FE / Architect  
 Refs: `CARD_DATA_SECURITY_LEDGER_SPEC.md`  
 Do: Store local register/top-up/check-in/checkout entries separately from card state; mask sensitive refs; never override card state.  
-Done: Station shows current-device transaction count/income.
+Done: Station shows transaction count/income for operations processed on this device.
 
 ### T-018 — Real NFC Card Repository ✅ DONE
 
@@ -236,7 +236,7 @@ Done: Generic NFC reader cannot plainly read identity, balance, status, or logs.
 Owner: Senior RN FE / Architect  
 Refs: `CARD_DATA_SECURITY_LEDGER_SPEC.md`  
 Do: Append ledger only after card write success for register/top-up/check-in/checkout; warn if ledger fails after card success.  
-Done: Local reports reflect successful operations on this device only.
+Done: Local reports reflect successful operations processed on this device.
 
 ---
 

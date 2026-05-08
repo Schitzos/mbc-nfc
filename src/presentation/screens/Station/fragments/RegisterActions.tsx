@@ -17,10 +17,14 @@ export function RegisterActions({
     <>
       <SignalButton
         label={
-          busyAction === 'register' ? 'Registering...' : 'Tap NFC Card to Register'
+          busyAction === 'register'
+            ? 'Registering...'
+            : 'Tap NFC Card to Register'
         }
         disabled={busyAction !== null}
-        onPress={() => void handleRegister()}
+        onPress={() => {
+          handleRegister();
+        }}
         leftIcon={<Text className="text-white">{'((•))'}</Text>}
       />
       <SignalButton

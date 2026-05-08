@@ -204,7 +204,8 @@ export function useStationActions(services: StationServices) {
     dismissedRef.current = true;
     setNfcSheet({ phase: 'idle' });
     setBusyAction(null);
-  }, []);
+    services.cancelNfc().catch(noop);
+  }, [services]);
 
   return {
     nfcStatus,
