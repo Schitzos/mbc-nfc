@@ -29,7 +29,8 @@ export function useScoutActions(services: ScoutServices) {
     dismissedRef.current = true;
     setNfcSheet({ phase: 'idle' });
     setBusy(false);
-  }, []);
+    services.cancelNfc().catch(noop);
+  }, [services]);
 
   const handleInspect = useCallback(async () => {
     dismissedRef.current = false;

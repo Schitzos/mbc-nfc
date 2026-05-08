@@ -35,7 +35,8 @@ export function useTerminalActions(services: TerminalServices) {
     dismissedRef.current = true;
     setNfcSheet({ phase: 'idle' });
     setBusy(false);
-  }, []);
+    services.cancelNfc().catch(noop);
+  }, [services]);
 
   const handleCheckout = useCallback(async () => {
     dismissedRef.current = false;
@@ -83,7 +84,7 @@ export function useTerminalActions(services: TerminalServices) {
   const insufficient = Boolean(
     latestResult &&
     !latestResult.success &&
-    latestResult.message.toLowerCase().includes('insufficient'),
+    latestResult.errorCode === 'INSUFFICIENT_BALANCE',
   );
   const genericFailure = Boolean(
     latestResult && !latestResult.success && !insufficient,

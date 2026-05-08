@@ -12,21 +12,25 @@ export type StationServices = {
   registerMemberCardUseCase: RegisterMemberCardUseCase;
   topUpMemberCardUseCase: TopUpMemberCardUseCase;
   getStationLedgerSummaryUseCase: GetStationLedgerSummaryUseCase;
+  cancelNfc: () => Promise<void>;
 };
 
 export type GateServices = {
   checkNfcAvailabilityUseCase: CheckNfcAvailabilityUseCase;
   checkInActivityUseCase: CheckInActivityUseCase;
+  cancelNfc: () => Promise<void>;
 };
 
 export type TerminalServices = {
   checkNfcAvailabilityUseCase: CheckNfcAvailabilityUseCase;
   checkOutActivityUseCase: CheckOutActivityUseCase;
+  cancelNfc: () => Promise<void>;
 };
 
 export type ScoutServices = {
   checkNfcAvailabilityUseCase: CheckNfcAvailabilityUseCase;
   inspectMemberCardUseCase: InspectMemberCardUseCase;
+  cancelNfc: () => Promise<void>;
 };
 
 export type AppServices = {
