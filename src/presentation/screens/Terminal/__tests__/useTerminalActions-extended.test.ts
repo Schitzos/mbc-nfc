@@ -18,6 +18,7 @@ const mockServices: TerminalServices = {
       card: { balance: 46000 },
     }),
   } as never,
+  cancelNfc: jest.fn().mockResolvedValue(undefined),
 };
 
 describe('useTerminalActions – extended branch coverage', () => {

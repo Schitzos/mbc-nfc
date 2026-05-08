@@ -38,6 +38,7 @@ const mockServices: StationServices = {
       latestEntries: [],
     }),
   } as never,
+  cancelNfc: jest.fn().mockResolvedValue(undefined),
 };
 
 describe('useStationActions', () => {
