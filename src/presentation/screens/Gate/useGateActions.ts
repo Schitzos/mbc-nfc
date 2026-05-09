@@ -38,6 +38,7 @@ export function useGateActions(services: GateServices) {
     setNfcSheet({
       phase: 'scanning',
       message: 'Hold your NFC card to check in',
+      color: '#1D4ED8',
     });
     try {
       appendNfcLog('[NFC] Check-in flow started');

@@ -38,6 +38,7 @@ export function useScoutActions(services: ScoutServices) {
     setNfcSheet({
       phase: 'scanning',
       message: 'Hold your NFC card to inspect',
+      color: '#D97706',
     });
     try {
       appendNfcLog('[NFC] Inspect flow started');
