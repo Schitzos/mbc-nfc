@@ -21,7 +21,7 @@ export function GateResultState({
 
   if (latestResult.success) {
     return (
-      <View className="rounded-2xl bg-white p-4 shadow-sm">
+      <View className="rounded-2xl bg-white p-4 shadow-sm mb-4">
         <View className="items-center">
           <View className="h-10 w-10 items-center justify-center rounded-full bg-green-100">
             <Text className="text-lg text-green-600">✓</Text>
@@ -61,7 +61,7 @@ export function GateResultState({
   }
 
   return (
-    <View className="rounded-xl border border-red-400 bg-[#FFECEC] p-3">
+    <View className="rounded-xl border border-red-400 bg-[#FFECEC] p-3 mb-4">
       <Text className="text-xs font-semibold uppercase text-red-700">
         {latestResult.errorCode === 'ALREADY_CHECKED_IN'
           ? 'Blocked'

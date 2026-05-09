@@ -5,7 +5,8 @@ import { CardRepositoryError } from '@domain/errors/card-repository-error';
 import { DomainError } from '@domain/errors/domain-error';
 import { encrypt, decrypt, isMbcEnvelope } from './silent-shield';
 
-const NTAG215_USER_MEMORY = 504;
+const NTAG215_RAW_MEMORY = 504;
+const NTAG215_NDEF_CAPACITY = 480;
 
 interface NdefRecord {
   tnf: number;
@@ -157,15 +158,19 @@ export class RealMbcCardRepository implements MbcCardRepository {
   }
 
   private async assertSupportedTag(): Promise<void> {
-    const tag = (await NfcManager.getTag()) as { maxSize?: number } | null;
+    const tag = (await NfcManager.getTag()) as {
+      maxSize?: number;
+      techTypes?: string[];
+    } | null;
+    console.log('[MBC-NFC] Tag info:', JSON.stringify(tag));
     if (
       tag &&
       typeof tag.maxSize === 'number' &&
-      tag.maxSize < NTAG215_USER_MEMORY
+      tag.maxSize < NTAG215_NDEF_CAPACITY
     ) {
       throw new CardRepositoryError(
         'CARD_UNSUPPORTED',
-        'This tag type is not supported. Use an NTAG215 or compatible card.',
+        `This tag type is not supported. Use an NTAG215 or compatible card. (reported maxSize: ${tag.maxSize})`,
       );
     }
   }
@@ -181,7 +186,7 @@ export class RealMbcCardRepository implements MbcCardRepository {
     }
 
     const envelope = shieldResult.value;
-    if (envelope.length > NTAG215_USER_MEMORY) {
+    if (envelope.length > NTAG215_RAW_MEMORY) {
       throw new CardRepositoryError(
         'CARD_CAPACITY_INSUFFICIENT',
         'Protected payload exceeds NTAG215 capacity.',

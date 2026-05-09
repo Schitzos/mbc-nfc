@@ -40,19 +40,34 @@ export function MemberCardInfo({
         </View>
         <View style={styles.row}>
           <Text style={styles.label}>Balance</Text>
-          <Text style={[styles.value, card.balance > 0 ? styles.balancePositive : styles.balanceZero]}>
+          <Text
+            style={[
+              styles.value,
+              card.balance > 0 ? styles.balancePositive : styles.balanceZero,
+            ]}
+          >
             Rp {card.balance.toLocaleString(LOCALE_ID)}
           </Text>
         </View>
         <View style={styles.row}>
           <Text style={styles.label}>Status</Text>
-          <View style={[styles.statusBadge, isCheckedIn ? styles.statusIn : styles.statusOut]}>
-            <Text style={[styles.statusText, isCheckedIn ? styles.statusTextIn : styles.statusTextOut]}>
+          <View
+            style={[
+              styles.statusBadge,
+              isCheckedIn ? styles.statusIn : styles.statusOut,
+            ]}
+          >
+            <Text
+              style={[
+                styles.statusText,
+                isCheckedIn ? styles.statusTextIn : styles.statusTextOut,
+              ]}
+            >
               {statusLabel}
             </Text>
           </View>
         </View>
-        {!!(card.activeSession?.checkedInAt) && (
+        {!!card.activeSession?.checkedInAt && (
           <View style={styles.row}>
             <Text style={styles.label}>Since</Text>
             <Text style={styles.value}>
@@ -67,7 +82,7 @@ export function MemberCardInfo({
 
 const styles = StyleSheet.create({
   card: {
-    backgroundColor: '#002255',
+    backgroundColor: 'white',
     borderRadius: 16,
     padding: 16,
     borderWidth: 1,
@@ -76,7 +91,7 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 14,
     fontWeight: '700',
-    color: '#FFFFFF',
+    color: '#1A1A1A',
   },
   rows: {
     marginTop: 12,
@@ -94,7 +109,7 @@ const styles = StyleSheet.create({
   value: {
     fontSize: 12,
     fontWeight: '600',
-    color: '#FFFFFF',
+    color: '#1A1A1A',
   },
   balancePositive: {
     color: '#00E676',
