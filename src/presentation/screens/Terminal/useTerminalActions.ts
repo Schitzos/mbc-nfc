@@ -44,6 +44,7 @@ export function useTerminalActions(services: TerminalServices) {
     setNfcSheet({
       phase: 'scanning',
       message: 'Hold your NFC card to check out',
+      color: '#7C3AED',
     });
     try {
       appendNfcLog('[NFC] Checkout flow started');
