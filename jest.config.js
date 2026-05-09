@@ -1,8 +1,12 @@
 module.exports = {
   preset: '@react-native/jest-preset',
   moduleNameMapper: {
-    'react-native-vector-icons/(.*)': '<rootDir>/__mocks__/react-native-vector-icons.js',
-    '@react-navigation/native': '<rootDir>/__mocks__/@react-navigation/native.js',
+    'react-native-linear-gradient':
+      '<rootDir>/__mocks__/react-native-linear-gradient.js',
+    'react-native-vector-icons/(.*)':
+      '<rootDir>/__mocks__/react-native-vector-icons.js',
+    '@react-navigation/native':
+      '<rootDir>/__mocks__/@react-navigation/native.js',
     '^@app/(.*)$': '<rootDir>/src/app/$1',
     '^@domain/(.*)$': '<rootDir>/src/domain/$1',
     '^@application/(.*)$': '<rootDir>/src/application/$1',
@@ -29,6 +33,6 @@ module.exports = {
     },
   },
   transformIgnorePatterns: [
-    'node_modules/(?!(react-native|@react-native|@react-navigation|nativewind|react-native-css-interop|react-native-vector-icons)/)',
+    'node_modules/(?!(react-native|@react-native|@react-navigation|nativewind|react-native-css-interop|react-native-vector-icons|react-native-linear-gradient)/)',
   ],
 };
