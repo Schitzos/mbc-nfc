@@ -195,7 +195,7 @@ describe('screens – full branch coverage', () => {
       expect(mockCheckNfcAvailabilityUseCase.execute).toHaveBeenCalled(),
     );
 
-    fireEvent.press(screen.getByText('Tap Card to Inspect'));
+    fireEvent.press(screen.getByText('Inspect'));
     await waitFor(() =>
       expect(mockInspectMemberCardUseCase.execute).toHaveBeenCalled(),
     );
@@ -220,7 +220,7 @@ describe('screens – full branch coverage', () => {
       expect(mockCheckNfcAvailabilityUseCase.execute).toHaveBeenCalled(),
     );
 
-    fireEvent.press(screen.getByText('Tap Card to Inspect'));
+    fireEvent.press(screen.getByText('Inspect'));
     await waitFor(() =>
       expect(mockInspectMemberCardUseCase.execute).toHaveBeenCalled(),
     );
@@ -244,6 +244,12 @@ describe('screens – full branch coverage', () => {
             nominal: 0,
             occurredAt: '2026-05-02T10:00:00.000Z',
           },
+          {
+            id: 'L2',
+            activity: 'CHECK_OUT',
+            nominal: 2000,
+            occurredAt: '2026-05-02T12:00:00.000Z',
+          },
         ],
       },
     });
@@ -253,12 +259,13 @@ describe('screens – full branch coverage', () => {
       expect(mockCheckNfcAvailabilityUseCase.execute).toHaveBeenCalled(),
     );
 
-    fireEvent.press(screen.getByText('Tap Card to Inspect'));
+    fireEvent.press(screen.getByText('Inspect'));
     await waitFor(() =>
       expect(mockInspectMemberCardUseCase.execute).toHaveBeenCalled(),
     );
 
     expect(screen.getByText(/CHECK IN/)).toBeTruthy();
+    expect(screen.getByText(/CHECK OUT/)).toBeTruthy();
   });
 
   it('Station handleRegister in register mode triggers NFC flow', async () => {
@@ -323,7 +330,7 @@ describe('screens – full branch coverage', () => {
       expect(mockCheckNfcAvailabilityUseCase.execute).toHaveBeenCalled(),
     );
 
-    fireEvent.press(screen.getByText('Tap Card to Inspect'));
+    fireEvent.press(screen.getByText('Inspect'));
     await waitFor(() =>
       expect(mockInspectMemberCardUseCase.execute).toHaveBeenCalled(),
     );
@@ -420,7 +427,7 @@ describe('screens – full branch coverage', () => {
       role: 'SCOUT',
       message: 'Inspected.',
       card: {
-        balance: 10000,
+        balance: 0,
         visitStatus: 'NOT_CHECKED_IN',
         transactionLogs: [],
       },
@@ -431,12 +438,13 @@ describe('screens – full branch coverage', () => {
       expect(mockCheckNfcAvailabilityUseCase.execute).toHaveBeenCalled(),
     );
 
-    fireEvent.press(screen.getByText('Tap Card to Inspect'));
+    fireEvent.press(screen.getByText('Inspect'));
     await waitFor(() =>
       expect(mockInspectMemberCardUseCase.execute).toHaveBeenCalled(),
     );
 
     expect(screen.getByText('MBC-***')).toBeTruthy();
+    expect(screen.getByText('Rp 0')).toBeTruthy();
   });
 
   it('Station top-up success with no card balance in result', async () => {
