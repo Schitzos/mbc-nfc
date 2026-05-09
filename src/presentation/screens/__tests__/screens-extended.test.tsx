@@ -288,7 +288,7 @@ describe('role screens – extended branch coverage', () => {
       expect(mockCheckNfcAvailabilityUseCase.execute).toHaveBeenCalled(),
     );
 
-    fireEvent.press(screen.getByText('Tap NFC Card to Register'));
+    fireEvent.press(screen.getByText('Tap Card to Register'));
     await waitFor(() =>
       expect(mockRegisterMemberCardUseCase.execute).toHaveBeenCalled(),
     );
@@ -319,7 +319,7 @@ describe('role screens – extended branch coverage', () => {
       expect(mockInspectMemberCardUseCase.execute).toHaveBeenCalled(),
     );
 
-    expect(screen.getByText('Checked in')).toBeTruthy();
+    await waitFor(() => expect(screen.getByText('Checked in')).toBeTruthy());
   });
 
   it('Scout shows "No logs yet" when transaction logs are empty', async () => {
@@ -345,7 +345,7 @@ describe('role screens – extended branch coverage', () => {
       expect(mockInspectMemberCardUseCase.execute).toHaveBeenCalled(),
     );
 
-    expect(screen.getByText('No logs yet.')).toBeTruthy();
+    await waitFor(() => expect(screen.getByText('No logs yet.')).toBeTruthy());
   });
 
   it('Scout does not call writeCard (read-only)', async () => {
@@ -395,7 +395,7 @@ describe('role screens – extended branch coverage', () => {
       expect(mockCheckNfcAvailabilityUseCase.execute).toHaveBeenCalled(),
     );
 
-    fireEvent.press(screen.getByText('Tap NFC Card to Register'));
+    fireEvent.press(screen.getByText('Tap Card to Register'));
     await waitFor(() =>
       expect(mockRegisterMemberCardUseCase.execute).toHaveBeenCalled(),
     );
@@ -418,9 +418,9 @@ describe('role screens – extended branch coverage', () => {
       expect(mockCheckNfcAvailabilityUseCase.execute).toHaveBeenCalled(),
     );
 
-    fireEvent.press(screen.getByText('Switch to Top Up'));
-    fireEvent.press(screen.getByText('100.000'));
-    fireEvent.press(screen.getByText('Tap NFC Card to Top Up'));
+    fireEvent.press(screen.getByText('Top Up'));
+    fireEvent.press(screen.getByText('100k'));
+    fireEvent.press(screen.getByText('Tap Card to Top Up'));
     await waitFor(() =>
       expect(mockTopUpMemberCardUseCase.execute).toHaveBeenCalledWith({
         amount: 100000,

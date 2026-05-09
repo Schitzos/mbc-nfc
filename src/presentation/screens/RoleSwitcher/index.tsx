@@ -24,8 +24,12 @@ export function RoleSwitcherScreen({ navigation }: Props): React.JSX.Element {
   return (
     <View className="flex-1 bg-transparent">
       <View className="flex-1">
-        <AppHeaderCard title="MBC Card" subTitle="Select Operating Role" rightIcon={<Icon name="info" size={20} color="#fff" />} />
-        <View className="-mt-3 rounded-t-xl bg-[#F0F2F5] p-6 gap-3 min-h-1 flex-1 justify-between">
+        <AppHeaderCard
+          title="MBC Card"
+          subTitle="Select Operating Role"
+          rightIcon={<Icon name="info" size={20} color="#fff" />}
+        />
+        <View className="-mt-3 rounded-t-3xl bg-[#F0F2F5] p-6 gap-3 min-h-1 flex-1 justify-between">
           <RoleOptionList
             activeRoleKey={selectedRole}
             roles={roleOptions}

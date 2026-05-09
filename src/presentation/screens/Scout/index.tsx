@@ -1,5 +1,12 @@
-import React, { useEffect, useRef } from 'react';
-import { Animated, Easing, ScrollView, Text, View } from 'react-native';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
+import {
+  Animated,
+  Easing,
+  Pressable,
+  ScrollView,
+  Text,
+  View,
+} from 'react-native';
 import { NfcLogPanel } from '@presentation/components/NfcLogPanel';
 import { NfcActionSheet } from '@presentation/components/NfcActionSheet';
 import { RadarZone } from '@presentation/components/RadarZone';
@@ -15,6 +22,7 @@ export function ScoutScreen(): React.JSX.Element {
   const setSelectedRole = useAppStore(state => state.setSelectedRole);
   const services = useScoutServices();
   const actions = useScoutActions(services);
+  const [showResult, setShowResult] = useState(false);
 
   const resultOpacity = useRef(new Animated.Value(0)).current;
   const resultTranslateY = useRef(new Animated.Value(30)).current;
@@ -25,6 +33,7 @@ export function ScoutScreen(): React.JSX.Element {
 
   useEffect(() => {
     if (actions.latestResult) {
+      setShowResult(true);
       Animated.parallel([
         Animated.timing(resultOpacity, {
           toValue: 1,
@@ -44,6 +53,10 @@ export function ScoutScreen(): React.JSX.Element {
     }
   }, [actions.latestResult, resultOpacity, resultTranslateY]);
 
+  const handleScanAgain = useCallback(() => {
+    setShowResult(false);
+  }, []);
+
   const statusText = actions.busy
     ? 'Reading card data...'
     : 'Tap to inspect member card';
@@ -62,34 +75,37 @@ export function ScoutScreen(): React.JSX.Element {
       />
 
       <View className="-mt-3 rounded-t-3xl bg-[#F0F2F5] flex-1 overflow-hidden">
-        <View className="flex-1">
-          <View className="absolute inset-0">
-            <RadarZone
-              color="#00B4D8"
-              label="Inspect"
-              busyLabel="Scanning..."
-              disabled={actions.busy}
-              onPress={() => {
-                void actions.handleInspect();
-              }}
-            />
+        {!showResult ? (
+          <View className="flex-1">
+            <View className="absolute inset-0 justify-center items-center z-0">
+              <RadarZone
+                color="#00B4D8"
+                label="Inspect"
+                busyLabel="Scanning..."
+                disabled={actions.busy}
+                onPress={() => {
+                  void actions.handleInspect();
+                }}
+              />
+            </View>
+
+            <View className="z-10 pointer-events-none">
+              <Text
+                className={`text-center text-sm ${actions.busy ? 'text-[#00B4D8] font-semibold' : 'text-[#8BA3C7]'} mt-6`}
+                accessibilityLiveRegion="polite"
+              >
+                {statusText}
+              </Text>
+            </View>
           </View>
-
+        ) : (
           <ScrollView
-            className="flex-1 z-10"
-            contentContainerClassName="flex-grow justify-end px-5 pb-4"
-            pointerEvents="box-none"
+            className="flex-1"
+            contentContainerClassName="px-5 pt-5 pb-4"
           >
-            <Text
-              className={`text-center text-sm ${actions.busy ? 'text-[#00B4D8] font-semibold' : 'text-[#8BA3C7]'} mt-6`}
-              accessibilityLiveRegion="polite"
-            >
-              {statusText}
-            </Text>
-
             {actions.latestResult && (
               <Animated.View
-                className="mt-8 gap-3"
+                className="gap-3"
                 style={{
                   opacity: resultOpacity,
                   transform: [{ translateY: resultTranslateY }],
@@ -108,8 +124,19 @@ export function ScoutScreen(): React.JSX.Element {
                 )}
               </Animated.View>
             )}
+
+            <Pressable
+              className="mt-4 bg-[#00B4D8] rounded-xl py-3 items-center"
+              onPress={handleScanAgain}
+              accessibilityRole="button"
+              accessibilityLabel="Scan another card"
+            >
+              <Text className="text-white font-semibold text-sm">
+                Scan Another Card
+              </Text>
+            </Pressable>
           </ScrollView>
-        </View>
+        )}
 
         <View className="px-5 pb-4 pt-2">
           <NfcLogPanel />

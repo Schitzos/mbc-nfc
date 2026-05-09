@@ -225,7 +225,9 @@ describe('screens – full branch coverage', () => {
       expect(mockInspectMemberCardUseCase.execute).toHaveBeenCalled(),
     );
 
-    expect(screen.getByText('Card cannot be processed')).toBeTruthy();
+    await waitFor(() =>
+      expect(screen.getByText('Card cannot be processed')).toBeTruthy(),
+    );
   });
 
   it('Scout shows log with no nominal', async () => {
@@ -264,8 +266,10 @@ describe('screens – full branch coverage', () => {
       expect(mockInspectMemberCardUseCase.execute).toHaveBeenCalled(),
     );
 
-    expect(screen.getByText(/CHECK IN/)).toBeTruthy();
-    expect(screen.getByText(/CHECK OUT/)).toBeTruthy();
+    await waitFor(() => {
+      expect(screen.getByText(/CHECK IN/)).toBeTruthy();
+      expect(screen.getByText(/CHECK OUT/)).toBeTruthy();
+    });
   });
 
   it('Station handleRegister in register mode triggers NFC flow', async () => {
@@ -275,7 +279,7 @@ describe('screens – full branch coverage', () => {
     );
 
     // Already in register mode by default
-    fireEvent.press(screen.getByText('Tap NFC Card to Register'));
+    fireEvent.press(screen.getByText('Tap Card to Register'));
     await waitFor(() =>
       expect(mockRegisterMemberCardUseCase.execute).toHaveBeenCalled(),
     );
@@ -297,8 +301,8 @@ describe('screens – full branch coverage', () => {
       expect(mockCheckNfcAvailabilityUseCase.execute).toHaveBeenCalled(),
     );
 
-    fireEvent.press(screen.getByText('Switch to Top Up'));
-    fireEvent.press(screen.getByText('Tap NFC Card to Top Up'));
+    fireEvent.press(screen.getByText('Top Up'));
+    fireEvent.press(screen.getByText('Tap Card to Top Up'));
     await waitFor(() =>
       expect(mockTopUpMemberCardUseCase.execute).toHaveBeenCalled(),
     );
@@ -347,7 +351,7 @@ describe('screens – full branch coverage', () => {
       expect(mockCheckNfcAvailabilityUseCase.execute).toHaveBeenCalled(),
     );
 
-    fireEvent.press(screen.getByText('Tap NFC Card to Register'));
+    fireEvent.press(screen.getByText('Tap Card to Register'));
     await waitFor(() =>
       expect(mockRegisterMemberCardUseCase.execute).toHaveBeenCalled(),
     );
@@ -443,8 +447,44 @@ describe('screens – full branch coverage', () => {
       expect(mockInspectMemberCardUseCase.execute).toHaveBeenCalled(),
     );
 
-    expect(screen.getByText('MBC-***')).toBeTruthy();
-    expect(screen.getByText('Rp 0')).toBeTruthy();
+    await waitFor(() => {
+      expect(screen.getByText('MBC-***')).toBeTruthy();
+      expect(screen.getByText('Rp 0')).toBeTruthy();
+    });
+  });
+
+  it('Scout Scan Another Card button returns to radar view', async () => {
+    mockInspectMemberCardUseCase.execute.mockResolvedValueOnce({
+      success: true,
+      role: 'SCOUT',
+      message: 'Inspected.',
+      card: {
+        maskedMemberReference: 'MBC-***-0001',
+        balance: 5000,
+        visitStatus: 'NOT_CHECKED_IN',
+        transactionLogs: [],
+      },
+    });
+
+    renderWithServices(<ScoutScreen />);
+    await waitFor(() =>
+      expect(mockCheckNfcAvailabilityUseCase.execute).toHaveBeenCalled(),
+    );
+
+    fireEvent.press(screen.getByText('Inspect'));
+    await waitFor(() =>
+      expect(mockInspectMemberCardUseCase.execute).toHaveBeenCalled(),
+    );
+
+    await waitFor(() =>
+      expect(screen.getByText('Scan Another Card')).toBeTruthy(),
+    );
+
+    fireEvent.press(screen.getByText('Scan Another Card'));
+
+    await waitFor(() =>
+      expect(screen.getByText('Tap to inspect member card')).toBeTruthy(),
+    );
   });
 
   it('Station top-up success with no card balance in result', async () => {
@@ -459,8 +499,8 @@ describe('screens – full branch coverage', () => {
       expect(mockCheckNfcAvailabilityUseCase.execute).toHaveBeenCalled(),
     );
 
-    fireEvent.press(screen.getByText('Switch to Top Up'));
-    fireEvent.press(screen.getByText('Tap NFC Card to Top Up'));
+    fireEvent.press(screen.getByText('Top Up'));
+    fireEvent.press(screen.getByText('Tap Card to Top Up'));
     await waitFor(() =>
       expect(mockTopUpMemberCardUseCase.execute).toHaveBeenCalled(),
     );

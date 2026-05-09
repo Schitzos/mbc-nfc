@@ -15,7 +15,7 @@ export function LocalStationLedgerCard({
   const [expanded, setExpanded] = useState(false);
 
   return (
-    <View className="rounded-2xl bg-white p-4 shadow-sm">
+    <View className="rounded-2xl bg-white p-4 shadow-sm mt-4 mb-4">
       <Pressable
         onPress={() => setExpanded(prev => !prev)}
         className="flex-row items-center justify-between"

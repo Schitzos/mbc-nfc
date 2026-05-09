@@ -198,12 +198,12 @@ describe('role screens', () => {
     await waitFor(() =>
       expect(mockCheckNfcAvailabilityUseCase.execute).toHaveBeenCalled(),
     );
-    fireEvent.press(screen.getByText('Tap NFC Card to Register'));
+    fireEvent.press(screen.getByText('Tap Card to Register'));
     await waitFor(() =>
       expect(mockRegisterMemberCardUseCase.execute).toHaveBeenCalled(),
     );
-    fireEvent.press(screen.getByText('Switch to Top Up'));
-    fireEvent.press(screen.getByText('Tap NFC Card to Top Up'));
+    fireEvent.press(screen.getByText('Top Up'));
+    fireEvent.press(screen.getByText('Tap Card to Top Up'));
 
     await waitFor(() => {
       (expect(mockTopUpMemberCardUseCase.execute).toHaveBeenCalled(),

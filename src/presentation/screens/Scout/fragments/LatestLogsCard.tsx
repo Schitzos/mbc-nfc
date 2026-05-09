@@ -28,7 +28,13 @@ export function LatestLogsCard({
       {logs.length ? (
         <View style={styles.logList}>
           {logs.slice(0, 5).map((log, index) => (
-            <View key={log.id} style={[styles.logRow, index < Math.min(logs.length, 5) - 1 && styles.logRowBorder]}>
+            <View
+              key={log.id}
+              style={[
+                styles.logRow,
+                index < Math.min(logs.length, 5) - 1 && styles.logRowBorder,
+              ]}
+            >
               <Text style={styles.logActivity}>
                 {index + 1}. {log.activity.replace('_', ' ')}
               </Text>
@@ -50,7 +56,7 @@ export function LatestLogsCard({
 
 const styles = StyleSheet.create({
   card: {
-    backgroundColor: '#002255',
+    backgroundColor: 'white',
     borderRadius: 16,
     padding: 16,
     borderWidth: 1,
@@ -59,7 +65,7 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 14,
     fontWeight: '700',
-    color: '#FFFFFF',
+    color: '#1A1A1A',
   },
   logList: {
     marginTop: 8,
@@ -76,7 +82,7 @@ const styles = StyleSheet.create({
   },
   logActivity: {
     fontSize: 11,
-    color: '#FFFFFF',
+    color: '#1A1A1A',
     flex: 1,
   },
   logMuted: {

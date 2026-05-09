@@ -1,6 +1,6 @@
 export type NfcActionState =
   | { phase: 'idle' }
-  | { phase: 'scanning'; message?: string }
+  | { phase: 'scanning'; message?: string; color?: string }
   | { phase: 'success'; title: string; message: string }
   | { phase: 'error'; title: string; message: string }
   | {

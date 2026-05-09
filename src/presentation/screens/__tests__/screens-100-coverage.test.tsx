@@ -147,7 +147,7 @@ describe('screen index.tsx — 100% function coverage', () => {
       });
       renderWithServices(<StationScreen />);
       await waitFor(() => expect(mockCheckNfc.execute).toHaveBeenCalled());
-      fireEvent.press(screen.getByText('Tap NFC Card to Register'));
+      fireEvent.press(screen.getByText('Tap Card to Register'));
       await waitFor(() => expect(mockRegister.execute).toHaveBeenCalled());
       // Dismiss the success sheet to reveal the result section
       await waitFor(() => expect(screen.getByText('Done')).toBeTruthy());
@@ -162,7 +162,7 @@ describe('screen index.tsx — 100% function coverage', () => {
       renderWithServices(<StationScreen />);
       await waitFor(() => expect(mockCheckNfc.execute).toHaveBeenCalled());
       // This triggers the .catch(() => undefined) path
-      fireEvent.press(screen.getByText('Tap NFC Card to Register'));
+      fireEvent.press(screen.getByText('Tap Card to Register'));
       await waitFor(() => expect(mockRegister.execute).toHaveBeenCalled());
     });
 
@@ -170,8 +170,8 @@ describe('screen index.tsx — 100% function coverage', () => {
       mockTopUp.execute.mockRejectedValueOnce(new Error('fail'));
       renderWithServices(<StationScreen />);
       await waitFor(() => expect(mockCheckNfc.execute).toHaveBeenCalled());
-      fireEvent.press(screen.getByText('Switch to Top Up'));
-      fireEvent.press(screen.getByText('Tap NFC Card to Top Up'));
+      fireEvent.press(screen.getByText('Top Up'));
+      fireEvent.press(screen.getByText('Tap Card to Top Up'));
       await waitFor(() => expect(mockTopUp.execute).toHaveBeenCalled());
     });
 
@@ -194,7 +194,7 @@ describe('screen index.tsx — 100% function coverage', () => {
       });
       renderWithServices(<StationScreen />);
       await waitFor(() => expect(mockCheckNfc.execute).toHaveBeenCalled());
-      fireEvent.press(screen.getByText('Tap NFC Card to Register'));
+      fireEvent.press(screen.getByText('Tap Card to Register'));
       await waitFor(() => expect(mockRegister.execute).toHaveBeenCalled());
       // Dismiss the success sheet
       fireEvent.press(screen.getByText('Done'));
@@ -267,7 +267,7 @@ describe('Station — resultTime null branch', () => {
     });
     renderWithServices(<StationScreen />);
     await waitFor(() => expect(mockCheckNfc.execute).toHaveBeenCalled());
-    fireEvent.press(screen.getByText('Tap NFC Card to Register'));
+    fireEvent.press(screen.getByText('Tap Card to Register'));
     await waitFor(() => expect(screen.getByText('Latest result')).toBeTruthy());
     // The resultTime branch is covered — formatResultDate is called
     expect(screen.getByText('Success')).toBeTruthy();
@@ -278,7 +278,7 @@ describe('Station — TextInput custom amount', () => {
   it('covers onChangeText for custom top-up amount', async () => {
     renderWithServices(<StationScreen />);
     await waitFor(() => expect(mockCheckNfc.execute).toHaveBeenCalled());
-    fireEvent.press(screen.getByText('Switch to Top Up'));
+    fireEvent.press(screen.getByText('Top Up'));
     const input = screen.getByDisplayValue('50.000');
     fireEvent.changeText(input, '75000');
     expect(screen.getByDisplayValue('75.000')).toBeTruthy();
@@ -287,7 +287,7 @@ describe('Station — TextInput custom amount', () => {
   it('covers onChangeText with empty string defaults to 0', async () => {
     renderWithServices(<StationScreen />);
     await waitFor(() => expect(mockCheckNfc.execute).toHaveBeenCalled());
-    fireEvent.press(screen.getByText('Switch to Top Up'));
+    fireEvent.press(screen.getByText('Top Up'));
     const input = screen.getByDisplayValue('50.000');
     fireEvent.changeText(input, '');
     expect(screen.getByDisplayValue('0')).toBeTruthy();
@@ -324,15 +324,15 @@ describe('Scout — activeSession branch', () => {
   });
 });
 
-describe('Station — Switch to Register from top-up mode', () => {
+describe('Station — Register from top-up mode', () => {
   it('covers setRegisterMode(true) onPress in top-up mode', async () => {
     renderWithServices(<StationScreen />);
     await waitFor(() => expect(mockCheckNfc.execute).toHaveBeenCalled());
     // Switch to top-up mode first
-    fireEvent.press(screen.getByText('Switch to Top Up'));
+    fireEvent.press(screen.getByText('Top Up'));
     // Now switch back to register
-    fireEvent.press(screen.getByText('Switch to Register'));
-    expect(screen.getByText('Tap NFC Card to Register')).toBeTruthy();
+    fireEvent.press(screen.getByText('Register'));
+    expect(screen.getByText('Tap Card to Register')).toBeTruthy();
   });
 });
 
@@ -434,7 +434,7 @@ describe('Station — memberName and CHECKED_IN branches', () => {
     });
     renderWithServices(<StationScreen />);
     await waitFor(() => expect(mockCheckNfc.execute).toHaveBeenCalled());
-    fireEvent.press(screen.getByText('Tap NFC Card to Register'));
+    fireEvent.press(screen.getByText('Tap Card to Register'));
     await waitFor(() => expect(mockRegister.execute).toHaveBeenCalled());
     fireEvent.press(screen.getByText('Done'));
     await waitFor(() => expect(screen.getByText('John Doe')).toBeTruthy());

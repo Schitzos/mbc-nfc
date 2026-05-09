@@ -444,6 +444,20 @@ Do: Extract the radar animation zone from Scout screen into a reusable `RadarZon
 Done: RadarZone is a reusable component with color prop; Gate and Terminal screens use it; all tests pass.
 QA: ✅ Validated 2026-05-09. 66 suites/440 tests pass. Coverage 99.78%. Visual validation deferred to T-029 demo capture.
 
+### T-UI-STATION-003 — Revamp Station screen layout and add scanning animation to NfcActionSheet ✅ DONE
+
+Owner: Senior RN FE + UI/UX Designer
+Refs: `SIGNAL_UI_GUIDE.md`, `DESIGN.md`
+Do: Refactor Station screen layout to fully align with Gate/Terminal/Scout pattern (RadarZone centered with absolute positioning, overlay cards on top/bottom with z-index layering, clean separation of concerns). Replace the plain ActivityIndicator in NfcActionSheet scanning phase with an animated radar/pulse scanning animation (concentric rings + sweep) consistent with the RadarZone visual language. Animation should be smooth and demo-ready.
+Acceptance Criteria:
+- Station screen layout matches Gate/Terminal/Scout structural pattern (RadarZone absolute center, overlays z-indexed)
+- NfcActionSheet scanning phase shows animated radar/pulse instead of ActivityIndicator
+- Scanning animation is smooth, visually consistent with RadarZone theme
+- All existing tests pass (>=90% coverage maintained)
+- No regression in Station register/top-up flows
+Status: **DONE** — QA validated 2026-05-09. 65 suites / 436 tests pass. 100% coverage. Station uses RadarZone with absolute centering (same as Gate/Terminal/Scout). NfcActionSheet has ScanningRings animation (3 concentric pulsing rings + center NFC icon breathe). Segmented control switches Register/Top-Up modes correctly. Runtime emulator validation deferred per user request.
+Done: Station screen aligned with Gate/Terminal/Scout pattern; NfcActionSheet has scanning animation; all tests pass.
+
 ### T-029 — Demo Capture
 
 Owner: Release Engineer / Writer / UI Designer  
