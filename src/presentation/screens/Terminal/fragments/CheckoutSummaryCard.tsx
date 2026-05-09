@@ -13,7 +13,7 @@ export function CheckoutSummaryCard({
   checkoutTime,
 }: Readonly<CheckoutSummaryCardProps>): React.JSX.Element {
   return (
-    <View className="rounded-2xl bg-white p-4 shadow-sm">
+    <View className="rounded-2xl bg-white p-4 shadow-sm mb-4">
       <Text className="mb-2 text-sm font-bold text-foreground">
         Checkout Summary
       </Text>

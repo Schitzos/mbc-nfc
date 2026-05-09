@@ -319,7 +319,7 @@ describe('role screens – extended branch coverage', () => {
       expect(mockInspectMemberCardUseCase.execute).toHaveBeenCalled(),
     );
 
-    expect(screen.getByText('Checked in')).toBeTruthy();
+    await waitFor(() => expect(screen.getByText('Checked in')).toBeTruthy());
   });
 
   it('Scout shows "No logs yet" when transaction logs are empty', async () => {
@@ -345,7 +345,7 @@ describe('role screens – extended branch coverage', () => {
       expect(mockInspectMemberCardUseCase.execute).toHaveBeenCalled(),
     );
 
-    expect(screen.getByText('No logs yet.')).toBeTruthy();
+    await waitFor(() => expect(screen.getByText('No logs yet.')).toBeTruthy());
   });
 
   it('Scout does not call writeCard (read-only)', async () => {
