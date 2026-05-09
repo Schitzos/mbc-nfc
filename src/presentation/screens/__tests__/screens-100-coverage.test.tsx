@@ -242,14 +242,14 @@ describe('screen index.tsx — 100% function coverage', () => {
       mockInspect.execute.mockRejectedValueOnce(new Error('cancelled'));
       renderWithServices(<ScoutScreen />);
       await waitFor(() => expect(mockCheckNfc.execute).toHaveBeenCalled());
-      fireEvent.press(screen.getByText('Tap Card to Inspect'));
+      fireEvent.press(screen.getByText('Inspect'));
       await waitFor(() => expect(mockInspect.execute).toHaveBeenCalled());
     });
 
     it('covers NfcActionSheet onDismiss callback', async () => {
       renderWithServices(<ScoutScreen />);
       await waitFor(() => expect(mockCheckNfc.execute).toHaveBeenCalled());
-      fireEvent.press(screen.getByText('Tap Card to Inspect'));
+      fireEvent.press(screen.getByText('Inspect'));
       await waitFor(() => expect(mockInspect.execute).toHaveBeenCalled());
       fireEvent.press(screen.getByText('Done'));
     });
@@ -318,7 +318,7 @@ describe('Scout — activeSession branch', () => {
     });
     renderWithServices(<ScoutScreen />);
     await waitFor(() => expect(mockCheckNfc.execute).toHaveBeenCalled());
-    fireEvent.press(screen.getByText('Tap Card to Inspect'));
+    fireEvent.press(screen.getByText('Inspect'));
     await waitFor(() => expect(screen.getByText(/Checked in/)).toBeTruthy());
     expect(screen.getByText('Since')).toBeTruthy();
   });
@@ -481,7 +481,7 @@ describe('Scout — MemberCardInfo invalid date branch', () => {
     });
     renderWithServices(<ScoutScreen />);
     await waitFor(() => expect(mockCheckNfc.execute).toHaveBeenCalled());
-    fireEvent.press(screen.getByText('Tap Card to Inspect'));
+    fireEvent.press(screen.getByText('Inspect'));
     await waitFor(() => expect(screen.getByText('not-a-date')).toBeTruthy());
   });
 });

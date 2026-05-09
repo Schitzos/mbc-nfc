@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import { Text, View } from 'react-native';
-import { SignalButton } from '@presentation/components/SignalButton';
+import { RadarZone } from '@presentation/components/RadarZone';
 import { NfcLogPanel } from '@presentation/components/NfcLogPanel';
 import { NfcActionSheet } from '@presentation/components/NfcActionSheet';
 import { useAppStore } from '@presentation/stores/app-store';
@@ -34,51 +34,53 @@ export function TerminalScreen(): React.JSX.Element {
           }
         />
         <View className="-mt-3 rounded-t-3xl bg-[#F0F2F5] px-5 pt-5 pb-6 flex-1">
-          <View className="gap-4">
-            {/* Tariff Preview */}
-            {!actions.insufficient && <TariffPreviewCard />}
-
-            {/* Checkout Button */}
+          <View className="flex-1">
             {!actions.insufficient && (
-              <SignalButton
-                label={actions.busy ? 'Processing...' : 'Tap Card to Check Out'}
-                disabled={actions.busy}
-                onPress={() => {
-                  void actions.handleCheckout();
-                }}
-              />
-            )}
-
-            {/* Checkout Summary (success) */}
-            {actions.success && actions.latestResult ? (
-              <CheckoutSummaryCard
-                latestResult={actions.latestResult}
-                checkoutTime={actions.checkoutTime}
-              />
-            ) : null}
-
-            {/* Insufficient Balance */}
-            {actions.insufficient && actions.latestResult ? (
-              <InsufficientBalanceCard
-                latestResult={actions.latestResult}
-                onRetry={() => {
-                  void actions.handleCheckout();
-                }}
-              />
-            ) : null}
-
-            {/* Generic Failure */}
-            {actions.genericFailure && actions.latestResult ? (
-              <View className="rounded-xl border border-red-400 bg-[#FFECEC] p-3">
-                <Text className="text-xs font-semibold uppercase text-red-700">
-                  Card cannot be processed
-                </Text>
-                <Text className="mt-1 text-sm font-semibold text-red-900">
-                  {actions.latestResult.message}
-                </Text>
+              <View className="absolute inset-0 justify-center items-center z-0">
+                <RadarZone
+                  color="#D97706"
+                  label="Tap Card to Check Out"
+                  busyLabel="Processing..."
+                  disabled={actions.busy}
+                  onPress={() => {
+                    void actions.handleCheckout();
+                  }}
+                />
               </View>
-            ) : null}
+            )}
+            <View className="z-10">
+              {!actions.insufficient && <TariffPreviewCard />}
+            </View>
+            <View className="mt-auto z-10">
+              {actions.success && actions.latestResult ? (
+                <CheckoutSummaryCard
+                  latestResult={actions.latestResult}
+                  checkoutTime={actions.checkoutTime}
+                />
+              ) : null}
 
+              {actions.insufficient && actions.latestResult ? (
+                <InsufficientBalanceCard
+                  latestResult={actions.latestResult}
+                  onRetry={() => {
+                    void actions.handleCheckout();
+                  }}
+                />
+              ) : null}
+
+              {actions.genericFailure && actions.latestResult ? (
+                <View className="rounded-xl border border-red-400 bg-[#FFECEC] p-3">
+                  <Text className="text-xs font-semibold uppercase text-red-700">
+                    Card cannot be processed
+                  </Text>
+                  <Text className="mt-1 text-sm font-semibold text-red-900">
+                    {actions.latestResult.message}
+                  </Text>
+                </View>
+              ) : null}
+            </View>
+          </View>
+          <View className="mt-auto">
             <NfcLogPanel />
           </View>
         </View>

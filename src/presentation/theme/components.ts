@@ -42,6 +42,42 @@ export const componentTokens = {
         textColor: signalColorTokens.brand.primary,
         iconColor: signalColorTokens.brand.primary,
       },
+      success: {
+        backgroundColor: signalColorTokens.systemIcon.valid,
+        borderColor: signalColorTokens.systemIcon.valid,
+        textColor: signalColorTokens.text.white,
+        iconColor: signalColorTokens.text.white,
+      },
+      info: {
+        backgroundColor: signalColorTokens.systemIcon.info,
+        borderColor: signalColorTokens.systemIcon.info,
+        textColor: signalColorTokens.text.white,
+        iconColor: signalColorTokens.text.white,
+      },
+      warning: {
+        backgroundColor: signalColorTokens.systemIcon.warning,
+        borderColor: signalColorTokens.systemIcon.warning,
+        textColor: signalColorTokens.text.white,
+        iconColor: signalColorTokens.text.white,
+      },
+      pink: {
+        backgroundColor: '#E91E8C',
+        borderColor: '#E91E8C',
+        textColor: signalColorTokens.text.white,
+        iconColor: signalColorTokens.text.white,
+      },
+      purple: {
+        backgroundColor: '#7B1FA2',
+        borderColor: '#7B1FA2',
+        textColor: signalColorTokens.text.white,
+        iconColor: signalColorTokens.text.white,
+      },
+      dark: {
+        backgroundColor: '#000000',
+        borderColor: '#000000',
+        textColor: signalColorTokens.text.white,
+        iconColor: signalColorTokens.text.white,
+      },
       text: {
         backgroundColor: 'transparent',
         borderColor: 'transparent',

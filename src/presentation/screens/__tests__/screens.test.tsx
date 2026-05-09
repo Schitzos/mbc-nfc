@@ -295,7 +295,7 @@ describe('role screens', () => {
     await waitFor(() =>
       expect(mockCheckNfcAvailabilityUseCase.execute).toHaveBeenCalled(),
     );
-    fireEvent.press(screen.getByText('Tap Card to Inspect'));
+    fireEvent.press(screen.getByText('Inspect'));
     await waitFor(() =>
       expect(mockInspectMemberCardUseCase.execute).toHaveBeenCalled(),
     );
