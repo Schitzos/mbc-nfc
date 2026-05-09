@@ -66,6 +66,8 @@ export function StationScreen(): React.JSX.Element {
               refreshSummary={actions.refreshSummary}
             />
 
+          </View>
+          <View className="mt-auto">
             <NfcLogPanel />
           </View>
         </View>
