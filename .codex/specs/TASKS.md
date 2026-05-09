@@ -366,6 +366,84 @@ Do: Test Android 9 FE with NTAG215; record exact OS/API level, NFC status, tag f
 Status: **DONE** — PO confirmed physical validation complete 2025-05-07.  
 Done: Android 9 FE real-device evidence is recorded honestly.
 
+### T-UI-STATION-001 — Register Button Green ✅ DONE
+
+Owner: Senior RN FE  
+Refs: `SIGNAL_UI_GUIDE.md`  
+Do: Change Register button in Station screen from red (primary) to green (success variant using `#008E53`).  
+Status: **DONE**  
+Done: Register button renders green; secondary button unchanged; all tests pass.
+
+### T-UI-STATION-002 — Register Button Purple
+
+Owner: Senior RN FE  
+Refs: `SIGNAL_UI_GUIDE.md`  
+Do: Change Register button in Station screen from green (`#008E53`) to purple.  
+Done: Register button renders purple; secondary buttons unchanged; all tests pass.
+
+### T-UI-APP-001 — Change app header to rainbow gradient ✅ DONE
+
+Owner: Senior RN FE  
+Do: Replace solid pink (#EC4899) background in AppHeaderCard with a rainbow LinearGradient. Install react-native-linear-gradient.  
+Done: AppHeaderCard renders rainbow gradient background; all tests pass.
+
+### T-UI-APP-002 — Change app header to black ✅ DONE
+
+Owner: Senior RN FE  
+Do: Replace rainbow LinearGradient in AppHeaderCard with solid black View background. Remove react-native-linear-gradient import from this component.  
+Status: **DONE** — QA validated 2026-05-08.  
+Done: AppHeaderCard renders solid black background; all tests pass.
+
+### T-UI-APP-003 — Change app header to rainbow gradient ✅ DONE
+
+Owner: Senior RN FE  
+Do: Replace solid black (#000000) background in AppHeaderCard with a rainbow LinearGradient using react-native-linear-gradient (already installed v2.8.3).  
+Done: AppHeaderCard renders rainbow gradient background; all tests pass.
+
+### T-UI-ROLE-001 — Change role selector icons per UI/UX recommendation ✅ DONE
+
+Owner: @FE + @UI/UX  
+Refs: `SIGNAL_UI_GUIDE.md`, `DESIGN.md`  
+Do: Update Role Selector screen icons for Station, Gate, Terminal, and Scout based on UI/UX designer recommendation. Icons must be visually distinct and represent each role's function.  
+Status: **DONE** — QA validated 2026-05-08. MaterialIcons applied (add-circle-outline, sensor-door, settings, search). 436 tests pass. Runtime verified on emulator.  
+Done: Role selector icons updated per UI/UX recommendation; all tests pass.
+
+### T-UI-APP-004 — Revert AppHeader to original dark blue and Register button to default ✅ DONE
+
+Owner: Senior RN FE
+Do: Revert AppHeaderCard from rainbow LinearGradient back to original solid dark blue (#001A41) View background. Remove LinearGradient import. Revert Register button in RegisterActions by removing variant="dark" prop.
+Status: **DONE** — QA validated 2026-05-09. Code review passed, 65 suites / 436 tests pass, Android bundle verified.
+Done: AppHeaderCard renders solid #001A41 background; Register button uses default variant; all tests pass.
+
+### ✅ T-UI-LAYOUT-001 — Pin NfcLogPanel to bottom of screen on all role screens
+
+Owner: Senior RN FE
+Do: Move NfcLogPanel out of the inner content View (gap-4) and position it at the bottom of the screen content area using mt-auto on all 5 screens: Station, Gate, Scout, Terminal, RoleSwitcher.
+Done: NfcLogPanel renders at the bottom of the screen on all role screens; all tests pass.
+
+### T-UI-SCOUT-001 — Redesign Scout screen with circular centered Inspect button and visual enhancements ✅ DONE
+
+Owner: Senior RN FE + UI/UX Designer
+Refs: `SIGNAL_UI_GUIDE.md`
+Do: Make the Inspect button circular and centered (vertically and horizontally) on the Scout screen. Enhance the Scout screen visual design to be more lively and demo-ready per UI/UX recommendation.
+Status: **DONE** — QA validated 2026-05-09. Circular 120px button centered, pulse animation, purple theme. 65 suites / 436 tests pass. 100% coverage on Scout/index.tsx. Runtime verified on Pixel 7 Pro emulator (Android 16).
+Done: Inspect button is circular and centered on screen; Scout screen has enhanced visual design; all tests pass.
+
+### T-UI-SCOUT-002 — Enhance Scout screen visual design to be more alive and engaging ✅ DONE
+
+Owner: Senior RN FE + UI/UX Designer
+Refs: `SIGNAL_UI_GUIDE.md`
+Do: Research NFC/card scanner app UI patterns for inspiration. Redesign Scout screen with richer visual elements — radar/sonar animation, gradient backgrounds, better typography hierarchy, status indicators, and polished card inspection feel. Keep the circular centered Inspect button but enhance the surrounding experience.
+Status: **DONE** — QA validated 2026-05-09. Dark immersive theme (#001A41), 3 concentric radar rings with breathing animations, 360° sweep line, pulse rings, 140px cyan circular button with glow, results slide-in animation. 65 suites / 436 tests pass. Coverage 99.67%. Runtime verified on Pixel 7 Pro emulator (Android 16).
+Done: Scout screen is visually rich and engaging; circular Inspect button retained; all tests pass.
+
+### T-UI-RADAR-001 — Extract RadarZone as reusable component and add to Gate and Terminal screens ✅ DONE
+
+Owner: Senior RN FE
+Do: Extract the radar animation zone from Scout screen into a reusable `RadarZone` component under `src/presentation/components/RadarZone/`. The component accepts a `color` prop to dynamically change the radar ring/pulse/button colors. Add RadarZone to Gate and Terminal screens replacing their SignalButton with the radar button. Each screen uses its own color (Scout: cyan #00B4D8, Gate: blue #1D4ED8, Terminal: amber #D97706).
+Done: RadarZone is a reusable component with color prop; Gate and Terminal screens use it; all tests pass.
+QA: ✅ Validated 2026-05-09. 66 suites/440 tests pass. Coverage 99.78%. Visual validation deferred to T-029 demo capture.
+
 ### T-029 — Demo Capture
 
 Owner: Release Engineer / Writer / UI Designer  

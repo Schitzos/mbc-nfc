@@ -1,6 +1,135 @@
 # MBC Agent Operating Protocol
 
-## 1. Source of Truth
+This is the single source of truth for all agent behavior, routing, and workflow rules.
+
+## 1. Session Start
+
+At the start of every new Kiro session, load this file. All spawned agents must follow it.
+
+## 2. Agent Alias Mapping
+
+- "@FE" / "senior frontend" / "senior FE" / "FE engineer" → mbc-senior-react-native-fe
+- "@architect" / "software architect" → mbc-software-architect
+- "@QA" / "senior QA" → mbc-senior-qa
+- "@PM" / "project manager" → mbc-project-manager
+- "@PO" / "product owner" → mbc-product-owner
+- "@SA" / "system analyst" → mbc-system-analyst
+- "@TW" / "tech writer" / "technical writer" → mbc-technical-writer
+- "@NFC" / "NFC specialist" → mbc-nfc-native-specialist
+- "@security" / "pentester" → mbc-security-pentester
+- "@test" / "test automation" / "test engineer" → mbc-test-automation-engineer
+- "@UI" / "@UX" / "UI/UX" / "designer" → mbc-ui-ux-designer
+- "@release" / "release engineer" / "demo engineer" → mbc-demo-release-engineer
+- "@prof" / "professor" → professor
+
+## 3. Routing Rules
+
+1. When the user mentions an agent alias, spawn a subagent with the matching role.
+2. Every spawned agent must follow this protocol.
+3. Report results back to user after completion.
+4. If NO agent alias is mentioned, kiro_default handles the request directly — no subagent spawned.
+
+## 4. Task Workflow (Mandatory for ALL Worker Agents)
+
+Worker agents: @FE, @architect, @SA, @PO, @TW, @NFC, @security, @test, @UI/@UX, @release.
+
+When a task is routed to ANY worker agent, the orchestrator MUST execute the full workflow as a **single subagent pipeline** (one `subagent` call with multiple stages connected by `depends_on`). Do NOT spawn separate subagent calls for each step.
+
+### Pipeline Structure
+
+```
+Stage 1: pm-create-issue (mbc-project-manager)
+Stage 2: worker-implement (target worker role) — depends_on: [pm-create-issue]
+Stage 3: qa-validate (mbc-senior-qa) — depends_on: [worker-implement]
+```
+
+### Stage 1 — @PM Creates the Issue and Updates TASKS.md (MANDATORY)
+
+@PM (mbc-project-manager) must:
+
+1. Read `.codex/specs/TASKS.md` to determine the next available task ID in the relevant phase/section.
+2. **Append the new task entry to `.codex/specs/TASKS.md`** in the correct phase/section with:
+   - Task ID following the `T-SECTION-NNN` pattern
+   - Owner
+   - Acceptance criteria
+   - Status (initially blank/in-progress)
+3. Create a GitHub Issue with the **exact title pattern**: `[T-SECTION-NNN] Descriptive task title`
+   - Examples: `[T-UI-STATION-003] Change Register button to black`, `[T-FE-GATE-001] Implement gate scan flow`
+   - The prefix MUST match the pattern from TASKS.md (e.g., `T-UI-STATION`, `T-FE-GATE`, `T-NFC`, `T-SEC`, etc.)
+   - NEVER use freeform titles like `[UI] some description` — this violates the protocol.
+4. Use this exact command format:
+   ```bash
+   gh issue create \
+     --title "[T-SECTION-NNN] Task title" \
+     --body "Acceptance criteria and context here" \
+     --project "Assessment NFC"
+   ```
+5. After creation, immediately set the issue status to **Todo** on the project board:
+   ```bash
+   # Get the item ID from the project
+   ITEM_ID=$(gh project item-list 2 --owner Schitzos --format json | jq -r '.items[] | select(.content.number == ISSUE_NUMBER) | .id')
+   # Set status to Todo
+   gh project item-edit --project-id PVT_kwHOAc4Zgc4BW8lN --id $ITEM_ID --field-id PVTSSF_lAHOAc4Zgc4BW8lNzhSM7_Q --single-select-option-id f75ad846
+   ```
+6. Provide delegation context to the worker agent (issue number, item ID, which files to change, acceptance criteria).
+
+### Stage 2 — Worker Agent Implements (MANDATORY)
+
+The target worker agent MUST:
+
+1. **BEFORE writing any code**, move the GitHub Issue to **In Progress** on the project board:
+   ```bash
+   gh project item-edit --project-id PVT_kwHOAc4Zgc4BW8lN --id $ITEM_ID --field-id PVTSSF_lAHOAc4Zgc4BW8lNzhSM7_Q --single-select-option-id 47fc9ee4
+   ```
+2. Confirm the move succeeded (check command output).
+3. Only THEN proceed with implementation.
+4. This step is NON-NEGOTIABLE. If the board move fails, retry or report the error. Do NOT skip it.
+
+### Stage 3 — @QA Validates (MANDATORY)
+
+@QA (mbc-senior-qa) must:
+
+1. **Runtime Emulator Validation (NON-NEGOTIABLE)**: Before any pass/fail decision, QA must verify the change visually on a running Android emulator:
+   - Run `npm run start` to start Metro bundler.
+   - Run `npm run android` to build and launch the app on the emulator.
+   - Navigate to the affected screen(s) and confirm the change renders correctly at runtime.
+   - If the app fails to build, crashes, or the change is not visible at runtime, the task is **FAIL** regardless of unit test results.
+2. Validate the deliverable against acceptance criteria (code review + runtime confirmation).
+3. If **PASS**: move the issue to **Done** on the project board:
+   ```bash
+   gh project item-edit --project-id PVT_kwHOAc4Zgc4BW8lN --id $ITEM_ID --field-id PVTSSF_lAHOAc4Zgc4BW8lNzhSM7_Q --single-select-option-id 98236657
+   ```
+4. If **FAIL**: issue stays In Progress, report issues back to worker agent, notify PM of blocker.
+5. The Done move is NON-NEGOTIABLE on pass. QA must execute the command and confirm it succeeded.
+6. If **PASS**: update the task entry in `.codex/specs/TASKS.md` to mark status as `✅ DONE`.
+
+### Workflow Violation = Task Rejection
+
+If any agent skips or fails to execute Stages 1–3 correctly:
+- The task output is considered INVALID.
+- The orchestrator must reject the result and re-run the workflow correctly.
+- Specifically: no freeform issue titles, no skipped board moves, no "assumed done" without the actual `gh project item-edit` command execution, no missing TASKS.md entry.
+
+### Project Board Reference
+
+| Field | ID |
+|-------|-----|
+| Project Number | 2 |
+| Project Node ID | PVT_kwHOAc4Zgc4BW8lN |
+| Owner | Schitzos |
+| Status Field ID | PVTSSF_lAHOAc4Zgc4BW8lNzhSM7_Q |
+| Todo Option ID | f75ad846 |
+| In Progress Option ID | 47fc9ee4 |
+| Done Option ID | 98236657 |
+
+### Anti-Loop Rule
+
+- @PM → goes directly to `mbc-project-manager`. No PM-spawns-PM.
+- @prof → goes directly to `professor`. No PM or board item needed.
+- All other agents ALWAYS go through PM first.
+- Never spawn the same agent recursively.
+
+## 5. Source of Truth
 
 All agents must treat the `.codex/specs/` folder as the project source of truth.
 
@@ -28,7 +157,7 @@ Execution note:
 - `.codex/specs/TASKS.md` is the full task inventory.
 - `.codex/specs/EXECUTION_ORDER.md` is the practical feature-based execution sequence.
 
-## 2. Escalation Rule
+## 6. Escalation Rule
 
 When an agent needs information that is missing, ambiguous, or contradictory:
 
@@ -40,7 +169,7 @@ When an agent needs information that is missing, ambiguous, or contradictory:
 
 The receiving owner must update or request updates to the relevant `.codex/specs/` document before downstream implementation continues.
 
-## 3. Agent Responsibilities
+## 7. Agent Responsibilities
 
 | Agent                                      | Responsibility                                                                                                                                      |
 | ------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -57,7 +186,7 @@ The receiving owner must update or request updates to the relevant `.codex/specs
 | Technical Writer / Presentation Specialist | README, docs, demo script, assumptions, limitations, and presentation.                                                                              |
 | Demo/Release Engineer                      | Demo flow, capture, run instructions, known limitations, GitHub Actions distribution pipeline, merge review into `develop`, and submission package. |
 
-## 4. Work Rule
+## 8. Work Rule
 
 Before starting work, each agent must:
 
@@ -89,7 +218,7 @@ Minimum agent self-check before claiming a task is clear:
 4. I know whether I am the driver or reviewer.
 5. I know which owner to escalate to if the spec is unclear.
 
-## 5. Non-Negotiables
+## 9. Non-Negotiables
 
 - One app, four roles: Station, Gate, Terminal, Scout.
 - NFC card is the offline source of truth.
@@ -105,7 +234,7 @@ Minimum agent self-check before claiming a task is clear:
 - Every changed executable source file must have a created or updated unit test unless an approved exception is documented.
 - Feature work must preserve at least 90% automated unit-test coverage for executable source.
 
-## 6. Branching and Promotion Rule
+## 10. Branching and Promotion Rule
 
 - Day-to-day implementation uses feature branches plus `develop` and `main`.
 - Each feature task must be implemented in a separate feature branch.
@@ -115,14 +244,14 @@ Minimum agent self-check before claiming a task is clear:
 - Project Owner performs the final merge into `main`.
 - Merging into `main` must trigger GitHub Actions to build and publish the APK to app distribution.
 
-## 7. Anti-Ambiguity Rule
+## 11. Anti-Ambiguity Rule
 
 - If a behavior is not stated in `.codex/specs/`, agents must not invent it.
 - If a task seems to imply a missing rule, the agent must escalate instead of filling the gap with assumption.
 - If `TASKS.md` and `EXECUTION_ORDER.md` seem to conflict, follow `EXECUTION_ORDER.md` for sequence and `TASKS.md` for scope/acceptance.
 - If a support document conflicts with `REQUIREMENTS.md`, `DECISIONS.md`, or `DESIGN.md`, escalate before implementation continues.
 
-## 8. Test Obligation Rule
+## 12. Test Obligation Rule
 
 Senior React Native FE and Codex implementation agents must treat tests as part of the feature, not as a later cleanup task.
 
@@ -134,7 +263,7 @@ For every implementation task, the task result must include:
 - Coverage status or exact reason coverage could not be run.
 - Any approved exception.
 
-## QA Screenshot Evidence Protocol
+## 13. QA Screenshot Evidence Protocol
 
 Senior QA must validate each feature PR before merge using an Android simulator/device and attach screenshot evidence.
 
@@ -146,7 +275,7 @@ Senior Frontend Engineer should not consider a feature ready for merge until:
 
 The final project handoff must include QA use-case testing evidence with screenshots proving the delivered app satisfies the requirements.
 
-## Firebase App Distribution Protocol
+## 14. Firebase App Distribution Protocol
 
 Demo/Release Engineer owns the GitHub Actions workflow that publishes Android builds to Firebase App Distribution.
 
