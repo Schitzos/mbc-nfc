@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import { Text, View } from 'react-native';
-import { SignalButton } from '@presentation/components/SignalButton';
+import { RadarZone } from '@presentation/components/RadarZone';
 import { NfcLogPanel } from '@presentation/components/NfcLogPanel';
 import { NfcActionSheet } from '@presentation/components/NfcActionSheet';
 import { useAppStore } from '@presentation/stores/app-store';
@@ -32,22 +32,27 @@ export function GateScreen(): React.JSX.Element {
             </View>
           }
         />
-        <View
-          className="-mt-3 rounded-t-3xl bg-[#F0F2F5] px-5 pt-5 pb-6 flex-1"
-        >
-          <View className="gap-4">
-            <SelectedActivityCard />
-
-            <SignalButton
-              label={actions.busy ? 'Processing...' : 'Tap Card to Check In'}
-              disabled={actions.busy}
-              onPress={() => {
-                void actions.handleCheckIn();
-              }}
-            />
-
-            <GateResultState latestResult={actions.latestResult} />
-
+        <View className="-mt-3 rounded-t-3xl bg-[#F0F2F5] px-5 pt-5 pb-6 flex-1">
+          <View className="flex-1">
+            <View className="absolute inset-0 justify-center items-center z-0">
+              <RadarZone
+                color="#1D4ED8"
+                label="Tap Card to Check In"
+                busyLabel="Processing..."
+                disabled={actions.busy}
+                onPress={() => {
+                  void actions.handleCheckIn();
+                }}
+              />
+            </View>
+            <View className="z-10">
+              <SelectedActivityCard />
+            </View>
+            <View className="mt-auto z-10">
+              <GateResultState latestResult={actions.latestResult} />
+            </View>
+          </View>
+          <View className="mt-auto">
             <NfcLogPanel />
           </View>
         </View>
