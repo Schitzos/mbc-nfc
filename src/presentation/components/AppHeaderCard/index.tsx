@@ -18,10 +18,7 @@ export function AppHeaderCard({
   const navigation = useNavigation();
   const insets = useSafeAreaInsets();
   return (
-    <View
-      style={{ paddingTop: insets.top + 32 }}
-      className="bg-[#001A41] px-6 pb-12"
-    >
+    <View style={{ paddingTop: insets.top + 32 }} className="bg-[#001A41] px-6 pb-12">
       <View className="flex-row items-center gap-2 w-max justify-between">
         <View className="flex-row items-center gap-4 ">
           {hasBackButton && (

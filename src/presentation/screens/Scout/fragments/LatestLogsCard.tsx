@@ -1,5 +1,5 @@
 import React from 'react';
-import { Text, View } from 'react-native';
+import { StyleSheet, Text, View } from 'react-native';
 import dayjs from 'dayjs';
 import { LOCALE_ID } from '@shared/constants';
 
@@ -23,32 +23,70 @@ export function LatestLogsCard({
   logs,
 }: Readonly<LatestLogsCardProps>): React.JSX.Element {
   return (
-    <View className="rounded-2xl bg-white p-4 shadow-sm">
-      <Text className="text-sm font-bold text-foreground">
-        Latest Five Logs
-      </Text>
+    <View style={styles.card}>
+      <Text style={styles.title}>Latest Five Logs</Text>
       {logs.length ? (
-        <View className="mt-2 gap-1">
+        <View style={styles.logList}>
           {logs.slice(0, 5).map((log, index) => (
-            <View
-              key={log.id}
-              className="flex-row items-center justify-between"
-            >
-              <Text className="text-xs text-muted">
+            <View key={log.id} style={[styles.logRow, index < Math.min(logs.length, 5) - 1 && styles.logRowBorder]}>
+              <Text style={styles.logActivity}>
                 {index + 1}. {log.activity.replace('_', ' ')}
               </Text>
-              <Text className="text-xs text-muted">
+              <Text style={styles.logMuted}>
                 Rp {log.nominal.toLocaleString(LOCALE_ID)}
               </Text>
-              <Text className="text-xs text-muted">
+              <Text style={styles.logMuted}>
                 {formatLogTime(log.occurredAt)}
               </Text>
             </View>
           ))}
         </View>
       ) : (
-        <Text className="mt-2 text-xs text-muted">No logs yet.</Text>
+        <Text style={styles.emptyText}>No logs yet.</Text>
       )}
     </View>
   );
 }
+
+const styles = StyleSheet.create({
+  card: {
+    backgroundColor: '#002255',
+    borderRadius: 16,
+    padding: 16,
+    borderWidth: 1,
+    borderColor: 'rgba(0, 180, 216, 0.2)',
+  },
+  title: {
+    fontSize: 14,
+    fontWeight: '700',
+    color: '#FFFFFF',
+  },
+  logList: {
+    marginTop: 8,
+  },
+  logRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingVertical: 6,
+  },
+  logRowBorder: {
+    borderBottomWidth: 1,
+    borderBottomColor: 'rgba(0, 180, 216, 0.1)',
+  },
+  logActivity: {
+    fontSize: 11,
+    color: '#FFFFFF',
+    flex: 1,
+  },
+  logMuted: {
+    fontSize: 11,
+    color: '#8BA3C7',
+    marginLeft: 8,
+  },
+  emptyText: {
+    marginTop: 8,
+    fontSize: 12,
+    color: '#8BA3C7',
+  },
+});

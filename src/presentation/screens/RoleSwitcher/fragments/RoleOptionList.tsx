@@ -1,5 +1,6 @@
 import React from 'react';
 import { Pressable, Text, View } from 'react-native';
+import Icon from 'react-native-vector-icons/MaterialIcons';
 import type { RoleOption } from '@presentation/config/role-options';
 
 interface RoleOptionListProps {
@@ -9,10 +10,17 @@ interface RoleOptionListProps {
 }
 
 const roleIcon: Record<RoleOption['key'], string> = {
-  station: '⊕',
-  gate: '↦',
-  terminal: '⊘',
-  scout: '◎',
+  station: 'add-circle-outline',
+  gate: 'sensor-door',
+  terminal: 'settings',
+  scout: 'search',
+};
+
+const roleIconColorHex: Record<RoleOption['key'], string> = {
+  station: '#15803d',
+  gate: '#1d4ed8',
+  terminal: '#c2410c',
+  scout: '#7e22ce',
 };
 
 const roleColor: Record<RoleOption['key'], string> = {
@@ -20,13 +28,6 @@ const roleColor: Record<RoleOption['key'], string> = {
   gate: 'bg-blue-100',
   terminal: 'bg-orange-100',
   scout: 'bg-purple-100',
-};
-
-const roleIconColor: Record<RoleOption['key'], string> = {
-  station: 'text-green-700',
-  gate: 'text-blue-700',
-  terminal: 'text-orange-700',
-  scout: 'text-purple-700',
 };
 
 const roleHint: Record<RoleOption['key'], string> = {
@@ -52,9 +53,7 @@ export function RoleOptionList({
           <View
             className={`mr-3 h-11 w-11 items-center justify-center rounded-xl ${roleColor[role.key]}`}
           >
-            <Text className={`text-lg font-bold ${roleIconColor[role.key]}`}>
-              {roleIcon[role.key]}
-            </Text>
+            <Icon name={roleIcon[role.key]} size={24} color={roleIconColorHex[role.key]} />
           </View>
           <View className="flex-1">
             <Text className="text-base font-bold text-foreground">

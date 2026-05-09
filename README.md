@@ -138,7 +138,7 @@ Expected delivery package:
 - presentation material
 - APK distribution path for reviewer installation
 
-Planned release automation:
+Release automation:
 
 - GitHub Actions on `main`
 - SonarCloud quality checks
@@ -146,18 +146,4 @@ Planned release automation:
 
 ## Known Limitations Right Now
 
-- final Figma refinement is still pending
-- GitHub, SonarCloud, and app distribution credentials are not configured yet
 - iOS NFC validation is deferred
-
-## Remote Setup Notes
-
-When GitHub or GitLab is ready:
-
-1. create the remote repository
-2. add the remote to this local repository
-3. push `main`
-4. create `develop`
-5. configure protected-branch rules
-6. configure SonarCloud and GitHub Actions secrets
-7. configure app distribution credentials
