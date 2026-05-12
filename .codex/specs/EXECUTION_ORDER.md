@@ -224,6 +224,7 @@ Expected outcome:
 Goal:
 
 - Improve implementation fidelity once Figma inputs are ready.
+- Extract shared RadarZone component, add ScanningRings animation, and align all role screens to consistent layout pattern.
 
 Dependency:
 
@@ -234,10 +235,16 @@ Order:
 1. `T-026A` Create Low-Fi E2E Figma Flow ✅ DONE
 2. `T-026B` Create Hi-Fi Implementation-Ready Figma Screens ✅ DONE
 3. `T-026C` Polish Hi-Fi Spacing, Icons, and Visual QA ✅ DONE
+4. `T-UI-SCOUT-002` Enhance Scout screen with radar animation ✅ DONE
+5. `T-UI-RADAR-001` Extract RadarZone as reusable component; add to Gate, Terminal ✅ DONE
+6. `T-UI-STATION-003` Revamp Station layout with RadarZone + segmented control + ScanningRings in NfcActionSheet ✅ DONE
 
 Expected outcome:
 
 - UI is refined and implementable with stronger visual consistency.
+- All 4 role screens use RadarZone as the shared NFC trigger component.
+- NfcActionSheet scanning phase uses ScanningRings animation.
+- Station uses segmented control (Register | Top Up) tabs.
 
 ### Phase 10 Demo And Submission
 

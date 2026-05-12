@@ -50,7 +50,10 @@ Talking points:
 
 - One app, four cooperative roles — no separate installs
 - Each role has isolated state; switching does not corrupt flow
-- NFC action feedback via shared NfcActionSheet component
+- All 4 roles use RadarZone as shared NFC trigger (dark immersive zone, concentric radar rings, colored circular button)
+- NFC action feedback via shared NfcActionSheet component with ScanningRings animation (3 pulsing rings + breathing icon)
+- Station uses segmented control (Register | Top Up tabs) for mode switching
+- Scout: radar hides after scan, card results at top, "Scan Another Card" resets view
 - Staff does not type member ID — system generates it
 - Scout is strictly read-only (never mutates card)
 
@@ -107,13 +110,13 @@ Talking points:
 
 ### Slide 2.3: Key Design Decisions
 
-| Decision                   | Rationale                                                               |
-| -------------------------- | ----------------------------------------------------------------------- |
-| NFC card = source of truth | Offline-first; no backend needed                                        |
-| SQLite = audit only        | Device-local reporting; never overrides card                            |
-| One app, four roles        | Simpler deployment; role switcher controls access                       |
-| NTAG215 target             | 504 bytes writable; compact codec fits (362 bytes worst-case encrypted) |
-| Parking first              | Assessment requirement; architecture is activity-agnostic               |
+| Decision                   | Rationale                                                                                    |
+| -------------------------- | -------------------------------------------------------------------------------------------- |
+| NFC card = source of truth | Offline-first; no backend needed                                                             |
+| SQLite = audit only        | Device-local reporting; never overrides card                                                 |
+| One app, four roles        | Simpler deployment; role switcher controls access                                            |
+| NTAG215 target             | 504 bytes raw / 480 bytes NDEF capacity; compact codec fits (362 bytes worst-case encrypted) |
+| Parking first              | Assessment requirement; architecture is activity-agnostic                                    |
 
 ---
 
@@ -177,10 +180,10 @@ Talking points:
 
 Talking points:
 
-- 194+ automated unit tests
-- 97%+ line coverage (policy minimum: 90%)
+- 444+ automated unit tests across 65 suites
+- 100% line coverage (jest.config.js enforces 99% statements/lines/branches, 96% functions)
 - Every changed executable source file requires unit test update
-- Domain, use cases, codec, Silent Shield, state policy all covered
+- Domain, use cases, codec, Silent Shield, state policy, RadarZone, ScanningRings all covered
 
 ### Slide 4.2: Static Analysis and CI
 

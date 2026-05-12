@@ -48,13 +48,13 @@ Do not use community libraries such as Material, iOS, or Simple Design System as
 
 ## 4. Screen Mapping
 
-| MBC Screen    | Signal UI Guidance                                                                                                      |
-| ------------- | ----------------------------------------------------------------------------------------------------------------------- |
-| Role Switcher | Use clear navigation or selector patterns; each role should have a distinct label, icon, and short operational purpose. |
-| Station       | Use form/input patterns, primary action button, validation/error states, and success result summary.                    |
-| Gate          | Use activity selector, NFC scan action, and member validation result.                                                   |
-| Terminal      | Use fee summary, status/result panels, warning/error state, and insufficient balance recovery guidance.                 |
-| Scout         | Use read-only summary, balance/status surface, and compact transaction history list.                                    |
+| MBC Screen    | Signal UI Guidance                                                                                                                                                                                              |
+| ------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Role Switcher | Use clear navigation or selector patterns; each role should have a distinct label, icon, and short operational purpose.                                                                                         |
+| Station       | RadarZone (green #008E53) as NFC trigger + segmented control (Register \| Top Up tabs). Form/input patterns for top-up, validation/error states, success result summary. Ledger accordion collapsed by default. |
+| Gate          | RadarZone (blue #1D4ED8) as NFC trigger. Activity selector, NFC scan action, and member validation result.                                                                                                      |
+| Terminal      | RadarZone (amber #D97706) as NFC trigger. Fee summary, status/result panels, warning/error state, and insufficient balance recovery guidance.                                                                   |
+| Scout         | RadarZone (cyan #00B4D8) as NFC trigger. After scan, radar hides and card results appear at top (balance, status, logs). "Scan Another Card" button resets to radar view.                                       |
 
 ## 5. Required States
 
@@ -447,6 +447,8 @@ Generated React Native reference:
 - `src/presentation/components/SignalSkeleton.tsx`
 - `src/presentation/components/SignalTextField.tsx`
 - `src/presentation/components/SignalJelajahCard.tsx`
+- `src/presentation/components/RadarZone/` — shared NFC trigger component used by all 4 role screens. Dark immersive zone with concentric radar rings, 360° sweep line, pulse animations, and a colored circular action button. Accepts `color` prop for per-role theming.
+- `src/presentation/components/ScanningRings/` — NfcActionSheet scanning-phase animation. 3 concentric pulsing rings + breathing center NFC icon. Replaces plain ActivityIndicator during NFC scan.
 
 Remaining exact Signal values are not yet fully extracted because earlier broad Figma inspection returned a plan/tool-call limit.
 

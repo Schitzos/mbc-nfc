@@ -12,6 +12,8 @@ Every source file changed by a feature must have a matching unit test created or
 
 The project target is at least **90% automated unit-test coverage** for executable repository source.
 
+Actual achievement: **100% line coverage** with 444+ automated tests across 65 suites. `jest.config.js` enforces thresholds of 99% statements/lines/branches and 96% functions.
+
 This rule applies to new files and modified files, including domain logic, use cases, repositories, codecs, security helpers, state/view models, hooks, utilities, and UI components where behavior is testable.
 
 ## 3. Changed-File Test Rule
