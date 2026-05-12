@@ -9,6 +9,7 @@ import { GateResultState } from './fragments/GateResultState';
 import { SelectedActivityCard } from './fragments/SelectedActivityCard';
 import { useGateActions } from './useGateActions';
 import { AppHeaderCard } from '@presentation/components/AppHeaderCard';
+import { signalColorTokens } from '@presentation/theme/colors';
 
 export function GateScreen(): React.JSX.Element {
   const setSelectedRole = useAppStore(state => state.setSelectedRole);
@@ -32,11 +33,11 @@ export function GateScreen(): React.JSX.Element {
             </View>
           }
         />
-        <View className="-mt-3 rounded-t-3xl bg-[#F0F2F5] px-5 pt-5 pb-6 flex-1">
+        <View className="-mt-3 rounded-t-2xl bg-[#F0F2F5] px-5 pt-5 pb-6 flex-1">
           <View className="flex-1">
             <View className="absolute inset-0 justify-center items-center z-0">
               <RadarZone
-                color="#1D4ED8"
+                color={signalColorTokens.brand.primary}
                 label="Tap Card to Check In"
                 busyLabel="Processing..."
                 disabled={actions.busy}

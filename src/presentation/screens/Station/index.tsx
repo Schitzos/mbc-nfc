@@ -10,6 +10,7 @@ import { AppHeaderCard } from '@presentation/components/AppHeaderCard';
 import { LatestResultCard } from './fragments/LatestResultCard';
 import { LocalStationLedgerCard } from './fragments/LocalStationLedgerCard';
 import { LOCALE_ID } from '@shared/constants';
+import { signalColorTokens } from '@presentation/theme/colors';
 
 export function StationScreen(): React.JSX.Element {
   const setSelectedRole = useAppStore(state => state.setSelectedRole);
@@ -52,7 +53,7 @@ export function StationScreen(): React.JSX.Element {
             {/* RadarZone centered */}
             <View className="absolute inset-0 justify-center items-center z-0">
               <RadarZone
-                color="#16A34A"
+                color={signalColorTokens.brand.primary}
                 label={radarLabel}
                 busyLabel={busyLabel}
                 disabled={isBusy}
@@ -70,7 +71,9 @@ export function StationScreen(): React.JSX.Element {
                   onPress={() => actions.setRegisterMode(true)}
                   className={`flex-1 py-2 rounded-full items-center ${actions.registerMode ? 'bg-[#16A34A]' : ''}`}
                 >
-                  <Text className={`text-sm font-semibold ${actions.registerMode ? 'text-white' : 'text-[#4E5764]'}`}>
+                  <Text
+                    className={`text-sm font-semibold ${actions.registerMode ? 'text-white' : 'text-[#4E5764]'}`}
+                  >
                     Register
                   </Text>
                 </Pressable>
@@ -80,7 +83,9 @@ export function StationScreen(): React.JSX.Element {
                   onPress={() => actions.setRegisterMode(false)}
                   className={`flex-1 py-2 rounded-full items-center ${!actions.registerMode ? 'bg-[#16A34A]' : ''}`}
                 >
-                  <Text className={`text-sm font-semibold ${!actions.registerMode ? 'text-white' : 'text-[#4E5764]'}`}>
+                  <Text
+                    className={`text-sm font-semibold ${!actions.registerMode ? 'text-white' : 'text-[#4E5764]'}`}
+                  >
                     Top Up
                   </Text>
                 </Pressable>
@@ -89,13 +94,19 @@ export function StationScreen(): React.JSX.Element {
               {/* Top-Up Amount Card */}
               {!actions.registerMode && (
                 <View className="mt-3 rounded-xl bg-white p-3 shadow-sm">
-                  <Text className="text-xs font-semibold text-[#4E5764]">Top Up Amount</Text>
+                  <Text className="text-xs font-semibold text-[#4E5764]">
+                    Top Up Amount
+                  </Text>
                   <View className="mt-1 flex-row items-center">
-                    <Text className="text-2xl font-bold text-[#1A1A1A]">Rp </Text>
+                    <Text className="text-2xl font-bold text-[#1A1A1A]">
+                      Rp{' '}
+                    </Text>
                     <TextInput
                       className="flex-1 text-2xl font-bold text-[#1A1A1A] p-0"
                       keyboardType="numeric"
-                      value={Number(actions.topUpAmount).toLocaleString(LOCALE_ID)}
+                      value={Number(actions.topUpAmount).toLocaleString(
+                        LOCALE_ID,
+                      )}
                       onChangeText={text => {
                         const numeric = text.replaceAll(/\D/g, '');
                         actions.setTopUpAmount(numeric || '0');
@@ -120,7 +131,7 @@ export function StationScreen(): React.JSX.Element {
                               : 'text-[#4E5764]'
                           }`}
                         >
-                          {(amount / 1000)}k
+                          {amount / 1000}k
                         </Text>
                       </Pressable>
                     ))}

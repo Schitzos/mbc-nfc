@@ -46,7 +46,7 @@ export function SignalBottomSheet({
           ) : (
             <View style={styles.titleSpacer} />
           )}
-          {onClose ? (
+          {onClose && (
             <Pressable
               accessibilityRole="button"
               onPress={onClose}
@@ -54,19 +54,19 @@ export function SignalBottomSheet({
             >
               <Text style={styles.closeText}>x</Text>
             </Pressable>
-          ) : null}
+          )}
         </View>
         <View style={styles.body}>{children}</View>
-        {stickyAction ? (
+        {stickyAction && (
           <View style={styles.sticky}>
-            {caption ? (
+            {caption && (
               <Text numberOfLines={1} style={styles.caption}>
                 {caption}
               </Text>
-            ) : null}
+            )}
             {stickyAction}
           </View>
-        ) : null}
+        )}
       </View>
     </View>
   );

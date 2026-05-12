@@ -446,6 +446,23 @@ Do: Extract the radar animation zone from Scout screen into a reusable `RadarZon
 Done: RadarZone is a reusable component with color prop; Gate and Terminal screens use it; all tests pass.
 QA: ✅ Validated 2026-05-09. 66 suites/440 tests pass. Coverage 99.78%. Visual validation deferred to T-029 demo capture.
 
+### T-UI-RADAR-002 — Unify all RadarZone colors to Signal UI primary red (#FF0025) ✅ DONE
+
+Owner: Senior RN FE
+Refs: `SIGNAL_UI_GUIDE.md`
+Do: Change RadarZone color prop on all 4 role screens from per-role colors (Station: #16A34A, Gate: #1D4ED8, Terminal: #D97706, Scout: #00B4D8) to Signal UI brand primary red `#FF0025` (`signalColorTokens.brand.primary`). Update RadarZone tests accordingly.
+Acceptance Criteria:
+
+- Station RadarZone color changed from `#16A34A` to `#FF0025`
+- Gate RadarZone color changed from `#1D4ED8` to `#FF0025`
+- Terminal RadarZone color changed from `#D97706` to `#FF0025`
+- Scout RadarZone color changed from `#00B4D8` to `#FF0025`
+- RadarZone test updated to use `#FF0025`
+- All existing tests pass (>=90% coverage maintained)
+- No regression in any screen rendering
+
+Done: All RadarZone instances use Signal UI primary red #FF0025; all tests pass.
+
 ### T-UI-STATION-003 — Revamp Station screen layout and add scanning animation to NfcActionSheet ✅ DONE
 
 Owner: Senior RN FE + UI/UX Designer
