@@ -1,7 +1,7 @@
 # KDX Membership Benefit Card
 
 ![Coverage](https://img.shields.io/badge/coverage-100%25-brightgreen)
-![Tests](https://img.shields.io/badge/tests-256%20passed-brightgreen)
+![Tests](https://img.shields.io/badge/tests-444%20passed-brightgreen)
 ![Platform](https://img.shields.io/badge/platform-Android-blue)
 ![NFC](https://img.shields.io/badge/NFC-NTAG215-orange)
 

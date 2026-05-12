@@ -33,7 +33,7 @@ NTAG215 is the MVP target tag. Measured payload sizes confirm the card stores id
 
 - Worst-case 5-log plaintext payload: 327 bytes.
 - Silent Shield encrypted envelope: 362 bytes (327 + 35 bytes overhead).
-- NTAG215 usable memory: 504 bytes.
+- NTAG215 raw user memory: 504 bytes. App validation threshold (`assertSupportedTag()`): 480 bytes NDEF capacity. The 24-byte difference accounts for CC bytes, lock bytes, and NTAG215 internal overhead.
 - Result: fits with margin.
 
 Compact codec format (`v,c,m,b,i,x,n`) ensures minimal payload size by:

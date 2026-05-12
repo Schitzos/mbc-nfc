@@ -30,7 +30,7 @@ Both Senior QA and Test Automation Engineer must maintain detailed E2E case docu
 
 Quality targets:
 
-- Automated unit-test coverage target across the whole executable repository source is at least 90%.
+- Automated unit-test coverage target across the whole executable repository source is at least 90%. Actual achievement: 100% line coverage (444+ tests, 65 suites; jest.config.js enforces 99% statements/lines/branches, 96% functions).
 - Coverage results should be exported in a format that can be consumed by SonarCloud.
 
 ## 3A. Changed-File Unit Test Policy
@@ -119,10 +119,14 @@ Must test:
 - Unsupported or disabled NFC guidance.
 - Station registration does not require typed member ID or human-readable profile input in the first implementation round.
 - Station top-up validation.
+- Station segmented control (Register | Top Up) switching.
 - Station local ledger summary panel displays local totals clearly.
 - Gate screen has no simulation controls in production flow.
 - Terminal missing card/scan timeout recovery guidance.
 - Scout one-tap balance, status, and transaction log display.
+- Scout radar-hides-on-result and "Scan Another Card" reset behavior.
+- RadarZone renders with correct color per role screen.
+- ScanningRings animation renders in NfcActionSheet scanning phase.
 - NFC loading, success, and error states.
 - Signal UI direction is applied consistently enough for assessment/demo review.
 

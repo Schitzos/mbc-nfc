@@ -6,7 +6,9 @@ This guide explains the MVP decision to use **NTAG215** as the target NFC tag an
 
 ## Decision
 
-NTAG215 is the MVP target tag. The card payload must be compact and capacity-tested before write. If the encrypted/protected payload cannot fit NTAG215, reduce optional/verbose formatting first. Do not reduce Silent Shield security and do not remove identity, balance, active visit, or the required latest 5 transaction records.
+NTAG215 is the MVP target tag. NTAG215 has 504 bytes raw user memory, but the effective NDEF-writable capacity is **480 bytes** (the 24-byte difference accounts for CC bytes, lock bytes, and internal overhead). The app's `assertSupportedTag()` validates against 480 bytes NDEF capacity as the acceptance threshold.
+
+The card payload must be compact and capacity-tested before write. If the encrypted/protected payload cannot fit NTAG215, reduce optional/verbose formatting first. Do not reduce Silent Shield security and do not remove identity, balance, active visit, or the required latest 5 transaction records.
 
 ## Required card data
 
@@ -89,7 +91,7 @@ Use AES-256-GCM or equivalent authenticated encryption for Silent Shield. Plain 
 
 ## Failure rule
 
-If protected payload size exceeds NTAG215 usable capacity, block write with:
+If protected payload size exceeds NTAG215 NDEF capacity (480 bytes), block write with:
 
 ```text
 CARD_CAPACITY_INSUFFICIENT

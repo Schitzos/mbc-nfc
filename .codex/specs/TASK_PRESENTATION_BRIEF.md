@@ -1,6 +1,6 @@
 # MBC Task Presentation Brief
 
-> Last updated: 2025-05-07 | Phases 0–9 complete | Phase 10 pending (T-029, T-030 only) | 194 tests | 97%+ coverage | SonarCloud + Firebase configured
+> Last updated: 2026-05-09 | Phases 0–9 complete | Phase 10 pending (T-029, T-030 only) | 444+ tests | 100% coverage | SonarCloud + Firebase configured
 
 This brief explains the KDX Membership Benefit Card project in a format suitable for assessment presentation slides, stakeholder updates, and technical reviewers.
 
@@ -16,11 +16,11 @@ One mobile app. Four cooperative roles. One NFC card as the portable source of t
 | Roles        | Station · Gate · Terminal · Scout                                          |
 | Card truth   | NFC card stores identity, balance, status, 5 logs                          |
 | Local DB     | SQLite — device-local audit only, never overrides card                     |
-| Target tag   | NTAG215                                                                    |
+| Target tag   | NTAG215 (504 bytes raw / 480 bytes NDEF capacity)                          |
 | Tariff       | Fixed Rp 2.000 per started hour (parking MVP)                              |
 | Security     | Silent Shield — AES-256-GCM authenticated encryption                       |
 | Architecture | Clean Architecture (Domain → Application → Infrastructure → Presentation)  |
-| Tests        | 194 automated tests, 97%+ line coverage                                    |
+| Tests        | 444+ automated tests, 65 suites, 100% line coverage                        |
 | CI/CD        | Single `build.yml`: PR validation gates + `main` Firebase App Distribution |
 | Offline      | All core flows work without internet or backend                            |
 
@@ -71,7 +71,7 @@ Use this table to find which tasks support each required presentation section:
 | UI/UX Design          | T-021, T-022–T-025, T-026, T-026A–C    | Signal UI system, role-based screens, one app four roles             |
 | Software Design       | T-005–T-009, T-006, T-019              | Clean Architecture, domain entities, repository contracts, SOLID     |
 | Software Construction | T-001–T-002, T-012–T-016, T-017–T-020A | TypeScript, React Native CLI, feature-by-feature delivery            |
-| Software Quality      | T-027, T-027A, T-027C                  | 194 tests, 97%+ coverage, SonarCloud gate, QA evidence               |
+| Software Quality      | T-027, T-027A, T-027C                  | 444+ tests, 100% coverage, SonarCloud gate, QA evidence              |
 | Software Deployment   | T-027B, T-029, T-030                   | GitHub Actions, Firebase App Distribution, APK delivery              |
 | Software Security     | T-020, T-019, T-004                    | Silent Shield AES-256-GCM, NTAG215 binary envelope, tamper detection |
 
@@ -128,24 +128,24 @@ Use this table to find which tasks support each required presentation section:
 
 ## Presentation Layer
 
-| Task                              | Purpose                                         | Owner                                     | Output                                                          | Presentation Value                                            |
-| --------------------------------- | ----------------------------------------------- | ----------------------------------------- | --------------------------------------------------------------- | ------------------------------------------------------------- |
-| T-021 Role Switcher               | Let one app play four roles                     | Senior React Native FE / UI UX Designer   | Station, Gate, Terminal, Scout selection                        | Shows the assessment runs as one multi-role app               |
-| T-022 Station Screen              | Register, top up, and review local summaries    | Senior React Native FE / UI UX Designer   | Registration, top-up, ledger summary, NFC action, result states | Shows cooperative staff workflow plus offline reporting value |
-| T-023 Gate Screen                 | Check in members to parking                     | Senior React Native FE / UI UX Designer   | Parking activity indicator, check-in, result states             | Shows entry flow with real device time                        |
-| T-024 Terminal Screen             | Check out and deduct balance                    | Senior React Native FE / UI UX Designer   | Fee summary, balance result, insufficient balance guidance      | Shows exit flow and fee calculation                           |
-| T-025 Scout Screen                | Inspect card safely                             | Senior React Native FE / UI UX Designer   | Read-only summary, balance, status, latest logs                 | Shows members can inspect card state without mutation         |
-| T-026 Signal UI Direction         | Apply the selected design system                | UI UX Designer / Senior React Native FE   | Signal tokens, components, and role screen styling              | Shows the app follows the required Signal UI direction        |
-| T-026A Low-Fi E2E Figma Flow      | Map all screens and edge cases before coding UI | UI UX Designer / Project Manager          | Low-fi Figma flow                                               | Shows the complete user journey is designed first             |
-| T-026B Hi-Fi Figma Screens        | Provide implementation-ready visual guidance    | UI UX Designer / FE / System Analyst      | Hi-fi mobile screens and validation board                       | Shows what the final demo should look like                    |
-| T-026C Hi-Fi Polish and Visual QA | Fix spacing, buttons, icons, and overlap issues | UI UX Designer / FE / PO / SA / Architect | Hi-fi V2 polish plan and updated Figma when available           | Shows design quality is reviewed before implementation        |
-| T-026D Task Presentation Brief    | Keep task explanations ready for slides         | Technical Writer / Project Manager        | This presentation brief                                         | Shows progress can be explained clearly to stakeholders       |
+| Task                              | Purpose                                         | Owner                                     | Output                                                                                   | Presentation Value                                            |
+| --------------------------------- | ----------------------------------------------- | ----------------------------------------- | ---------------------------------------------------------------------------------------- | ------------------------------------------------------------- |
+| T-021 Role Switcher               | Let one app play four roles                     | Senior React Native FE / UI UX Designer   | Station, Gate, Terminal, Scout selection                                                 | Shows the assessment runs as one multi-role app               |
+| T-022 Station Screen              | Register, top up, and review local summaries    | Senior React Native FE / UI UX Designer   | RadarZone (green) + segmented control (Register \| Top Up), ledger accordion, NFC action | Shows cooperative staff workflow plus offline reporting value |
+| T-023 Gate Screen                 | Check in members to parking                     | Senior React Native FE / UI UX Designer   | Parking activity indicator, check-in, result states                                      | Shows entry flow with real device time                        |
+| T-024 Terminal Screen             | Check out and deduct balance                    | Senior React Native FE / UI UX Designer   | Fee summary, balance result, insufficient balance guidance                               | Shows exit flow and fee calculation                           |
+| T-025 Scout Screen                | Inspect card safely                             | Senior React Native FE / UI UX Designer   | RadarZone (cyan), radar hides after scan, card info at top, "Scan Another Card" resets   | Shows members can inspect card state without mutation         |
+| T-026 Signal UI Direction         | Apply the selected design system                | UI UX Designer / Senior React Native FE   | Signal tokens, components, and role screen styling                                       | Shows the app follows the required Signal UI direction        |
+| T-026A Low-Fi E2E Figma Flow      | Map all screens and edge cases before coding UI | UI UX Designer / Project Manager          | Low-fi Figma flow                                                                        | Shows the complete user journey is designed first             |
+| T-026B Hi-Fi Figma Screens        | Provide implementation-ready visual guidance    | UI UX Designer / FE / System Analyst      | Hi-fi mobile screens and validation board                                                | Shows what the final demo should look like                    |
+| T-026C Hi-Fi Polish and Visual QA | Fix spacing, buttons, icons, and overlap issues | UI UX Designer / FE / PO / SA / Architect | Hi-fi V2 polish plan and updated Figma when available                                    | Shows design quality is reviewed before implementation        |
+| T-026D Task Presentation Brief    | Keep task explanations ready for slides         | Technical Writer / Project Manager        | This presentation brief                                                                  | Shows progress can be explained clearly to stakeholders       |
 
 ## Verification and Demo
 
 | Task                                            | Purpose                                        | Owner                                            | Output                                                                  | Presentation Value                                                        |
 | ----------------------------------------------- | ---------------------------------------------- | ------------------------------------------------ | ----------------------------------------------------------------------- | ------------------------------------------------------------------------- |
-| T-027 Unit and Use-Case Tests                   | Prove business logic works                     | Test Automation Engineer / Senior QA             | 194 tests, 97%+ coverage, `E2E_TEST_CASES.md` with evidence paths       | Shows quality is not only manual demo and has traceable evidence          |
+| T-027 Unit and Use-Case Tests                   | Prove business logic works                     | Test Automation Engineer / Senior QA             | 444+ tests, 100% coverage, `E2E_TEST_CASES.md` with evidence paths      | Shows quality is not only manual demo and has traceable evidence          |
 | T-027A SonarCloud Quality Gate                  | Keep automated quality visible and enforceable | Test Automation Engineer / Demo/Release Engineer | SonarCloud setup, coverage import, quality-gate result                  | Shows code quality is measured continuously, not judged only by demo feel |
 | T-027B GitHub Actions Firebase App Distribution | Controlled APK delivery from `main`            | Demo/Release Engineer                            | GitHub Actions workflow → Firebase App Distribution                     | Shows the project has a controlled APK delivery path for reviewers        |
 | T-027C Feature PR QA Screenshot Evidence        | Prove each feature works visually              | Senior QA / Test Automation Engineer             | Screenshot evidence per feature PR                                      | Shows each feature is checked by QA before merge                          |
@@ -170,29 +170,29 @@ Use this table to find which tasks support each required presentation section:
 
 ## Key Architecture Decisions (for Software Design slide)
 
-| Decision                     | Rationale                                                             |
-| ---------------------------- | --------------------------------------------------------------------- |
-| NFC card is source of truth  | Offline-first: no backend needed for core flows                       |
-| SQLite is audit-only         | Device-local reporting; never overrides card state                    |
-| Clean Architecture layers    | Domain has zero framework dependencies; testable without NFC hardware |
-| Repository interface pattern | Swap mock ↔ real NFC without changing business logic                  |
-| One app, four roles          | Simpler deployment; role switcher controls access                     |
-| Parking as first activity    | Required by assessment; architecture supports future activities       |
-| NTAG215 target               | Widely available, 504-byte writable; compact binary payload fits      |
+| Decision                     | Rationale                                                                            |
+| ---------------------------- | ------------------------------------------------------------------------------------ |
+| NFC card is source of truth  | Offline-first: no backend needed for core flows                                      |
+| SQLite is audit-only         | Device-local reporting; never overrides card state                                   |
+| Clean Architecture layers    | Domain has zero framework dependencies; testable without NFC hardware                |
+| Repository interface pattern | Swap mock ↔ real NFC without changing business logic                                 |
+| One app, four roles          | Simpler deployment; role switcher controls access                                    |
+| Parking as first activity    | Required by assessment; architecture supports future activities                      |
+| NTAG215 target               | 504 bytes raw / 480 bytes NDEF capacity (app threshold); compact binary payload fits |
 
 ---
 
 ## Security Posture (for Software Security slide)
 
-| Layer            | Protection                                                               |
-| ---------------- | ------------------------------------------------------------------------ |
-| Card payload     | AES-256-GCM authenticated encryption (Silent Shield)                     |
-| Envelope format  | Binary `mbc1` — not readable by generic NFC apps                         |
-| Tamper detection | GCM authentication tag; any modification → `CARD_TAMPERED`               |
-| Key handling     | Demo key bundled (documented as demo-only); production requires Keystore |
-| Logging          | Identity and balance redacted from all logs                              |
-| Write safety     | writeNdefMessage throws on failure; capacity guard enforced before write |
-| Capacity guard   | Payload checked against NTAG215 limit before every write                 |
+| Layer            | Protection                                                                   |
+| ---------------- | ---------------------------------------------------------------------------- |
+| Card payload     | AES-256-GCM authenticated encryption (Silent Shield)                         |
+| Envelope format  | Binary `mbc1` — not readable by generic NFC apps                             |
+| Tamper detection | GCM authentication tag; any modification → `CARD_TAMPERED`                   |
+| Key handling     | Demo key bundled (documented as demo-only); production requires Keystore     |
+| Logging          | Identity and balance redacted from all logs                                  |
+| Write safety     | writeNdefMessage throws on failure; capacity guard enforced before write     |
+| Capacity guard   | Payload checked against NTAG215 NDEF capacity (480 bytes) before every write |
 
 ### Prototype vs Production — Honest Separation
 
@@ -210,9 +210,9 @@ Use this table to find which tasks support each required presentation section:
 
 | Metric           | Value                                                       |
 | ---------------- | ----------------------------------------------------------- |
-| Automated tests  | 194                                                         |
-| Line coverage    | 97%+                                                        |
-| Coverage policy  | ≥90% for all executable source                              |
+| Automated tests  | 444+ (65 suites)                                            |
+| Line coverage    | 100%                                                        |
+| Coverage policy  | ≥90% minimum; jest.config.js enforces 99%/96%               |
 | Static analysis  | SonarCloud quality gate integrated                          |
 | Dependency audit | `npm audit` = 0 vulnerabilities                             |
 | QA evidence      | Screenshot proof per feature PR (T-027C)                    |

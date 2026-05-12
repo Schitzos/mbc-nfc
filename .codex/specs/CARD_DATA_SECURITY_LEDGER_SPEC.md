@@ -15,7 +15,9 @@ SQLite must never override card balance, card status, active activity state, or 
 
 ## 2. NFC Card Payload v1 — NTAG215 Compact MVP
 
-The MVP target NFC tag is **NTAG215**. NTAG215 provides limited writable user memory, so the MBC card payload must be compact, capacity-tested, and protected before every write. Logical examples below are for domain/testing only; the NFC tag must store the Silent Shield protected envelope, not plain JSON.
+The MVP target NFC tag is **NTAG215**. NTAG215 provides 504 bytes raw user memory, but the effective NDEF-writable capacity is **480 bytes** after accounting for CC bytes, lock bytes, and internal overhead. The app's `assertSupportedTag()` uses 480 bytes (NDEF capacity) as the minimum acceptance threshold. Constants: `NTAG215_RAW_MEMORY = 504`, `NTAG215_NDEF_CAPACITY = 480`.
+
+The MBC card payload must be compact, capacity-tested, and protected before every write. Logical examples below are for domain/testing only; the NFC tag must store the Silent Shield protected envelope, not plain JSON.
 
 ### 2.1 Required data that must stay on card
 

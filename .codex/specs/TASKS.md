@@ -1,5 +1,7 @@
 # KDX Membership Benefit Card — Codex Task Plan Lite
 
+> Current status: 444+ tests | 65 suites | 100% line coverage | jest.config.js thresholds: 99% statements/lines/branches, 96% functions
+
 Purpose: compact, Codex-friendly task cards. Execute task order from `EXECUTION_ORDER.md`. Use detailed docs only when the task references them.
 
 ## Source-of-Truth Order
@@ -450,13 +452,54 @@ Owner: Senior RN FE + UI/UX Designer
 Refs: `SIGNAL_UI_GUIDE.md`, `DESIGN.md`
 Do: Refactor Station screen layout to fully align with Gate/Terminal/Scout pattern (RadarZone centered with absolute positioning, overlay cards on top/bottom with z-index layering, clean separation of concerns). Replace the plain ActivityIndicator in NfcActionSheet scanning phase with an animated radar/pulse scanning animation (concentric rings + sweep) consistent with the RadarZone visual language. Animation should be smooth and demo-ready.
 Acceptance Criteria:
+
 - Station screen layout matches Gate/Terminal/Scout structural pattern (RadarZone absolute center, overlays z-indexed)
 - NfcActionSheet scanning phase shows animated radar/pulse instead of ActivityIndicator
 - Scanning animation is smooth, visually consistent with RadarZone theme
 - All existing tests pass (>=90% coverage maintained)
 - No regression in Station register/top-up flows
-Status: **DONE** — QA validated 2026-05-09. 65 suites / 436 tests pass. 100% coverage. Station uses RadarZone with absolute centering (same as Gate/Terminal/Scout). NfcActionSheet has ScanningRings animation (3 concentric pulsing rings + center NFC icon breathe). Segmented control switches Register/Top-Up modes correctly. Runtime emulator validation deferred per user request.
-Done: Station screen aligned with Gate/Terminal/Scout pattern; NfcActionSheet has scanning animation; all tests pass.
+  Status: **DONE** — QA validated 2026-05-09. 65 suites / 436 tests pass. 100% coverage. Station uses RadarZone with absolute centering (same as Gate/Terminal/Scout). NfcActionSheet has ScanningRings animation (3 concentric pulsing rings + center NFC icon breathe). Segmented control switches Register/Top-Up modes correctly. Runtime emulator validation deferred per user request.
+  Done: Station screen aligned with Gate/Terminal/Scout pattern; NfcActionSheet has scanning animation; all tests pass.
+
+### T-UI-TERMINAL-001 — Remove blank space above error cards on Terminal screen ✅ DONE
+
+Owner: @FE (mbc-senior-react-native-fe)
+Do: Remove blank space above InsufficientBalanceCard on Terminal screen. When insufficient balance or generic failure state is active, the error card should render at the top of the content area instead of being pushed to the bottom by mt-auto.
+Acceptance Criteria:
+
+- InsufficientBalanceCard and genericFailure card appear at the top of the grey content area with no large blank space above them
+- RadarZone and TariffPreviewCard are hidden in error states
+- File: src/presentation/screens/Terminal/index.tsx
+  Status: **DONE** — QA validated 2026-05-12. Code review passed, 12 suites / 108 tests pass (Terminal+screens). mt-auto conditionally removed in error states; RadarZone and TariffPreviewCard hidden when insufficient or genericFailure.
+  Done: Error cards render at top of content area without blank space above; all tests pass.
+
+### T-UI-TERMINAL-002 — Refactor Terminal index.tsx — extract inline JSX to fragments ✅ DONE
+
+Owner: @FE (mbc-senior-react-native-fe)
+Refs: `SIGNAL_UI_GUIDE.md`, `DESIGN.md`
+Do: Extract inline JSX blocks in `src/presentation/screens/Terminal/index.tsx` into dedicated fragment components under `fragments/` directory (e.g., `GenericFailureCard`). Improve readability without changing behavior.
+Acceptance Criteria:
+
+- Inline JSX blocks moved to fragment files under `src/presentation/screens/Terminal/fragments/`
+- No behavioral changes — all existing tests pass
+- Coverage remains >=90%
+- Terminal screen renders identically before and after refactor
+  Status: **DONE** — QA validated 2026-05-12. GenericFailureCard extracted to fragments/. 10/10 Terminal tests pass. Runtime verified on Pixel 7 Pro emulator (Android 16). No behavioral changes.
+  Done: Terminal index.tsx is concise and readable; inline JSX extracted to fragments; all tests pass.
+
+### T-UI-CODE-001 — Replace ternary-to-null with && operator in UI rendering ✅ DONE
+
+Owner: @FE (mbc-senior-react-native-fe)
+Refs: `SIGNAL_UI_GUIDE.md`, `DESIGN.md`
+Do: Replace all `condition ? <JSX> : null` ternary patterns with `condition && <JSX>` for better readability. 10 instances across 4 files: Terminal/index.tsx (3), SignalBottomSheet/index.tsx (3), SignalTextField/index.tsx (3), SignalStatusBanner/index.tsx (1). Do NOT convert ternaries with actual else branches.
+Acceptance Criteria:
+
+- All 10 `condition ? <JSX> : null` patterns replaced with `condition && <JSX>`
+- No behavioral changes — all existing tests pass
+- Coverage remains >=90%
+- No regression in any screen rendering
+  Status: **DONE** — QA validated 2026-05-12. All 10 ternary-to-null patterns replaced with && operator across 4 files. 64 suites / 431 tests pass. Runtime verified on Pixel 7 Pro emulator (Android 16) — all 5 screens render correctly with no behavioral changes.
+  Done: All ternary-to-null patterns replaced with && operator; all tests pass.
 
 ### T-029 — Demo Capture
 
