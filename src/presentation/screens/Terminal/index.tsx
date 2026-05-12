@@ -10,6 +10,8 @@ import { AppHeaderCard } from '@presentation/components/AppHeaderCard';
 import { CheckoutSummaryCard } from './fragments/CheckoutSummaryCard';
 import { TariffPreviewCard } from './fragments/TariffPreviewCard';
 import { InsufficientBalanceCard } from './fragments/InsufficientBalanceCard';
+import { GenericFailureCard } from './fragments/GenericFailureCard';
+import { signalColorTokens } from '@presentation/theme/colors';
 
 export function TerminalScreen(): React.JSX.Element {
   const setSelectedRole = useAppStore(state => state.setSelectedRole);
@@ -33,12 +35,12 @@ export function TerminalScreen(): React.JSX.Element {
             </View>
           }
         />
-        <View className="-mt-3 rounded-t-3xl bg-[#F0F2F5] px-5 pt-5 pb-6 flex-1">
+        <View className="-mt-3 rounded-t-2xl bg-[#F0F2F5] px-5 pt-5 pb-6 flex-1">
           <View className="flex-1">
-            {!actions.insufficient && (
+            {!actions.insufficient && !actions.genericFailure && (
               <View className="absolute inset-0 justify-center items-center z-0">
                 <RadarZone
-                  color="#D97706"
+                  color={signalColorTokens.brand.primary}
                   label="Tap Card to Check Out"
                   busyLabel="Processing..."
                   disabled={actions.busy}
@@ -49,35 +51,32 @@ export function TerminalScreen(): React.JSX.Element {
               </View>
             )}
             <View className="z-10">
-              {!actions.insufficient && <TariffPreviewCard />}
+              {!actions.insufficient && !actions.genericFailure && (
+                <TariffPreviewCard />
+              )}
             </View>
-            <View className="mt-auto z-10">
-              {actions.success && actions.latestResult ? (
+            <View
+              className={`z-10${!actions.insufficient && !actions.genericFailure ? ' mt-auto' : ''}`}
+            >
+              {actions.success && actions.latestResult && (
                 <CheckoutSummaryCard
                   latestResult={actions.latestResult}
                   checkoutTime={actions.checkoutTime}
                 />
-              ) : null}
+              )}
 
-              {actions.insufficient && actions.latestResult ? (
+              {actions.insufficient && actions.latestResult && (
                 <InsufficientBalanceCard
                   latestResult={actions.latestResult}
                   onRetry={() => {
                     void actions.handleCheckout();
                   }}
                 />
-              ) : null}
+              )}
 
-              {actions.genericFailure && actions.latestResult ? (
-                <View className="rounded-xl border border-red-400 bg-[#FFECEC] p-3">
-                  <Text className="text-xs font-semibold uppercase text-red-700">
-                    Card cannot be processed
-                  </Text>
-                  <Text className="mt-1 text-sm font-semibold text-red-900">
-                    {actions.latestResult.message}
-                  </Text>
-                </View>
-              ) : null}
+              {actions.genericFailure && actions.latestResult && (
+                <GenericFailureCard latestResult={actions.latestResult} />
+              )}
             </View>
           </View>
           <View className="mt-auto">

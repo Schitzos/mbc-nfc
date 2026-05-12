@@ -45,12 +45,12 @@ export function SignalTextField({
 
   return (
     <View style={[styles.root, style]}>
-      {label ? (
+      {label && (
         <View style={styles.labelRow}>
           <Text style={styles.label}>{label}</Text>
-          {required ? <Text style={styles.required}>*</Text> : null}
+          {required && <Text style={styles.required}>*</Text>}
         </View>
-      ) : null}
+      )}
       <View style={[styles.inputShell, dynamicStyles.shell]}>
         <TextInput
           value={value}
@@ -70,11 +70,11 @@ export function SignalTextField({
         />
         {rightElement}
       </View>
-      {helperText ? (
+      {helperText && (
         <Text style={[styles.helper, dynamicStyles.helperColor]}>
           {helperText}
         </Text>
-      ) : null}
+      )}
     </View>
   );
 }

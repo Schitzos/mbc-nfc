@@ -14,6 +14,7 @@ import { useAppStore } from '@presentation/stores/app-store';
 import { useScoutServices } from '@presentation/context/service-context';
 import { useScoutActions } from './useScoutActions';
 import { AppHeaderCard } from '@presentation/components/AppHeaderCard';
+import { signalColorTokens } from '@presentation/theme/colors';
 import { ScoutErrorCard } from './fragments/MemberCardError';
 import { MemberCardInfo } from './fragments/MemberCardInfo';
 import { LatestLogsCard } from './fragments/LatestLogsCard';
@@ -74,12 +75,12 @@ export function ScoutScreen(): React.JSX.Element {
         }
       />
 
-      <View className="-mt-3 rounded-t-3xl bg-[#F0F2F5] flex-1 overflow-hidden">
+      <View className="-mt-3 rounded-t-2xl bg-[#F0F2F5] flex-1 overflow-hidden">
         {!showResult ? (
           <View className="flex-1">
             <View className="absolute inset-0 justify-center items-center z-0">
               <RadarZone
-                color="#00B4D8"
+                color={signalColorTokens.brand.primary}
                 label="Inspect"
                 busyLabel="Scanning..."
                 disabled={actions.busy}

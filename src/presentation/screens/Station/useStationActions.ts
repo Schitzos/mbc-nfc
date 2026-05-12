@@ -65,7 +65,7 @@ export function useStationActions(services: StationServices) {
     setNfcSheet({
       phase: 'scanning',
       message: 'Hold the same card to wipe and re-register',
-      color: '#16A34A',
+      color: '#FF0025',
     });
     try {
       appendNfcLog('[NFC] Wipe & re-register flow started');
@@ -106,7 +106,7 @@ export function useStationActions(services: StationServices) {
     setNfcSheet({
       phase: 'scanning',
       message: 'Hold your NFC card to register',
-      color: '#16A34A',
+      color: '#FF0025',
     });
     try {
       appendNfcLog('[NFC] Register flow started');
@@ -162,7 +162,11 @@ export function useStationActions(services: StationServices) {
   const handleTopUp = useCallback(async () => {
     dismissedRef.current = false;
     setBusyAction('topup');
-    setNfcSheet({ phase: 'scanning', message: 'Hold your NFC card to top up', color: '#16A34A' });
+    setNfcSheet({
+      phase: 'scanning',
+      message: 'Hold your NFC card to top up',
+      color: '#FF0025',
+    });
     try {
       appendNfcLog('[NFC] Top-up flow started');
       const result = await services.topUpMemberCardUseCase.execute({
