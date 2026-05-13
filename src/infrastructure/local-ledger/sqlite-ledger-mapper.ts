@@ -1,4 +1,4 @@
-import type { LedgerEntry } from '@domain/membership/entities/membership-card';
+import type { LedgerEntry } from '@domain/membership/entities/ledger-entry';
 
 interface LedgerRow {
   id: string;

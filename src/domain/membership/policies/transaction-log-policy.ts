@@ -1,8 +1,6 @@
-import type {
-  MbcActivity,
-  MbcCard,
-  TransactionLog,
-} from '../entities/membership-card';
+import type { MbcCard } from '../entities/membership-card';
+import type { TransactionLog } from '../entities/transaction-log';
+import type { MbcActivity } from '../types/card-status';
 import { createDomainError } from '../errors/domain-error';
 
 interface CreateTransactionLogInput {

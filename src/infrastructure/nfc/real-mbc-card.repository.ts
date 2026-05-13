@@ -5,9 +5,9 @@ import type { MbcCardRepository } from '@domain/membership/repositories/membersh
 import {
   createCardRepositoryError,
   isCardRepositoryError,
-} from '@domain/membership/errors/card-repository-error';
+} from '@domain/membership/errors/membership-card-repository-error';
 import { isDomainError } from '@domain/membership/errors/domain-error';
-import type { CardRepositoryError } from '@domain/membership/errors/card-repository-error';
+import type { CardRepositoryError } from '@domain/membership/errors/membership-card-repository-error';
 import type { DomainError } from '@domain/membership/errors/domain-error';
 import { encrypt, decrypt, isMbcEnvelope } from './silent-shield';
 

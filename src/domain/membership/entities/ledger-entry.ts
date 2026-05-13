@@ -1,6 +1,19 @@
-import type { LedgerEntry } from './membership-card';
+import type {
+  MbcRole,
+  MbcActivity,
+  BenefitActivityType,
+} from '../types/card-status';
 
-export type { LedgerEntry } from './membership-card';
+export type LedgerEntry = {
+  id: string;
+  role: MbcRole;
+  action: MbcActivity;
+  maskedMemberReference?: string;
+  activityType?: BenefitActivityType;
+  amount?: number;
+  occurredAt: string;
+  deviceId?: string;
+};
 
 export type StationLedgerSummary = {
   topUpTotal: number;

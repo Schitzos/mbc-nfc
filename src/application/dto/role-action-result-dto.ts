@@ -1,4 +1,4 @@
-import type { MbcRole } from '@domain/membership/entities/membership-card';
+import type { MbcRole } from '@domain/membership/types/card-status';
 import type { CardSummaryDto } from './card-summary-dto';
 
 export type RoleActionErrorCode =

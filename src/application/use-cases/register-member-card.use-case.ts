@@ -3,7 +3,7 @@ import { createInitialCard } from '@domain/membership/factories/membership-card.
 import type { MbcCardRepository } from '@domain/membership/repositories/membership-card.repository';
 import type { RoleActionResultDto } from '@application/dto/role-action-result-dto';
 import { toCardSummaryDto } from '@application/dto/card-summary-mapper';
-import { isCardRepositoryError } from '@domain/membership/errors/card-repository-error';
+import { isCardRepositoryError } from '@domain/membership/errors/membership-card-repository-error';
 import { createRandomId } from '@shared/utils/create-random-id';
 import type { LocalLedgerRepository } from '@domain/membership/repositories/ledger.repository';
 import { maskMemberReference } from '@shared/utils/mask-member-reference';

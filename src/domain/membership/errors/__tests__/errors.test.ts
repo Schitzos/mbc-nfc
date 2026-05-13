@@ -1,5 +1,5 @@
 import { createDomainError } from '@domain/membership/errors/domain-error';
-import { createCardRepositoryError } from '@domain/membership/errors/card-repository-error';
+import { createCardRepositoryError } from '@domain/membership/errors/membership-card-repository-error';
 
 describe('DomainError', () => {
   it('creates an error with code and message', () => {

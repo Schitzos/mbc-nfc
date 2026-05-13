@@ -1,7 +1,7 @@
 import { createRegisterMemberCardUseCase } from '@application/use-cases/register-member-card.use-case';
 import type { MbcCardRepository } from '@domain/membership/repositories/membership-card.repository';
 import type { LocalLedgerRepository } from '@domain/membership/repositories/ledger.repository';
-import { createCardRepositoryError } from '@domain/membership/errors/card-repository-error';
+import { createCardRepositoryError } from '@domain/membership/errors/membership-card-repository-error';
 
 function createCardRepository(
   overrides?: Partial<MbcCardRepository>,

@@ -1,7 +1,9 @@
 import type { DB } from '@op-engineering/op-sqlite';
 import type { LocalLedgerRepository } from '@domain/membership/repositories/ledger.repository';
-import type { LedgerEntry } from '@domain/membership/entities/membership-card';
-import type { StationLedgerSummary } from '@domain/membership/entities/ledger-entry';
+import type {
+  LedgerEntry,
+  StationLedgerSummary,
+} from '@domain/membership/entities/ledger-entry';
 import { mapLedgerRowToEntry } from './sqlite-ledger-mapper';
 
 const CREATE_LEDGER_TABLE_SQL = `

@@ -1,1 +1,4 @@
-export type { MemberProfile } from '../entities/membership-card';
+export type MemberProfile = {
+  memberId: string;
+  displayName?: string;
+};

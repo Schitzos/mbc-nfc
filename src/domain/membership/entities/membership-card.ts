@@ -1,41 +1,8 @@
-export type VisitStatus = 'NOT_CHECKED_IN' | 'CHECKED_IN';
-
-export type MbcActivity = 'REGISTER' | 'TOP_UP' | 'CHECK_IN' | 'CHECK_OUT';
-
-export type BenefitActivityType = 'PARKING';
-
-export type MbcRole = 'STATION' | 'GATE' | 'TERMINAL' | 'SCOUT';
-
-export type CurrencyCode = 'IDR';
-
-export type ActivitySession = {
-  activityId: string;
-  activityType: BenefitActivityType;
-  checkedInAt: string;
-};
-
-export type MemberProfile = {
-  memberId: string;
-  displayName?: string;
-};
-
-export type TransactionLog = {
-  id: string;
-  activity: MbcActivity;
-  nominal: number;
-  occurredAt: string;
-};
-
-export type LedgerEntry = {
-  id: string;
-  role: MbcRole;
-  action: MbcActivity;
-  maskedMemberReference?: string;
-  activityType?: BenefitActivityType;
-  amount?: number;
-  occurredAt: string;
-  deviceId?: string;
-};
+import type { ActivitySession } from './activity-session';
+import type { TransactionLog } from './transaction-log';
+import type { VisitStatus } from '../types/card-status';
+import type { CurrencyCode } from '../types/money';
+import type { MemberProfile } from '../types/member-id';
 
 export type MbcCard = {
   version: number;

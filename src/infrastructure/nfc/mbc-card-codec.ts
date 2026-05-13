@@ -1,8 +1,8 @@
+import type { MbcCard } from '@domain/membership/entities/membership-card';
 import type {
-  MbcCard,
   MbcActivity,
   VisitStatus,
-} from '@domain/membership/entities/membership-card';
+} from '@domain/membership/types/card-status';
 
 const SUPPORTED_VERSION = 1;
 const MAX_TRANSACTION_LOGS = 5;

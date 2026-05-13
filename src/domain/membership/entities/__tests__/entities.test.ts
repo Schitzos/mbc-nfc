@@ -1,15 +1,17 @@
-import {
-  type MbcCard,
-  type MbcActivity,
-  type MbcRole,
-  type VisitStatus,
-  type ActivitySession,
-  type MemberProfile,
-  type TransactionLog,
-  type LedgerEntry,
-} from '@domain/membership/entities/membership-card';
+import type { MbcCard } from '@domain/membership/entities/membership-card';
+import type { ActivitySession } from '@domain/membership/entities/activity-session';
+import type { TransactionLog } from '@domain/membership/entities/transaction-log';
+import type {
+  LedgerEntry,
+  StationLedgerSummary,
+} from '@domain/membership/entities/ledger-entry';
+import type {
+  MbcActivity,
+  MbcRole,
+  VisitStatus,
+} from '@domain/membership/types/card-status';
+import type { MemberProfile } from '@domain/membership/types/member-id';
 import { PARKING_TARIFF_PER_STARTED_HOUR } from '@domain/membership/config/parking-tariff';
-import type { StationLedgerSummary } from '@domain/membership/entities/ledger-entry';
 
 describe('domain/entities/mbc-card', () => {
   it('exports PARKING_TARIFF_PER_STARTED_HOUR as 2000', () => {

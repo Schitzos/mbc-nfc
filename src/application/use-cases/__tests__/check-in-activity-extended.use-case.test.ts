@@ -1,7 +1,7 @@
 import { createCheckInActivityUseCase } from '@application/use-cases/check-in-activity.use-case';
 import type { MbcCardRepository } from '@domain/membership/repositories/membership-card.repository';
 import type { MbcCard } from '@domain/membership/entities/membership-card';
-import { createCardRepositoryError } from '@domain/membership/errors/card-repository-error';
+import { createCardRepositoryError } from '@domain/membership/errors/membership-card-repository-error';
 import { createDomainError } from '@domain/membership/errors/domain-error';
 
 function createCard(overrides?: Partial<MbcCard>): MbcCard {

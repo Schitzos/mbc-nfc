@@ -1,5 +1,5 @@
 import type { MbcCardRepository } from '@domain/membership/repositories/membership-card.repository';
-import { isCardRepositoryError } from '@domain/membership/errors/card-repository-error';
+import { isCardRepositoryError } from '@domain/membership/errors/membership-card-repository-error';
 import {
   createDomainError,
   isDomainError,
@@ -18,7 +18,7 @@ import type {
 import { toCardSummaryDto } from '@application/dto/card-summary-mapper';
 import type { LocalLedgerRepository } from '@domain/membership/repositories/ledger.repository';
 import { maskMemberReference } from '@shared/utils/mask-member-reference';
-import type { BenefitActivityType } from '@domain/membership/entities/membership-card';
+import type { BenefitActivityType } from '@domain/membership/types/card-status';
 
 export type CheckOutActivityRequest = {
   checkedOutAt?: string;

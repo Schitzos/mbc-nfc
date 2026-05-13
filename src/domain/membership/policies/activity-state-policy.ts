@@ -1,8 +1,6 @@
-import type {
-  ActivitySession,
-  BenefitActivityType,
-  MbcCard,
-} from '../entities/membership-card';
+import type { MbcCard } from '../entities/membership-card';
+import type { ActivitySession } from '../entities/activity-session';
+import type { BenefitActivityType } from '../types/card-status';
 import { createDomainError } from '../errors/domain-error';
 
 interface CheckInInput {
