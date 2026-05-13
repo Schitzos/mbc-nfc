@@ -376,12 +376,12 @@ Do: Change Register button in Station screen from red (primary) to green (succes
 Status: **DONE**  
 Done: Register button renders green; secondary button unchanged; all tests pass.
 
-### T-UI-STATION-002 — Register Button Purple
+### T-UI-STATION-002 — Register Button Purple ❌ CANCELLED
 
 Owner: Senior RN FE  
 Refs: `SIGNAL_UI_GUIDE.md`  
 Do: Change Register button in Station screen from green (`#008E53`) to purple.  
-Done: Register button renders purple; secondary buttons unchanged; all tests pass.
+Status: **CANCELLED** — Superseded; Station retains green (#16A34A) per final design decision.
 
 ### T-UI-APP-001 — Change app header to rainbow gradient ✅ DONE
 

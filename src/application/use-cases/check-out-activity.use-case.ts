@@ -8,7 +8,10 @@ import {
   createTransactionLog,
 } from '@domain/services/transaction-log-policy';
 import { createRandomId } from '@shared/utils/create-random-id';
-import type { RoleActionResultDto } from '@application/dto/role-action-result-dto';
+import type {
+  RoleActionErrorCode,
+  RoleActionResultDto,
+} from '@application/dto/role-action-result-dto';
 import { toCardSummaryDto } from '@application/dto/card-summary-mapper';
 import type { LocalLedgerRepository } from '@domain/repositories/local-ledger-repository';
 import { maskMemberReference } from '@shared/utils/mask-member-reference';
@@ -22,7 +25,7 @@ export type CheckOutActivityUseCase = {
   execute: (request?: CheckOutActivityRequest) => Promise<RoleActionResultDto>;
 };
 
-function mapCardRepoErrorCode(code: string): string {
+function mapCardRepoErrorCode(code: string): RoleActionErrorCode {
   if (code === 'CARD_TAMPERED') return 'CARD_TAMPERED';
   if (code === 'UNREGISTERED_CARD') return 'UNREGISTERED_CARD';
   return 'GENERIC_FAILURE';
@@ -37,9 +40,9 @@ export function createCheckOutActivityUseCase(
       checkedOutAt,
     }: CheckOutActivityRequest = {}): Promise<RoleActionResultDto> {
       const occurredAt = checkedOutAt ?? new Date().toISOString();
+      let tariffResult = { chargedAmount: 0, chargedHours: 0, durationMs: 0 };
 
       try {
-        let tariffResult = { chargedAmount: 0, chargedHours: 0, durationMs: 0 };
         let sessionActivityType: BenefitActivityType = 'PARKING';
 
         const updatedCard = await cardRepository.readWriteCard(card => {
@@ -112,16 +115,21 @@ export function createCheckOutActivityUseCase(
         }
 
         if (isDomainError(error)) {
-          const isInsufficientBalance = error.code === 'INSUFFICIENT_BALANCE';
+          if (error.code === 'INSUFFICIENT_BALANCE') {
+            return {
+              success: false,
+              role: 'TERMINAL',
+              errorCode: 'INSUFFICIENT_BALANCE',
+              message:
+                'Insufficient balance. Direct the member to top up at Station before checkout.',
+              chargedAmount: tariffResult.chargedAmount,
+            };
+          }
           return {
             success: false,
             role: 'TERMINAL',
-            errorCode: isInsufficientBalance
-              ? 'INSUFFICIENT_BALANCE'
-              : 'GENERIC_FAILURE',
-            message: isInsufficientBalance
-              ? 'Insufficient balance. Direct the member to top up at Station before checkout.'
-              : error.message,
+            errorCode: 'GENERIC_FAILURE',
+            message: error.message,
           };
         }
 

@@ -23,20 +23,20 @@ Layer responsibilities:
 
 ## 2. Technology Stack
 
-| Area              | Choice                                                 |
-| ----------------- | ------------------------------------------------------ |
-| Mobile framework  | React Native CLI                                       |
-| Language          | TypeScript                                             |
-| NFC library       | `react-native-nfc-manager`                             |
-| Crypto library    | `react-native-quick-crypto` (AES-256-GCM)              |
-| Local database    | SQLite                                                 |
-| UI system         | Signal UI, guided by `.codex/specs/SIGNAL_UI_GUIDE.md` |
-| Navigation        | React Navigation                                       |
-| Animations        | `react-native-reanimated`                              |
-| State management  | Zustand or React Context                               |
-| Testing           | Jest, React Native Testing Library                     |
-| Static analysis   | SonarCloud                                             |
-| Security baseline | OWASP MASVS-inspired mobile controls                   |
+| Area              | Choice                                                    |
+| ----------------- | --------------------------------------------------------- |
+| Mobile framework  | React Native CLI                                          |
+| Language          | TypeScript                                                |
+| NFC library       | `react-native-nfc-manager`                                |
+| Crypto library    | `react-native-quick-crypto` (AES-256-GCM)                 |
+| Local database    | SQLite                                                    |
+| UI system         | Signal UI, guided by `.codex/specs/SIGNAL_UI_GUIDE.md`    |
+| Navigation        | React Navigation                                          |
+| Animations        | `react-native-reanimated`                                 |
+| State management  | Zustand (presentation state) + React Context (service DI) |
+| Testing           | Jest, React Native Testing Library                        |
+| Static analysis   | SonarCloud                                                |
+| Security baseline | OWASP MASVS-inspired mobile controls                      |
 
 ## 3. Suggested Folder Structure
 
@@ -120,11 +120,6 @@ src/
       Scout/
         index.tsx
         useScoutActions.ts
-      RoleSwitcherScreen.tsx
-      StationScreen.tsx
-      GateScreen.tsx
-      TerminalScreen.tsx
-      ScoutScreen.tsx
     components/
       AppHeaderCard/
       NfcActionSheet/
@@ -384,7 +379,7 @@ Before any real card operation, the presentation layer checks NFC availability t
 
 All role screens use `NfcActionSheet` — a bottom sheet component that provides scan/success/error feedback during NFC operations. The scanning phase uses `ScanningRings` animation (3 concentric pulsing rings + breathing center NFC icon) consistent with the RadarZone visual language.
 
-All four role screens (Station, Gate, Terminal, Scout) use `RadarZone` as the shared NFC trigger component — a dark immersive zone with concentric radar rings, sweep line animation, and a colored circular action button. Each role uses a distinct color (Station: green #008E53, Gate: blue #1D4ED8, Terminal: amber #D97706, Scout: cyan #00B4D8).
+All four role screens (Station, Gate, Terminal, Scout) use `RadarZone` as the shared NFC trigger component — a dark immersive zone with concentric radar rings, sweep line animation, and a colored circular action button. All roles use the unified Signal UI primary red (#FF0025) as the RadarZone accent color.
 
 - Station uses RadarZone with a segmented control (Register | Top Up tabs) to switch between registration and top-up modes. The local ledger summary is displayed as a collapsible accordion (collapsed by default). Top-up accepts numeric input (free-text allowed) with validation to ensure only numbers are entered. Preset buttons (10k/20k/50k/100k) are also available as shortcuts.
 - Gate: parking check-in action via RadarZone tap, NFC write action, status result. No simulation mode or mock scenario selectors.

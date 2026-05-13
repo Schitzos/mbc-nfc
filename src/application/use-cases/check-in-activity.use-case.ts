@@ -8,7 +8,10 @@ import {
 import { isCardRepositoryError } from '@domain/errors/card-repository-error';
 import { isDomainError } from '@domain/errors/domain-error';
 import { createRandomId } from '@shared/utils/create-random-id';
-import type { RoleActionResultDto } from '@application/dto/role-action-result-dto';
+import type {
+  RoleActionErrorCode,
+  RoleActionResultDto,
+} from '@application/dto/role-action-result-dto';
 import { toCardSummaryDto } from '@application/dto/card-summary-mapper';
 
 export type CheckInActivityRequest = {
@@ -32,7 +35,7 @@ export type CheckInActivityUseCase = {
   execute: (request: CheckInActivityRequest) => Promise<RoleActionResultDto>;
 };
 
-function mapCheckInErrorCode(error: unknown): string {
+function mapCheckInErrorCode(error: unknown): RoleActionErrorCode {
   if (
     isDomainError(error) &&
     (error.code === 'CARD_ALREADY_CHECKED_IN' ||

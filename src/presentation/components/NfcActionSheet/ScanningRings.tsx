@@ -5,7 +5,11 @@ interface ScanningRingsProps {
   color?: string;
 }
 
-const RING_COUNT = 3;
+const RINGS = [
+  { key: 'ring-inner', index: 0, delay: 0 },
+  { key: 'ring-middle', index: 1, delay: STAGGER },
+  { key: 'ring-outer', index: 2, delay: STAGGER * 2 },
+];
 const DURATION = 1500;
 const STAGGER = 500;
 
@@ -93,8 +97,13 @@ export function ScanningRings({
       accessibilityLabel="Scanning for NFC card"
       accessibilityRole="progressbar"
     >
-      {Array.from({ length: RING_COUNT }).map((_, i) => (
-        <Ring key={`ring-${i}`} color={color} delay={i * STAGGER} index={i} />
+      {RINGS.map(ring => (
+        <Ring
+          key={ring.key}
+          color={color}
+          delay={ring.delay}
+          index={ring.index}
+        />
       ))}
       <Animated.View
         style={[styles.iconContainer, { transform: [{ scale: breathe }] }]}
