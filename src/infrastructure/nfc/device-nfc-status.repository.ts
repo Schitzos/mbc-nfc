@@ -2,7 +2,7 @@ import NfcManager from 'react-native-nfc-manager';
 import type {
   NfcAvailabilityRepository,
   NfcAvailabilityStatus,
-} from '@domain/repositories/nfc-availability-repository';
+} from '@domain/membership/repositories/nfc-availability.repository';
 
 export type DeviceNfcStatusRepository = NfcAvailabilityRepository;
 

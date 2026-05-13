@@ -2,7 +2,7 @@ import { createCheckNfcAvailabilityUseCase } from '@application/use-cases/check-
 import type {
   NfcAvailabilityRepository,
   NfcAvailabilityStatus,
-} from '@domain/repositories/nfc-availability-repository';
+} from '@domain/membership/repositories/nfc-availability.repository';
 
 function createRepository(
   status: NfcAvailabilityStatus,

@@ -3,7 +3,7 @@ import type {
   CurrencyCode,
   TransactionLog,
   VisitStatus,
-} from '@domain/entities/mbc-card';
+} from '@domain/membership/entities/membership-card';
 
 export type CardSummaryDto = {
   cardId: string;

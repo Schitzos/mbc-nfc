@@ -1,5 +1,5 @@
-import type { MbcCardRepository } from '@domain/repositories/mbc-card-repository';
-import { isCardRepositoryError } from '@domain/errors/card-repository-error';
+import type { MbcCardRepository } from '@domain/membership/repositories/membership-card.repository';
+import { isCardRepositoryError } from '@domain/membership/errors/card-repository-error';
 import type { RoleActionResultDto } from '@application/dto/role-action-result-dto';
 import { toCardSummaryDto } from '@application/dto/card-summary-mapper';
 

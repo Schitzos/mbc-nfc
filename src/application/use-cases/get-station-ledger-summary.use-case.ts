@@ -1,4 +1,4 @@
-import type { LocalLedgerRepository } from '@domain/repositories/local-ledger-repository';
+import type { LocalLedgerRepository } from '@domain/membership/repositories/ledger.repository';
 import type { StationLedgerSummaryDto } from '@application/dto/station-ledger-summary-dto';
 
 export type GetStationLedgerSummaryUseCase = {

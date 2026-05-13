@@ -1,5 +1,5 @@
 import { createGetStationLedgerSummaryUseCase } from '@application/use-cases/get-station-ledger-summary.use-case';
-import type { LocalLedgerRepository } from '@domain/repositories/local-ledger-repository';
+import type { LocalLedgerRepository } from '@domain/membership/repositories/ledger.repository';
 
 function createLedgerRepository(
   overrides?: Partial<LocalLedgerRepository>,

@@ -1,12 +1,15 @@
-import type { BenefitActivityType, MbcCard } from '@domain/entities/mbc-card';
-import type { MbcCardRepository } from '@domain/repositories/mbc-card-repository';
-import { applyCheckInState } from '@domain/services/activity-state-policy';
+import type {
+  BenefitActivityType,
+  MbcCard,
+} from '@domain/membership/entities/membership-card';
+import type { MbcCardRepository } from '@domain/membership/repositories/membership-card.repository';
+import { applyCheckInState } from '@domain/membership/policies/activity-state-policy';
 import {
   appendTransactionLog,
   createTransactionLog,
-} from '@domain/services/transaction-log-policy';
-import { isCardRepositoryError } from '@domain/errors/card-repository-error';
-import { isDomainError } from '@domain/errors/domain-error';
+} from '@domain/membership/policies/transaction-log-policy';
+import { isCardRepositoryError } from '@domain/membership/errors/card-repository-error';
+import { isDomainError } from '@domain/membership/errors/domain-error';
 import { createRandomId } from '@shared/utils/create-random-id';
 import type {
   RoleActionErrorCode,
