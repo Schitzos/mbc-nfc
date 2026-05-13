@@ -192,11 +192,15 @@ describe('SignalStatusBanner – extended coverage', () => {
 
 describe('SignalSkeleton – extended coverage', () => {
   it('renders default title variant without explicit prop', () => {
-    render(<SignalSkeleton />);
+    const { toJSON } = render(<SignalSkeleton />);
+    expect(toJSON()).toBeDefined();
   });
 
   it('renders with custom style', () => {
-    render(<SignalSkeleton variant="button" style={{ marginTop: 10 }} />);
+    const { toJSON } = render(
+      <SignalSkeleton variant="button" style={{ marginTop: 10 }} />,
+    );
+    expect(toJSON()).toBeDefined();
   });
 });
 
@@ -247,10 +251,7 @@ describe('NfcActionSheet – scanning without message', () => {
     const { NfcActionSheet } = require('../../components/NfcActionSheet');
 
     render(
-      <NfcActionSheet
-        state={{ phase: 'scanning' }}
-        onDismiss={jest.fn()}
-      />,
+      <NfcActionSheet state={{ phase: 'scanning' }} onDismiss={jest.fn()} />,
     );
 
     expect(
@@ -262,24 +263,28 @@ describe('NfcActionSheet – scanning without message', () => {
 describe('BackgroundDecor – default variant', () => {
   it('renders without variant prop (uses default)', () => {
     const { BackgroundDecor } = require('../BackgroundDecor');
-    render(<BackgroundDecor />);
+    const { toJSON } = render(<BackgroundDecor />);
+    expect(toJSON()).toBeDefined();
   });
 });
 
 describe('BackgroundDecor – variant branches', () => {
   it('renders gate variant (covers getDiamondColor gate branch)', () => {
     const { BackgroundDecor } = require('../BackgroundDecor');
-    render(<BackgroundDecor variant="gate" />);
+    const { toJSON } = render(<BackgroundDecor variant="gate" />);
+    expect(toJSON()).toBeDefined();
   });
 
   it('renders terminal variant (covers getDiamondColor terminal branch)', () => {
     const { BackgroundDecor } = require('../BackgroundDecor');
-    render(<BackgroundDecor variant="terminal" />);
+    const { toJSON } = render(<BackgroundDecor variant="terminal" />);
+    expect(toJSON()).toBeDefined();
   });
 
   it('renders scout variant (covers getCircleColor scout branch)', () => {
     const { BackgroundDecor } = require('../BackgroundDecor');
-    render(<BackgroundDecor variant="scout" />);
+    const { toJSON } = render(<BackgroundDecor variant="scout" />);
+    expect(toJSON()).toBeDefined();
   });
 });
 

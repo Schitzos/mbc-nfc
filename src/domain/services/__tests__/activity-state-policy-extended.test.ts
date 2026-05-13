@@ -3,7 +3,6 @@ import {
   applyCheckOutState,
 } from '@domain/services/activity-state-policy';
 import type { MbcCard } from '@domain/entities/mbc-card';
-import { DomainError } from '@domain/errors/domain-error';
 
 const baseCard: MbcCard = {
   version: 1,
@@ -23,7 +22,7 @@ describe('activityStatePolicy – extended branch coverage', () => {
         activityType: 'PARKING',
         checkedInAt: 'not-a-valid-date',
       }),
-    ).toThrow(DomainError);
+    ).toThrow(Error);
   });
 
   it('supports custom activityId for check-in (not hardcoded)', () => {
@@ -46,7 +45,7 @@ describe('activityStatePolicy – extended branch coverage', () => {
 
     expect(() =>
       applyCheckOutState(inconsistentCard, { chargedAmount: 2000 }),
-    ).toThrow(DomainError);
+    ).toThrow(Error);
   });
 
   it('does not mutate the original card on successful check-in', () => {
@@ -113,8 +112,8 @@ describe('activityStatePolicy – extended branch coverage', () => {
       applyCheckOutState(checkedInCard, { chargedAmount: 2000 });
       fail('Expected DomainError');
     } catch (error) {
-      expect(error).toBeInstanceOf(DomainError);
-      expect((error as DomainError).code).toBe('INSUFFICIENT_BALANCE');
+      expect(error).toBeInstanceOf(Error);
+      expect((error as { code: string }).code).toBe('INSUFFICIENT_BALANCE');
     }
   });
 });
@@ -142,6 +141,6 @@ describe('applyCheckInState – activeSession guard', () => {
         activityType: 'PARKING',
         checkedInAt: '2026-05-01T09:00:00.000Z',
       }),
-    ).toThrow(DomainError);
+    ).toThrow(Error);
   });
 });

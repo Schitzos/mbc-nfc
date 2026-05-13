@@ -1,4 +1,4 @@
-import { CheckInActivityUseCase } from '@application/use-cases/check-in-activity.use-case';
+import { createCheckInActivityUseCase } from '@application/use-cases/check-in-activity.use-case';
 import type { MbcCardRepository } from '@domain/repositories/mbc-card-repository';
 import type { MbcCard } from '@domain/entities/mbc-card';
 
@@ -32,10 +32,10 @@ function createCardRepository(
   };
 }
 
-describe('CheckInActivityUseCase', () => {
+describe('createCheckInActivityUseCase', () => {
   it('writes activity context, timestamp, and checked-in status', async () => {
     const cardRepository = createCardRepository();
-    const useCase = new CheckInActivityUseCase(cardRepository);
+    const useCase = createCheckInActivityUseCase(cardRepository);
 
     const result = await useCase.execute({
       activityId: 'parking-main-gate',
@@ -54,7 +54,7 @@ describe('CheckInActivityUseCase', () => {
 
   it('always uses current timestamp for check-in', async () => {
     const cardRepository = createCardRepository();
-    const useCase = new CheckInActivityUseCase(cardRepository);
+    const useCase = createCheckInActivityUseCase(cardRepository);
 
     const result = await useCase.execute({
       activityId: 'coop-event-hall',
@@ -80,7 +80,7 @@ describe('CheckInActivityUseCase', () => {
         .fn()
         .mockImplementation(async (fn: any) => fn(checkedInCard)),
     });
-    const useCase = new CheckInActivityUseCase(cardRepository);
+    const useCase = createCheckInActivityUseCase(cardRepository);
 
     const result = await useCase.execute({
       activityId: 'parking-main-gate',

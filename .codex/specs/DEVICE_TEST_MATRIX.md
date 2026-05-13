@@ -23,11 +23,11 @@ Supporting roles:
 
 ## 3. Test Cards/Tags
 
-| ID       | Tag Type            | Writable | Capacity                                                            | Notes                 |
-| -------- | ------------------- | -------- | ------------------------------------------------------------------- | --------------------- |
-| CARD-001 | NTAG215             | Yes      | 504 bytes user memory; effective app budget measured during testing | Primary MBC test card |
-| CARD-002 | NTAG215             | Yes      | 504 bytes user memory; effective app budget measured during testing | Low balance test card |
-| CARD-003 | Unknown/unsupported | TBD      | TBD                                                                 | Unsupported card test |
+| ID       | Tag Type            | Writable | Capacity                                                                       | Notes                 |
+| -------- | ------------------- | -------- | ------------------------------------------------------------------------------ | --------------------- |
+| CARD-001 | NTAG215             | Yes      | 504 bytes raw user memory / 480 bytes NDEF capacity (app validation threshold) | Primary MBC test card |
+| CARD-002 | NTAG215             | Yes      | 504 bytes raw user memory / 480 bytes NDEF capacity (app validation threshold) | Low balance test card |
+| CARD-003 | Unknown/unsupported | TBD      | TBD                                                                            | Unsupported card test |
 
 ## 4. Compatibility Matrix
 
@@ -63,10 +63,11 @@ Supporting roles:
 - Real-device NFC screenshots will be provided by PO separately; emulator screenshots are not sufficient for NFC evidence.
 - ASUS ROG Phone 9 FE is the validated MVP real-device NFC read/write baseline (Android 14+).
 - iOS NFC write is out of MVP and may be documented as deferred or best-effort/read-only only if separately validated later.
-- MVP target tag is NTAG215; validated with standard NTAG215 tags (504 bytes user memory).
+- MVP target tag is NTAG215; validated with standard NTAG215 tags (504 bytes raw user memory; app validates against 480 bytes NDEF capacity via `assertSupportedTag()`).
 - Full read/write behavior confirmed on Android with `react-native-nfc-manager`.
 - Protected payload byte length measured: 362 bytes worst-case (5 logs, checked-in state).
 - Silent Shield AES-256-GCM via `react-native-quick-crypto` confirmed working.
 - Buffer polyfill required in `index.js` for binary crypto operations.
 - Android NFC permissions and intent filters configured in AndroidManifest.xml.
 - `react-native-reanimated/plugin` added to `babel.config.js` for NfcActionSheet animations.
+- Current quality status: 444+ automated tests, 65 suites, 100% line coverage.

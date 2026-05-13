@@ -20,7 +20,7 @@ export function InsufficientBalanceCard({
     useNavigation<NativeStackNavigationProp<RootStackParamList>>();
 
   return (
-    <View className="gap-4">
+    <View className="gap-4 mb-4">
       <View className="rounded-2xl border border-red-400 bg-white p-4">
         <Text className="text-base font-bold text-red-700">
           Insufficient balance
@@ -32,8 +32,7 @@ export function InsufficientBalanceCard({
           <View className="flex-1 rounded-xl border border-red-200 bg-red-50 p-3">
             <Text className="text-xs text-muted">Required Fee</Text>
             <Text className="text-lg font-bold text-foreground">
-              Rp{' '}
-              {latestResult.chargedAmount?.toLocaleString(LOCALE_ID) ?? '2.000'}
+              Rp {latestResult.chargedAmount?.toLocaleString(LOCALE_ID) ?? '0'}
             </Text>
           </View>
           <View className="flex-1 rounded-xl border border-red-200 bg-red-50 p-3">

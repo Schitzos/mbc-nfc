@@ -1,31 +1,37 @@
 import type { MbcCardRepository } from '@domain/repositories/mbc-card-repository';
-import { CardRepositoryError } from '@domain/errors/card-repository-error';
+import { isCardRepositoryError } from '@domain/errors/card-repository-error';
 import type { RoleActionResultDto } from '@application/dto/role-action-result-dto';
 import { toCardSummaryDto } from '@application/dto/card-summary-mapper';
 
-export class InspectMemberCardUseCase {
-  constructor(private readonly cardRepository: MbcCardRepository) {}
+export type InspectMemberCardUseCase = {
+  execute: () => Promise<RoleActionResultDto>;
+};
 
-  async execute(): Promise<RoleActionResultDto> {
-    try {
-      const card = await this.cardRepository.readCard();
+export function createInspectMemberCardUseCase(
+  cardRepository: MbcCardRepository,
+): InspectMemberCardUseCase {
+  return {
+    async execute(): Promise<RoleActionResultDto> {
+      try {
+        const card = await cardRepository.readCard();
 
-      return {
-        success: true,
-        role: 'SCOUT',
-        message: 'Card inspected successfully.',
-        card: toCardSummaryDto(card),
-      };
-    } catch (error) {
-      if (error instanceof CardRepositoryError) {
         return {
-          success: false,
+          success: true,
           role: 'SCOUT',
-          message: error.message,
+          message: 'Card inspected successfully.',
+          card: toCardSummaryDto(card),
         };
-      }
+      } catch (error) {
+        if (isCardRepositoryError(error)) {
+          return {
+            success: false,
+            role: 'SCOUT',
+            message: error.message,
+          };
+        }
 
-      throw error;
-    }
-  }
+        throw error;
+      }
+    },
+  };
 }

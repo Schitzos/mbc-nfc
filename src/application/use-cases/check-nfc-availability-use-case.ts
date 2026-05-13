@@ -48,19 +48,23 @@ const GUIDANCE_BY_STATUS: Record<NfcAvailabilityStatus, GuidanceContent> = {
   },
 };
 
-export class CheckNfcAvailabilityUseCase {
-  constructor(
-    private readonly nfcAvailabilityRepository: NfcAvailabilityRepository,
-  ) {}
+export type CheckNfcAvailabilityUseCase = {
+  execute: () => Promise<CheckNfcAvailabilityResultDto>;
+};
 
-  async execute(): Promise<CheckNfcAvailabilityResultDto> {
-    const status = await this.nfcAvailabilityRepository.getAvailabilityStatus();
-    const guidance = GUIDANCE_BY_STATUS[status];
+export function createCheckNfcAvailabilityUseCase(
+  nfcAvailabilityRepository: NfcAvailabilityRepository,
+): CheckNfcAvailabilityUseCase {
+  return {
+    async execute(): Promise<CheckNfcAvailabilityResultDto> {
+      const status = await nfcAvailabilityRepository.getAvailabilityStatus();
+      const guidance = GUIDANCE_BY_STATUS[status];
 
-    return {
-      supported: status === 'SUPPORTED',
-      status,
-      ...guidance,
-    };
-  }
+      return {
+        supported: status === 'SUPPORTED',
+        status,
+        ...guidance,
+      };
+    },
+  };
 }

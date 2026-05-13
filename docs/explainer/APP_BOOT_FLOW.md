@@ -109,17 +109,17 @@ This is where all the "real" implementations are wired together:
 ```ts
 export function createAppServices(): AppServices {
   const db = open({ name: 'mbc-ledger.db', location: 'default' });
-  const cardRepository = new RealMbcCardRepository();
-  const nfcStatusRepository = new DeviceNfcStatusRepository();
-  const ledgerRepository = new SqliteLedgerRepository(db);
+  const cardRepository = createRealMbcCardRepository();
+  const nfcStatusRepository = createDeviceNfcStatusRepository();
+  const ledgerRepository = createSqliteLedgerRepository(db);
 
   return {
     station: {
-      registerMemberCardUseCase: new RegisterMemberCardUseCase(
+      registerMemberCardUseCase: createRegisterMemberCardUseCase(
         cardRepository,
         ledgerRepository,
       ),
-      topUpMemberCardUseCase: new TopUpMemberCardUseCase(
+      topUpMemberCardUseCase: createTopUpMemberCardUseCase(
         cardRepository,
         ledgerRepository,
       ),

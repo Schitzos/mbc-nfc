@@ -23,20 +23,20 @@ Layer responsibilities:
 
 ## 2. Technology Stack
 
-| Area              | Choice                                                 |
-| ----------------- | ------------------------------------------------------ |
-| Mobile framework  | React Native CLI                                       |
-| Language          | TypeScript                                             |
-| NFC library       | `react-native-nfc-manager`                             |
-| Crypto library    | `react-native-quick-crypto` (AES-256-GCM)              |
-| Local database    | SQLite                                                 |
-| UI system         | Signal UI, guided by `.codex/specs/SIGNAL_UI_GUIDE.md` |
-| Navigation        | React Navigation                                       |
-| Animations        | `react-native-reanimated`                              |
-| State management  | Zustand or React Context                               |
-| Testing           | Jest, React Native Testing Library                     |
-| Static analysis   | SonarCloud                                             |
-| Security baseline | OWASP MASVS-inspired mobile controls                   |
+| Area              | Choice                                                    |
+| ----------------- | --------------------------------------------------------- |
+| Mobile framework  | React Native CLI                                          |
+| Language          | TypeScript                                                |
+| NFC library       | `react-native-nfc-manager`                                |
+| Crypto library    | `react-native-quick-crypto` (AES-256-GCM)                 |
+| Local database    | SQLite                                                    |
+| UI system         | Signal UI, guided by `.codex/specs/SIGNAL_UI_GUIDE.md`    |
+| Navigation        | React Navigation                                          |
+| Animations        | `react-native-reanimated`                                 |
+| State management  | Zustand (presentation state) + React Context (service DI) |
+| Testing           | Jest, React Native Testing Library                        |
+| Static analysis   | SonarCloud                                                |
+| Security baseline | OWASP MASVS-inspired mobile controls                      |
 
 ## 3. Suggested Folder Structure
 
@@ -120,15 +120,12 @@ src/
       Scout/
         index.tsx
         useScoutActions.ts
-      RoleSwitcherScreen.tsx
-      StationScreen.tsx
-      GateScreen.tsx
-      TerminalScreen.tsx
-      ScoutScreen.tsx
     components/
       AppHeaderCard/
       NfcActionSheet/
       NfcLogPanel/
+      RadarZone/
+      ScanningRings/
       SignalButton/
       SignalTextField/
       SignalOptionCard/
@@ -366,7 +363,7 @@ Design rules:
 - Generic NFC readers must not reveal member identity, balance, parking status details, or transaction values.
 - Any decrypt/authentication failure maps to `CARD_TAMPERED`.
 
-Measured payload sizes on NTAG215 (504 bytes user memory):
+Measured payload sizes on NTAG215 (504 bytes raw user memory; app validates against 480 bytes NDEF capacity):
 
 - Worst-case 5-log payload: 327 bytes plaintext, 362 bytes encrypted (fits NTAG215).
 
@@ -380,12 +377,14 @@ The app starts with role selection and then shows the active role surface.
 
 Before any real card operation, the presentation layer checks NFC availability through the application use case. If NFC is unsupported or disabled, the role screen must show a clear message that real MBC card scan/read/write requires an NFC-capable device with NFC enabled.
 
-All role screens use `NfcActionSheet` — a bottom sheet component that provides scan/success/error feedback during NFC operations.
+All role screens use `NfcActionSheet` — a bottom sheet component that provides scan/success/error feedback during NFC operations. The scanning phase uses `ScanningRings` animation (3 concentric pulsing rings + breathing center NFC icon) consistent with the RadarZone visual language.
 
-- Station top-up accepts numeric input (free-text allowed) with validation to ensure only numbers are entered. Preset buttons (10k/20k/50k/100k) are also available as shortcuts. The local ledger summary is displayed as a collapsible accordion (collapsed by default).
-- Gate: parking check-in action, NFC write action, status result. No simulation mode or mock scenario selectors.
-- Terminal: checkout action, fixed tariff display, duration/fee summary, tap-out time displayed in `dd-MMM-YYYY hh:mm` format, insufficient balance guidance, NFC write action, status result.
-- Scout: one-tap read-only card summary, balance, visit status, last five logs with timestamps on transaction entries.
+All four role screens (Station, Gate, Terminal, Scout) use `RadarZone` as the shared NFC trigger component — a dark immersive zone with concentric radar rings, sweep line animation, and a colored circular action button. All roles use the unified Signal UI primary red (#FF0025) as the RadarZone accent color.
+
+- Station uses RadarZone with a segmented control (Register | Top Up tabs) to switch between registration and top-up modes. The local ledger summary is displayed as a collapsible accordion (collapsed by default). Top-up accepts numeric input (free-text allowed) with validation to ensure only numbers are entered. Preset buttons (10k/20k/50k/100k) are also available as shortcuts.
+- Gate: parking check-in action via RadarZone tap, NFC write action, status result. No simulation mode or mock scenario selectors.
+- Terminal: checkout action via RadarZone tap, fixed tariff display, duration/fee summary, tap-out time displayed in `dd-MMM-YYYY hh:mm` format, insufficient balance guidance, NFC write action, status result.
+- Scout: one-tap read-only card summary via RadarZone tap. After scan, the radar hides and card results appear at the top of the screen (balance, visit status, last five logs with timestamps). A "Scan Another Card" button resets the view back to radar mode.
 - Shared: NFC Log panel is scrollable with a fixed max height, can be toggled on/off and cleared by the operator. It records safe operational events only (no sensitive payload data).
 
 NFC operational log design rules:
@@ -402,7 +401,7 @@ Signal UI adoption is documented in `.codex/specs/SIGNAL_UI_GUIDE.md`. Role scre
 ## 11. Quality Strategy
 
 - Domain and application logic should be written for high automated testability.
-- The repository should target at least 90% automated unit-test coverage across the whole executable source base, excluding only pure type-only contract files and generated artifacts.
+- The repository should target at least 90% automated unit-test coverage across the whole executable source base, excluding only pure type-only contract files and generated artifacts. Actual achievement: 100% line coverage (444+ tests, 65 suites; jest.config.js enforces 99% statements/lines/branches, 96% functions).
 - SonarCloud should analyze the repository with coverage input, lint/test results where applicable, and a passing quality gate before submission.
 - Dependency changes should be followed by `npm audit`, and the working dependency set should remain at 0 known vulnerabilities.
 - Coverage and static-analysis targets should not encourage shallow tests; critical balance, status, tariff, codec, and ledger paths must be meaningfully asserted.
@@ -432,8 +431,8 @@ Compact rules:
 - binary Silent Shield envelope is written directly to NTAG215;
 - write is blocked with `CARD_CAPACITY_INSUFFICIENT` if protected payload does not fit.
 
-Measured capacity (NTAG215, 504 bytes user memory):
+Measured capacity (NTAG215, 504 bytes raw user memory; `assertSupportedTag()` validates against 480 bytes NDEF capacity):
 
 - Worst-case 5-log payload: 327 bytes plaintext, 362 bytes encrypted.
 - Envelope overhead: 35 bytes (4 magic + 1 version + 1 kid + 1 alg + 12 IV + 16 authTag).
-- Fits comfortably within NTAG215 usable capacity.
+- Fits comfortably within NTAG215 NDEF capacity (480 bytes). The 24-byte difference between raw memory (504) and NDEF capacity (480) accounts for CC bytes, lock bytes, and NTAG215 internal overhead.

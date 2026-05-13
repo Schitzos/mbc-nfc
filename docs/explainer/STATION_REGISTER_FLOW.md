@@ -210,9 +210,9 @@ Inside the use case:
 ```ts
 async execute(): Promise<RoleActionResultDto> {
   try {
-    return await this.performRegistration();
+    return await performRegistration();
   } catch (error) {
-    if (error instanceof CardRepositoryError && error.code === 'CARD_ALREADY_REGISTERED') {
+    if (isCardRepositoryError(error) && error.code === 'CARD_ALREADY_REGISTERED') {
       return { success: false, role: 'STATION', message: error.message };
     }
     throw error;
@@ -253,8 +253,8 @@ This creates a fresh card with zero balance and one transaction log entry record
 
 ```ts
 async registerCard(card: MbcCard): Promise<void> {
-  await this.ensureStarted();           // NfcManager.start() once
-  await this.requestNdefTechnology();   // Opens NFC session, waits for card
+  await ensureStarted();           // NfcManager.start() once
+  await requestNdefTechnology();   // Opens NFC session, waits for card
 
   // Check if card already has valid MBC data
   const currentTag = await NfcManager.getTag();
@@ -269,8 +269,8 @@ async registerCard(card: MbcCard): Promise<void> {
   }
 
   // Card is blank — proceed with write
-  await this.writeToActiveSession(card);
-  await this.cancel(); // Close NFC session
+  await writeToActiveSession(card);
+  await cancel(); // Close NFC session
 }
 ```
 
@@ -363,7 +363,7 @@ The encrypted envelope is wrapped in an NDEF record with a custom MIME type (`ap
 Back in the use case, after the NFC write succeeds:
 
 ```ts
-await this.localLedgerRepository.append({
+await localLedgerRepository.append({
   id: createRandomId('LEDGER'),
   role: 'STATION',
   action: 'REGISTER',

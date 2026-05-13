@@ -1,4 +1,4 @@
-import { GetStationLedgerSummaryUseCase } from '@application/use-cases/get-station-ledger-summary.use-case';
+import { createGetStationLedgerSummaryUseCase } from '@application/use-cases/get-station-ledger-summary.use-case';
 import type { LocalLedgerRepository } from '@domain/repositories/local-ledger-repository';
 
 function createLedgerRepository(
@@ -18,10 +18,10 @@ function createLedgerRepository(
   };
 }
 
-describe('GetStationLedgerSummaryUseCase', () => {
+describe('createGetStationLedgerSummaryUseCase', () => {
   it('returns the local station ledger summary from the repository', async () => {
     const ledgerRepository = createLedgerRepository();
-    const useCase = new GetStationLedgerSummaryUseCase(ledgerRepository);
+    const useCase = createGetStationLedgerSummaryUseCase(ledgerRepository);
 
     const result = await useCase.execute();
 

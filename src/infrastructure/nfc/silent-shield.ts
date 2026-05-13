@@ -86,16 +86,16 @@ export function decrypt(
   }
 
   const iv = Buffer.from(
-    envelope.slice(HEADER_LENGTH, HEADER_LENGTH + IV_LENGTH),
+    envelope.subarray(HEADER_LENGTH, HEADER_LENGTH + IV_LENGTH),
   );
   const authTag = Buffer.from(
-    envelope.slice(
+    envelope.subarray(
       HEADER_LENGTH + IV_LENGTH,
       HEADER_LENGTH + IV_LENGTH + AUTH_TAG_LENGTH,
     ),
   );
   const ciphertext = Buffer.from(
-    envelope.slice(HEADER_LENGTH + IV_LENGTH + AUTH_TAG_LENGTH),
+    envelope.subarray(HEADER_LENGTH + IV_LENGTH + AUTH_TAG_LENGTH),
   );
 
   try {

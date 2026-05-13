@@ -1,7 +1,7 @@
-import { InspectMemberCardUseCase } from '@application/use-cases/inspect-member-card.use-case';
+import { createInspectMemberCardUseCase } from '@application/use-cases/inspect-member-card.use-case';
 import type { MbcCardRepository } from '@domain/repositories/mbc-card-repository';
 import type { MbcCard } from '@domain/entities/mbc-card';
-import { CardRepositoryError } from '@domain/errors/card-repository-error';
+import { createCardRepositoryError } from '@domain/errors/card-repository-error';
 
 function createCard(overrides?: Partial<MbcCard>): MbcCard {
   return {
@@ -37,10 +37,10 @@ function createRepository(
   };
 }
 
-describe('InspectMemberCardUseCase', () => {
+describe('createInspectMemberCardUseCase', () => {
   it('returns balance, status, and logs without writing the card', async () => {
     const repository = createRepository();
-    const useCase = new InspectMemberCardUseCase(repository);
+    const useCase = createInspectMemberCardUseCase(repository);
 
     const result = await useCase.execute();
 
@@ -58,7 +58,7 @@ describe('InspectMemberCardUseCase', () => {
         .fn()
         .mockRejectedValue(new Error('Card read failed unexpectedly')),
     });
-    const useCase = new InspectMemberCardUseCase(repository);
+    const useCase = createInspectMemberCardUseCase(repository);
 
     await expect(useCase.execute()).rejects.toThrow(
       'Card read failed unexpectedly',
@@ -71,13 +71,13 @@ describe('InspectMemberCardUseCase', () => {
       readCard: jest
         .fn()
         .mockRejectedValue(
-          new CardRepositoryError(
+          createCardRepositoryError(
             'UNREGISTERED_CARD',
             'Card is not registered yet. Register it first at Station.',
           ),
         ),
     });
-    const useCase = new InspectMemberCardUseCase(repository);
+    const useCase = createInspectMemberCardUseCase(repository);
 
     const result = await useCase.execute();
 

@@ -12,6 +12,7 @@ jest.mock('../providers', () => ({
 
 describe('src app entry', () => {
   it('renders without crashing', () => {
-    render(<App />);
+    const { toJSON } = render(<App />);
+    expect(toJSON()).toBeDefined();
   });
 });

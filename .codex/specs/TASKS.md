@@ -1,5 +1,7 @@
 # KDX Membership Benefit Card — Codex Task Plan Lite
 
+> Current status: 444+ tests | 65 suites | 100% line coverage | jest.config.js thresholds: 99% statements/lines/branches, 96% functions
+
 Purpose: compact, Codex-friendly task cards. Execute task order from `EXECUTION_ORDER.md`. Use detailed docs only when the task references them.
 
 ## Source-of-Truth Order
@@ -374,12 +376,12 @@ Do: Change Register button in Station screen from red (primary) to green (succes
 Status: **DONE**  
 Done: Register button renders green; secondary button unchanged; all tests pass.
 
-### T-UI-STATION-002 — Register Button Purple
+### T-UI-STATION-002 — Register Button Purple ❌ CANCELLED
 
 Owner: Senior RN FE  
 Refs: `SIGNAL_UI_GUIDE.md`  
 Do: Change Register button in Station screen from green (`#008E53`) to purple.  
-Done: Register button renders purple; secondary buttons unchanged; all tests pass.
+Status: **CANCELLED** — Superseded; Station retains green (#16A34A) per final design decision.
 
 ### T-UI-APP-001 — Change app header to rainbow gradient ✅ DONE
 
@@ -444,19 +446,104 @@ Do: Extract the radar animation zone from Scout screen into a reusable `RadarZon
 Done: RadarZone is a reusable component with color prop; Gate and Terminal screens use it; all tests pass.
 QA: ✅ Validated 2026-05-09. 66 suites/440 tests pass. Coverage 99.78%. Visual validation deferred to T-029 demo capture.
 
+### T-UI-RADAR-002 — Unify all RadarZone colors to Signal UI primary red (#FF0025) ✅ DONE
+
+Owner: Senior RN FE
+Refs: `SIGNAL_UI_GUIDE.md`
+Do: Change RadarZone color prop on all 4 role screens from per-role colors (Station: #16A34A, Gate: #1D4ED8, Terminal: #D97706, Scout: #00B4D8) to Signal UI brand primary red `#FF0025` (`signalColorTokens.brand.primary`). Update RadarZone tests accordingly.
+Acceptance Criteria:
+
+- Station RadarZone color changed from `#16A34A` to `#FF0025`
+- Gate RadarZone color changed from `#1D4ED8` to `#FF0025`
+- Terminal RadarZone color changed from `#D97706` to `#FF0025`
+- Scout RadarZone color changed from `#00B4D8` to `#FF0025`
+- RadarZone test updated to use `#FF0025`
+- All existing tests pass (>=90% coverage maintained)
+- No regression in any screen rendering
+
+Done: All RadarZone instances use Signal UI primary red #FF0025; all tests pass.
+
 ### T-UI-STATION-003 — Revamp Station screen layout and add scanning animation to NfcActionSheet ✅ DONE
 
 Owner: Senior RN FE + UI/UX Designer
 Refs: `SIGNAL_UI_GUIDE.md`, `DESIGN.md`
 Do: Refactor Station screen layout to fully align with Gate/Terminal/Scout pattern (RadarZone centered with absolute positioning, overlay cards on top/bottom with z-index layering, clean separation of concerns). Replace the plain ActivityIndicator in NfcActionSheet scanning phase with an animated radar/pulse scanning animation (concentric rings + sweep) consistent with the RadarZone visual language. Animation should be smooth and demo-ready.
 Acceptance Criteria:
+
 - Station screen layout matches Gate/Terminal/Scout structural pattern (RadarZone absolute center, overlays z-indexed)
 - NfcActionSheet scanning phase shows animated radar/pulse instead of ActivityIndicator
 - Scanning animation is smooth, visually consistent with RadarZone theme
 - All existing tests pass (>=90% coverage maintained)
 - No regression in Station register/top-up flows
-Status: **DONE** — QA validated 2026-05-09. 65 suites / 436 tests pass. 100% coverage. Station uses RadarZone with absolute centering (same as Gate/Terminal/Scout). NfcActionSheet has ScanningRings animation (3 concentric pulsing rings + center NFC icon breathe). Segmented control switches Register/Top-Up modes correctly. Runtime emulator validation deferred per user request.
-Done: Station screen aligned with Gate/Terminal/Scout pattern; NfcActionSheet has scanning animation; all tests pass.
+  Status: **DONE** — QA validated 2026-05-09. 65 suites / 436 tests pass. 100% coverage. Station uses RadarZone with absolute centering (same as Gate/Terminal/Scout). NfcActionSheet has ScanningRings animation (3 concentric pulsing rings + center NFC icon breathe). Segmented control switches Register/Top-Up modes correctly. Runtime emulator validation deferred per user request.
+  Done: Station screen aligned with Gate/Terminal/Scout pattern; NfcActionSheet has scanning animation; all tests pass.
+
+### T-UI-TERMINAL-001 — Remove blank space above error cards on Terminal screen ✅ DONE
+
+Owner: @FE (mbc-senior-react-native-fe)
+Do: Remove blank space above InsufficientBalanceCard on Terminal screen. When insufficient balance or generic failure state is active, the error card should render at the top of the content area instead of being pushed to the bottom by mt-auto.
+Acceptance Criteria:
+
+- InsufficientBalanceCard and genericFailure card appear at the top of the grey content area with no large blank space above them
+- RadarZone and TariffPreviewCard are hidden in error states
+- File: src/presentation/screens/Terminal/index.tsx
+  Status: **DONE** — QA validated 2026-05-12. Code review passed, 12 suites / 108 tests pass (Terminal+screens). mt-auto conditionally removed in error states; RadarZone and TariffPreviewCard hidden when insufficient or genericFailure.
+  Done: Error cards render at top of content area without blank space above; all tests pass.
+
+### T-UI-TERMINAL-002 — Refactor Terminal index.tsx — extract inline JSX to fragments ✅ DONE
+
+Owner: @FE (mbc-senior-react-native-fe)
+Refs: `SIGNAL_UI_GUIDE.md`, `DESIGN.md`
+Do: Extract inline JSX blocks in `src/presentation/screens/Terminal/index.tsx` into dedicated fragment components under `fragments/` directory (e.g., `GenericFailureCard`). Improve readability without changing behavior.
+Acceptance Criteria:
+
+- Inline JSX blocks moved to fragment files under `src/presentation/screens/Terminal/fragments/`
+- No behavioral changes — all existing tests pass
+- Coverage remains >=90%
+- Terminal screen renders identically before and after refactor
+  Status: **DONE** — QA validated 2026-05-12. GenericFailureCard extracted to fragments/. 10/10 Terminal tests pass. Runtime verified on Pixel 7 Pro emulator (Android 16). No behavioral changes.
+  Done: Terminal index.tsx is concise and readable; inline JSX extracted to fragments; all tests pass.
+
+### T-UI-CODE-001 — Replace ternary-to-null with && operator in UI rendering ✅ DONE
+
+Owner: @FE (mbc-senior-react-native-fe)
+Refs: `SIGNAL_UI_GUIDE.md`, `DESIGN.md`
+Do: Replace all `condition ? <JSX> : null` ternary patterns with `condition && <JSX>` for better readability. 10 instances across 4 files: Terminal/index.tsx (3), SignalBottomSheet/index.tsx (3), SignalTextField/index.tsx (3), SignalStatusBanner/index.tsx (1). Do NOT convert ternaries with actual else branches.
+Acceptance Criteria:
+
+- All 10 `condition ? <JSX> : null` patterns replaced with `condition && <JSX>`
+- No behavioral changes — all existing tests pass
+- Coverage remains >=90%
+- No regression in any screen rendering
+  Status: **DONE** — QA validated 2026-05-12. All 10 ternary-to-null patterns replaced with && operator across 4 files. 64 suites / 431 tests pass. Runtime verified on Pixel 7 Pro emulator (Android 16) — all 5 screens render correctly with no behavioral changes.
+  Done: All ternary-to-null patterns replaced with && operator; all tests pass.
+
+### T-UI-STATION-004 — Extract segmented control and amount input to Station fragments
+
+Owner: @FE (mbc-senior-react-native-fe)
+Refs: `DESIGN.md`, `CODE_AUDIT_REPORT.md`
+Do: Extract the inline segmented control (Register/Top-Up tabs) and amount input JSX from `src/presentation/screens/Station/index.tsx` into dedicated fragment components under `src/presentation/screens/Station/fragments/`.
+Acceptance Criteria:
+
+- Segmented control extracted to its own fragment component
+- Amount input extracted to its own fragment component
+- Station/index.tsx imports and uses the new fragments
+- No behavioral changes — all existing tests pass
+- Coverage remains >=90%
+  Status: ✅ DONE
+
+### T-CODE-AUDIT-001 — SOLID and Clean Architecture Code Audit
+
+Owner: @SA + @FE
+Refs: `DESIGN.md`, `REQUIREMENTS.md`
+Do: Line-by-line audit of ALL source files under `src/` for SOLID principle violations (SRP, OCP, LSP, ISP, DIP) and Clean Architecture layer boundary violations. Ensure production-grade code quality.
+Acceptance Criteria:
+
+- Every file in src/ reviewed for SOLID violations
+- Every file checked for Clean Architecture layer boundary violations
+- All violations documented with file path, line number, principle violated, and recommended fix
+- No critical violations remain unfixed or unacknowledged
+  Status: ✅ DONE
 
 ### T-029 — Demo Capture
 

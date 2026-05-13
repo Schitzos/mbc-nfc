@@ -1,9 +1,9 @@
-import { DomainError } from '@domain/errors/domain-error';
-import { CardRepositoryError } from '@domain/errors/card-repository-error';
+import { createDomainError } from '@domain/errors/domain-error';
+import { createCardRepositoryError } from '@domain/errors/card-repository-error';
 
 describe('DomainError', () => {
   it('creates an error with code and message', () => {
-    const error = new DomainError(
+    const error = createDomainError(
       'INVALID_TIMESTAMP',
       'Timestamp is not valid.',
     );
@@ -26,7 +26,7 @@ describe('DomainError', () => {
     ] as const;
 
     for (const code of codes) {
-      const error = new DomainError(code, `Error: ${code}`);
+      const error = createDomainError(code, `Error: ${code}`);
       expect(error.code).toBe(code);
     }
   });
@@ -34,7 +34,7 @@ describe('DomainError', () => {
 
 describe('CardRepositoryError', () => {
   it('creates an error with code and message', () => {
-    const error = new CardRepositoryError(
+    const error = createCardRepositoryError(
       'UNREGISTERED_CARD',
       'Card is not registered.',
     );
@@ -57,7 +57,7 @@ describe('CardRepositoryError', () => {
     ] as const;
 
     for (const code of codes) {
-      const error = new CardRepositoryError(code, `Error: ${code}`);
+      const error = createCardRepositoryError(code, `Error: ${code}`);
       expect(error.code).toBe(code);
     }
   });

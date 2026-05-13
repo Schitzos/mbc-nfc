@@ -137,28 +137,28 @@ const handleDismissSheet = useCallback(() => {
 This is the **application layer** orchestrator (`src/application/use-cases/check-out-activity.use-case.ts`). Think of it as the "manager" that coordinates between the NFC hardware and the business rules.
 
 ```typescript
-export class CheckOutActivityUseCase {
-  constructor(
-    private readonly cardRepository: MbcCardRepository,
-    private readonly localLedgerRepository?: LocalLedgerRepository,
-  ) {}
+export function createCheckOutActivityUseCase(
+  cardRepository: MbcCardRepository,
+  localLedgerRepository?: LocalLedgerRepository,
+): CheckOutActivityUseCase {
+  return {
+    async execute({
+      checkedOutAt,
+    }: CheckOutActivityRequest = {}): Promise<RoleActionResultDto> {
+      const occurredAt = checkedOutAt ?? new Date().toISOString();
 
-  async execute({
-    checkedOutAt,
-  }: CheckOutActivityRequest = {}): Promise<RoleActionResultDto> {
-    const occurredAt = checkedOutAt ?? new Date().toISOString();
+      const updatedCard = await cardRepository.readWriteCard(card => {
+        // 1. Validate card has active session
+        // 2. Calculate tariff (duration × rate)
+        // 3. Apply check-out state (deduct balance, clear session)
+        // 4. Append transaction log
+        return transformedCard;
+      });
 
-    const updatedCard = await this.cardRepository.readWriteCard(card => {
-      // 1. Validate card has active session
-      // 2. Calculate tariff (duration × rate)
-      // 3. Apply check-out state (deduct balance, clear session)
-      // 4. Append transaction log
-      return transformedCard;
-    });
-
-    // 5. Write to local SQLite ledger
-    // 6. Return success result
-  }
+      // 5. Write to local SQLite ledger
+      // 6. Return success result
+    },
+  };
 }
 ```
 
@@ -172,17 +172,17 @@ When `readWriteCard` is called on `RealMbcCardRepository` (`src/infrastructure/n
 
 ```typescript
 async readWriteCard(transform: (card: MbcCard) => MbcCard): Promise<MbcCard> {
-  await this.ensureStarted();          // Initialize NFC hardware
+  await ensureStarted();          // Initialize NFC hardware
   try {
-    await this.requestNdefTechnology(); // Wait for card tap (NDEF tech)
-    const card = await this.readCardFromActiveSession();  // READ
+    await requestNdefTechnology(); // Wait for card tap (NDEF tech)
+    const card = await readCardFromActiveSession();  // READ
     const updated = transform(card);    // TRANSFORM (domain logic)
-    await this.writeToActiveSession(updated);             // WRITE
+    await writeToActiveSession(updated);             // WRITE
     return updated;
   } catch (error) {
     throw toReadableError(error);
   } finally {
-    await this.cancel();                // Release NFC hardware
+    await cancel();                // Release NFC hardware
   }
 }
 ```
@@ -313,8 +313,8 @@ After the transform function returns the updated `MbcCard`, the repository write
 ```typescript
 // writeToActiveSession in real-mbc-card.repository.ts
 private async writeToActiveSession(card: MbcCard): Promise<void> {
-  this.writeCounter++;
-  const shieldResult = encrypt(card, this.writeCounter);
+  const nextWriteCounter = readResult.writeCounter + 1;
+  const shieldResult = encrypt(card, nextWriteCounter);
   // ... validate size fits NTAG215 (504 bytes)
   // ... encode as NDEF MIME record
   await NfcManager.ndefHandler.writeNdefMessage(encoded);
@@ -339,7 +339,7 @@ All of this happens while the card is still on the phone — that's why it's a *
 After the NFC write succeeds, the use case writes an audit record to the local SQLite database:
 
 ```typescript
-await this.localLedgerRepository.append({
+await localLedgerRepository.append({
   id: createRandomId('LEDGER'),
   role: 'TERMINAL',
   action: 'CHECK_OUT',

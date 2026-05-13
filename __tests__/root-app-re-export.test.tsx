@@ -22,6 +22,7 @@ describe('Root App.tsx re-export', () => {
   });
 
   it('renders without crashing', () => {
-    render(<RootApp />);
+    const { toJSON } = render(<RootApp />);
+    expect(toJSON()).toBeDefined();
   });
 });

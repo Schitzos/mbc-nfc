@@ -1,7 +1,7 @@
-import { TopUpMemberCardUseCase } from '@application/use-cases/top-up-member-card.use-case';
+import { createTopUpMemberCardUseCase } from '@application/use-cases/top-up-member-card.use-case';
 import type { MbcCardRepository } from '@domain/repositories/mbc-card-repository';
 import type { LocalLedgerRepository } from '@domain/repositories/local-ledger-repository';
-import { CardRepositoryError } from '@domain/errors/card-repository-error';
+import { createCardRepositoryError } from '@domain/errors/card-repository-error';
 
 function createCardRepository(
   overrides?: Partial<MbcCardRepository>,
@@ -38,9 +38,9 @@ function createLedgerRepository(
   };
 }
 
-describe('TopUpMemberCardUseCase', () => {
+describe('createTopUpMemberCardUseCase', () => {
   it('rejects non-positive top-up amounts', async () => {
-    const useCase = new TopUpMemberCardUseCase(createCardRepository());
+    const useCase = createTopUpMemberCardUseCase(createCardRepository());
 
     const result = await useCase.execute({ amount: 0 });
 
@@ -50,7 +50,7 @@ describe('TopUpMemberCardUseCase', () => {
 
   it('increases balance and appends a top-up log', async () => {
     const cardRepository = createCardRepository();
-    const useCase = new TopUpMemberCardUseCase(cardRepository);
+    const useCase = createTopUpMemberCardUseCase(cardRepository);
 
     const result = await useCase.execute({ amount: 50000 });
 
@@ -61,7 +61,7 @@ describe('TopUpMemberCardUseCase', () => {
 
   it('writes a local ledger entry after successful top-up when configured', async () => {
     const ledgerRepository = createLedgerRepository();
-    const useCase = new TopUpMemberCardUseCase(
+    const useCase = createTopUpMemberCardUseCase(
       createCardRepository(),
       ledgerRepository,
     );
@@ -82,7 +82,7 @@ describe('TopUpMemberCardUseCase', () => {
     const ledgerRepository = createLedgerRepository({
       append: jest.fn().mockRejectedValue(new Error('ledger unavailable')),
     });
-    const useCase = new TopUpMemberCardUseCase(
+    const useCase = createTopUpMemberCardUseCase(
       createCardRepository(),
       ledgerRepository,
     );
@@ -94,12 +94,12 @@ describe('TopUpMemberCardUseCase', () => {
   });
 
   it('surfaces repository read failures safely', async () => {
-    const useCase = new TopUpMemberCardUseCase(
+    const useCase = createTopUpMemberCardUseCase(
       createCardRepository({
         readWriteCard: jest
           .fn()
           .mockRejectedValue(
-            new CardRepositoryError(
+            createCardRepositoryError(
               'UNREGISTERED_CARD',
               'Card is not registered yet. Register it first at Station.',
             ),

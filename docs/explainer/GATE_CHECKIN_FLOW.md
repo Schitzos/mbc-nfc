@@ -155,33 +155,35 @@ The user can dismiss the sheet at any time. If they do, `dismissedRef.current` i
 This is the **application layer** — it orchestrates the entire check-in operation. Think of it as the "manager" that tells the NFC card repository what to do and handles the result.
 
 ```tsx
-export class CheckInActivityUseCase {
-  constructor(private readonly cardRepository: MbcCardRepository) {}
+export function createCheckInActivityUseCase(
+  cardRepository: MbcCardRepository,
+): CheckInActivityUseCase {
+  return {
+    async execute({
+      activityId,
+      activityType,
+    }: CheckInActivityRequest): Promise<RoleActionResultDto> {
+      const occurredAt = new Date().toISOString();
 
-  async execute({
-    activityId,
-    activityType,
-  }: CheckInActivityRequest): Promise<RoleActionResultDto> {
-    const occurredAt = new Date().toISOString();
-
-    const updatedCard = await this.cardRepository.readWriteCard(card => {
-      // Step 1: Apply check-in state (domain validation + state change)
-      const checkedInCard = applyCheckInState(card, {
-        activityId,
-        activityType,
-        checkedInAt: occurredAt,
+      const updatedCard = await cardRepository.readWriteCard(card => {
+        // Step 1: Apply check-in state (domain validation + state change)
+        const checkedInCard = applyCheckInState(card, {
+          activityId,
+          activityType,
+          checkedInAt: occurredAt,
+        });
+        // Step 2: Append a CHECK_IN transaction log
+        return createCheckInLog(checkedInCard, occurredAt);
       });
-      // Step 2: Append a CHECK_IN transaction log
-      return createCheckInLog(checkedInCard, occurredAt);
-    });
 
-    return {
-      success: true,
-      role: 'GATE',
-      message: 'Card checked in successfully.',
-      card: toCardSummaryDto(updatedCard),
-    };
-  }
+      return {
+        success: true,
+        role: 'GATE',
+        message: 'Card checked in successfully.',
+        card: toCardSummaryDto(updatedCard),
+      };
+    },
+  };
 }
 ```
 
@@ -197,17 +199,17 @@ When `readWriteCard` is called, here's what happens at the NFC level:
 
 ```tsx
 async readWriteCard(transform: (card: MbcCard) => MbcCard): Promise<MbcCard> {
-  await this.ensureStarted();          // Initialize NFC manager
+  await ensureStarted();          // Initialize NFC manager
   try {
-    await this.requestNdefTechnology(); // Wait for card tap (blocks here!)
-    const card = await this.readCardFromActiveSession(); // Read + decrypt
+    await requestNdefTechnology(); // Wait for card tap (blocks here!)
+    const card = await readCardFromActiveSession(); // Read + decrypt
     const updated = transform(card);    // Apply domain logic
-    await this.writeToActiveSession(updated); // Encrypt + write
+    await writeToActiveSession(updated); // Encrypt + write
     return updated;
   } catch (error) {
     throw toReadableError(error);
   } finally {
-    await this.cancel();                // Release NFC session
+    await cancel();                // Release NFC session
   }
 }
 ```
@@ -308,8 +310,8 @@ After the domain logic produces the updated `MbcCard`, the repository writes it 
 
 ```tsx
 private async writeToActiveSession(card: MbcCard): Promise<void> {
-  this.writeCounter++;
-  const shieldResult = encrypt(card, this.writeCounter);
+  const nextWriteCounter = readResult.writeCounter + 1;
+  const shieldResult = encrypt(card, nextWriteCounter);
   // ... validate result
   const envelope = shieldResult.value;
   // ... check it fits in NTAG215 (504 bytes)
@@ -351,7 +353,7 @@ Unlike Station and Terminal, the **Gate role does NOT write to the local SQLite 
 ```tsx
 // From src/app/container.ts
 gate: {
-  checkInActivityUseCase: new CheckInActivityUseCase(cardRepository),
+  checkInActivityUseCase: createCheckInActivityUseCase(cardRepository),
   cancelNfc,
 },
 ```

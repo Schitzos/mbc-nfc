@@ -1,8 +1,8 @@
-import { CheckInActivityUseCase } from '@application/use-cases/check-in-activity.use-case';
+import { createCheckInActivityUseCase } from '@application/use-cases/check-in-activity.use-case';
 import type { MbcCardRepository } from '@domain/repositories/mbc-card-repository';
 import type { MbcCard } from '@domain/entities/mbc-card';
-import { CardRepositoryError } from '@domain/errors/card-repository-error';
-import { DomainError } from '@domain/errors/domain-error';
+import { createCardRepositoryError } from '@domain/errors/card-repository-error';
+import { createDomainError } from '@domain/errors/domain-error';
 
 function createCard(overrides?: Partial<MbcCard>): MbcCard {
   return {
@@ -34,19 +34,19 @@ function createCardRepository(
   };
 }
 
-describe('CheckInActivityUseCase – extended coverage', () => {
+describe('createCheckInActivityUseCase – extended coverage', () => {
   it('handles CardRepositoryError gracefully', async () => {
     const cardRepository = createCardRepository({
       readWriteCard: jest
         .fn()
         .mockRejectedValue(
-          new CardRepositoryError(
+          createCardRepositoryError(
             'UNREGISTERED_CARD',
             'Card is not registered yet.',
           ),
         ),
     });
-    const useCase = new CheckInActivityUseCase(cardRepository);
+    const useCase = createCheckInActivityUseCase(cardRepository);
 
     const result = await useCase.execute({
       activityId: 'parking-main-gate',
@@ -60,7 +60,7 @@ describe('CheckInActivityUseCase – extended coverage', () => {
 
   it('supports custom activityId (not hardcoded)', async () => {
     const cardRepository = createCardRepository();
-    const useCase = new CheckInActivityUseCase(cardRepository);
+    const useCase = createCheckInActivityUseCase(cardRepository);
 
     const result = await useCase.execute({
       activityId: 'co-working-space',
@@ -74,7 +74,7 @@ describe('CheckInActivityUseCase – extended coverage', () => {
 
   it('appends a CHECK_IN transaction log with nominal 0', async () => {
     const cardRepository = createCardRepository();
-    const useCase = new CheckInActivityUseCase(cardRepository);
+    const useCase = createCheckInActivityUseCase(cardRepository);
 
     const result = await useCase.execute({
       activityId: 'parking-main-gate',
@@ -92,7 +92,7 @@ describe('CheckInActivityUseCase – extended coverage', () => {
         .fn()
         .mockRejectedValue(new Error('Unexpected failure')),
     });
-    const useCase = new CheckInActivityUseCase(cardRepository);
+    const useCase = createCheckInActivityUseCase(cardRepository);
 
     await expect(
       useCase.execute({
@@ -116,7 +116,7 @@ describe('CheckInActivityUseCase – extended coverage', () => {
         .fn()
         .mockImplementation(async (fn: any) => fn(checkedInCard)),
     });
-    const useCase = new CheckInActivityUseCase(cardRepository);
+    const useCase = createCheckInActivityUseCase(cardRepository);
 
     const result = await useCase.execute({
       activityId: 'new-activity',
@@ -132,10 +132,10 @@ describe('CheckInActivityUseCase – extended coverage', () => {
       readWriteCard: jest
         .fn()
         .mockRejectedValue(
-          new CardRepositoryError('CARD_TAMPERED', 'Card data is tampered.'),
+          createCardRepositoryError('CARD_TAMPERED', 'Card data is tampered.'),
         ),
     });
-    const useCase = new CheckInActivityUseCase(cardRepository);
+    const useCase = createCheckInActivityUseCase(cardRepository);
 
     const result = await useCase.execute({
       activityId: 'parking-main-gate',
@@ -151,10 +151,10 @@ describe('CheckInActivityUseCase – extended coverage', () => {
       readWriteCard: jest
         .fn()
         .mockRejectedValue(
-          new CardRepositoryError('UNREGISTERED_CARD', 'Not registered.'),
+          createCardRepositoryError('UNREGISTERED_CARD', 'Not registered.'),
         ),
     });
-    const useCase = new CheckInActivityUseCase(cardRepository);
+    const useCase = createCheckInActivityUseCase(cardRepository);
 
     const result = await useCase.execute({
       activityId: 'parking-main-gate',
@@ -179,7 +179,7 @@ describe('CheckInActivityUseCase – extended coverage', () => {
         .fn()
         .mockImplementation(async (fn: any) => fn(checkedInCard2)),
     });
-    const useCase = new CheckInActivityUseCase(cardRepository);
+    const useCase = createCheckInActivityUseCase(cardRepository);
 
     const result = await useCase.execute({
       activityId: 'new-activity',
@@ -196,10 +196,10 @@ it('returns GENERIC_FAILURE errorCode for other CardRepositoryError codes', asyn
     readWriteCard: jest
       .fn()
       .mockRejectedValue(
-        new CardRepositoryError('SCAN_CANCELLED', 'Scan was cancelled.'),
+        createCardRepositoryError('SCAN_CANCELLED', 'Scan was cancelled.'),
       ),
   });
-  const useCase = new CheckInActivityUseCase(cardRepository);
+  const useCase = createCheckInActivityUseCase(cardRepository);
 
   const result = await useCase.execute({
     activityId: 'parking-main-gate',
@@ -215,10 +215,10 @@ it('returns ALREADY_CHECKED_IN errorCode for ACTIVE_SESSION_EXISTS DomainError',
     readWriteCard: jest
       .fn()
       .mockRejectedValue(
-        new DomainError('ACTIVE_SESSION_EXISTS', 'Active session exists.'),
+        createDomainError('ACTIVE_SESSION_EXISTS', 'Active session exists.'),
       ),
   });
-  const useCase = new CheckInActivityUseCase(cardRepository);
+  const useCase = createCheckInActivityUseCase(cardRepository);
 
   const result = await useCase.execute({
     activityId: 'parking-main-gate',

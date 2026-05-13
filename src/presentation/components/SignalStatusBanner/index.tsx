@@ -61,7 +61,7 @@ export function SignalStatusBanner({
       </Text>
       <Text style={styles.title}>{title}</Text>
       <Text style={styles.body}>{body}</Text>
-      {items?.length ? (
+      {!!items?.length && (
         <View style={styles.list}>
           {items.map(item => (
             <Text key={item} style={styles.listItem}>
@@ -69,7 +69,7 @@ export function SignalStatusBanner({
             </Text>
           ))}
         </View>
-      ) : null}
+      )}
       {children}
     </View>
   );

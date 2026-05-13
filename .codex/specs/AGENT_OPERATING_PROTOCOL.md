@@ -106,21 +106,22 @@ The target worker agent MUST:
 ### Workflow Violation = Task Rejection
 
 If any agent skips or fails to execute Stages 1–3 correctly:
+
 - The task output is considered INVALID.
 - The orchestrator must reject the result and re-run the workflow correctly.
 - Specifically: no freeform issue titles, no skipped board moves, no "assumed done" without the actual `gh project item-edit` command execution, no missing TASKS.md entry.
 
 ### Project Board Reference
 
-| Field | ID |
-|-------|-----|
-| Project Number | 2 |
-| Project Node ID | PVT_kwHOAc4Zgc4BW8lN |
-| Owner | Schitzos |
-| Status Field ID | PVTSSF_lAHOAc4Zgc4BW8lNzhSM7_Q |
-| Todo Option ID | f75ad846 |
-| In Progress Option ID | 47fc9ee4 |
-| Done Option ID | 98236657 |
+| Field                 | ID                             |
+| --------------------- | ------------------------------ |
+| Project Number        | 2                              |
+| Project Node ID       | PVT_kwHOAc4Zgc4BW8lN           |
+| Owner                 | Schitzos                       |
+| Status Field ID       | PVTSSF_lAHOAc4Zgc4BW8lNzhSM7_Q |
+| Todo Option ID        | f75ad846                       |
+| In Progress Option ID | 47fc9ee4                       |
+| Done Option ID        | 98236657                       |
 
 ### Anti-Loop Rule
 
@@ -286,3 +287,21 @@ Required behavior:
 - workflow uploads the build to Firebase App Distribution,
 - secrets and tester group configuration are documented,
 - failures are visible in GitHub Actions logs.
+
+## 15. Coding Style Rules
+
+Ternary usage:
+
+- Simple single-line ternaries are allowed (e.g., `condition ? 'a' : 'b'`).
+- Multi-line ternaries with different properties per branch are PROHIBITED. Use `if/else` with early return instead.
+- Nested ternaries (ternary inside ternary) are PROHIBITED. Extract to a helper function or use `if/else`.
+- In error-handling blocks, always use explicit `if` branches — never ternaries for error code or message selection.
+
+General readability:
+
+- Prefer `Number.parseInt` over global `parseInt`.
+- Prefer `Buffer.subarray()` over deprecated `Buffer.slice()`.
+- Mark React component props as `Readonly<>`.
+- Do not use bare array index as React `key` — use a stable string key.
+- Every test case must contain at least one `expect()` assertion.
+- Helper functions that return union types must declare the exact union return type, not `string`.
