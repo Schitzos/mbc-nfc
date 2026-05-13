@@ -1,5 +1,5 @@
 import type { DB } from '@op-engineering/op-sqlite';
-import { SqliteLedgerRepository } from '@infrastructure/local-ledger/sqlite-ledger.repository';
+import { createSqliteLedgerRepository } from '@infrastructure/local-ledger/sqlite-ledger.repository';
 
 type ExecuteMock = jest.MockedFunction<DB['execute']>;
 
@@ -7,7 +7,7 @@ function createDb(execute: ExecuteMock): DB {
   return { execute } as unknown as DB;
 }
 
-describe('SqliteLedgerRepository – extended branch coverage', () => {
+describe('createSqliteLedgerRepository – extended branch coverage', () => {
   it('handles null summary row values gracefully', async () => {
     const execute = jest
       .fn()
@@ -25,7 +25,7 @@ describe('SqliteLedgerRepository – extended branch coverage', () => {
       })
       .mockResolvedValueOnce({ rows: [] }) as ExecuteMock;
 
-    const repository = new SqliteLedgerRepository(createDb(execute));
+    const repository = createSqliteLedgerRepository(createDb(execute));
     const summary = await repository.getStationSummary();
 
     expect(summary.topUpTotal).toBe(0);
@@ -43,7 +43,7 @@ describe('SqliteLedgerRepository – extended branch coverage', () => {
       .mockResolvedValueOnce({ rows: [undefined] })
       .mockResolvedValueOnce({ rows: [] }) as ExecuteMock;
 
-    const repository = new SqliteLedgerRepository(createDb(execute));
+    const repository = createSqliteLedgerRepository(createDb(execute));
     const summary = await repository.getStationSummary();
 
     expect(summary.topUpTotal).toBe(0);
@@ -56,7 +56,7 @@ describe('SqliteLedgerRepository – extended branch coverage', () => {
       .mockResolvedValueOnce({ rows: [] }) // CREATE TABLE
       .mockResolvedValueOnce({ rows: [] }) as ExecuteMock; // INSERT
 
-    const repository = new SqliteLedgerRepository(createDb(execute));
+    const repository = createSqliteLedgerRepository(createDb(execute));
 
     await repository.append({
       id: 'LEDGER-MINIMAL',

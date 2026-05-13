@@ -1,4 +1,4 @@
-import { TopUpMemberCardUseCase } from '@application/use-cases/top-up-member-card.use-case';
+import { createTopUpMemberCardUseCase } from '@application/use-cases/top-up-member-card.use-case';
 import type { MbcCardRepository } from '@domain/repositories/mbc-card-repository';
 import type { LocalLedgerRepository } from '@domain/repositories/local-ledger-repository';
 
@@ -37,9 +37,9 @@ function createLedgerRepository(
   };
 }
 
-describe('TopUpMemberCardUseCase – extended coverage', () => {
+describe('createTopUpMemberCardUseCase – extended coverage', () => {
   it('rejects negative top-up amounts', async () => {
-    const useCase = new TopUpMemberCardUseCase(createCardRepository());
+    const useCase = createTopUpMemberCardUseCase(createCardRepository());
 
     const result = await useCase.execute({ amount: -5000 });
 
@@ -48,7 +48,7 @@ describe('TopUpMemberCardUseCase – extended coverage', () => {
   });
 
   it('rejects NaN top-up amounts', async () => {
-    const useCase = new TopUpMemberCardUseCase(createCardRepository());
+    const useCase = createTopUpMemberCardUseCase(createCardRepository());
 
     const result = await useCase.execute({ amount: NaN });
 
@@ -57,7 +57,7 @@ describe('TopUpMemberCardUseCase – extended coverage', () => {
   });
 
   it('rejects Infinity top-up amounts', async () => {
-    const useCase = new TopUpMemberCardUseCase(createCardRepository());
+    const useCase = createTopUpMemberCardUseCase(createCardRepository());
 
     const result = await useCase.execute({ amount: Infinity });
 
@@ -66,7 +66,7 @@ describe('TopUpMemberCardUseCase – extended coverage', () => {
   });
 
   it('works without a ledger repository (optional dependency)', async () => {
-    const useCase = new TopUpMemberCardUseCase(createCardRepository());
+    const useCase = createTopUpMemberCardUseCase(createCardRepository());
 
     const result = await useCase.execute({ amount: 10000 });
 
@@ -76,7 +76,7 @@ describe('TopUpMemberCardUseCase – extended coverage', () => {
 
   it('includes masked member reference in ledger entry', async () => {
     const ledgerRepository = createLedgerRepository();
-    const useCase = new TopUpMemberCardUseCase(
+    const useCase = createTopUpMemberCardUseCase(
       createCardRepository(),
       ledgerRepository,
     );
@@ -94,7 +94,7 @@ describe('TopUpMemberCardUseCase – extended coverage', () => {
     const cardRepository = createCardRepository({
       readWriteCard: jest.fn().mockRejectedValue(new Error('Disk failure')),
     });
-    const useCase = new TopUpMemberCardUseCase(cardRepository);
+    const useCase = createTopUpMemberCardUseCase(cardRepository);
 
     await expect(useCase.execute({ amount: 10000 })).rejects.toThrow(
       'Disk failure',

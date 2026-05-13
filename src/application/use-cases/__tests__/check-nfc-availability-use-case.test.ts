@@ -1,4 +1,4 @@
-import { CheckNfcAvailabilityUseCase } from '@application/use-cases/check-nfc-availability-use-case';
+import { createCheckNfcAvailabilityUseCase } from '@application/use-cases/check-nfc-availability-use-case';
 import type {
   NfcAvailabilityRepository,
   NfcAvailabilityStatus,
@@ -13,9 +13,9 @@ function createRepository(
   };
 }
 
-describe('CheckNfcAvailabilityUseCase', () => {
+describe('createCheckNfcAvailabilityUseCase', () => {
   it('returns a supported result when NFC is available', async () => {
-    const useCase = new CheckNfcAvailabilityUseCase(
+    const useCase = createCheckNfcAvailabilityUseCase(
       createRepository('SUPPORTED'),
     );
 
@@ -26,7 +26,7 @@ describe('CheckNfcAvailabilityUseCase', () => {
   });
 
   it('returns an unsupported result when NFC hardware is missing', async () => {
-    const useCase = new CheckNfcAvailabilityUseCase(
+    const useCase = createCheckNfcAvailabilityUseCase(
       createRepository('UNSUPPORTED'),
     );
 
@@ -37,7 +37,7 @@ describe('CheckNfcAvailabilityUseCase', () => {
   });
 
   it('returns a disabled result when the platform can distinguish disabled NFC', async () => {
-    const useCase = new CheckNfcAvailabilityUseCase(
+    const useCase = createCheckNfcAvailabilityUseCase(
       createRepository('DISABLED'),
     );
 
@@ -48,7 +48,7 @@ describe('CheckNfcAvailabilityUseCase', () => {
   });
 
   it('returns an unavailable result when NFC cannot be prepared right now', async () => {
-    const useCase = new CheckNfcAvailabilityUseCase(
+    const useCase = createCheckNfcAvailabilityUseCase(
       createRepository('UNAVAILABLE'),
     );
 

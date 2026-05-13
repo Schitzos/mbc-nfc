@@ -1,5 +1,4 @@
 import type { MbcCard } from '@domain/entities/mbc-card';
-import { DomainError } from '@domain/errors/domain-error';
 import {
   appendTransactionLog,
   createTransactionLog,
@@ -24,7 +23,7 @@ describe('transactionLogPolicy – extended branch coverage', () => {
         nominal: 5000,
         occurredAt: 'invalid-date-string',
       }),
-    ).toThrow(DomainError);
+    ).toThrow(Error);
   });
 
   it('does not mutate the original card when appending a log', () => {

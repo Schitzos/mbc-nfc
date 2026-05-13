@@ -17,15 +17,25 @@ const CREATE_LEDGER_TABLE_SQL = `
   )
 `;
 
-export class SqliteLedgerRepository implements LocalLedgerRepository {
-  private initialized = false;
+export type SqliteLedgerRepository = LocalLedgerRepository;
 
-  constructor(private readonly db: DB) {}
+export function createSqliteLedgerRepository(db: DB): SqliteLedgerRepository {
+  let initialized = false;
 
-  async append(entry: LedgerEntry): Promise<void> {
-    await this.ensureInitialized();
-    await this.db.execute(
-      `
+  async function ensureInitialized(): Promise<void> {
+    if (initialized) {
+      return;
+    }
+
+    await db.execute(CREATE_LEDGER_TABLE_SQL);
+    initialized = true;
+  }
+
+  return {
+    async append(entry: LedgerEntry): Promise<void> {
+      await ensureInitialized();
+      await db.execute(
+        `
         INSERT INTO station_ledger_entries (
           id,
           role,
@@ -37,24 +47,24 @@ export class SqliteLedgerRepository implements LocalLedgerRepository {
           device_id
         ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
       `,
-      [
-        entry.id,
-        entry.role,
-        entry.action,
-        entry.maskedMemberReference ?? null,
-        entry.activityType ?? null,
-        entry.amount ?? null,
-        entry.occurredAt,
-        entry.deviceId ?? null,
-      ],
-    );
-  }
+        [
+          entry.id,
+          entry.role,
+          entry.action,
+          entry.maskedMemberReference ?? null,
+          entry.activityType ?? null,
+          entry.amount ?? null,
+          entry.occurredAt,
+          entry.deviceId ?? null,
+        ],
+      );
+    },
 
-  async getStationSummary(): Promise<StationLedgerSummary> {
-    await this.ensureInitialized();
+    async getStationSummary(): Promise<StationLedgerSummary> {
+      await ensureInitialized();
 
-    const summaryResult = await this.db.execute(
-      `
+      const summaryResult = await db.execute(
+        `
         SELECT
           COALESCE(SUM(CASE WHEN action = 'TOP_UP' THEN amount ELSE 0 END), 0) AS top_up_total,
           COALESCE(SUM(CASE WHEN action = 'CHECK_OUT' THEN amount ELSE 0 END), 0) AS checkout_total,
@@ -63,10 +73,10 @@ export class SqliteLedgerRepository implements LocalLedgerRepository {
           COALESCE(SUM(CASE WHEN action = 'CHECK_OUT' THEN 1 ELSE 0 END), 0) AS checkout_count
         FROM station_ledger_entries
       `,
-    );
+      );
 
-    const latestEntriesResult = await this.db.execute(
-      `
+      const latestEntriesResult = await db.execute(
+        `
         SELECT
           id,
           role,
@@ -80,34 +90,26 @@ export class SqliteLedgerRepository implements LocalLedgerRepository {
         ORDER BY occurred_at DESC
         LIMIT 5
       `,
-    );
+      );
 
-    const summaryRow = summaryResult.rows[0] as {
-      top_up_total: number;
-      checkout_total: number;
-      register_count: number;
-      top_up_count: number;
-      checkout_count: number;
-    };
+      const summaryRow = summaryResult.rows[0] as {
+        top_up_total: number;
+        checkout_total: number;
+        register_count: number;
+        top_up_count: number;
+        checkout_count: number;
+      };
 
-    return {
-      topUpTotal: Number(summaryRow?.top_up_total ?? 0),
-      checkoutTotal: Number(summaryRow?.checkout_total ?? 0),
-      registerCount: Number(summaryRow?.register_count ?? 0),
-      topUpCount: Number(summaryRow?.top_up_count ?? 0),
-      checkoutCount: Number(summaryRow?.checkout_count ?? 0),
-      latestEntries: latestEntriesResult.rows.map(row =>
-        mapLedgerRowToEntry(row as never),
-      ),
-    };
-  }
-
-  private async ensureInitialized(): Promise<void> {
-    if (this.initialized) {
-      return;
-    }
-
-    await this.db.execute(CREATE_LEDGER_TABLE_SQL);
-    this.initialized = true;
-  }
+      return {
+        topUpTotal: Number(summaryRow?.top_up_total ?? 0),
+        checkoutTotal: Number(summaryRow?.checkout_total ?? 0),
+        registerCount: Number(summaryRow?.register_count ?? 0),
+        topUpCount: Number(summaryRow?.top_up_count ?? 0),
+        checkoutCount: Number(summaryRow?.checkout_count ?? 0),
+        latestEntries: latestEntriesResult.rows.map(row =>
+          mapLedgerRowToEntry(row as never),
+        ),
+      };
+    },
+  };
 }

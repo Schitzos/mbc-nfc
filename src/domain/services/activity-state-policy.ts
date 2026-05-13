@@ -3,7 +3,7 @@ import type {
   BenefitActivityType,
   MbcCard,
 } from '@domain/entities/mbc-card';
-import { DomainError } from '@domain/errors/domain-error';
+import { createDomainError } from '@domain/errors/domain-error';
 
 interface CheckInInput {
   activityId: string;
@@ -19,7 +19,7 @@ function parseIsoDate(value: string): void {
   const parsedDate = new Date(value);
 
   if (Number.isNaN(parsedDate.getTime())) {
-    throw new DomainError(
+    throw createDomainError(
       'INVALID_TIMESTAMP',
       'Activity timestamps must be valid ISO date strings.',
     );
@@ -47,14 +47,14 @@ function createActivitySession(input: CheckInInput): ActivitySession {
 
 export function applyCheckInState(card: MbcCard, input: CheckInInput): MbcCard {
   if (card.visitStatus !== 'NOT_CHECKED_IN') {
-    throw new DomainError(
+    throw createDomainError(
       'CARD_ALREADY_CHECKED_IN',
       'Card is already checked in and cannot start another activity.',
     );
   }
 
   if (card.activeSession) {
-    throw new DomainError(
+    throw createDomainError(
       'ACTIVE_SESSION_EXISTS',
       'Card already has an active activity session and cannot start another one.',
     );
@@ -71,21 +71,21 @@ export function applyCheckOutState(
   input: CheckOutInput,
 ): MbcCard {
   if (card.visitStatus !== 'CHECKED_IN') {
-    throw new DomainError(
+    throw createDomainError(
       'CARD_NOT_CHECKED_IN',
       'Card is not currently checked in and cannot be checked out.',
     );
   }
 
   if (!card.activeSession) {
-    throw new DomainError(
+    throw createDomainError(
       'ACTIVE_SESSION_MISSING',
       'Card must have an active activity session before checkout.',
     );
   }
 
   if (card.balance < input.chargedAmount) {
-    throw new DomainError(
+    throw createDomainError(
       'INSUFFICIENT_BALANCE',
       'Card balance is insufficient for the requested checkout.',
     );

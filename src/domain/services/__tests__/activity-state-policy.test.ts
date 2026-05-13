@@ -3,7 +3,6 @@ import {
   applyCheckOutState,
 } from '@domain/services/activity-state-policy';
 import type { MbcCard } from '@domain/entities/mbc-card';
-import { DomainError } from '@domain/errors/domain-error';
 
 const baseCard: MbcCard = {
   version: 1,
@@ -51,7 +50,7 @@ describe('activityStatePolicy', () => {
           checkedInAt: '2026-05-01T09:00:00.000Z',
         },
       ),
-    ).toThrow(DomainError);
+    ).toThrow(Error);
   });
 
   it('rejects double check-in', () => {
@@ -67,7 +66,7 @@ describe('activityStatePolicy', () => {
           checkedInAt: '2026-05-01T08:00:00.000Z',
         },
       ),
-    ).toThrow(DomainError);
+    ).toThrow(Error);
   });
 
   it('allows valid checkout and clears active state', () => {
@@ -96,7 +95,7 @@ describe('activityStatePolicy', () => {
       applyCheckOutState(baseCard, {
         chargedAmount: 4000,
       }),
-    ).toThrow(DomainError);
+    ).toThrow(Error);
   });
 
   it('does not mutate active card state when balance is insufficient', () => {
@@ -115,7 +114,7 @@ describe('activityStatePolicy', () => {
       applyCheckOutState(activeCard, {
         chargedAmount: 4000,
       }),
-    ).toThrow(DomainError);
+    ).toThrow(Error);
     expect(activeCard.visitStatus).toBe('CHECKED_IN');
     expect(activeCard.activeSession).toBeDefined();
     expect(activeCard.balance).toBe(1000);

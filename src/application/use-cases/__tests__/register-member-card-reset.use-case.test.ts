@@ -1,7 +1,7 @@
-import { RegisterMemberCardUseCase } from '@application/use-cases/register-member-card.use-case';
+import { createRegisterMemberCardUseCase } from '@application/use-cases/register-member-card.use-case';
 import type { MbcCardRepository } from '@domain/repositories/mbc-card-repository';
 import type { LocalLedgerRepository } from '@domain/repositories/local-ledger-repository';
-import { CardRepositoryError } from '@domain/errors/card-repository-error';
+import { createCardRepositoryError } from '@domain/errors/card-repository-error';
 
 function createCardRepository(
   overrides?: Partial<MbcCardRepository>,
@@ -11,7 +11,7 @@ function createCardRepository(
     readCard: jest
       .fn()
       .mockRejectedValue(
-        new CardRepositoryError('UNREGISTERED_CARD', 'Not registered'),
+        createCardRepositoryError('UNREGISTERED_CARD', 'Not registered'),
       ),
     writeCard: jest.fn().mockResolvedValue(undefined),
     readWriteCard: jest.fn(),
@@ -31,11 +31,11 @@ function createLedgerRepository(
   };
 }
 
-describe('RegisterMemberCardUseCase – reset/re-registration flow', () => {
+describe('createRegisterMemberCardUseCase – reset/re-registration flow', () => {
   describe('executeWithReset() forces registration via writeCard', () => {
     it('writes a fresh card payload bypassing registerCard check', async () => {
       const cardRepository = createCardRepository();
-      const useCase = new RegisterMemberCardUseCase(cardRepository);
+      const useCase = createRegisterMemberCardUseCase(cardRepository);
 
       const result = await useCase.executeWithReset();
 
@@ -52,7 +52,7 @@ describe('RegisterMemberCardUseCase – reset/re-registration flow', () => {
     it('appends a ledger entry after successful reset registration', async () => {
       const cardRepository = createCardRepository();
       const ledgerRepository = createLedgerRepository();
-      const useCase = new RegisterMemberCardUseCase(
+      const useCase = createRegisterMemberCardUseCase(
         cardRepository,
         ledgerRepository,
       );
@@ -67,7 +67,7 @@ describe('RegisterMemberCardUseCase – reset/re-registration flow', () => {
 
     it('generates a new card ID and member ID', async () => {
       const cardRepository = createCardRepository();
-      const useCase = new RegisterMemberCardUseCase(cardRepository);
+      const useCase = createRegisterMemberCardUseCase(cardRepository);
 
       const result = await useCase.executeWithReset();
 
@@ -80,7 +80,7 @@ describe('RegisterMemberCardUseCase – reset/re-registration flow', () => {
       const ledgerRepository = createLedgerRepository({
         append: jest.fn().mockRejectedValue(new Error('disk full')),
       });
-      const useCase = new RegisterMemberCardUseCase(
+      const useCase = createRegisterMemberCardUseCase(
         cardRepository,
         ledgerRepository,
       );

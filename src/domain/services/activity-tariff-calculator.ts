@@ -1,4 +1,4 @@
-import { DomainError } from '@domain/errors/domain-error';
+import { createDomainError } from '@domain/errors/domain-error';
 
 export type TariffStrategy = {
   ratePerUnit: number;
@@ -21,7 +21,7 @@ function parseIsoDate(value: string): Date {
   const parsedDate = new Date(value);
 
   if (Number.isNaN(parsedDate.getTime())) {
-    throw new DomainError(
+    throw createDomainError(
       'INVALID_TIMESTAMP',
       'Activity timestamps must be valid ISO date strings.',
     );
@@ -45,7 +45,7 @@ export function calculateActivityTariff(
   const durationMs = finishedAt.getTime() - startedAt.getTime();
 
   if (durationMs <= 0) {
-    throw new DomainError(
+    throw createDomainError(
       'INVALID_DURATION',
       'Activity checkout time must be later than the check-in time.',
     );

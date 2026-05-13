@@ -5,8 +5,8 @@ import {
   appendTransactionLog,
   createTransactionLog,
 } from '@domain/services/transaction-log-policy';
-import { CardRepositoryError } from '@domain/errors/card-repository-error';
-import { DomainError } from '@domain/errors/domain-error';
+import { isCardRepositoryError } from '@domain/errors/card-repository-error';
+import { isDomainError } from '@domain/errors/domain-error';
 import { createRandomId } from '@shared/utils/create-random-id';
 import type { RoleActionResultDto } from '@application/dto/role-action-result-dto';
 import { toCardSummaryDto } from '@application/dto/card-summary-mapper';
@@ -28,57 +28,59 @@ function createCheckInLog(card: MbcCard, occurredAt: string): MbcCard {
   );
 }
 
-export class CheckInActivityUseCase {
-  constructor(private readonly cardRepository: MbcCardRepository) {}
+export type CheckInActivityUseCase = {
+  execute: (request: CheckInActivityRequest) => Promise<RoleActionResultDto>;
+};
 
-  async execute({
-    activityId,
-    activityType,
-  }: CheckInActivityRequest): Promise<RoleActionResultDto> {
-    const occurredAt = new Date().toISOString();
+export function createCheckInActivityUseCase(
+  cardRepository: MbcCardRepository,
+): CheckInActivityUseCase {
+  return {
+    async execute({
+      activityId,
+      activityType,
+    }: CheckInActivityRequest): Promise<RoleActionResultDto> {
+      const occurredAt = new Date().toISOString();
 
-    try {
-      const updatedCard = await this.cardRepository.readWriteCard(card => {
-        const checkedInCard = applyCheckInState(card, {
-          activityId,
-          activityType,
-          checkedInAt: occurredAt,
+      try {
+        const updatedCard = await cardRepository.readWriteCard(card => {
+          const checkedInCard = applyCheckInState(card, {
+            activityId,
+            activityType,
+            checkedInAt: occurredAt,
+          });
+          return createCheckInLog(checkedInCard, occurredAt);
         });
-        return createCheckInLog(checkedInCard, occurredAt);
-      });
 
-      return {
-        success: true,
-        role: 'GATE',
-        message: 'Card checked in successfully.',
-        card: toCardSummaryDto(updatedCard),
-      };
-    } catch (error) {
-      if (
-        error instanceof CardRepositoryError ||
-        error instanceof DomainError
-      ) {
-        const errorCode =
-          error instanceof DomainError &&
-          (error.code === 'CARD_ALREADY_CHECKED_IN' ||
-            error.code === 'ACTIVE_SESSION_EXISTS')
-            ? 'ALREADY_CHECKED_IN'
-            : error instanceof CardRepositoryError &&
-                error.code === 'CARD_TAMPERED'
-              ? 'CARD_TAMPERED'
-              : error instanceof CardRepositoryError &&
-                  error.code === 'UNREGISTERED_CARD'
-                ? 'UNREGISTERED_CARD'
-                : 'GENERIC_FAILURE';
         return {
-          success: false,
+          success: true,
           role: 'GATE',
-          message: error.message,
-          errorCode,
+          message: 'Card checked in successfully.',
+          card: toCardSummaryDto(updatedCard),
         };
-      }
+      } catch (error) {
+        if (isCardRepositoryError(error) || isDomainError(error)) {
+          const errorCode =
+            isDomainError(error) &&
+            (error.code === 'CARD_ALREADY_CHECKED_IN' ||
+              error.code === 'ACTIVE_SESSION_EXISTS')
+              ? 'ALREADY_CHECKED_IN'
+              : isCardRepositoryError(error) && error.code === 'CARD_TAMPERED'
+                ? 'CARD_TAMPERED'
+                : isCardRepositoryError(error) &&
+                    error.code === 'UNREGISTERED_CARD'
+                  ? 'UNREGISTERED_CARD'
+                  : 'GENERIC_FAILURE';
+          return {
+            success: false,
+            role: 'GATE',
+            message: error.message,
+            errorCode,
+          };
+        }
 
-      throw error;
-    }
-  }
+        throw error;
+      }
+    },
+  };
 }

@@ -1,6 +1,6 @@
 import type { RoleActionResultDto } from '@application/dto/role-action-result-dto';
 import type { MbcCardRepository } from '@domain/repositories/mbc-card-repository';
-import { CardRepositoryError } from '@domain/errors/card-repository-error';
+import { isCardRepositoryError } from '@domain/errors/card-repository-error';
 import {
   createTransactionLog,
   appendTransactionLog,
@@ -10,76 +10,80 @@ import { toCardSummaryDto } from '@application/dto/card-summary-mapper';
 import type { LocalLedgerRepository } from '@domain/repositories/local-ledger-repository';
 import { maskMemberReference } from '@shared/utils/mask-member-reference';
 
-interface TopUpMemberCardRequest {
+export interface TopUpMemberCardRequest {
   amount: number;
 }
 
-export class TopUpMemberCardUseCase {
-  constructor(
-    private readonly cardRepository: MbcCardRepository,
-    private readonly localLedgerRepository?: LocalLedgerRepository,
-  ) {}
+export type TopUpMemberCardUseCase = {
+  execute: (request: TopUpMemberCardRequest) => Promise<RoleActionResultDto>;
+};
 
-  async execute({
-    amount,
-  }: TopUpMemberCardRequest): Promise<RoleActionResultDto> {
-    if (!Number.isFinite(amount) || amount <= 0) {
-      return {
-        success: false,
-        role: 'STATION',
-        message: 'Top-up amount must be a positive number.',
-      };
-    }
-
-    try {
-      const nextCard = await this.cardRepository.readWriteCard(card =>
-        appendTransactionLog(
-          { ...card, balance: card.balance + amount },
-          createTransactionLog({
-            id: createRandomId('LOG'),
-            activity: 'TOP_UP',
-            nominal: amount,
-            occurredAt: new Date().toISOString(),
-          }),
-        ),
-      );
-
-      let message = 'Top-up completed successfully.';
-
-      if (this.localLedgerRepository) {
-        try {
-          await this.localLedgerRepository.append({
-            id: createRandomId('LEDGER'),
-            role: 'STATION',
-            action: 'TOP_UP',
-            maskedMemberReference: maskMemberReference(
-              nextCard.member.memberId,
-            ),
-            amount,
-            occurredAt: new Date().toISOString(),
-          });
-        } catch {
-          message =
-            'Top-up completed, but the local audit ledger could not be updated.';
-        }
-      }
-
-      return {
-        success: true,
-        role: 'STATION',
-        message,
-        card: toCardSummaryDto(nextCard),
-      };
-    } catch (error) {
-      if (error instanceof CardRepositoryError) {
+export function createTopUpMemberCardUseCase(
+  cardRepository: MbcCardRepository,
+  localLedgerRepository?: LocalLedgerRepository,
+): TopUpMemberCardUseCase {
+  return {
+    async execute({
+      amount,
+    }: TopUpMemberCardRequest): Promise<RoleActionResultDto> {
+      if (!Number.isFinite(amount) || amount <= 0) {
         return {
           success: false,
           role: 'STATION',
-          message: error.message,
+          message: 'Top-up amount must be a positive number.',
         };
       }
 
-      throw error;
-    }
-  }
+      try {
+        const nextCard = await cardRepository.readWriteCard(card =>
+          appendTransactionLog(
+            { ...card, balance: card.balance + amount },
+            createTransactionLog({
+              id: createRandomId('LOG'),
+              activity: 'TOP_UP',
+              nominal: amount,
+              occurredAt: new Date().toISOString(),
+            }),
+          ),
+        );
+
+        let message = 'Top-up completed successfully.';
+
+        if (localLedgerRepository) {
+          try {
+            await localLedgerRepository.append({
+              id: createRandomId('LEDGER'),
+              role: 'STATION',
+              action: 'TOP_UP',
+              maskedMemberReference: maskMemberReference(
+                nextCard.member.memberId,
+              ),
+              amount,
+              occurredAt: new Date().toISOString(),
+            });
+          } catch {
+            message =
+              'Top-up completed, but the local audit ledger could not be updated.';
+          }
+        }
+
+        return {
+          success: true,
+          role: 'STATION',
+          message,
+          card: toCardSummaryDto(nextCard),
+        };
+      } catch (error) {
+        if (isCardRepositoryError(error)) {
+          return {
+            success: false,
+            role: 'STATION',
+            message: error.message,
+          };
+        }
+
+        throw error;
+      }
+    },
+  };
 }

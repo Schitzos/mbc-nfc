@@ -3,7 +3,7 @@ import type {
   MbcCard,
   TransactionLog,
 } from '@domain/entities/mbc-card';
-import { DomainError } from '@domain/errors/domain-error';
+import { createDomainError } from '@domain/errors/domain-error';
 
 interface CreateTransactionLogInput {
   id: string;
@@ -16,7 +16,7 @@ function parseIsoDate(value: string): void {
   const parsedDate = new Date(value);
 
   if (Number.isNaN(parsedDate.getTime())) {
-    throw new DomainError(
+    throw createDomainError(
       'INVALID_TIMESTAMP',
       'Transaction logs must use valid ISO date strings.',
     );

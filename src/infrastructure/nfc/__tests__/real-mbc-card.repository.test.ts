@@ -45,8 +45,9 @@ jest.mock('react-native-quick-crypto', () => {
 
 import { encrypt } from '@infrastructure/nfc/silent-shield';
 import type { MbcCard } from '@domain/entities/mbc-card';
+import { createDomainError } from '@domain/errors/domain-error';
 
-const { RealMbcCardRepository } = require('../real-mbc-card.repository');
+const { createRealMbcCardRepository } = require('../real-mbc-card.repository');
 
 const cardFixture: MbcCard = {
   version: 1,
@@ -68,11 +69,11 @@ function makeEncryptedTag(card: MbcCard, counter: number) {
   };
 }
 
-describe('RealMbcCardRepository', () => {
-  let repository: InstanceType<typeof RealMbcCardRepository>;
+describe('createRealMbcCardRepository', () => {
+  let repository: ReturnType<typeof createRealMbcCardRepository>;
 
   beforeEach(() => {
-    repository = new RealMbcCardRepository();
+    repository = createRealMbcCardRepository();
     jest.clearAllMocks();
     mockIsSupported.mockResolvedValue(true);
     mockStart.mockResolvedValue(undefined);
@@ -179,6 +180,26 @@ describe('RealMbcCardRepository', () => {
     });
   });
 
+  it('writeCard starts counter from zero when card is unregistered', async () => {
+    mockGetNdefMessage.mockRejectedValueOnce(new Error('unsupported'));
+    mockGetTag.mockResolvedValueOnce({ ndefMessage: [] });
+    mockGetTag.mockResolvedValueOnce({ maxSize: 504 });
+
+    await expect(repository.writeCard(cardFixture)).resolves.toBeUndefined();
+    expect(mockWriteNdefMessage).toHaveBeenCalled();
+  });
+
+  it('writeCard returns WRITE_FAILED when counter resolution throws non-card error', async () => {
+    mockGetNdefMessage.mockRejectedValueOnce(new Error('unsupported'));
+    mockGetTag
+      .mockResolvedValueOnce({ maxSize: 504 })
+      .mockRejectedValueOnce(new Error('tag read crashed'));
+
+    await expect(repository.writeCard(cardFixture)).rejects.toMatchObject({
+      code: 'WRITE_FAILED',
+    });
+  });
+
   it('readWriteCard reads, transforms, and writes in a single session', async () => {
     const result = await repository.readWriteCard((card: MbcCard) => ({
       ...card,
@@ -190,10 +211,9 @@ describe('RealMbcCardRepository', () => {
   });
 
   it('readWriteCard propagates DomainError from transform', async () => {
-    const { DomainError } = require('../../../domain/errors/domain-error');
     await expect(
       repository.readWriteCard(() => {
-        throw new DomainError('INSUFFICIENT_BALANCE', 'Not enough');
+        throw createDomainError('INSUFFICIENT_BALANCE', 'Not enough');
       }),
     ).rejects.toMatchObject({ code: 'INSUFFICIENT_BALANCE' });
   });
@@ -206,11 +226,11 @@ describe('RealMbcCardRepository', () => {
   });
 });
 
-describe('RealMbcCardRepository – additional error paths', () => {
-  let repository: InstanceType<typeof RealMbcCardRepository>;
+describe('createRealMbcCardRepository – additional error paths', () => {
+  let repository: ReturnType<typeof createRealMbcCardRepository>;
 
   beforeEach(() => {
-    repository = new RealMbcCardRepository();
+    repository = createRealMbcCardRepository();
     jest.clearAllMocks();
     mockIsSupported.mockResolvedValue(true);
     mockStart.mockResolvedValue(undefined);
@@ -301,11 +321,11 @@ describe('RealMbcCardRepository – additional error paths', () => {
   });
 });
 
-describe('RealMbcCardRepository – new error codes', () => {
-  let repository: InstanceType<typeof RealMbcCardRepository>;
+describe('createRealMbcCardRepository – new error codes', () => {
+  let repository: ReturnType<typeof createRealMbcCardRepository>;
 
   beforeEach(() => {
-    repository = new RealMbcCardRepository();
+    repository = createRealMbcCardRepository();
     jest.clearAllMocks();
     mockStart.mockResolvedValue(undefined);
     mockRequestTechnology.mockResolvedValue(undefined);
