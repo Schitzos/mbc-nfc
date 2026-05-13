@@ -21,13 +21,13 @@ Offline-first NFC membership card app for a village cooperative. The NFC card is
 
 ## App Screenshots
 
-|                     Role Switcher                      |                      Station (Register)                      |                    Station (Top Up)                     |
-| :----------------------------------------------------: | :----------------------------------------------------------: | :-----------------------------------------------------: |
-| ![Role Switcher](.tmp/screen-role-switcher-latest.png) | ![Station Register](.tmp/screen-station-register-latest.png) | ![Station Top Up](.tmp/screen-station-topup-latest.png) |
+|                      Role Switcher                      |                    Station (Register)                     |                     Station (Top Up)                     |
+| :-----------------------------------------------------: | :-------------------------------------------------------: | :------------------------------------------------------: |
+| ![Role Switcher](docs/screenshots/00-role-switcher.png) | ![Station Register](docs/screenshots/10-station-open.png) | ![Station Top Up](docs/screenshots/11-station-topup.png) |
 
-|                 Gate                 |                   Terminal                   |                 Scout                  |
-| :----------------------------------: | :------------------------------------------: | :------------------------------------: |
-| ![Gate](.tmp/screen-gate-latest.png) | ![Terminal](.tmp/screen-terminal-latest.png) | ![Scout](.tmp/screen-scout-latest.png) |
+|                    Gate                    |                      Terminal                      |                    Scout                     |
+| :----------------------------------------: | :------------------------------------------------: | :------------------------------------------: |
+| ![Gate](docs/screenshots/30-gate-open.png) | ![Terminal](docs/screenshots/60-terminal-open.png) | ![Scout](docs/screenshots/50-scout-open.png) |
 
 ## Architecture
 
