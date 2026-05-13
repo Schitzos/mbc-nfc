@@ -32,6 +32,23 @@ export type CheckInActivityUseCase = {
   execute: (request: CheckInActivityRequest) => Promise<RoleActionResultDto>;
 };
 
+function mapCheckInErrorCode(error: unknown): string {
+  if (
+    isDomainError(error) &&
+    (error.code === 'CARD_ALREADY_CHECKED_IN' ||
+      error.code === 'ACTIVE_SESSION_EXISTS')
+  ) {
+    return 'ALREADY_CHECKED_IN';
+  }
+  if (isCardRepositoryError(error) && error.code === 'CARD_TAMPERED') {
+    return 'CARD_TAMPERED';
+  }
+  if (isCardRepositoryError(error) && error.code === 'UNREGISTERED_CARD') {
+    return 'UNREGISTERED_CARD';
+  }
+  return 'GENERIC_FAILURE';
+}
+
 export function createCheckInActivityUseCase(
   cardRepository: MbcCardRepository,
 ): CheckInActivityUseCase {
@@ -60,22 +77,11 @@ export function createCheckInActivityUseCase(
         };
       } catch (error) {
         if (isCardRepositoryError(error) || isDomainError(error)) {
-          const errorCode =
-            isDomainError(error) &&
-            (error.code === 'CARD_ALREADY_CHECKED_IN' ||
-              error.code === 'ACTIVE_SESSION_EXISTS')
-              ? 'ALREADY_CHECKED_IN'
-              : isCardRepositoryError(error) && error.code === 'CARD_TAMPERED'
-                ? 'CARD_TAMPERED'
-                : isCardRepositoryError(error) &&
-                    error.code === 'UNREGISTERED_CARD'
-                  ? 'UNREGISTERED_CARD'
-                  : 'GENERIC_FAILURE';
           return {
             success: false,
             role: 'GATE',
             message: error.message,
-            errorCode,
+            errorCode: mapCheckInErrorCode(error),
           };
         }
 

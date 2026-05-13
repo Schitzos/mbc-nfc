@@ -11,13 +11,17 @@ const STAGGER = 500;
 
 function hexToRgba(hex: string, alpha: number): string {
   const h = hex.replace('#', '');
-  const r = parseInt(h.substring(0, 2), 16);
-  const g = parseInt(h.substring(2, 4), 16);
-  const b = parseInt(h.substring(4, 6), 16);
+  const r = Number.parseInt(h.substring(0, 2), 16);
+  const g = Number.parseInt(h.substring(2, 4), 16);
+  const b = Number.parseInt(h.substring(4, 6), 16);
   return `rgba(${r}, ${g}, ${b}, ${alpha})`;
 }
 
-function Ring({ color, delay, index }: { color: string; delay: number; index: number }) {
+function Ring({
+  color,
+  delay,
+  index,
+}: Readonly<{ color: string; delay: number; index: number }>) {
   const scale = useRef(new Animated.Value(1)).current;
   const opacity = useRef(new Animated.Value(0.6 - index * 0.2)).current;
 
@@ -25,8 +29,18 @@ function Ring({ color, delay, index }: { color: string; delay: number; index: nu
     const timeout = setTimeout(() => {
       Animated.loop(
         Animated.parallel([
-          Animated.timing(scale, { toValue: 2.2 + index * 0.4, duration: DURATION, easing: Easing.out(Easing.cubic), useNativeDriver: true }),
-          Animated.timing(opacity, { toValue: 0, duration: DURATION, easing: Easing.out(Easing.cubic), useNativeDriver: true }),
+          Animated.timing(scale, {
+            toValue: 2.2 + index * 0.4,
+            duration: DURATION,
+            easing: Easing.out(Easing.cubic),
+            useNativeDriver: true,
+          }),
+          Animated.timing(opacity, {
+            toValue: 0,
+            duration: DURATION,
+            easing: Easing.out(Easing.cubic),
+            useNativeDriver: true,
+          }),
         ]),
       ).start();
     }, delay);
@@ -47,14 +61,26 @@ function Ring({ color, delay, index }: { color: string; delay: number; index: nu
   );
 }
 
-export function ScanningRings({ color = '#0050AE' }: Readonly<ScanningRingsProps>): React.JSX.Element {
+export function ScanningRings({
+  color = '#0050AE',
+}: Readonly<ScanningRingsProps>): React.JSX.Element {
   const breathe = useRef(new Animated.Value(1)).current;
 
   useEffect(() => {
     const loop = Animated.loop(
       Animated.sequence([
-        Animated.timing(breathe, { toValue: 1.05, duration: 1000, easing: Easing.inOut(Easing.ease), useNativeDriver: true }),
-        Animated.timing(breathe, { toValue: 1, duration: 1000, easing: Easing.inOut(Easing.ease), useNativeDriver: true }),
+        Animated.timing(breathe, {
+          toValue: 1.05,
+          duration: 1000,
+          easing: Easing.inOut(Easing.ease),
+          useNativeDriver: true,
+        }),
+        Animated.timing(breathe, {
+          toValue: 1,
+          duration: 1000,
+          easing: Easing.inOut(Easing.ease),
+          useNativeDriver: true,
+        }),
       ]),
     );
     loop.start();
@@ -68,9 +94,11 @@ export function ScanningRings({ color = '#0050AE' }: Readonly<ScanningRingsProps
       accessibilityRole="progressbar"
     >
       {Array.from({ length: RING_COUNT }).map((_, i) => (
-        <Ring key={i} color={color} delay={i * STAGGER} index={i} />
+        <Ring key={`ring-${i}`} color={color} delay={i * STAGGER} index={i} />
       ))}
-      <Animated.View style={[styles.iconContainer, { transform: [{ scale: breathe }] }]}>
+      <Animated.View
+        style={[styles.iconContainer, { transform: [{ scale: breathe }] }]}
+      >
         <Text style={[styles.icon, { color }]}>{'((•))'}</Text>
       </Animated.View>
     </View>
