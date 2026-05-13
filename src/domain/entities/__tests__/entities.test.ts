@@ -3,8 +3,6 @@ import {
   type MbcActivity,
   type MbcRole,
   type VisitStatus,
-  type BenefitActivityType,
-  type CurrencyCode,
   type ActivitySession,
   type MemberProfile,
   type TransactionLog,
@@ -122,13 +120,25 @@ describe('domain/entities/mbc-card', () => {
   });
 
   it('BenefitActivityType is PARKING for MVP', () => {
-    const type: BenefitActivityType = 'PARKING';
-    expect(type).toBe('PARKING');
+    const session: ActivitySession = {
+      activityId: 'ACT-001',
+      activityType: 'PARKING',
+      checkedInAt: '2026-05-07T10:00:00+07:00',
+    };
+    expect(session.activityType).toBe('PARKING');
   });
 
   it('CurrencyCode is IDR', () => {
-    const code: CurrencyCode = 'IDR';
-    expect(code).toBe('IDR');
+    const card: MbcCard = {
+      version: 1,
+      cardId: 'CARD-CUR',
+      member: { memberId: 'MEM-CUR' },
+      balance: 0,
+      currency: 'IDR',
+      visitStatus: 'NOT_CHECKED_IN',
+      transactionLogs: [],
+    };
+    expect(card.currency).toBe('IDR');
   });
 });
 

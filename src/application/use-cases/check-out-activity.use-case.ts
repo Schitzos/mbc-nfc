@@ -22,6 +22,12 @@ export type CheckOutActivityUseCase = {
   execute: (request?: CheckOutActivityRequest) => Promise<RoleActionResultDto>;
 };
 
+function mapCardRepoErrorCode(code: string): string {
+  if (code === 'CARD_TAMPERED') return 'CARD_TAMPERED';
+  if (code === 'UNREGISTERED_CARD') return 'UNREGISTERED_CARD';
+  return 'GENERIC_FAILURE';
+}
+
 export function createCheckOutActivityUseCase(
   cardRepository: MbcCardRepository,
   localLedgerRepository?: LocalLedgerRepository,
@@ -101,27 +107,21 @@ export function createCheckOutActivityUseCase(
             success: false,
             role: 'TERMINAL',
             message: error.message,
-            errorCode:
-              error.code === 'CARD_TAMPERED'
-                ? 'CARD_TAMPERED'
-                : error.code === 'UNREGISTERED_CARD'
-                  ? 'UNREGISTERED_CARD'
-                  : 'GENERIC_FAILURE',
+            errorCode: mapCardRepoErrorCode(error.code),
           };
         }
 
         if (isDomainError(error)) {
+          const isInsufficientBalance = error.code === 'INSUFFICIENT_BALANCE';
           return {
             success: false,
             role: 'TERMINAL',
-            errorCode:
-              error.code === 'INSUFFICIENT_BALANCE'
-                ? 'INSUFFICIENT_BALANCE'
-                : 'GENERIC_FAILURE',
-            message:
-              error.code === 'INSUFFICIENT_BALANCE'
-                ? 'Insufficient balance. Direct the member to top up at Station before checkout.'
-                : error.message,
+            errorCode: isInsufficientBalance
+              ? 'INSUFFICIENT_BALANCE'
+              : 'GENERIC_FAILURE',
+            message: isInsufficientBalance
+              ? 'Insufficient balance. Direct the member to top up at Station before checkout.'
+              : error.message,
           };
         }
 
