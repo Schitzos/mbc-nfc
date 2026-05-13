@@ -225,28 +225,23 @@ SQLite is required for Station reporting and audit on the current device/current
 Table schema:
 
 ```sql
-CREATE TABLE transactions (
-  id TEXT PRIMARY KEY,
-  card_id TEXT NOT NULL,
-  member_id_ref TEXT NOT NULL,
-  type TEXT NOT NULL,
-  amount INTEGER NOT NULL,
-  balance_before INTEGER,
-  balance_after INTEGER,
-  activity_id TEXT,
-  device_role TEXT NOT NULL,
-  device_id TEXT NOT NULL,
+CREATE TABLE IF NOT EXISTS station_ledger_entries (
+  id TEXT PRIMARY KEY NOT NULL,
+  role TEXT NOT NULL,
+  action TEXT NOT NULL,
+  masked_member_reference TEXT,
+  activity_type TEXT,
+  amount INTEGER,
   occurred_at TEXT NOT NULL,
-  raw_card_debug TEXT,
-  created_at TEXT NOT NULL
+  device_id TEXT
 );
 ```
 
 Privacy rule:
 
-- Prefer masked or shortened `member_id_ref` in local reporting.
+- Member references are stored masked (`MEM-***-XXX` format) — never raw member IDs.
 - Do not store raw secrets or the raw undecoded protected NFC payload in logs.
-- `raw_card_debug` is optional and, if used, must be redacted or protected.
+- No balance snapshots or raw card debug data are stored in the ledger.
 
 Ledger write rules:
 
@@ -258,16 +253,16 @@ Ledger write rules:
 Reporting examples:
 
 ```sql
-SELECT type, COUNT(*) AS total_count, SUM(amount) AS total_amount
-FROM transactions
-GROUP BY type;
+SELECT action, COUNT(*) AS total_count, SUM(amount) AS total_amount
+FROM station_ledger_entries
+GROUP BY action;
 ```
 
 ```sql
-SELECT activity_id, COUNT(*) AS total_checkout, SUM(amount) AS income
-FROM transactions
-WHERE type = 'CHECKOUT'
-GROUP BY activity_id;
+SELECT activity_type, COUNT(*) AS total_checkout, SUM(amount) AS income
+FROM station_ledger_entries
+WHERE action = 'CHECK_OUT'
+GROUP BY activity_type;
 ```
 
 ## 9. Fixed Parking MVP Tariff

@@ -32,8 +32,7 @@ export function InsufficientBalanceCard({
           <View className="flex-1 rounded-xl border border-red-200 bg-red-50 p-3">
             <Text className="text-xs text-muted">Required Fee</Text>
             <Text className="text-lg font-bold text-foreground">
-              Rp{' '}
-              {latestResult.chargedAmount?.toLocaleString(LOCALE_ID) ?? '2.000'}
+              Rp {latestResult.chargedAmount?.toLocaleString(LOCALE_ID) ?? '0'}
             </Text>
           </View>
           <View className="flex-1 rounded-xl border border-red-200 bg-red-50 p-3">
