@@ -1,6 +1,6 @@
-import { RegisterMemberCardUseCase } from '@application/use-cases/register-member-card.use-case';
+import { createRegisterMemberCardUseCase } from '@application/use-cases/register-member-card.use-case';
 import type { MbcCardRepository } from '@domain/repositories/mbc-card-repository';
-import { CardRepositoryError } from '@domain/errors/card-repository-error';
+import { createCardRepositoryError } from '@domain/errors/card-repository-error';
 
 function createCardRepository(
   overrides?: Partial<MbcCardRepository>,
@@ -10,7 +10,7 @@ function createCardRepository(
     readCard: jest
       .fn()
       .mockRejectedValue(
-        new CardRepositoryError('UNREGISTERED_CARD', 'Not registered'),
+        createCardRepositoryError('UNREGISTERED_CARD', 'Not registered'),
       ),
     writeCard: jest.fn().mockResolvedValue(undefined),
     readWriteCard: jest.fn(),
@@ -20,19 +20,19 @@ function createCardRepository(
   };
 }
 
-describe('RegisterMemberCardUseCase – extended coverage', () => {
+describe('createRegisterMemberCardUseCase – extended coverage', () => {
   it('re-throws unexpected errors from registerCard', async () => {
     const cardRepository = createCardRepository({
       registerCard: jest.fn().mockRejectedValue(new TypeError('Unexpected')),
     });
-    const useCase = new RegisterMemberCardUseCase(cardRepository);
+    const useCase = createRegisterMemberCardUseCase(cardRepository);
 
     await expect(useCase.execute()).rejects.toThrow('Unexpected');
   });
 
   it('generates a unique member ID automatically (no typed input)', async () => {
     const cardRepository = createCardRepository();
-    const useCase = new RegisterMemberCardUseCase(cardRepository);
+    const useCase = createRegisterMemberCardUseCase(cardRepository);
 
     const result = await useCase.execute();
 
@@ -42,7 +42,7 @@ describe('RegisterMemberCardUseCase – extended coverage', () => {
 
   it('does not expose full internal member ID in the result', async () => {
     const cardRepository = createCardRepository();
-    const useCase = new RegisterMemberCardUseCase(cardRepository);
+    const useCase = createRegisterMemberCardUseCase(cardRepository);
 
     const result = await useCase.execute();
 
@@ -51,7 +51,7 @@ describe('RegisterMemberCardUseCase – extended coverage', () => {
 
   it('works without a ledger repository (optional dependency)', async () => {
     const cardRepository = createCardRepository();
-    const useCase = new RegisterMemberCardUseCase(cardRepository);
+    const useCase = createRegisterMemberCardUseCase(cardRepository);
 
     const result = await useCase.execute();
 

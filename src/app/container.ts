@@ -1,15 +1,15 @@
 import { open } from '@op-engineering/op-sqlite';
-import { CheckNfcAvailabilityUseCase } from '@application/use-cases/check-nfc-availability-use-case';
-import { CheckInActivityUseCase } from '@application/use-cases/check-in-activity.use-case';
-import { CheckOutActivityUseCase } from '@application/use-cases/check-out-activity.use-case';
-import { GetStationLedgerSummaryUseCase } from '@application/use-cases/get-station-ledger-summary.use-case';
-import { InspectMemberCardUseCase } from '@application/use-cases/inspect-member-card.use-case';
-import { RegisterMemberCardUseCase } from '@application/use-cases/register-member-card.use-case';
-import { TopUpMemberCardUseCase } from '@application/use-cases/top-up-member-card.use-case';
-import { SqliteLedgerRepository } from '@infrastructure/local-ledger/sqlite-ledger.repository';
-import { DeviceNfcStatusRepository } from '@infrastructure/nfc/device-nfc-status.repository';
-import { RealMbcCardRepository } from '@infrastructure/nfc/real-mbc-card.repository';
-import type { AppServices } from '@presentation/context/service-context';
+import { createCheckNfcAvailabilityUseCase } from '@application/use-cases/check-nfc-availability-use-case';
+import { createCheckInActivityUseCase } from '@application/use-cases/check-in-activity.use-case';
+import { createCheckOutActivityUseCase } from '@application/use-cases/check-out-activity.use-case';
+import { createGetStationLedgerSummaryUseCase } from '@application/use-cases/get-station-ledger-summary.use-case';
+import { createInspectMemberCardUseCase } from '@application/use-cases/inspect-member-card.use-case';
+import { createRegisterMemberCardUseCase } from '@application/use-cases/register-member-card.use-case';
+import { createTopUpMemberCardUseCase } from '@application/use-cases/top-up-member-card.use-case';
+import { createSqliteLedgerRepository } from '@infrastructure/local-ledger/sqlite-ledger.repository';
+import { createDeviceNfcStatusRepository } from '@infrastructure/nfc/device-nfc-status.repository';
+import { createRealMbcCardRepository } from '@infrastructure/nfc/real-mbc-card.repository';
+import type { AppServices } from '@app/services-contract';
 
 let cachedServices: AppServices | null = null;
 
@@ -19,52 +19,47 @@ export function createAppServices(): AppServices {
   }
 
   const db = open({ name: 'mbc-ledger.db', location: 'default' });
-  const cardRepository = new RealMbcCardRepository();
-  const nfcStatusRepository = new DeviceNfcStatusRepository();
-  const ledgerRepository = new SqliteLedgerRepository(db);
+  const cardRepository = createRealMbcCardRepository();
+  const nfcStatusRepository = createDeviceNfcStatusRepository();
+  const ledgerRepository = createSqliteLedgerRepository(db);
 
   const cancelNfc = () => cardRepository.cancel();
 
   cachedServices = {
     station: {
-      checkNfcAvailabilityUseCase: new CheckNfcAvailabilityUseCase(
-        nfcStatusRepository,
-      ),
-      registerMemberCardUseCase: new RegisterMemberCardUseCase(
+      checkNfcAvailabilityUseCase:
+        createCheckNfcAvailabilityUseCase(nfcStatusRepository),
+      registerMemberCardUseCase: createRegisterMemberCardUseCase(
         cardRepository,
         ledgerRepository,
       ),
-      topUpMemberCardUseCase: new TopUpMemberCardUseCase(
+      topUpMemberCardUseCase: createTopUpMemberCardUseCase(
         cardRepository,
         ledgerRepository,
       ),
-      getStationLedgerSummaryUseCase: new GetStationLedgerSummaryUseCase(
-        ledgerRepository,
-      ),
+      getStationLedgerSummaryUseCase:
+        createGetStationLedgerSummaryUseCase(ledgerRepository),
       cancelNfc,
     },
     gate: {
-      checkNfcAvailabilityUseCase: new CheckNfcAvailabilityUseCase(
-        nfcStatusRepository,
-      ),
-      checkInActivityUseCase: new CheckInActivityUseCase(cardRepository),
+      checkNfcAvailabilityUseCase:
+        createCheckNfcAvailabilityUseCase(nfcStatusRepository),
+      checkInActivityUseCase: createCheckInActivityUseCase(cardRepository),
       cancelNfc,
     },
     terminal: {
-      checkNfcAvailabilityUseCase: new CheckNfcAvailabilityUseCase(
-        nfcStatusRepository,
-      ),
-      checkOutActivityUseCase: new CheckOutActivityUseCase(
+      checkNfcAvailabilityUseCase:
+        createCheckNfcAvailabilityUseCase(nfcStatusRepository),
+      checkOutActivityUseCase: createCheckOutActivityUseCase(
         cardRepository,
         ledgerRepository,
       ),
       cancelNfc,
     },
     scout: {
-      checkNfcAvailabilityUseCase: new CheckNfcAvailabilityUseCase(
-        nfcStatusRepository,
-      ),
-      inspectMemberCardUseCase: new InspectMemberCardUseCase(cardRepository),
+      checkNfcAvailabilityUseCase:
+        createCheckNfcAvailabilityUseCase(nfcStatusRepository),
+      inspectMemberCardUseCase: createInspectMemberCardUseCase(cardRepository),
       cancelNfc,
     },
   };

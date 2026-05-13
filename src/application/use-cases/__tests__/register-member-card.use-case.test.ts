@@ -1,7 +1,7 @@
-import { RegisterMemberCardUseCase } from '@application/use-cases/register-member-card.use-case';
+import { createRegisterMemberCardUseCase } from '@application/use-cases/register-member-card.use-case';
 import type { MbcCardRepository } from '@domain/repositories/mbc-card-repository';
 import type { LocalLedgerRepository } from '@domain/repositories/local-ledger-repository';
-import { CardRepositoryError } from '@domain/errors/card-repository-error';
+import { createCardRepositoryError } from '@domain/errors/card-repository-error';
 
 function createCardRepository(
   overrides?: Partial<MbcCardRepository>,
@@ -11,7 +11,7 @@ function createCardRepository(
     readCard: jest
       .fn()
       .mockRejectedValue(
-        new CardRepositoryError('UNREGISTERED_CARD', 'Not registered'),
+        createCardRepositoryError('UNREGISTERED_CARD', 'Not registered'),
       ),
     writeCard: jest.fn().mockResolvedValue(undefined),
     readWriteCard: jest.fn(),
@@ -31,10 +31,10 @@ function createLedgerRepository(
   };
 }
 
-describe('RegisterMemberCardUseCase', () => {
+describe('createRegisterMemberCardUseCase', () => {
   it('registers a new card via registerCard', async () => {
     const cardRepository = createCardRepository();
-    const useCase = new RegisterMemberCardUseCase(cardRepository);
+    const useCase = createRegisterMemberCardUseCase(cardRepository);
 
     const result = await useCase.execute();
 
@@ -54,13 +54,13 @@ describe('RegisterMemberCardUseCase', () => {
       registerCard: jest
         .fn()
         .mockRejectedValue(
-          new CardRepositoryError(
+          createCardRepositoryError(
             'CARD_ALREADY_REGISTERED',
             'This card is already registered.',
           ),
         ),
     });
-    const useCase = new RegisterMemberCardUseCase(cardRepository);
+    const useCase = createRegisterMemberCardUseCase(cardRepository);
 
     const result = await useCase.execute();
 
@@ -71,7 +71,7 @@ describe('RegisterMemberCardUseCase', () => {
   it('appends a local ledger record after successful registration', async () => {
     const cardRepository = createCardRepository();
     const ledgerRepository = createLedgerRepository();
-    const useCase = new RegisterMemberCardUseCase(
+    const useCase = createRegisterMemberCardUseCase(
       cardRepository,
       ledgerRepository,
     );
@@ -89,7 +89,7 @@ describe('RegisterMemberCardUseCase', () => {
     const ledgerRepository = createLedgerRepository({
       append: jest.fn().mockRejectedValue(new Error('ledger unavailable')),
     });
-    const useCase = new RegisterMemberCardUseCase(
+    const useCase = createRegisterMemberCardUseCase(
       cardRepository,
       ledgerRepository,
     );
@@ -104,7 +104,7 @@ describe('RegisterMemberCardUseCase', () => {
     const cardRepository = createCardRepository({
       registerCard: jest.fn().mockRejectedValue(new Error('unexpected')),
     });
-    const useCase = new RegisterMemberCardUseCase(cardRepository);
+    const useCase = createRegisterMemberCardUseCase(cardRepository);
 
     await expect(useCase.execute()).rejects.toThrow('unexpected');
   });

@@ -1,4 +1,5 @@
 export type { NfcAvailabilityStatus } from '@domain/repositories/nfc-availability-repository';
+import type { NfcAvailabilityStatus } from '@domain/repositories/nfc-availability-repository';
 
 export type CheckNfcAvailabilityResultDto = {
   supported: boolean;

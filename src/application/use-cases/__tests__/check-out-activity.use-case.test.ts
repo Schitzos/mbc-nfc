@@ -1,7 +1,7 @@
-import { CheckOutActivityUseCase } from '@application/use-cases/check-out-activity.use-case';
+import { createCheckOutActivityUseCase } from '@application/use-cases/check-out-activity.use-case';
 import type { MbcCardRepository } from '@domain/repositories/mbc-card-repository';
 import type { LocalLedgerRepository } from '@domain/repositories/local-ledger-repository';
-import { CardRepositoryError } from '@domain/errors/card-repository-error';
+import { createCardRepositoryError } from '@domain/errors/card-repository-error';
 import type { MbcCard } from '@domain/entities/mbc-card';
 
 function createCheckedInCard(overrides?: Partial<MbcCard>): MbcCard {
@@ -49,10 +49,10 @@ function createCardRepository(
   };
 }
 
-describe('CheckOutActivityUseCase', () => {
+describe('createCheckOutActivityUseCase', () => {
   it('calculates duration and fee using fixed tariff, deducts balance, and clears status', async () => {
     const cardRepository = createCardRepository();
-    const useCase = new CheckOutActivityUseCase(cardRepository);
+    const useCase = createCheckOutActivityUseCase(cardRepository);
 
     const result = await useCase.execute({
       checkedOutAt: '2026-05-01T09:05:01.000Z',
@@ -76,7 +76,7 @@ describe('CheckOutActivityUseCase', () => {
         .fn()
         .mockImplementation(async (fn: any) => fn(noSessionCard)),
     });
-    const useCase = new CheckOutActivityUseCase(cardRepository);
+    const useCase = createCheckOutActivityUseCase(cardRepository);
 
     const result = await useCase.execute({
       checkedOutAt: '2026-05-01T09:05:01.000Z',
@@ -95,7 +95,7 @@ describe('CheckOutActivityUseCase', () => {
         .fn()
         .mockImplementation(async (fn: any) => fn(insufficientCard)),
     });
-    const useCase = new CheckOutActivityUseCase(cardRepository);
+    const useCase = createCheckOutActivityUseCase(cardRepository);
 
     const result = await useCase.execute({
       checkedOutAt: '2026-05-01T09:05:01.000Z',
@@ -107,7 +107,7 @@ describe('CheckOutActivityUseCase', () => {
 
   it('appends a local ledger entry after successful checkout when configured', async () => {
     const ledgerRepository = createLedgerRepository();
-    const useCase = new CheckOutActivityUseCase(
+    const useCase = createCheckOutActivityUseCase(
       createCardRepository(),
       ledgerRepository,
     );
@@ -130,7 +130,7 @@ describe('CheckOutActivityUseCase', () => {
     const ledgerRepository = createLedgerRepository({
       append: jest.fn().mockRejectedValue(new Error('ledger unavailable')),
     });
-    const useCase = new CheckOutActivityUseCase(
+    const useCase = createCheckOutActivityUseCase(
       createCardRepository(),
       ledgerRepository,
     );
@@ -144,12 +144,12 @@ describe('CheckOutActivityUseCase', () => {
   });
 
   it('surfaces repository errors safely during checkout', async () => {
-    const useCase = new CheckOutActivityUseCase(
+    const useCase = createCheckOutActivityUseCase(
       createCardRepository({
         readWriteCard: jest
           .fn()
           .mockRejectedValue(
-            new CardRepositoryError(
+            createCardRepositoryError(
               'UNREGISTERED_CARD',
               'Card is not registered yet. Register it first at Station.',
             ),
@@ -166,7 +166,7 @@ describe('CheckOutActivityUseCase', () => {
   });
 
   it('returns a non-balance domain validation error when checkout timestamp is invalid', async () => {
-    const useCase = new CheckOutActivityUseCase(createCardRepository());
+    const useCase = createCheckOutActivityUseCase(createCardRepository());
 
     const result = await useCase.execute({
       checkedOutAt: 'not-a-real-date',

@@ -1,5 +1,5 @@
 import NfcManager from 'react-native-nfc-manager';
-import { DeviceNfcStatusRepository } from '@infrastructure/nfc/device-nfc-status.repository';
+import { createDeviceNfcStatusRepository } from '@infrastructure/nfc/device-nfc-status.repository';
 
 jest.mock('react-native-nfc-manager', () => ({
   start: jest.fn().mockResolvedValue(undefined),
@@ -7,15 +7,15 @@ jest.mock('react-native-nfc-manager', () => ({
   isEnabled: jest.fn().mockResolvedValue(true),
 }));
 
-describe('DeviceNfcStatusRepository', () => {
+describe('createDeviceNfcStatusRepository', () => {
   it('reports supported NFC status', async () => {
-    const repository = new DeviceNfcStatusRepository();
+    const repository = createDeviceNfcStatusRepository();
     await expect(repository.getAvailabilityStatus()).resolves.toBe('SUPPORTED');
   });
 
   it('reports unsupported status', async () => {
     (NfcManager.isSupported as jest.Mock).mockResolvedValueOnce(false);
-    const repository = new DeviceNfcStatusRepository();
+    const repository = createDeviceNfcStatusRepository();
     await expect(repository.getAvailabilityStatus()).resolves.toBe(
       'UNSUPPORTED',
     );
@@ -24,7 +24,7 @@ describe('DeviceNfcStatusRepository', () => {
   it('reports disabled status', async () => {
     (NfcManager.isSupported as jest.Mock).mockResolvedValueOnce(true);
     (NfcManager.isEnabled as jest.Mock).mockResolvedValueOnce(false);
-    const repository = new DeviceNfcStatusRepository();
+    const repository = createDeviceNfcStatusRepository();
     await expect(repository.getAvailabilityStatus()).resolves.toBe('DISABLED');
   });
 
@@ -33,14 +33,14 @@ describe('DeviceNfcStatusRepository', () => {
     (NfcManager.isEnabled as jest.Mock).mockRejectedValueOnce(
       new Error('not available'),
     );
-    const repository = new DeviceNfcStatusRepository();
+    const repository = createDeviceNfcStatusRepository();
     await expect(repository.getAvailabilityStatus()).resolves.toBe(
       'UNAVAILABLE',
     );
   });
 
   it('isSupported delegates to NfcManager', async () => {
-    const repository = new DeviceNfcStatusRepository();
+    const repository = createDeviceNfcStatusRepository();
     await expect(repository.isSupported()).resolves.toBe(true);
   });
 });

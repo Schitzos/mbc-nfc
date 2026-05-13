@@ -1,5 +1,4 @@
 import { calculateActivityTariff } from '@domain/services/activity-tariff-calculator';
-import { DomainError } from '@domain/errors/domain-error';
 import { PARKING_TARIFF_PER_STARTED_HOUR } from '@domain/config/parking-tariff';
 
 describe('calculateActivityTariff', () => {
@@ -52,7 +51,7 @@ describe('calculateActivityTariff', () => {
         checkedInAt: 'not-a-date',
         checkedOutAt: '2026-05-01T10:15:00.000Z',
       }),
-    ).toThrow(DomainError);
+    ).toThrow(Error);
   });
 
   it('floors partial hours when roundUp is false', () => {
@@ -77,6 +76,6 @@ describe('calculateActivityTariff', () => {
         checkedInAt: '2026-05-01T10:15:00.000Z',
         checkedOutAt: '2026-05-01T10:15:00.000Z',
       }),
-    ).toThrow(DomainError);
+    ).toThrow(Error);
   });
 });

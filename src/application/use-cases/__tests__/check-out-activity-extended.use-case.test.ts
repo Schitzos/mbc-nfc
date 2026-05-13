@@ -1,7 +1,7 @@
-import { CheckOutActivityUseCase } from '@application/use-cases/check-out-activity.use-case';
+import { createCheckOutActivityUseCase } from '@application/use-cases/check-out-activity.use-case';
 import type { MbcCardRepository } from '@domain/repositories/mbc-card-repository';
 import type { LocalLedgerRepository } from '@domain/repositories/local-ledger-repository';
-import { CardRepositoryError } from '@domain/errors/card-repository-error';
+import { createCardRepositoryError } from '@domain/errors/card-repository-error';
 import type { MbcCard } from '@domain/entities/mbc-card';
 
 function createCheckedInCard(overrides?: Partial<MbcCard>): MbcCard {
@@ -49,7 +49,7 @@ function createLedgerRepository(
   };
 }
 
-describe('CheckOutActivityUseCase – extended coverage', () => {
+describe('createCheckOutActivityUseCase – extended coverage', () => {
   it('uses current time when checkedOutAt is not provided', async () => {
     const card = createCheckedInCard({
       activeSession: {
@@ -61,7 +61,7 @@ describe('CheckOutActivityUseCase – extended coverage', () => {
     const cardRepository = createCardRepository({
       readWriteCard: jest.fn().mockImplementation(async (fn: any) => fn(card)),
     });
-    const useCase = new CheckOutActivityUseCase(cardRepository);
+    const useCase = createCheckOutActivityUseCase(cardRepository);
 
     const result = await useCase.execute();
 
@@ -73,7 +73,7 @@ describe('CheckOutActivityUseCase – extended coverage', () => {
     const cardRepository = createCardRepository({
       readWriteCard: jest.fn().mockRejectedValue(new Error('Network failure')),
     });
-    const useCase = new CheckOutActivityUseCase(cardRepository);
+    const useCase = createCheckOutActivityUseCase(cardRepository);
 
     await expect(
       useCase.execute({ checkedOutAt: '2026-05-01T10:00:00.000Z' }),
@@ -82,7 +82,7 @@ describe('CheckOutActivityUseCase – extended coverage', () => {
 
   it('includes masked member reference in ledger entry', async () => {
     const ledgerRepository = createLedgerRepository();
-    const useCase = new CheckOutActivityUseCase(
+    const useCase = createCheckOutActivityUseCase(
       createCardRepository(),
       ledgerRepository,
     );
@@ -98,7 +98,7 @@ describe('CheckOutActivityUseCase – extended coverage', () => {
 
   it('includes activityType in ledger entry', async () => {
     const ledgerRepository = createLedgerRepository();
-    const useCase = new CheckOutActivityUseCase(
+    const useCase = createCheckOutActivityUseCase(
       createCardRepository(),
       ledgerRepository,
     );
@@ -124,7 +124,7 @@ describe('CheckOutActivityUseCase – extended coverage', () => {
       readWriteCard: jest.fn().mockImplementation(async (fn: any) => fn(card)),
     });
     const ledgerRepository = createLedgerRepository();
-    const useCase = new CheckOutActivityUseCase(
+    const useCase = createCheckOutActivityUseCase(
       cardRepository,
       ledgerRepository,
     );
@@ -148,7 +148,7 @@ describe('CheckOutActivityUseCase – extended coverage', () => {
         .fn()
         .mockImplementation(async (fn: any) => fn(insufficientCard)),
     });
-    const useCase = new CheckOutActivityUseCase(cardRepository);
+    const useCase = createCheckOutActivityUseCase(cardRepository);
 
     const result = await useCase.execute({
       checkedOutAt: '2026-05-01T09:05:01.000Z',
@@ -158,7 +158,7 @@ describe('CheckOutActivityUseCase – extended coverage', () => {
   });
 
   it('rejects checkout with exit time before entry time (INVALID_DURATION)', async () => {
-    const useCase = new CheckOutActivityUseCase(createCardRepository());
+    const useCase = createCheckOutActivityUseCase(createCardRepository());
 
     const result = await useCase.execute({
       checkedOutAt: '2026-05-01T07:00:00.000Z', // before check-in at 08:00
@@ -173,10 +173,10 @@ describe('CheckOutActivityUseCase – extended coverage', () => {
       readWriteCard: jest
         .fn()
         .mockRejectedValue(
-          new CardRepositoryError('CARD_TAMPERED', 'Card data is tampered.'),
+          createCardRepositoryError('CARD_TAMPERED', 'Card data is tampered.'),
         ),
     });
-    const useCase = new CheckOutActivityUseCase(cardRepository);
+    const useCase = createCheckOutActivityUseCase(cardRepository);
 
     const result = await useCase.execute({
       checkedOutAt: '2026-05-01T09:05:01.000Z',
@@ -192,10 +192,10 @@ it('returns UNREGISTERED_CARD errorCode for unregistered card', async () => {
     readWriteCard: jest
       .fn()
       .mockRejectedValue(
-        new CardRepositoryError('UNREGISTERED_CARD', 'Card not registered.'),
+        createCardRepositoryError('UNREGISTERED_CARD', 'Card not registered.'),
       ),
   });
-  const useCase = new CheckOutActivityUseCase(cardRepository);
+  const useCase = createCheckOutActivityUseCase(cardRepository);
 
   const result = await useCase.execute({
     checkedOutAt: '2026-05-01T09:05:01.000Z',
@@ -210,10 +210,10 @@ it('returns GENERIC_FAILURE errorCode for other CardRepositoryError codes', asyn
     readWriteCard: jest
       .fn()
       .mockRejectedValue(
-        new CardRepositoryError('SCAN_CANCELLED', 'Scan was cancelled.'),
+        createCardRepositoryError('SCAN_CANCELLED', 'Scan was cancelled.'),
       ),
   });
-  const useCase = new CheckOutActivityUseCase(cardRepository);
+  const useCase = createCheckOutActivityUseCase(cardRepository);
 
   const result = await useCase.execute({
     checkedOutAt: '2026-05-01T09:05:01.000Z',

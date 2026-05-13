@@ -1,5 +1,5 @@
 import type { DB } from '@op-engineering/op-sqlite';
-import { SqliteLedgerRepository } from '@infrastructure/local-ledger/sqlite-ledger.repository';
+import { createSqliteLedgerRepository } from '@infrastructure/local-ledger/sqlite-ledger.repository';
 
 type ExecuteMock = jest.MockedFunction<DB['execute']>;
 
@@ -7,13 +7,13 @@ function createDb(execute: ExecuteMock): DB {
   return { execute } as unknown as DB;
 }
 
-describe('SqliteLedgerRepository', () => {
+describe('createSqliteLedgerRepository', () => {
   it('initializes schema once and appends entries', async () => {
     const execute = jest
       .fn()
       .mockResolvedValueOnce({ rows: [] })
       .mockResolvedValueOnce({ rows: [] }) as ExecuteMock;
-    const repository = new SqliteLedgerRepository(createDb(execute));
+    const repository = createSqliteLedgerRepository(createDb(execute));
 
     await repository.append({
       id: 'LEDGER-001',
@@ -68,7 +68,7 @@ describe('SqliteLedgerRepository', () => {
           },
         ],
       }) as ExecuteMock;
-    const repository = new SqliteLedgerRepository(createDb(execute));
+    const repository = createSqliteLedgerRepository(createDb(execute));
 
     const summary = await repository.getStationSummary();
 
