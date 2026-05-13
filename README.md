@@ -1,149 +1,99 @@
 # KDX Membership Benefit Card
 
+[![SonarQube Cloud](https://sonarcloud.io/images/project_badges/sonarcloud-light.svg)](https://sonarcloud.io/summary/new_code?id=Schitzos_mbc-nfc)
+[![Quality gate](https://sonarcloud.io/api/project_badges/quality_gate?project=Schitzos_mbc-nfc)](https://sonarcloud.io/summary/new_code?id=Schitzos_mbc-nfc)
+
+[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=Schitzos_mbc-nfc&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=Schitzos_mbc-nfc)
+[![Bugs](https://sonarcloud.io/api/project_badges/measure?project=Schitzos_mbc-nfc&metric=bugs)](https://sonarcloud.io/summary/new_code?id=Schitzos_mbc-nfc)
+[![Code Smells](https://sonarcloud.io/api/project_badges/measure?project=Schitzos_mbc-nfc&metric=code_smells)](https://sonarcloud.io/summary/new_code?id=Schitzos_mbc-nfc)
+[![Coverage](https://sonarcloud.io/api/project_badges/measure?project=Schitzos_mbc-nfc&metric=coverage)](https://sonarcloud.io/summary/new_code?id=Schitzos_mbc-nfc)
+[![Duplicated Lines (%)](https://sonarcloud.io/api/project_badges/measure?project=Schitzos_mbc-nfc&metric=duplicated_lines_density)](https://sonarcloud.io/summary/new_code?id=Schitzos_mbc-nfc)
 ![Coverage](https://img.shields.io/badge/coverage-100%25-brightgreen)
 ![Tests](https://img.shields.io/badge/tests-444%20passed-brightgreen)
 ![Platform](https://img.shields.io/badge/platform-Android-blue)
 ![NFC](https://img.shields.io/badge/NFC-NTAG215-orange)
 
-Frontend mobile application for the KDX Membership Benefit Card (MBC) assessment.
+Offline-first NFC membership card app for a village cooperative. The NFC card is the portable source of truth for member identity, balance, and activity state — no backend required.
+
+## Status
+
+**Production-ready assessment build.** Full parking MVP validated on real hardware (ASUS ROG Phone 9 FE + NTAG215).
 
 ## App Screenshots
 
-|                      Role Switcher                      |                     Station                      |                    Gate                    |                      Terminal                      |                    Scout                     |
-| :-----------------------------------------------------: | :----------------------------------------------: | :----------------------------------------: | :------------------------------------------------: | :------------------------------------------: |
-| ![Role Switcher](docs/screenshots/00-role-switcher.png) | ![Station](docs/screenshots/10-station-open.png) | ![Gate](docs/screenshots/30-gate-open.png) | ![Terminal](docs/screenshots/60-terminal-open.png) | ![Scout](docs/screenshots/50-scout-open.png) |
+|                     Role Switcher                      |                      Station (Register)                      |                    Station (Top Up)                     |
+| :----------------------------------------------------: | :----------------------------------------------------------: | :-----------------------------------------------------: |
+| ![Role Switcher](.tmp/screen-role-switcher-latest.png) | ![Station Register](.tmp/screen-station-register-latest.png) | ![Station Top Up](.tmp/screen-station-topup-latest.png) |
 
-## Current Status
+|                 Gate                 |                   Terminal                   |                 Scout                  |
+| :----------------------------------: | :------------------------------------------: | :------------------------------------: |
+| ![Gate](.tmp/screen-gate-latest.png) | ![Terminal](.tmp/screen-terminal-latest.png) | ![Scout](.tmp/screen-scout-latest.png) |
 
-The application is **functional with real NFC** on Android (ASUS ROG Phone 9 FE + NTAG215).
+## Architecture
 
-Completed:
+Clean Architecture with SOLID principles:
 
-- Full parking MVP flow: Register → Top-Up → Check-In → Check-Out → Scout inspect
-- All NFC operations complete in a single tap (single-session read+write)
-- Silent Shield AES-256-GCM encryption via `react-native-quick-crypto`
-- Compact card codec (`v,c,m,b,i,x,n` format) fits NTAG215 (362 bytes worst-case)
-- NfcActionSheet bottom sheet (50% height, dark overlay, dismissable) for scan/success/error feedback
-- Local SQLite ledger for device-side audit and reporting
-- No simulation mode or mock scenario selectors — all flows use real NFC
-
-## Product Summary
-
-The app is one mobile application that can switch between four roles:
-
-- Station
-- Gate
-- Terminal
-- Scout
-
-Core rules:
-
-- the NFC card is the source of truth for member state
-- the app works offline-first
-- a local SQLite ledger is allowed only for device-side audit and reporting
-- parking is the first demo activity, but the flow is designed to support other activities later
-
-## NFC And Device Notes
-
-Real card operations require:
-
-- an NFC-capable device
-- NFC enabled on the device
-- a supported physical NFC card/tag (NTAG215 validated)
-
-Validated configuration:
-
-- ASUS ROG Phone 9 FE (Android 14+) with NTAG215 tags
-- Android NFC permissions and intent filters configured
-- Buffer polyfill in `index.js` for binary crypto
-- `react-native-reanimated/plugin` in `babel.config.js` for bottom sheet animations
-
-Platform notes:
-
-- Android is the primary real-device target (fully validated)
-- iOS remains a secondary validation target and must be documented honestly based on real-device behavior
-
-## Repository Working Rules
-
-Branch strategy:
-
-- `main` = protected release branch
-- `develop` = integration branch
-- `feature/*` = implementation branches for each feature/task
-
-Merge flow:
-
-1. Feature work is implemented in a separate `feature/*` branch.
-2. Finished work is proposed by merge request into `develop`.
-3. Demo/Release Engineer reviews and merges approved work into `develop`.
-4. Demo/Release Engineer prepares the promotion merge request from `develop` to `main`.
-5. Project Owner performs the final merge into `main`.
-6. Merge to `main` triggers GitHub Actions release publishing to app distribution.
-
-Commit-message convention:
-
-- `feat: ...`
-- `fix: ...`
-- `chore: ...`
-- `docs: ...`
-- `refactor: ...`
-- `test: ...`
-
-Example:
-
-```txt
-chore: initialize repository baseline
+```
+Presentation → Application → Domain
+Infrastructure → Application/Domain contracts
 ```
 
-## Main Project Documents
+- **Domain**: Entities, tariff rules, card state policy
+- **Application**: Use cases (register, top-up, check-in, check-out, inspect)
+- **Infrastructure**: NFC reader/writer, Silent Shield codec, SQLite ledger
+- **Presentation**: Role screens, Signal UI components
 
-Recommended reading order for the project owner:
+## Tech Stack
 
-- `.codex/specs/PROJECT_OWNER_READING_ORDER.md`
+| Area       | Choice                                    |
+| ---------- | ----------------------------------------- |
+| Framework  | React Native CLI + TypeScript             |
+| NFC        | `react-native-nfc-manager`                |
+| Crypto     | `react-native-quick-crypto` (AES-256-GCM) |
+| Local DB   | SQLite (device-local audit only)          |
+| UI         | Signal UI design system                   |
+| State      | Zustand + React Context (DI)              |
+| Navigation | React Navigation                          |
+| Testing    | Jest (444+ tests, 100% coverage)          |
+| Quality    | SonarCloud, Husky hooks                   |
 
-Main execution documents:
+## Key Features
 
-- `.codex/specs/REQUIREMENTS.md`
-- `.codex/specs/DESIGN.md`
-- `.codex/specs/TASKS.md`
-- `.codex/specs/EXECUTION_ORDER.md`
-- `.codex/specs/AGENT_OPERATING_PROTOCOL.md`
+- **4 Roles**: Station, Gate, Terminal, Scout — switchable in one app
+- **Station**: Register cards, top-up balance, view local ledger summary
+- **Gate**: Check-in members to parking (real device time)
+- **Terminal**: Check-out, calculate fee (Rp 2.000/started hour), deduct balance
+- **Scout**: Read-only card inspection (balance, status, last 5 transactions)
+- **Silent Shield**: AES-256-GCM authenticated encryption — card data unreadable by generic NFC apps
+- **NTAG215 Compact Codec**: 362 bytes worst-case, fits within 480-byte NDEF capacity
+- **Offline-first**: No internet required for any core flow
+- **Single-tap NFC**: Read+validate+transform+write in one session
+- **SQLite Ledger**: Device-local audit trail for Station operations
 
-## Local Development Setup
+## How to Run
 
-Implementation setup will be finalized during the React Native scaffolding tasks.
+```bash
+# Install dependencies
+npm install
 
-Planned stack:
+# Start Metro
+npm start
 
-- React Native CLI
-- TypeScript
-- React Navigation
-- NativeWind for utility-first styling
-- `react-native-nfc-manager`
-- SQLite
-- Jest
-- SonarCloud
+# Run on Android
+npm run android
+```
 
-## Mock And Demo Path
+**Requirements**: Android device with NFC enabled + NTAG215 tags.
 
-All flows now use real NFC — no simulation mode or mock scenario selectors remain in the app. Development and demo require an NFC-capable Android device with NTAG215 tags.
+## Branch Strategy
 
-## Submission And Release Notes
+- `main` → protected release (triggers Firebase App Distribution)
+- `develop` → integration
+- `feature/*` → implementation branches
 
-Expected delivery package:
+## Known Limitations
 
-- source code repository
-- working app demo
-- technical and non-technical documentation
-- presentation material
-- APK distribution path for reviewer installation
-
-Release automation:
-
-- GitHub Actions on `main`
-- SonarCloud quality checks
-- app distribution publish pipeline
-
-## Known Limitations Right Now
-
-- iOS NFC validation is deferred
+- iOS NFC write is deferred (read-only/best-effort)
+- Demo AES key is app-bundled (production needs secure provisioning)
+- SQLite ledger is device-local only, not cross-device
+- Device clock correctness is an operational dependency

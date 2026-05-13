@@ -186,27 +186,29 @@ The user can dismiss the sheet at any time. If they do, `dismissedRef.current` b
 This is the simplest use case in the entire app. From `src/application/use-cases/inspect-member-card.use-case.ts`:
 
 ```typescript
-export class InspectMemberCardUseCase {
-  constructor(private readonly cardRepository: MbcCardRepository) {}
+export function createInspectMemberCardUseCase(
+  cardRepository: MbcCardRepository,
+): InspectMemberCardUseCase {
+  return {
+    async execute(): Promise<RoleActionResultDto> {
+      try {
+        // ONLY reads — never writes
+        const card = await cardRepository.readCard();
 
-  async execute(): Promise<RoleActionResultDto> {
-    try {
-      // ONLY reads — never writes
-      const card = await this.cardRepository.readCard();
-
-      return {
-        success: true,
-        role: 'SCOUT',
-        message: 'Card inspected successfully.',
-        card: toCardSummaryDto(card),
-      };
-    } catch (error) {
-      if (error instanceof CardRepositoryError) {
-        return { success: false, role: 'SCOUT', message: error.message };
+        return {
+          success: true,
+          role: 'SCOUT',
+          message: 'Card inspected successfully.',
+          card: toCardSummaryDto(card),
+        };
+      } catch (error) {
+        if (isCardRepositoryError(error)) {
+          return { success: false, role: 'SCOUT', message: error.message };
+        }
+        throw error;
       }
-      throw error;
-    }
-  }
+    },
+  };
 }
 ```
 
@@ -318,7 +320,7 @@ This gets decoded into a full `MbcCard` domain entity.
 
 ```typescript
 finally {
-  await this.cancel(); // NfcManager.cancelTechnologyRequest()
+  await cancel(); // NfcManager.cancelTechnologyRequest()
 }
 ```
 
