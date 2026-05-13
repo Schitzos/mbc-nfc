@@ -182,7 +182,7 @@ async execute({ amount }: TopUpMemberCardRequest): Promise<RoleActionResultDto> 
     return { success: false, role: 'STATION', message: 'Top-up amount must be a positive number.' };
   }
 
-  const nextCard = await this.cardRepository.readWriteCard(card =>
+  const nextCard = await cardRepository.readWriteCard(card =>
     appendTransactionLog(
       { ...card, balance: card.balance + amount },
       createTransactionLog({
@@ -205,15 +205,15 @@ The `readWriteCard` method in `RealMbcCardRepository` (`src/infrastructure/nfc/r
 
 ```typescript
 async readWriteCard(transform: (card: MbcCard) => MbcCard): Promise<MbcCard> {
-  await this.ensureStarted();
+  await ensureStarted();
   try {
-    await this.requestNdefTechnology();       // Opens NFC session
-    const card = await this.readCardFromActiveSession();  // READ
+    await requestNdefTechnology();       // Opens NFC session
+    const card = await readCardFromActiveSession();  // READ
     const updated = transform(card);          // TRANSFORM (domain logic)
-    await this.writeToActiveSession(updated); // WRITE
+    await writeToActiveSession(updated); // WRITE
     return updated;
   } finally {
-    await this.cancel();                      // Close NFC session
+    await cancel();                      // Close NFC session
   }
 }
 ```
@@ -406,7 +406,7 @@ if (envelope.length > NTAG215_USER_MEMORY) {
 After the NFC write succeeds, the use case writes to the **local SQLite ledger** for audit purposes:
 
 ```typescript
-await this.localLedgerRepository.append({
+await localLedgerRepository.append({
   id: createRandomId('LEDGER'),
   role: 'STATION',
   action: 'TOP_UP',
