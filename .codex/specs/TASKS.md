@@ -518,6 +518,33 @@ Acceptance Criteria:
   Status: **DONE** — QA validated 2026-05-12. All 10 ternary-to-null patterns replaced with && operator across 4 files. 64 suites / 431 tests pass. Runtime verified on Pixel 7 Pro emulator (Android 16) — all 5 screens render correctly with no behavioral changes.
   Done: All ternary-to-null patterns replaced with && operator; all tests pass.
 
+### T-UI-STATION-004 — Extract segmented control and amount input to Station fragments
+
+Owner: @FE (mbc-senior-react-native-fe)
+Refs: `DESIGN.md`, `CODE_AUDIT_REPORT.md`
+Do: Extract the inline segmented control (Register/Top-Up tabs) and amount input JSX from `src/presentation/screens/Station/index.tsx` into dedicated fragment components under `src/presentation/screens/Station/fragments/`.
+Acceptance Criteria:
+
+- Segmented control extracted to its own fragment component
+- Amount input extracted to its own fragment component
+- Station/index.tsx imports and uses the new fragments
+- No behavioral changes — all existing tests pass
+- Coverage remains >=90%
+  Status: ✅ DONE
+
+### T-CODE-AUDIT-001 — SOLID and Clean Architecture Code Audit
+
+Owner: @SA + @FE
+Refs: `DESIGN.md`, `REQUIREMENTS.md`
+Do: Line-by-line audit of ALL source files under `src/` for SOLID principle violations (SRP, OCP, LSP, ISP, DIP) and Clean Architecture layer boundary violations. Ensure production-grade code quality.
+Acceptance Criteria:
+
+- Every file in src/ reviewed for SOLID violations
+- Every file checked for Clean Architecture layer boundary violations
+- All violations documented with file path, line number, principle violated, and recommended fix
+- No critical violations remain unfixed or unacknowledged
+  Status: ✅ DONE
+
 ### T-029 — Demo Capture
 
 Owner: Release Engineer / Writer / UI Designer  
