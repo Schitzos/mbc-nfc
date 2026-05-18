@@ -1,4 +1,4 @@
-import type { MbcCard } from '@domain/entities/mbc-card';
+import type { MbcCard } from '@domain/membership/entities/membership-card';
 import { maskMemberReference } from '@shared/utils/mask-member-reference';
 import type { CardSummaryDto } from './card-summary-dto';
 

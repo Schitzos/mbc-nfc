@@ -1,4 +1,4 @@
-# KDX Membership Benefit Card Traceability Matrix
+# Membership Benefit Card Traceability Matrix
 
 This document maps requirements to design sections, implementation tasks, and verification activities.
 

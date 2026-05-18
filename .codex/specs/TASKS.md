@@ -1,4 +1,4 @@
-# KDX Membership Benefit Card — Codex Task Plan Lite
+# Membership Benefit Card — Codex Task Plan Lite
 
 > Current status: 444+ tests | 65 suites | 100% line coverage | jest.config.js thresholds: 99% statements/lines/branches, 96% functions
 
@@ -544,6 +544,21 @@ Acceptance Criteria:
 - All violations documented with file path, line number, principle violated, and recommended fix
 - No critical violations remain unfixed or unacknowledged
   Status: ✅ DONE
+
+### T-REFACTOR-DOMAIN-001 — Restructure domain layer to membership-based folder layout ✅ DONE
+
+Owner: @SA + @FE (Architect)
+Refs: `DESIGN.md`
+Do: Restructure `src/domain/` from flat entity/service/repository folders into a cohesive `src/domain/membership/` bounded-context layout with sub-folders: entities, types, policies, repositories, factories, errors, config. Update all imports across application, infrastructure, presentation, and test layers. Remove old folders.
+Acceptance Criteria:
+
+- New `src/domain/membership/` structure with entities, types, policies, repositories, factories, errors, config sub-folders
+- Old `src/domain/entities/`, `src/domain/services/`, `src/domain/repositories/`, `src/domain/factories/`, `src/domain/errors/` removed
+- All imports updated to `@domain/membership/...` paths
+- All tests pass with 100% coverage maintained
+- No stale imports remain
+  Status: ✅ DONE — QA validated 2026-05-13. 65 suites / 439 tests pass. 100% coverage. PR #149.
+  Done: Domain layer restructured to membership-based bounded context; all imports updated; old folders removed; all tests pass.
 
 ### T-029 — Demo Capture
 

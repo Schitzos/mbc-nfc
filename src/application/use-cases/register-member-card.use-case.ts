@@ -1,11 +1,11 @@
-import type { MbcCard } from '@domain/entities/mbc-card';
-import { createInitialCard } from '@domain/factories/mbc-card-factory';
-import type { MbcCardRepository } from '@domain/repositories/mbc-card-repository';
+import type { MbcCard } from '@domain/membership/entities/membership-card';
+import { createInitialCard } from '@domain/membership/factories/membership-card.factory';
+import type { MbcCardRepository } from '@domain/membership/repositories/membership-card.repository';
 import type { RoleActionResultDto } from '@application/dto/role-action-result-dto';
 import { toCardSummaryDto } from '@application/dto/card-summary-mapper';
-import { isCardRepositoryError } from '@domain/errors/card-repository-error';
+import { isCardRepositoryError } from '@domain/membership/errors/membership-card-repository-error';
 import { createRandomId } from '@shared/utils/create-random-id';
-import type { LocalLedgerRepository } from '@domain/repositories/local-ledger-repository';
+import type { LocalLedgerRepository } from '@domain/membership/repositories/ledger.repository';
 import { maskMemberReference } from '@shared/utils/mask-member-reference';
 
 export type RegisterMemberCardUseCase = {
@@ -71,9 +71,20 @@ export function createRegisterMemberCardUseCase(
     },
 
     async executeWithReset(): Promise<RoleActionResultDto> {
-      const card = createInitialCard();
-      await cardRepository.writeCard(card);
-      return buildSuccessResult(card);
+      try {
+        const card = createInitialCard();
+        await cardRepository.writeCard(card);
+        return buildSuccessResult(card);
+      } catch (error) {
+        if (isCardRepositoryError(error)) {
+          return {
+            success: false,
+            role: 'STATION',
+            message: error.message,
+          };
+        }
+        throw error;
+      }
     },
   };
 }

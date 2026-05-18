@@ -1,21 +1,24 @@
-import type { MbcCardRepository } from '@domain/repositories/mbc-card-repository';
-import { isCardRepositoryError } from '@domain/errors/card-repository-error';
-import { createDomainError, isDomainError } from '@domain/errors/domain-error';
-import { applyCheckOutState } from '@domain/services/activity-state-policy';
-import { calculateActivityTariff } from '@domain/services/activity-tariff-calculator';
+import type { MbcCardRepository } from '@domain/membership/repositories/membership-card.repository';
+import { isCardRepositoryError } from '@domain/membership/errors/membership-card-repository-error';
+import {
+  createDomainError,
+  isDomainError,
+} from '@domain/membership/errors/domain-error';
+import { applyCheckOutState } from '@domain/membership/policies/activity-state-policy';
+import { calculateActivityTariff } from '@domain/membership/policies/tariff-policy';
 import {
   appendTransactionLog,
   createTransactionLog,
-} from '@domain/services/transaction-log-policy';
+} from '@domain/membership/policies/transaction-log-policy';
 import { createRandomId } from '@shared/utils/create-random-id';
 import type {
   RoleActionErrorCode,
   RoleActionResultDto,
 } from '@application/dto/role-action-result-dto';
 import { toCardSummaryDto } from '@application/dto/card-summary-mapper';
-import type { LocalLedgerRepository } from '@domain/repositories/local-ledger-repository';
+import type { LocalLedgerRepository } from '@domain/membership/repositories/ledger.repository';
 import { maskMemberReference } from '@shared/utils/mask-member-reference';
-import type { BenefitActivityType } from '@domain/entities/mbc-card';
+import type { BenefitActivityType } from '@domain/membership/types/card-status';
 
 export type CheckOutActivityRequest = {
   checkedOutAt?: string;

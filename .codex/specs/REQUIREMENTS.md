@@ -1,4 +1,4 @@
-# KDX Chapter 1: Membership Benefit Card Requirements
+# Chapter 1: Membership Benefit Card Requirements
 
 ## 1. Purpose
 

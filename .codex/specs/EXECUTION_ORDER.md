@@ -1,4 +1,4 @@
-# KDX Membership Benefit Card Execution Order
+# Membership Benefit Card Execution Order
 
 ## 1. Purpose
 

@@ -44,8 +44,8 @@ jest.mock('react-native-quick-crypto', () => {
 });
 
 import { encrypt } from '@infrastructure/nfc/silent-shield';
-import type { MbcCard } from '@domain/entities/mbc-card';
-import { createDomainError } from '@domain/errors/domain-error';
+import type { MbcCard } from '@domain/membership/entities/membership-card';
+import { createDomainError } from '@domain/membership/errors/domain-error';
 
 const { createRealMbcCardRepository } = require('../real-mbc-card.repository');
 

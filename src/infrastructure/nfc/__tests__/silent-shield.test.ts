@@ -12,8 +12,12 @@ jest.mock('react-native-quick-crypto', () => {
   };
 });
 
-import { encrypt, decrypt, isMbcEnvelope } from '@infrastructure/nfc/silent-shield';
-import type { MbcCard } from '@domain/entities/mbc-card';
+import {
+  encrypt,
+  decrypt,
+  isMbcEnvelope,
+} from '@infrastructure/nfc/silent-shield';
+import type { MbcCard } from '@domain/membership/entities/membership-card';
 
 const validCard: MbcCard = {
   version: 1,
