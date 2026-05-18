@@ -1,4 +1,4 @@
-# KDX Membership Benefit Card Changelog
+# Membership Benefit Card Changelog
 
 All notable spec and design changes should be recorded here.
 
@@ -119,8 +119,8 @@ Gate writes a compact tariff snapshot into the NFC card active visit state. Term
 
 ### Changed
 
-- Rebased all documentation on `KDX#1 - Membership Benefit Card (MBC).pdf`.
-- Shifted product scope from a generic e-parking NFC prototype to the KDX MBC assessment.
+- Rebased all documentation on `#1 - Membership Benefit Card (MBC).pdf`.
+- Shifted product scope from a generic e-parking NFC prototype to the MBC assessment.
 - Added four required app roles:
   - The Station.
   - The Gate.

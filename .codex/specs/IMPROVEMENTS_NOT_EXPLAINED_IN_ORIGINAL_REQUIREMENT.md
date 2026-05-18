@@ -2,7 +2,7 @@
 
 ## Purpose
 
-This document lists the improvements, product decisions, architecture clarifications, and delivery controls that were added during Product Owner review but were **not explicitly described in the original `KDX#1 - Membership Benefit Card (MBC).pdf` requirement**.
+This document lists the improvements, product decisions, architecture clarifications, and delivery controls that were added during Product Owner review but were **not explicitly described in the original `#1 - Membership Benefit Card (MBC).pdf` requirement**.
 
 These additions are intended to make the requirement implementable, testable, secure, and clear for System Analyst, Software Architect, developers, QA, and Codex execution.
 

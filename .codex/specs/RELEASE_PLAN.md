@@ -1,4 +1,4 @@
-# KDX Membership Benefit Card Release Plan
+# Membership Benefit Card Release Plan
 
 ## 1. Release Strategy
 

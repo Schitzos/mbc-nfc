@@ -1,4 +1,4 @@
-# KDX Membership Benefit Card React Native Prototype 101
+# Membership Benefit Card React Native Prototype 101
 
 > This document is a developer onboarding and NFC/React Native technical reference only.
 > If this document conflicts with `REQUIREMENTS.md`, `DESIGN.md`,
@@ -7,7 +7,7 @@
 
 ## 1. Overview
 
-This project is a frontend mobile assessment for KDX Chapter 1: Membership Benefit Card (MBC). The app demonstrates how an NFC card can become a portable cooperative membership card for areas where internet connectivity is unstable.
+This project is a frontend mobile assessment for Chapter 1: Membership Benefit Card (MBC). The app demonstrates how an NFC card can become a portable cooperative membership card for areas where internet connectivity is unstable.
 
 Instead of relying on a central database for every transaction, the card carries the important member state: identity, balance, active parking visit status and recent transaction history. The mobile app reads and writes that card data directly through NFC. A separate device-local SQLite ledger may store offline reporting and audit history for the current device, but it does not replace the card as member-state truth.
 

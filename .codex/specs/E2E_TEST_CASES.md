@@ -1,4 +1,4 @@
-# KDX Membership Benefit Card E2E Test Cases
+# Membership Benefit Card E2E Test Cases
 
 ## 1. Purpose
 

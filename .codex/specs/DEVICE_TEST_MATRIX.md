@@ -1,4 +1,4 @@
-# KDX Membership Benefit Card Device Test Matrix
+# Membership Benefit Card Device Test Matrix
 
 ## 1. Purpose
 

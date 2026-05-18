@@ -1,6 +1,6 @@
 # Product Owner Alignment Summary
 
-This bundle has been aligned against `KDX#1 - Membership Benefit Card (MBC).pdf` as the source of truth.
+This bundle has been aligned against `#1 - Membership Benefit Card (MBC).pdf` as the source of truth.
 
 ## Key Alignment Decisions
 

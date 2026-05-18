@@ -1,4 +1,4 @@
-# KDX Membership Benefit Card Risk Register
+# Membership Benefit Card Risk Register
 
 ## Risk Matrix
 

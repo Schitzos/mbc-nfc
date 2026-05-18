@@ -1,4 +1,4 @@
-# KDX Membership Benefit Card
+# Membership Benefit Card
 
 [![SonarQube Cloud](https://sonarcloud.io/images/project_badges/sonarcloud-light.svg)](https://sonarcloud.io/summary/new_code?id=Schitzos_mbc-nfc)
 [![Quality gate](https://sonarcloud.io/api/project_badges/quality_gate?project=Schitzos_mbc-nfc)](https://sonarcloud.io/summary/new_code?id=Schitzos_mbc-nfc)

@@ -2,7 +2,7 @@
 
 > Last updated: 2026-05-09 | Phases 0–9 complete | Phase 10 pending (T-029, T-030 only) | 444+ tests | 100% coverage | SonarCloud + Firebase configured
 
-This brief explains the KDX Membership Benefit Card project in a format suitable for assessment presentation slides, stakeholder updates, and technical reviewers.
+This brief explains the Membership Benefit Card project in a format suitable for assessment presentation slides, stakeholder updates, and technical reviewers.
 
 ---
 
