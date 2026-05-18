@@ -29,7 +29,7 @@
        │  No server, no internet needed
        ▼
   ┌──────────┐
-  │  SQLite  │  Local audit ledger (device-only)
+  │ OP-SQLite│  Local audit ledger (device-only)
   └──────────┘
 ```
 
@@ -76,7 +76,7 @@ An **offline-first NFC membership card** where the card itself stores all member
 | 3   | Staff can register cards and top-up balances       | ✅ Station role              |
 | 4   | Tap-based entry and exit flows for members         | ✅ Gate + Terminal roles     |
 | 5   | Sensitive data not readable by external NFC apps   | ✅ Silent Shield AES-256-GCM |
-| 6   | Offline device-side audit trail and income summary | ✅ SQLite ledger             |
+| 6   | Offline device-side audit trail and income summary | ✅ OP-SQLite ledger          |
 
 ## Key System Requirements
 
@@ -156,13 +156,12 @@ sequenceDiagram
     participant Repo as MbcCardRepository
     participant Shield as Silent Shield
     participant Card as NFC Card (NTAG215)
-    participant DB as SQLite Ledger
+    participant DB as OP-SQLite Ledger
 
     Admin->>UI: Tap "Register" → Place card
     UI->>UC: execute()
-    UC->>UC: Generate memberId (UUID)
-    UC->>UC: Create MbcCard (balance=0, NOT_CHECKED_IN)
-    UC->>Repo: writeCard(newCard)
+    UC->>UC: createInitialCard() via factory
+    UC->>Repo: registerCard(newCard)
     Repo->>Shield: encrypt(compactPayload)
     Shield-->>Repo: MBC1 envelope (≤362 bytes)
     Repo->>Card: writeNdefMessage(envelope)
@@ -183,19 +182,17 @@ sequenceDiagram
     participant Repo as MbcCardRepository
     participant Shield as Silent Shield
     participant Card as NFC Card (NTAG215)
-    participant DB as SQLite Ledger
+    participant DB as OP-SQLite Ledger
 
     Admin->>UI: Enter amount (or preset) → Place card
     UI->>UC: execute(amount)
-    UC->>Repo: readCard()
+    UC->>Repo: readWriteCard(transform)
     Repo->>Card: readNdefMessage()
     Card-->>Repo: Raw NDEF payload
     Repo->>Shield: decrypt(envelope)
     Shield-->>Repo: Decoded MbcCard
-    Repo-->>UC: MbcCard data
     UC->>UC: Validate positive amount
-    UC->>UC: Add balance + append transaction log
-    UC->>Repo: writeCard(updatedCard)
+    UC->>UC: Add balance + appendTransactionLog
     Repo->>Shield: encrypt(newPayload, fresh IV)
     Shield-->>Repo: New MBC1 envelope
     Repo->>Card: writeNdefMessage(envelope)
@@ -219,18 +216,16 @@ sequenceDiagram
 
     Op->>UI: Tap "Check-in" → Place card
     UI->>UC: execute(PARKING, deviceTime)
-    UC->>Repo: readCard()
+    UC->>Repo: readWriteCard(transform)
     Repo->>Card: readNdefMessage()
     Card-->>Repo: Raw payload
     Repo->>Shield: decrypt(envelope)
     Shield-->>Repo: MbcCard
-    Repo-->>UC: MbcCard data
-    UC->>UC: Validate: visitStatus == NOT_CHECKED_IN
+    UC->>UC: applyCheckInState — validate NOT_CHECKED_IN
     alt Already checked in
         UC-->>UI: ❌ ALREADY_CHECKED_IN
     else Valid
-        UC->>UC: Set activeSession + CHECKED_IN + append log
-        UC->>Repo: writeCard(updatedCard)
+        UC->>UC: Set activeSession + CHECKED_IN + appendTransactionLog
         Repo->>Shield: encrypt(payload, fresh IV)
         Shield-->>Repo: MBC1 envelope
         Repo->>Card: writeNdefMessage(envelope)
@@ -248,30 +243,27 @@ sequenceDiagram
     actor Op as Terminal Operator
     participant UI as Terminal Screen
     participant UC as CheckOutActivity UseCase
-    participant Tariff as TariffCalculator
+    participant Tariff as calculateActivityTariff
     participant Repo as MbcCardRepository
     participant Shield as Silent Shield
     participant Card as NFC Card (NTAG215)
-    participant DB as SQLite Ledger
+    participant DB as OP-SQLite Ledger
 
     Op->>UI: Tap "Check-out" → Place card
     UI->>UC: execute(exitTime)
-    UC->>Repo: readCard()
+    UC->>Repo: readWriteCard(transform)
     Repo->>Card: readNdefMessage()
     Card-->>Repo: Raw payload
     Repo->>Shield: decrypt(envelope)
     Shield-->>Repo: MbcCard
-    Repo-->>UC: MbcCard data
     UC->>UC: Validate: visitStatus == CHECKED_IN
-    UC->>UC: Validate: exitTime > entryTime
-    UC->>Tariff: calculate(entryTime, exitTime)
-    Tariff-->>UC: {chargedHours, fee}
+    UC->>Tariff: calculateActivityTariff(entryTime, exitTime)
+    Tariff-->>UC: {chargedHours, chargedAmount, durationMs}
     alt Insufficient balance
         UC-->>UI: ❌ INSUFFICIENT_BALANCE
         UI-->>Op: "Top up at Station first"
     else Balance sufficient
-        UC->>UC: Deduct balance + clear session + append log
-        UC->>Repo: writeCard(updatedCard)
+        UC->>UC: applyCheckOutState + appendTransactionLog
         Repo->>Shield: encrypt(payload, fresh IV)
         Shield-->>Repo: MBC1 envelope
         Repo->>Card: writeNdefMessage(envelope)
@@ -301,7 +293,7 @@ sequenceDiagram
     Repo->>Shield: decrypt(envelope)
     Shield-->>Repo: MbcCard
     Repo-->>UC: MbcCard data
-    UC-->>UI: Read-only summary
+    UC-->>UI: Read-only CardSummaryDto
     UI-->>Member: Balance / Status / Last 5 logs
     Note over UC,Card: Scout NEVER calls writeCard()
 ```
@@ -318,7 +310,7 @@ graph TB
         direction LR
         P1[Role Screens]
         P2[Signal UI Components]
-        P3[Zustand Stores]
+        P3[Zustand Store]
     end
 
     subgraph Application["⚙️ Application Layer"]
@@ -328,22 +320,24 @@ graph TB
         A3[CheckInActivity]
         A4[CheckOutActivity]
         A5[InspectMemberCard]
-        A6[GetStationSummary]
+        A6[GetStationLedgerSummary]
+        A7[CheckNfcAvailability]
     end
 
     subgraph Domain["💎 Domain Layer"]
         direction LR
-        D1[MbcCard Entity]
-        D2[TariffCalculator]
-        D3[CardStatePolicy]
-        D4[Repository Interfaces]
+        D1[MbcCard Type]
+        D2[TariffPolicy]
+        D3[ActivityStatePolicy]
+        D4[TransactionLogPolicy]
+        D5[Repository Interfaces]
     end
 
     subgraph Infrastructure["🔧 Infrastructure Layer"]
         direction LR
         I1[NFC Reader/Writer]
-        I2[Silent Shield Codec]
-        I3[SQLite Ledger]
+        I2[Silent Shield + Codec]
+        I3[OP-SQLite Ledger]
     end
 
     Presentation --> Application
@@ -372,23 +366,57 @@ graph LR
 
 > **Golden Rule:** Inner layers never know about outer layers. Business rules don't care if data comes from NFC or a test mock.
 
-| Layer              | Responsibility                                   | Key Files                                        |
-| ------------------ | ------------------------------------------------ | ------------------------------------------------ |
-| **Domain**         | Entities, tariff rules, state policy, interfaces | `domain/entities/`, `domain/rules/`              |
-| **Application**    | Use case orchestration (6 use cases)             | `application/use-cases/`                         |
-| **Infrastructure** | NFC, crypto, SQLite implementations              | `infrastructure/nfc/`, `crypto/`, `persistence/` |
-| **Presentation**   | Screens, stores, navigation, Signal UI           | `presentation/screens/`, `components/`           |
+| Layer              | Responsibility                                       | Key Paths                                                     |
+| ------------------ | ---------------------------------------------------- | ------------------------------------------------------------- |
+| **Domain**         | Entities, policies, factories, types, interfaces     | `domain/membership/entities/`, `policies/`, `repositories/`   |
+| **Application**    | Use case orchestration (7 use cases) + DTOs          | `application/use-cases/`, `application/dto/`                  |
+| **Infrastructure** | NFC, Silent Shield, codec, OP-SQLite implementations | `infrastructure/nfc/`, `infrastructure/local-ledger/`         |
+| **Presentation**   | Screens, stores, context, navigation, Signal UI      | `presentation/screens/`, `components/`, `stores/`, `context/` |
+
+## Domain Folder Structure
+
+```
+domain/membership/
+├── entities/          MbcCard, ActivitySession, TransactionLog, LedgerEntry, StationLedgerSummary
+├── policies/          tariff-policy, activity-state-policy, transaction-log-policy
+├── factories/         membership-card.factory (createInitialCard)
+├── errors/            DomainError, CardRepositoryError (membership-card-repository-error)
+├── types/             VisitStatus, MbcActivity, BenefitActivityType, MbcRole, CurrencyCode, MemberProfile
+├── config/            parking-tariff (PARKING_TARIFF_STRATEGY)
+└── repositories/      MbcCardRepository, LocalLedgerRepository, NfcAvailabilityRepository
+```
+
+## Repository Interface Composition
+
+```mermaid
+graph TB
+    CR[CardReader<br/>readCard, cancel] --> MCR[MbcCardRepository]
+    CW[CardWriter<br/>writeCard, readWriteCard, registerCard, cancel] --> MCR
+    NCC[NfcCapabilityChecker<br/>isSupported] --> MCR
+
+    LLR[LocalLedgerRepository<br/>append, getStationSummary]
+    NAR[NfcAvailabilityRepository<br/>isSupported, getAvailabilityStatus]
+
+    style MCR fill:#FFD54F,color:#000
+    style CR fill:#FFF9C4,color:#000
+    style CW fill:#FFF9C4,color:#000
+    style NCC fill:#FFF9C4,color:#000
+    style LLR fill:#FFD54F,color:#000
+    style NAR fill:#FFD54F,color:#000
+```
+
+**5 interfaces total:** CardReader + CardWriter + NfcCapabilityChecker (compose into MbcCardRepository), LocalLedgerRepository, NfcAvailabilityRepository.
 
 ## Code Audit Results — Grade: A-
 
-| Category                  | Result     | Details                           |
-| ------------------------- | ---------- | --------------------------------- |
-| Layer boundary compliance | ✅ PASS    | All 30+ files respect boundaries  |
-| Single Responsibility     | ⚠️ 2 minor | Station hook manages 3 flows      |
-| Open/Closed               | ✅ PASS    | New activities = config only      |
-| Liskov Substitution       | ✅ PASS    | Mock ↔ Real repos interchangeable |
-| Interface Segregation     | ✅ PASS    | 3 focused interfaces              |
-| Dependency Inversion      | ✅ PASS    | Use cases depend on abstractions  |
+| Category                  | Result     | Details                                 |
+| ------------------------- | ---------- | --------------------------------------- |
+| Layer boundary compliance | ✅ PASS    | All files respect dependency rule       |
+| Single Responsibility     | ⚠️ 2 minor | Station hook manages 3 flows            |
+| Open/Closed               | ✅ PASS    | New activities = config only            |
+| Liskov Substitution       | ✅ PASS    | Mock ↔ Real repos interchangeable       |
+| Interface Segregation     | ✅ PASS    | 5 focused interfaces (3 compose into 1) |
+| Dependency Inversion      | ✅ PASS    | Use cases depend on abstractions        |
 
 > **0 critical violations · 0 major violations · 2 minor observations**
 
@@ -396,13 +424,13 @@ graph LR
 
 # 7. SOLID Design Principles
 
-| Principle                     | Rule                                        | MBC Implementation                                                                              |
-| ----------------------------- | ------------------------------------------- | ----------------------------------------------------------------------------------------------- |
-| **S** — Single Responsibility | Each class has one job                      | `TariffCalculator` only computes cost; `CardStatePolicy` only validates state                   |
-| **O** — Open/Closed           | Open for extension, closed for modification | New activities (gym, library) need zero changes to use cases                                    |
-| **L** — Liskov Substitution   | Implementations are interchangeable         | `MockCardRepository` and `RealMbcCardRepository` both satisfy `MbcCardRepository`               |
-| **I** — Interface Segregation | Don't depend on unused methods              | 3 focused interfaces: `MbcCardRepository`, `LocalLedgerRepository`, `NfcAvailabilityRepository` |
-| **D** — Dependency Inversion  | Depend on abstractions                      | Use cases define interfaces; Infrastructure implements them                                     |
+| Principle                     | Rule                                        | MBC Implementation                                                                                                                 |
+| ----------------------------- | ------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------- |
+| **S** — Single Responsibility | Each module has one job                     | `calculateActivityTariff` only computes cost; `applyCheckInState`/`applyCheckOutState` only validate state transitions             |
+| **O** — Open/Closed           | Open for extension, closed for modification | New activities (gym, library) need zero changes to use cases — add TariffStrategy config only                                      |
+| **L** — Liskov Substitution   | Implementations are interchangeable         | Mock repositories and `RealMbcCardRepository` both satisfy `MbcCardRepository`                                                     |
+| **I** — Interface Segregation | Don't depend on unused methods              | 5 interfaces: CardReader, CardWriter, NfcCapabilityChecker (→ MbcCardRepository), LocalLedgerRepository, NfcAvailabilityRepository |
+| **D** — Dependency Inversion  | Depend on abstractions                      | Use cases define interfaces in domain; Infrastructure implements them                                                              |
 
 ```mermaid
 graph TB
@@ -418,11 +446,11 @@ graph TB
 
 ## Package Principles
 
-| Principle                     | MBC Example                                                          |
-| ----------------------------- | -------------------------------------------------------------------- |
-| **Reuse/Release Equivalency** | Card codec, tariff rules, state policy are independently versionable |
-| **Common Closure**            | Tariff logic + card encoding live in same boundary                   |
-| **Common Reuse**              | Each role screen imports only needed use cases                       |
+| Principle                     | MBC Example                                                                    |
+| ----------------------------- | ------------------------------------------------------------------------------ |
+| **Reuse/Release Equivalency** | Card codec, tariff policy, state policy are independently testable/versionable |
+| **Common Closure**            | Tariff logic + card encoding live in same bounded context                      |
+| **Common Reuse**              | Each role screen imports only needed use cases via service context             |
 
 ---
 
@@ -443,19 +471,19 @@ graph TB
 flowchart LR
     subgraph Write["✍️ Write Path"]
         direction TB
-        W1[Card Data] --> W2[Compact JSON]
+        W1[MbcCard Data] --> W2[Compact JSON via mbc-card-codec]
         W2 --> W3[Random IV 12B]
-        W3 --> W4[AES-256-GCM Encrypt]
+        W3 --> W4[AES-256-GCM Encrypt via react-native-quick-crypto]
         W4 --> W5[MBC1 Envelope]
-        W5 --> W6[NTAG215 Write]
+        W5 --> W6[NDEF MIME Record → NTAG215 Write]
     end
 
     subgraph Read["👁️ Read Path"]
         direction TB
-        R1[NTAG215 Read] --> R2[Parse MBC1]
+        R1[NTAG215 Read] --> R2[Parse MBC1 magic]
         R2 --> R3[Extract IV + AuthTag]
         R3 --> R4{Decrypt + Verify}
-        R4 -->|✅| R5[Valid Data]
+        R4 -->|✅| R5[Valid MbcCard]
         R4 -->|❌| R6[CARD_TAMPERED]
     end
 
@@ -467,11 +495,19 @@ flowchart LR
 
 ```
 ┌────────┬─────┬───────┬──────┬──────────┬─────────────┬────────────┐
-│ MBC1   │ Ver │ KeyID │ Algo │ IV (12B) │ AuthTag(16B)│ Ciphertext │
+│ MBC1   │ Ver │ KeyID │ Alg  │ IV (12B) │ AuthTag(16B)│ Ciphertext │
 │ 4 bytes│ 1B  │  1B   │  1B  │  random  │  integrity  │  variable  │
 └────────┴─────┴───────┴──────┴──────────┴─────────────┴────────────┘
-Total overhead: 35 bytes fixed + ciphertext
+Total fixed overhead: 35 bytes (4+1+1+1+12+16) + ciphertext
 ```
+
+## NDEF Record Format
+
+| Property  | Value                    |
+| --------- | ------------------------ |
+| TNF       | `TNF_MIME_MEDIA`         |
+| MIME Type | `application/vnd.mbc.v1` |
+| Payload   | Binary MBC1 envelope     |
 
 ## What's Protected on Card
 
@@ -493,35 +529,48 @@ Total overhead: 35 bytes fixed + ciphertext
 | ---------------------------- | --------------- | -------------- |
 | NTAG215 raw capacity         | 504 bytes       | —              |
 | NDEF usable capacity         | 480 bytes       | —              |
+| Safe plaintext budget        | 337 bytes       | —              |
 | Worst-case encrypted payload | 362 bytes       | ✅ Fits        |
 | Safety margin                | 118 bytes (25%) | ✅ Comfortable |
 
+## Plaintext Budget Calculation
+
+```
+floor((504 - 7) × 3/4) - 35 = 337 bytes available for compact JSON plaintext
+
+Where:
+  504 = NTAG215 raw memory
+    7 = NDEF record header overhead
+  3/4 = Base64URL worst-case encoding ratio
+   35 = Silent Shield envelope overhead (magic + ver + kid + alg + IV + authTag)
+```
+
 ## Compact Payload Fields
 
-| Field | Name         | Content                                 | Example                   |
-| ----- | ------------ | --------------------------------------- | ------------------------- |
-| `v`   | Version      | Payload version                         | `1`                       |
-| `c`   | Counter      | Write counter (monotonic)               | `5`                       |
-| `m`   | Member ID    | UUID identifier                         | `"abc-123..."`            |
-| `b`   | Balance      | Current balance (IDR)                   | `20000`                   |
-| `i`   | Visit info   | `{s, a, t}` — status, activity, time    | `{s:"I", a:"P", t:"..."}` |
-| `x`   | Extra        | Reserved                                | `null`                    |
-| `n`   | Transactions | Last 5 logs `[activity, nominal, time]` | `[["U",20000,"..."]]`     |
+| Field | Name             | Type                             | Description                                                            |
+| ----- | ---------------- | -------------------------------- | ---------------------------------------------------------------------- |
+| `v`   | Version          | `number`                         | Payload schema version (always `1`)                                    |
+| `c`   | Card ID          | `string`                         | Short internal card identifier                                         |
+| `m`   | Member ID        | `string`                         | Generated member ID reference                                          |
+| `b`   | Balance          | `number`                         | Current balance in IDR                                                 |
+| `i`   | Active Session   | `{a: number, t: string} \| null` | Check-in state: `a`=1 active, `t`=ISO time; `null` when not checked in |
+| `x`   | Transaction Logs | `[activity, nominal, time][]`    | Last 5 logs as compact tuples                                          |
+| `n`   | Write Counter    | `number`                         | Monotonic write counter (increments per write)                         |
 
 ## Activity Codes (Compact)
 
-| Code | Meaning   |
-| ---- | --------- |
-| `R`  | Register  |
-| `U`  | Top-Up    |
-| `I`  | Check-In  |
-| `O`  | Check-Out |
+| Code | Full Activity | Nominal Rule         |
+| ---- | ------------- | -------------------- |
+| `R`  | REGISTER      | `0`                  |
+| `U`  | TOP_UP        | Top-up amount        |
+| `I`  | CHECK_IN      | `0`                  |
+| `O`  | CHECK_OUT     | Parking fee deducted |
 
 ## Data Transformation Pipeline
 
 ```
-MbcCard Object → Compact JSON → AES-256-GCM Encrypt → MBC1 Envelope → NDEF Message → NFC Tag
-     ~200B          ~327B            +35B overhead         362B             362B         ✅
+MbcCard Type → Compact JSON (mbc-card-codec) → AES-256-GCM (silent-shield) → MBC1 Envelope → NDEF MIME Record → NFC Tag
+                    ≤337B                          +35B overhead                  ≤362B              ≤362B           ✅
 ```
 
 ---
@@ -540,26 +589,46 @@ Based on **Telkomsel Signal UI** design system (Figma source).
 | **Shadows**         | 3 elevation levels                              |
 | **Radius**          | Consistent corner radius tokens                 |
 
-## Screen Mapping
+## Screen Architecture
 
-| Screen        | Signal UI Components Used                                          |
-| ------------- | ------------------------------------------------------------------ |
-| Role Switcher | SignalOptionCard (4 role cards)                                    |
-| Station       | SignalTextField, SignalButton, SegmentedControl, SignalSurfaceCard |
-| Gate          | SignalButton, SignalStatusBanner, RadarZone                        |
-| Terminal      | SignalButton, SignalStatusBanner, CheckoutSummaryCard              |
-| Scout         | MemberCardInfo, LatestLogsCard, SignalSurfaceCard                  |
-| All Roles     | NfcActionSheet (ScanningRings), NfcLogPanel, BackgroundDecor       |
+| Screen           | Purpose                  | Key Components Used                                              |
+| ---------------- | ------------------------ | ---------------------------------------------------------------- |
+| **RoleSwitcher** | Select operational role  | SignalOptionCard (4 role cards), BackgroundDecor                 |
+| **Station**      | Register, Top-up, Ledger | SignalTextField, SignalButton, SignalSurfaceCard, NfcActionSheet |
+| **Gate**         | Check-in entry           | SignalButton, SignalStatusBanner, RadarZone, NfcActionSheet      |
+| **Terminal**     | Check-out exit           | SignalButton, SignalStatusBanner, NfcActionSheet                 |
+| **Scout**        | Read-only inspection     | SignalSurfaceCard, SignalJelajahCard, NfcActionSheet             |
 
-## Custom MBC Components
+## Presentation Components (14 total)
 
 | Component              | Purpose                                                           |
 | ---------------------- | ----------------------------------------------------------------- |
+| **SignalBottomSheet**  | Reusable bottom sheet container                                   |
+| **SignalOptionCard**   | Role selection card with icon and label                           |
+| **BackgroundDecor**    | Decorative background gradient/pattern                            |
+| **SignalButton**       | Primary/secondary action button with variants                     |
+| **ErrorBoundary**      | React error boundary for graceful crash handling                  |
 | **RadarZone**          | Dark immersive zone with concentric radar rings + sweep animation |
-| **ScanningRings**      | 3 pulsing concentric rings + breathing NFC icon during scan       |
-| **NfcActionSheet**     | Bottom sheet with states: scanning → success → error → confirm    |
+| **SignalSkeleton**     | Loading placeholder skeleton                                      |
+| **SignalTextField**    | Text input with validation states                                 |
+| **SignalJelajahCard**  | Exploration/info card component                                   |
 | **NfcLogPanel**        | Toggleable operational log (timestamp + event text)               |
+| **AppHeaderCard**      | Screen header with role context                                   |
+| **SignalSurfaceCard**  | Elevated surface container                                        |
 | **SignalStatusBanner** | Role-colored status feedback (success/error/info)                 |
+| **NfcActionSheet**     | Bottom sheet with states: scanning → success → error → confirm    |
+
+## NfcActionSheet — Unified NFC Feedback
+
+The `NfcActionSheet` bottom sheet provides scan/success/error/confirm feedback on **all screens**. It includes `ScanningRings` — 3 pulsing concentric rings with a breathing NFC icon during active scan.
+
+## State Management
+
+| Concern              | Solution                              |
+| -------------------- | ------------------------------------- |
+| App state            | Zustand store (`app-store.ts`)        |
+| Dependency injection | React Context (`service-context.tsx`) |
+| Navigation           | React Navigation with `native-stack`  |
 
 ---
 
@@ -569,33 +638,47 @@ Based on **Telkomsel Signal UI** design system (Figma source).
 
 | Metric                    | Value      | Target |
 | ------------------------- | ---------- | ------ |
-| Automated tests           | **444+**   | —      |
+| Automated tests           | **439**    | —      |
 | Test suites               | **65**     | —      |
-| Line coverage             | **100%**   | ≥99%   |
 | Statement coverage        | **99%+**   | ≥99%   |
+| Line coverage             | **99%+**   | ≥99%   |
 | Branch coverage           | **99%+**   | ≥99%   |
+| Function coverage         | **96%+**   | ≥96%   |
 | npm audit vulnerabilities | **0**      | 0      |
 | SonarCloud quality gate   | **PASSED** | Pass   |
 | Code audit grade          | **A-**     | —      |
+
+## Coverage Thresholds (jest.config.js)
+
+```json
+{
+  "statements": 99,
+  "lines": 99,
+  "functions": 96,
+  "branches": 99
+}
+```
+
+Build fails automatically if coverage drops below these thresholds.
 
 ## Test Strategy (6 Levels)
 
 | Level              | Scope                              | Environment         |
 | ------------------ | ---------------------------------- | ------------------- |
-| **Unit**           | Domain rules, tariff, state, codec | Jest (no hardware)  |
+| **Unit**           | Domain policies, tariff, state     | Jest (no hardware)  |
 | **Application**    | Use case orchestration             | Jest + mock repos   |
-| **Infrastructure** | NFC repo, SQLite, crypto           | Jest + mocks        |
-| **Presentation**   | Screens, hooks, stores             | Jest + RNTL         |
+| **Infrastructure** | NFC repo, OP-SQLite, codec, shield | Jest + mocks        |
+| **Presentation**   | Screens, hooks, stores, components | Jest + RNTL         |
 | **Device**         | Real NFC read/write flows          | ASUS ROG Phone 9 FE |
 | **Security**       | Tamper detection, encryption       | Jest + device       |
 
-## How 444+ Tests Run Without NFC Hardware
+## How 439 Tests Run Without NFC Hardware
 
 ```mermaid
 graph LR
     UC[Use Cases] -->|depend on| IF[Interfaces<br/>Domain Layer]
     MOCK[MockCardRepository] -.->|implements| IF
-    REAL[RealMbcCardRepository] -.->|implements| IF
+    REAL[RealMbcCardRepository] -.->|production| IF
 
     UC -.->|test with| MOCK
     UC -.->|production with| REAL
@@ -605,15 +688,15 @@ graph LR
     style IF fill:#FFD54F,color:#000
 ```
 
-> Clean Architecture makes this possible: mock repositories replace real NFC/SQLite. All 444+ tests run in CI without physical devices.
+> Clean Architecture makes this possible: mock repositories replace real NFC/OP-SQLite. All 439 tests run in CI without physical devices.
 
 ## Quality Gates Enforced
 
-- ✅ `jest.config.js` — 99% threshold (build fails if coverage drops)
+- ✅ `jest.config.js` — coverage thresholds (statements 99%, lines 99%, branches 99%, functions 96%)
 - ✅ SonarCloud — quality gate on every PR
-- ✅ Husky pre-commit hooks — lint + test
+- ✅ Husky pre-commit hooks — lint-staged (eslint + prettier)
 - ✅ PR requires QA screenshot evidence
-- ✅ `npm audit` — 0 vulnerabilities enforced
+- ✅ `npm audit` — 0 vulnerabilities enforced (audit-level=high)
 
 ---
 
@@ -626,14 +709,14 @@ flowchart LR
     F[feature/*] -->|PR| DEV[develop]
     DEV -->|PR| MAIN[main]
 
-    subgraph QG["Quality Gate (PR to develop)"]
+    subgraph QG["Quality Gate (PR to develop / push to main)"]
         direction TB
         UT[Unit Test] --> VS[Vulnerability Scan]
         LT[Lint] --> VS
         VS --> SC[SonarCloud]
     end
 
-    subgraph REL["Release (manual on main)"]
+    subgraph REL["Release (workflow_dispatch on main)"]
         direction TB
         BA[Build APK] --> FD[Firebase<br/>App Distribution]
     end
@@ -648,48 +731,40 @@ flowchart LR
     style REL fill:#C8E6C9,color:#000
 ```
 
-## CI/CD Behavior
+## CI/CD Triggers
 
-| Trigger                       | Pipeline Stages                                                                        | Purpose                   |
-| ----------------------------- | -------------------------------------------------------------------------------------- | ------------------------- |
-| **PR to `develop`**           | Unit Test → Lint → Vulnerability Scan → SonarCloud                                     | Quality gate before merge |
-| **Manual dispatch on `main`** | Unit Test → Lint → Vulnerability Scan → SonarCloud → Build APK → Firebase Distribution | Release to testers        |
+| Trigger                                                            | Pipeline Stages                                                                 | Purpose                   |
+| ------------------------------------------------------------------ | ------------------------------------------------------------------------------- | ------------------------- |
+| **PR to `develop`** (opened/synchronize/reopened/ready_for_review) | unit_test + lint → vulnerability_scan → sonarcloud                              | Quality gate before merge |
+| **Push to `main`**                                                 | unit_test + lint → vulnerability_scan → sonarcloud                              | Post-merge quality check  |
+| **workflow_dispatch on `main`** (build_and_distribute=true)        | unit_test + lint → vulnerability_scan → sonarcloud → build_apk → distribute_apk | Release to testers        |
 
-### PR to `develop` — Quality Gate
+## Pipeline Stages
 
 ```
 ┌───────────┐     ┌──────┐
-│ Unit Test │     │ Lint │    (parallel)
+│ unit_test │     │ lint │    (parallel)
 └─────┬─────┘     └──┬───┘
       └───────┬───────┘
               ▼
-    ┌───────────────────┐
-    │ Vulnerability Scan│    npm audit --audit-level=high
-    └─────────┬─────────┘
+    ┌───────────────────────┐
+    │  vulnerability_scan   │    npm audit --omit=dev --audit-level=high
+    └─────────┬─────────────┘
               ▼
-    ┌───────────────────┐
-    │   SonarCloud Scan │    Coverage + code quality
-    └───────────────────┘
+    ┌───────────────────────┐
+    │     sonarcloud         │    Coverage + code quality
+    └─────────┬─────────────┘
+              ▼  (only on workflow_dispatch + main)
+    ┌───────────────────────┐
+    │      build_apk         │    Bundle JS → Gradle assembleDebug
+    └─────────┬─────────────┘
+              ▼
+    ┌───────────────────────┐
+    │    distribute_apk      │    Upload to Firebase "testers" group
+    └───────────────────────┘
 ```
 
-All 4 jobs must pass before PR can be merged.
-
-### Manual Dispatch on `main` — Build & Distribute
-
-```
-Quality Gate (same as above)
-              │
-              ▼
-    ┌───────────────────┐
-    │     Build APK     │    Bundle JS → Gradle assembleDebug
-    └─────────┬─────────┘
-              ▼
-    ┌───────────────────┐
-    │ Firebase App Dist │    Upload to "testers" group
-    └───────────────────┘
-```
-
-Build and distribution only run on `main` branch via manual workflow dispatch.
+Build + distribute only runs on `workflow_dispatch` when ref is `main`.
 
 ## Required Secrets
 
@@ -714,31 +789,31 @@ Build and distribution only run on `main` branch via manual workflow dispatch.
 
 ## Risk Register — 20/20 Closed ✅
 
-| ID    | Risk                              | Impact | Mitigation                         | Status    |
-| ----- | --------------------------------- | ------ | ---------------------------------- | --------- |
-| R-001 | NTAG215 capacity exceeded         | High   | Compact codec: 362B < 480B         | ✅ Closed |
-| R-002 | iOS NFC write unsupported         | Medium | Deferred — Android-first MVP       | ✅ Closed |
-| R-003 | Sensitive data exposed via NFC    | High   | Silent Shield AES-256-GCM          | ✅ Closed |
-| R-004 | Demo key confused with production | Medium | Documented + ADR                   | ✅ Closed |
-| R-005 | Write interrupted mid-operation   | Medium | writeNdefMessage throws on failure | ✅ Closed |
-| R-006 | Double check-in/out               | Medium | CardStatePolicy validation         | ✅ Closed |
-| R-007 | Coverage gaps                     | Medium | 100% achieved (444+ tests)         | ✅ Closed |
-| R-008 | Clock manipulation                | Low    | Operational procedure documented   | ✅ Closed |
-| R-009 | Card removed during write         | Medium | NFC session error handling         | ✅ Closed |
-| R-010 | Insufficient balance at exit      | Medium | Clear top-up guidance shown        | ✅ Closed |
+| ID    | Risk                              | Impact | Mitigation                                      | Status    |
+| ----- | --------------------------------- | ------ | ----------------------------------------------- | --------- |
+| R-001 | NTAG215 capacity exceeded         | High   | Compact codec: 362B < 480B                      | ✅ Closed |
+| R-002 | iOS NFC write unsupported         | Medium | Deferred — Android-first MVP                    | ✅ Closed |
+| R-003 | Sensitive data exposed via NFC    | High   | Silent Shield AES-256-GCM                       | ✅ Closed |
+| R-004 | Demo key confused with production | Medium | Documented + ADR                                | ✅ Closed |
+| R-005 | Write interrupted mid-operation   | Medium | writeNdefMessage throws on failure              | ✅ Closed |
+| R-006 | Double check-in/out               | Medium | applyCheckInState/applyCheckOutState validation | ✅ Closed |
+| R-007 | Coverage gaps                     | Medium | 99%+ achieved (439 tests)                       | ✅ Closed |
+| R-008 | Clock manipulation                | Low    | Operational procedure documented                | ✅ Closed |
+| R-009 | Card removed during write         | Medium | NFC session error handling                      | ✅ Closed |
+| R-010 | Insufficient balance at exit      | Medium | Clear top-up guidance shown                     | ✅ Closed |
 
 > Full 20-risk register with all mitigations in `.codex/specs/RISKS.md`
 
 ## Edge Cases Handled (20 total)
 
-| Category               | Edge Cases                                                                           | Count | Handling                                               |
-| ---------------------- | ------------------------------------------------------------------------------------ | :---: | ------------------------------------------------------ |
-| **State conflicts**    | Double check-in tap · Double check-out tap · Re-register existing card               |   3   | Reject duplicate check-in/out with clear error         |
-| **Balance & input**    | Insufficient balance at exit · Top-up while checked in · Invalid top-up input        |   3   | Guidance shown, state preserved, input validated       |
-| **Card integrity**     | Unknown card tapped · Tampered payload · Unsupported schema version                  |   3   | CARD_TAMPERED / CARD_UNSUPPORTED / version rejection   |
-| **NFC failures**       | Card removed mid-write · Buffer polyfill missing · Sheet dismissed mid-scan          |   3   | Error recovery + retry guidance + clean session cancel |
-| **Capacity & storage** | Payload exceeds capacity · More than 5 logs · Ledger deleted · Multi-device use      |   4   | Compact payload, log rotation, card as source of truth |
-| **Time & edge**        | Exit before entry time · Future time removed · Readback removed · Wrong device clock |   4   | INVALID_DURATION rejection, boundary validation        |
+| Category               | Edge Cases                                                                       | Count | Handling                                                                            |
+| ---------------------- | -------------------------------------------------------------------------------- | :---: | ----------------------------------------------------------------------------------- |
+| **State conflicts**    | Double check-in tap · Double check-out tap · Re-register existing card           |   3   | Reject with CARD_ALREADY_CHECKED_IN / CARD_NOT_CHECKED_IN / CARD_ALREADY_REGISTERED |
+| **Balance & input**    | Insufficient balance at exit · Top-up while checked in · Invalid top-up input    |   3   | Guidance shown, state preserved, input validated                                    |
+| **Card integrity**     | Unknown card tapped · Tampered payload · Unsupported schema version              |   3   | UNREGISTERED_CARD / CARD_TAMPERED / version rejection                               |
+| **NFC failures**       | Card removed mid-write · Scan cancelled · Scan timeout                           |   3   | Error recovery + retry guidance + clean session cancel                              |
+| **Capacity & storage** | Payload exceeds capacity · More than 5 logs · Ledger deleted · Multi-device use  |   4   | CARD_CAPACITY_INSUFFICIENT, slice(-5) log rotation, card as source of truth         |
+| **Time & edge**        | Exit before entry time · Invalid timestamps · Wrong device clock · Zero duration |   4   | INVALID_DURATION / INVALID_TIMESTAMP rejection                                      |
 
 > Full edge case definitions in `.codex/specs/EDGE_CASES.md`
 
@@ -816,20 +891,20 @@ TODO → IN_PROGRESS → DEV_DONE → UNIT_TEST_DONE → QA_READY → QA_PASSED 
 
 # 15. Architecture Decision Records (Key ADRs)
 
-| ADR     | Decision                      | Rationale                                        |
-| ------- | ----------------------------- | ------------------------------------------------ |
-| ADR-001 | React Native CLI (not Expo)   | Full native module access for NFC                |
-| ADR-003 | NFC Card as core data store   | Offline-first — no server dependency             |
-| ADR-004 | Clean Architecture            | Testable, maintainable, replaceable layers       |
-| ADR-005 | Silent Shield (AES-256-GCM)   | Production-grade authenticated encryption        |
-| ADR-007 | Fixed parking tariff          | Single isolated constant, not magic numbers      |
-| ADR-009 | Auto-generated member ID      | No manual input errors, UUID uniqueness          |
-| ADR-011 | Reusable activity flow        | Parking first, extensible for future             |
-| ADR-013 | SQLite as device-local ledger | Audit trail without replacing card truth         |
-| ADR-016 | Feature branch promotion      | Controlled release via main → Firebase           |
-| ADR-017 | Standardized payload v1       | Compact fields + Silent Shield + ledger boundary |
-| ADR-021 | Firebase App Distribution     | Automated release channel                        |
-| ADR-022 | QA screenshot evidence gate   | Visual proof before merge                        |
+| ADR     | Decision                         | Rationale                                        |
+| ------- | -------------------------------- | ------------------------------------------------ |
+| ADR-001 | React Native CLI (not Expo)      | Full native module access for NFC                |
+| ADR-003 | NFC Card as core data store      | Offline-first — no server dependency             |
+| ADR-004 | Clean Architecture               | Testable, maintainable, replaceable layers       |
+| ADR-005 | Silent Shield (AES-256-GCM)      | Production-grade authenticated encryption        |
+| ADR-007 | Fixed parking tariff             | Single isolated constant, not magic numbers      |
+| ADR-009 | Auto-generated member ID         | No manual input errors, UUID uniqueness          |
+| ADR-011 | Reusable activity flow           | Parking first, extensible for future             |
+| ADR-013 | OP-SQLite as device-local ledger | Audit trail without replacing card truth         |
+| ADR-016 | Feature branch promotion         | Controlled release via main → Firebase           |
+| ADR-017 | Standardized payload v1          | Compact fields + Silent Shield + ledger boundary |
+| ADR-021 | Firebase App Distribution        | Automated release channel                        |
+| ADR-022 | QA screenshot evidence gate      | Visual proof before merge                        |
 
 > 22 total ADRs documented in `.codex/specs/DECISIONS.md`
 
@@ -837,18 +912,21 @@ TODO → IN_PROGRESS → DEV_DONE → UNIT_TEST_DONE → QA_READY → QA_PASSED 
 
 # 16. Tech Stack
 
-| Area           | Choice                        | Rationale                                   |
-| -------------- | ----------------------------- | ------------------------------------------- |
-| **Framework**  | React Native CLI + TypeScript | Full native NFC access                      |
-| **NFC**        | react-native-nfc-manager      | Industry standard RN NFC library            |
-| **Crypto**     | react-native-quick-crypto     | Native-backed AES-256-GCM (not JS polyfill) |
-| **Local DB**   | SQLite                        | Offline-first, no server dependency         |
-| **UI**         | Signal UI design system       | Telkomsel brand consistency                 |
-| **State**      | Zustand + React Context (DI)  | Lightweight state + dependency injection    |
-| **Navigation** | React Navigation              | Standard RN navigation                      |
-| **Testing**    | Jest (444+ tests)             | 100% coverage, CI-friendly                  |
-| **Quality**    | SonarCloud + Husky            | Automated quality gates                     |
-| **CI/CD**      | GitHub Actions → Firebase     | Automated distribution                      |
+| Area           | Choice                                | Version  | Rationale                                   |
+| -------------- | ------------------------------------- | -------- | ------------------------------------------- |
+| **Framework**  | React Native CLI                      | 0.85.2   | Full native NFC access                      |
+| **Language**   | TypeScript                            | 6.0.3    | Type safety across all layers               |
+| **Runtime**    | React                                 | 19.2.3   | Latest concurrent features                  |
+| **NFC**        | react-native-nfc-manager              | ^3.17.2  | Industry standard RN NFC library            |
+| **Crypto**     | react-native-quick-crypto             | ^0.7.11  | Native-backed AES-256-GCM (not JS polyfill) |
+| **Local DB**   | @op-engineering/op-sqlite (OP-SQLite) | ^15.2.12 | High-performance offline SQLite             |
+| **UI**         | Signal UI design system               | —        | Telkomsel brand consistency                 |
+| **State**      | Zustand + React Context (DI)          | ^5.0.13  | Lightweight state + dependency injection    |
+| **Navigation** | React Navigation (native-stack)       | ^7.2.2   | Standard RN navigation                      |
+| **Animation**  | react-native-reanimated               | ^4.3.0   | Smooth UI animations                        |
+| **Testing**    | Jest + React Native Testing Library   | 30.3.0   | 439 tests, CI-friendly                      |
+| **Quality**    | SonarCloud + Husky + lint-staged      | —        | Automated quality gates                     |
+| **CI/CD**      | GitHub Actions → Firebase             | —        | Automated distribution                      |
 
 ---
 
@@ -894,7 +972,7 @@ TODO → IN_PROGRESS → DEV_DONE → UNIT_TEST_DONE → QA_READY → QA_PASSED 
 | 4    | Gate     | Check-in → Tap card            | ✅ Checked in at HH:MM          |
 | 5    | —        | Wait ~1-2 minutes              | Time passes for fee             |
 | 6    | Terminal | Check-out → Tap card           | ✅ Fee shown, balance deducted  |
-| 7    | Scout    | Inspect → Tap card             | ✅ Balance, status, 4 logs      |
+| 7    | Scout    | Inspect → Tap card             | ✅ Balance, status, logs        |
 | 8    | —        | Generic NFC reader → Scan card | ❌ Only opaque MBC1 binary      |
 
 ## Demo Sequence Diagram
@@ -908,7 +986,7 @@ sequenceDiagram
     Note over User,Card: 1 — Register (Station)
     User->>App: Station → Register
     App->>Card: Write new member payload
-    App-->>User: ✅ Card ID: MBR-XXXXX
+    App-->>User: ✅ Card ID: CARD-XXXXX
 
     Note over User,Card: 2 — Top-up (Station)
     User->>App: Top-up Rp 20.000
@@ -928,7 +1006,7 @@ sequenceDiagram
     Note over User,Card: 5 — Inspect (Scout)
     User->>App: Scout → Inspect
     App->>Card: Read only
-    App-->>User: Balance: Rp 16.000 | 4 logs
+    App-->>User: Balance: Rp 16.000 | Logs shown
 
     Note over User,Card: 6 — Security Proof
     User->>Card: Generic NFC reader
@@ -937,12 +1015,12 @@ sequenceDiagram
 
 ## Security Verification
 
-| What's Visible (Generic Reader) | What's NOT Visible     |
-| ------------------------------- | ---------------------- |
-| NDEF record exists              | ❌ Member name/ID      |
-| Binary blob (MBC1 header)       | ❌ Balance amount      |
-| ~362 bytes encrypted data       | ❌ Transaction history |
-| Opaque byte sequence            | ❌ Check-in timestamp  |
+| What's Visible (Generic Reader)   | What's NOT Visible     |
+| --------------------------------- | ---------------------- |
+| NDEF record exists                | ❌ Member name/ID      |
+| MIME type: application/vnd.mbc.v1 | ❌ Balance amount      |
+| Binary blob (MBC1 header)         | ❌ Transaction history |
+| ~362 bytes encrypted data         | ❌ Check-in timestamp  |
 
 ---
 
@@ -952,9 +1030,9 @@ sequenceDiagram
 
 | Metric                    | Value     |
 | ------------------------- | --------- |
-| 🧪 Automated tests        | **444+**  |
+| 🧪 Automated tests        | **439**   |
 | 📦 Test suites            | **65**    |
-| 📈 Line coverage          | **100%**  |
+| 📈 Line coverage          | **99%+**  |
 | 🔒 Vulnerabilities        | **0**     |
 | ⚠️ Risks closed           | **20/20** |
 | 🏗️ Phases complete        | **10/10** |
@@ -964,15 +1042,16 @@ sequenceDiagram
 | 🏆 Code audit grade       | **A-**    |
 | 📐 ADRs documented        | **22**    |
 | 🎯 Requirements traced    | **All**   |
+| ⚙️ Use cases              | **7**     |
 
 ## Architecture Benefits Delivered
 
 | Promise                   | Evidence                                          |
 | ------------------------- | ------------------------------------------------- |
 | Offline-first             | All flows work without internet                   |
-| Testable without hardware | 444+ tests in CI, no NFC needed                   |
+| Testable without hardware | 439 tests in CI, no NFC needed                    |
 | Secure                    | AES-256-GCM, tamper detection validated on device |
-| Extensible                | New activities = config change only               |
+| Extensible                | New activities = TariffStrategy config only       |
 | Simple for staff          | Role-based UI, one action per screen              |
 | Maintainable              | Grade A- audit, 0 critical violations             |
 
@@ -982,12 +1061,12 @@ sequenceDiagram
 
 ## Prototype Scope Limitations
 
-| Limitation              | Impact                | Mitigation                                 |
-| ----------------------- | --------------------- | ------------------------------------------ |
-| iOS NFC write deferred  | Android-only MVP      | iOS read possible; write needs entitlement |
-| Demo AES key bundled    | Not production-secure | Documented; production needs HSM           |
-| SQLite is device-local  | No cross-device sync  | Sufficient for single-station              |
-| Device clock dependency | Fee accuracy          | Operational procedure                      |
+| Limitation                | Impact                | Mitigation                                 |
+| ------------------------- | --------------------- | ------------------------------------------ |
+| iOS NFC write deferred    | Android-only MVP      | iOS read possible; write needs entitlement |
+| Demo AES key bundled      | Not production-secure | Documented; production needs HSM           |
+| OP-SQLite is device-local | No cross-device sync  | Sufficient for single-station              |
+| Device clock dependency   | Fee accuracy          | Operational procedure                      |
 
 ## Production Hardening Roadmap
 
@@ -1012,10 +1091,10 @@ sequenceDiagram
 | **Demo**          | Screenshot/video evidence of all flows                            | ✅     |
 | **Documentation** | Technical + non-technical docs                                    | ✅     |
 | **Presentation**  | Covers UI/UX, Design, Construction, Quality, Deployment, Security | ✅     |
-| **Tests**         | 444+ tests, 100% coverage, 0 vulnerabilities                      | ✅     |
+| **Tests**         | 439 tests, 99%+ coverage, 0 vulnerabilities                       | ✅     |
 | **Quality**       | SonarCloud PASSED, Code Audit A-                                  | ✅     |
 | **Security**      | Silent Shield validated, tamper detection working                 | ✅     |
-| **Device**        | Real NFC validated (ASUS ROG + NTAG215)                           | ✅     |
+| **Device**        | Real NFC validated (ASUS ROG Phone 9 FE + NTAG215)                | ✅     |
 | **CI/CD**         | GitHub Actions → Firebase App Distribution                        | ✅     |
 | **Specs**         | All requirements traced and verified                              | ✅     |
 | **Risks**         | 20/20 risks mitigated and closed                                  | ✅     |
@@ -1025,6 +1104,32 @@ sequenceDiagram
 # 📌 Summary
 
 > **In one sentence:** Clean Architecture + SOLID keeps the village cooperative's business rules **safe at the center**, while NFC hardware, encryption, and screens are **replaceable outer shells** that can evolve independently.
+
+## Key Files Reference
+
+| Layer              | Path                              | Contents                                                                                    |
+| ------------------ | --------------------------------- | ------------------------------------------------------------------------------------------- |
+| Domain entities    | `domain/membership/entities/`     | MbcCard, ActivitySession, TransactionLog, LedgerEntry, StationLedgerSummary                 |
+| Domain policies    | `domain/membership/policies/`     | tariff-policy, activity-state-policy, transaction-log-policy                                |
+| Domain interfaces  | `domain/membership/repositories/` | MbcCardRepository, LocalLedgerRepository, NfcAvailabilityRepository                         |
+| Application        | `application/use-cases/`          | 7 use cases                                                                                 |
+| Application DTOs   | `application/dto/`                | CardSummaryDto, RoleActionResultDto, CheckNfcAvailabilityResultDto, StationLedgerSummaryDto |
+| Infrastructure NFC | `infrastructure/nfc/`             | silent-shield, mbc-card-codec, real-mbc-card.repository, device-nfc-status.repository       |
+| Infrastructure DB  | `infrastructure/local-ledger/`    | sqlite-ledger.repository, sqlite-ledger-mapper                                              |
+| Screens            | `presentation/screens/`           | RoleSwitcher, Station, Gate, Terminal, Scout                                                |
+| Components         | `presentation/components/`        | 14 Signal UI components + NfcActionSheet                                                    |
+
+## Domain Types Quick Reference
+
+| Type                  | Values / Shape                                                                                 |
+| --------------------- | ---------------------------------------------------------------------------------------------- |
+| `VisitStatus`         | `'NOT_CHECKED_IN' \| 'CHECKED_IN'`                                                             |
+| `MbcActivity`         | `'REGISTER' \| 'TOP_UP' \| 'CHECK_IN' \| 'CHECK_OUT'`                                          |
+| `BenefitActivityType` | `'PARKING'`                                                                                    |
+| `MbcRole`             | `'STATION' \| 'GATE' \| 'TERMINAL' \| 'SCOUT'`                                                 |
+| `CurrencyCode`        | `'IDR'`                                                                                        |
+| `MemberProfile`       | `{ memberId: string; displayName?: string }`                                                   |
+| `MbcCard`             | `{ version, cardId, member, balance, currency, visitStatus, activeSession?, transactionLogs }` |
 
 ### Assessment Coverage
 
