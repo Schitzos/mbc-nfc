@@ -1,6 +1,6 @@
 import { createCheckInActivityUseCase } from '@application/use-cases/check-in-activity.use-case';
-import type { MbcCardRepository } from '@domain/repositories/mbc-card-repository';
-import type { MbcCard } from '@domain/entities/mbc-card';
+import type { MbcCardRepository } from '@domain/membership/repositories/membership-card.repository';
+import type { MbcCard } from '@domain/membership/entities/membership-card';
 
 function createCard(overrides?: Partial<MbcCard>): MbcCard {
   return {

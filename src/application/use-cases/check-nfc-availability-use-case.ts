@@ -2,7 +2,7 @@ import type { CheckNfcAvailabilityResultDto } from '@application/dto/check-nfc-a
 import type {
   NfcAvailabilityRepository,
   NfcAvailabilityStatus,
-} from '@domain/repositories/nfc-availability-repository';
+} from '@domain/membership/repositories/nfc-availability.repository';
 
 type GuidanceContent = Omit<
   CheckNfcAvailabilityResultDto,
