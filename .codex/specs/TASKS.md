@@ -1,4 +1,4 @@
-# KDX Membership Benefit Card — Codex Task Plan Lite
+# Membership Benefit Card — Codex Task Plan Lite
 
 > Current status: 444+ tests | 65 suites | 100% line coverage | jest.config.js thresholds: 99% statements/lines/branches, 96% functions
 

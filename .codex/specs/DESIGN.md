@@ -1,4 +1,4 @@
-# KDX Membership Benefit Card Design
+# Membership Benefit Card Design
 
 ## 1. Architecture
 

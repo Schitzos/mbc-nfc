@@ -1,4 +1,4 @@
-# KDX Membership Benefit Card Security
+# Membership Benefit Card Security
 
 ## 1. Security Baseline
 

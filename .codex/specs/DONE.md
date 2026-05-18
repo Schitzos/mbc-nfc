@@ -1,4 +1,4 @@
-# KDX Membership Benefit Card Definition of Done
+# Membership Benefit Card Definition of Done
 
 ## Task Definition of Done
 
@@ -93,7 +93,7 @@ A quality-sensitive delivery is done when:
 
 Documentation is done when:
 
-- Requirements, design, tasks, tests, and traceability are aligned with the KDX MBC brief.
+- Requirements, design, tasks, tests, and traceability are aligned with the MBC brief.
 - Design changes have a decision record when meaningful.
 - Risk changes are recorded in `RISKS.md`.
 - User-facing assumptions are explicit.

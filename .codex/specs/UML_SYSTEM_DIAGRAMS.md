@@ -1,4 +1,4 @@
-# KDX Membership Benefit Card UML and System Diagrams
+# Membership Benefit Card UML and System Diagrams
 
 This document contains the baseline UML/system diagrams for the current MBC scope.
 

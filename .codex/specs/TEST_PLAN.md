@@ -1,4 +1,4 @@
-# KDX Membership Benefit Card Test Plan
+# Membership Benefit Card Test Plan
 
 ## 1. Purpose
 

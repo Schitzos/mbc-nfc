@@ -1,6 +1,6 @@
-# KDX MBC — Presentation Slide Outline
+# MBC — Presentation Slide Outline
 
-> Maps the 6 KDX assessment sections to specific project evidence, screenshots, and documentation.
+> Maps the 6 assessment sections to specific project evidence, screenshots, and documentation.
 > Last updated: 2025-05-07 | Phases 0–9 complete | Phase 10 pending (T-029, T-030)
 
 ---
@@ -9,7 +9,7 @@
 
 | Item       | Content                                                                                |
 | ---------- | -------------------------------------------------------------------------------------- |
-| Title      | KDX Membership Benefit Card (MBC) — Parking MVP                                        |
+| Title      | Membership Benefit Card (MBC) — Parking MVP                                            |
 | Subtitle   | One app · Four roles · One NFC card as source of truth                                 |
 | Key fact   | Offline-first cooperative membership system validated on ASUS ROG Phone 9 FE + NTAG215 |
 | Scope note | Parking is the first demo activity, not the product limit                              |

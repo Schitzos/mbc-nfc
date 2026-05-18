@@ -1,4 +1,4 @@
-# KDX Membership Benefit Card Decision Log
+# Membership Benefit Card Decision Log
 
 This document records architecture and product decisions. Use ADR-style entries.
 
@@ -342,4 +342,3 @@ Decision: Senior QA must validate each feature on Android simulator/device and a
 Reason: The project needs visible proof that delivered features match the requirements, not only automated test results.
 
 Impact: Feature delivery includes both automated tests and QA evidence. Final delivery requires a use-case evidence package with screenshots.
-
