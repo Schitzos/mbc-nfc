@@ -71,9 +71,20 @@ export function createRegisterMemberCardUseCase(
     },
 
     async executeWithReset(): Promise<RoleActionResultDto> {
-      const card = createInitialCard();
-      await cardRepository.writeCard(card);
-      return buildSuccessResult(card);
+      try {
+        const card = createInitialCard();
+        await cardRepository.writeCard(card);
+        return buildSuccessResult(card);
+      } catch (error) {
+        if (isCardRepositoryError(error)) {
+          return {
+            success: false,
+            role: 'STATION',
+            message: error.message,
+          };
+        }
+        throw error;
+      }
     },
   };
 }

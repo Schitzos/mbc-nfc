@@ -5,13 +5,13 @@ interface ScanningRingsProps {
   color?: string;
 }
 
+const DURATION = 1500;
+const STAGGER = 500;
 const RINGS = [
   { key: 'ring-inner', index: 0, delay: 0 },
   { key: 'ring-middle', index: 1, delay: STAGGER },
   { key: 'ring-outer', index: 2, delay: STAGGER * 2 },
 ];
-const DURATION = 1500;
-const STAGGER = 500;
 
 function hexToRgba(hex: string, alpha: number): string {
   const h = hex.replace('#', '');
