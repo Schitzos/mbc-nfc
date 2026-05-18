@@ -61,7 +61,7 @@ src/
       transaction-log-policy.ts
     errors/
       domain-error.ts
-      card-repository-error.ts
+      membership-card-repository-error.ts
   application/
     use-cases/
       check-nfc-availability-use-case.ts

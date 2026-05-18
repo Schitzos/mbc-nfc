@@ -44,7 +44,7 @@ The codebase demonstrates **strong adherence** to Clean Architecture principles 
 | `services/activity-state-policy.ts`           | `@domain/entities/mbc-card`, `@domain/errors/domain-error`                                               | ✅      |
 | `services/transaction-log-policy.ts`          | `@domain/entities/mbc-card`, `@domain/errors/domain-error`                                               | ✅      |
 | `errors/domain-error.ts`                      | None                                                                                                     | ✅      |
-| `errors/card-repository-error.ts`             | None                                                                                                     | ✅      |
+| `errors/membership-card-repository-error.ts`  | None                                                                                                     | ✅      |
 | `config/parking-tariff.ts`                    | `@domain/services/activity-tariff-calculator`                                                            | ✅      |
 | `factories/mbc-card-factory.ts`               | `@domain/entities/mbc-card`, `@domain/services/transaction-log-policy`, `@shared/utils/create-random-id` | ✅      |
 

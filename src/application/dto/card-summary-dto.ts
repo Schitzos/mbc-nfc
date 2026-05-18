@@ -1,9 +1,7 @@
-import type {
-  ActivitySession,
-  CurrencyCode,
-  TransactionLog,
-  VisitStatus,
-} from '@domain/entities/mbc-card';
+import type { ActivitySession } from '@domain/membership/entities/activity-session';
+import type { TransactionLog } from '@domain/membership/entities/transaction-log';
+import type { VisitStatus } from '@domain/membership/types/card-status';
+import type { CurrencyCode } from '@domain/membership/types/money';
 
 export type CardSummaryDto = {
   cardId: string;

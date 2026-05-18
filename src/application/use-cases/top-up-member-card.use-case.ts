@@ -1,13 +1,13 @@
 import type { RoleActionResultDto } from '@application/dto/role-action-result-dto';
-import type { MbcCardRepository } from '@domain/repositories/mbc-card-repository';
-import { isCardRepositoryError } from '@domain/errors/card-repository-error';
+import type { MbcCardRepository } from '@domain/membership/repositories/membership-card.repository';
+import { isCardRepositoryError } from '@domain/membership/errors/membership-card-repository-error';
 import {
   createTransactionLog,
   appendTransactionLog,
-} from '@domain/services/transaction-log-policy';
+} from '@domain/membership/policies/transaction-log-policy';
 import { createRandomId } from '@shared/utils/create-random-id';
 import { toCardSummaryDto } from '@application/dto/card-summary-mapper';
-import type { LocalLedgerRepository } from '@domain/repositories/local-ledger-repository';
+import type { LocalLedgerRepository } from '@domain/membership/repositories/ledger.repository';
 import { maskMemberReference } from '@shared/utils/mask-member-reference';
 
 export interface TopUpMemberCardRequest {

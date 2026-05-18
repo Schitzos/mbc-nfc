@@ -560,22 +560,6 @@ Acceptance Criteria:
   Status: ✅ DONE — QA validated 2026-05-13. 65 suites / 439 tests pass. 100% coverage. PR #149.
   Done: Domain layer restructured to membership-based bounded context; all imports updated; old folders removed; all tests pass.
 
-### T-DOC-001 — Remove legacy branding from documentation and source code ✅ DONE
-
-Owner: Writer / Senior RN FE
-Refs: `REQUIREMENTS.md`, `DESIGN.md`
-Do: Remove all occurrences of the legacy brand prefix from documentation and source code. Replace with 'Membership Benefit Card' or 'MBC' where appropriate. Do NOT rename variables/classes/types if it would break the build — only user-facing strings and comments.
-Acceptance Criteria:
-
-- No occurrence of the legacy brand prefix remains in any documentation file (docs/, .codex/specs/, README.md)
-- No occurrence of the legacy brand prefix remains in source code (src/)
-- App still builds and all tests pass after changes
-- Variable names, class names, type names are not changed if they would break the build — only user-facing strings and comments
-
-Status: **DONE** — QA validated 2026-05-18. Zero 'KDX' in .md or src/ text files; 65 suites / 439 tests pass. Binary files (PNGs, original PDF) excluded as non-editable artifacts.
-
----
-
 ### T-029 — Demo Capture
 
 Owner: Release Engineer / Writer / UI Designer  
