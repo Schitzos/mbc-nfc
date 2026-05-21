@@ -254,11 +254,18 @@ export function createRealMbcCardRepository(): RealMbcCardRepository {
         await requestNdefTechnology();
         await assertSupportedTag();
 
-        const currentTag = (await NfcManager.getTag()) as NdefTag | null;
+        let ndefMessage: NdefRecord[] | undefined;
+        try {
+          const msg = await NfcManager.ndefHandler.getNdefMessage();
+          const tagObj = msg as NdefTag | null;
+          ndefMessage = tagObj?.ndefMessage;
+        } catch {
+          const currentTag = (await NfcManager.getTag()) as NdefTag | null;
+          ndefMessage = currentTag?.ndefMessage;
+        }
 
-        if (currentTag?.ndefMessage?.length) {
-          const rawPayload = currentTag.ndefMessage[0].payload;
-          const payloadBytes = Buffer.from(rawPayload as number[]);
+        if (ndefMessage?.length) {
+          const payloadBytes = Buffer.from(ndefMessage[0].payload as number[]);
           if (isMbcEnvelope(payloadBytes)) {
             const decryptResult = decrypt(payloadBytes);
             if (decryptResult.ok) {
@@ -267,6 +274,11 @@ export function createRealMbcCardRepository(): RealMbcCardRepository {
                 'This card is already registered. Use a blank card or reset first.',
               );
             }
+          } else {
+            throw createCardRepositoryError(
+              'CARD_HAS_EXISTING_DATA',
+              'This card contains existing data from another application.',
+            );
           }
         }
 

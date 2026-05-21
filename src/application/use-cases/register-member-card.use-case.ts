@@ -58,7 +58,8 @@ export function createRegisterMemberCardUseCase(
       } catch (error) {
         if (
           isCardRepositoryError(error) &&
-          error.code === 'CARD_ALREADY_REGISTERED'
+          (error.code === 'CARD_ALREADY_REGISTERED' ||
+            error.code === 'CARD_HAS_EXISTING_DATA')
         ) {
           return {
             success: false,

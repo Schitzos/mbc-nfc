@@ -50,6 +50,7 @@ describe('CardRepositoryError', () => {
       'UNREGISTERED_CARD',
       'CARD_TAMPERED',
       'CARD_ALREADY_REGISTERED',
+      'CARD_HAS_EXISTING_DATA',
       'NFC_UNSUPPORTED',
       'NFC_DISABLED',
       'NFC_UNAVAILABLE',
