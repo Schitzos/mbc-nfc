@@ -388,6 +388,7 @@ describe('role screens – extended branch coverage', () => {
       success: false,
       role: 'STATION',
       message: 'This card is already registered.',
+      requiresReset: true,
     });
 
     renderWithServices(<StationScreen />);
@@ -401,7 +402,7 @@ describe('role screens – extended branch coverage', () => {
     );
 
     // Confirm sheet should show wipe option
-    expect(screen.getByText('Card Already Registered')).toBeTruthy();
+    expect(screen.getByText('Card Has Existing Data')).toBeTruthy();
     expect(screen.getByText('Wipe & Re-register')).toBeTruthy();
     expect(screen.getByText('Skip')).toBeTruthy();
 

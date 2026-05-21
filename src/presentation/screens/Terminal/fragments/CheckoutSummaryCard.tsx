@@ -10,6 +10,14 @@ interface CheckoutSummaryCardProps {
   isSimulation?: boolean;
 }
 
+function formatDuration(ms: number): string {
+  const totalSec = Math.floor(ms / 1000);
+  const h = Math.floor(totalSec / 3600);
+  const m = Math.floor((totalSec % 3600) / 60);
+  const s = totalSec % 60;
+  return `${h}h ${m}m ${s}s`;
+}
+
 export function CheckoutSummaryCard({
   latestResult,
   checkoutTime,
@@ -40,14 +48,7 @@ export function CheckoutSummaryCard({
         <View className="flex-row justify-between">
           <Text className="text-xs text-muted">Duration</Text>
           <Text className="text-xs font-semibold text-foreground">
-            {(() => {
-              const ms = latestResult.durationMs ?? 0;
-              const totalSec = Math.floor(ms / 1000);
-              const h = Math.floor(totalSec / 3600);
-              const m = Math.floor((totalSec % 3600) / 60);
-              const s = totalSec % 60;
-              return `${h}h ${m}m ${s}s`;
-            })()}
+            {formatDuration(latestResult.durationMs ?? 0)}
           </Text>
         </View>
         <View className="flex-row justify-between">
