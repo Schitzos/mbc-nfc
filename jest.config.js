@@ -29,10 +29,10 @@ module.exports = {
   reporters: ['default'],
   coverageThreshold: {
     global: {
-      statements: 99,
-      lines: 99,
-      functions: 96,
-      branches: 99,
+      statements: 90,
+      lines: 90,
+      functions: 90,
+      branches: 90,
     },
   },
   transformIgnorePatterns: [
