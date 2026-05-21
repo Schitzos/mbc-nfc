@@ -255,7 +255,7 @@ describe('NfcActionSheet – scanning without message', () => {
     );
 
     expect(
-      screen.getByText('Hold your NFC card to the back of the phone'),
+      screen.getByText('Tap your member card near the phone'),
     ).toBeTruthy();
   });
 });
