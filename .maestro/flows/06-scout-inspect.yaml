@@ -1,0 +1,24 @@
+appId: com.mbcnfc
+---
+# 06 - Scout: Inspect Card
+# Navigate to Scout, tap RadarZone, assert card info visible
+
+- tapOn:
+    accessibilityLabel: 'Go back'
+- tapOn: 'Scout'
+- assertVisible: 'The Scout'
+- takeScreenshot: '06-scout-inspect-ready'
+
+# Tap RadarZone to inspect
+- tapOn:
+    accessibilityLabel: 'Inspect'
+
+# Wait for card info
+- extendedWaitUntil:
+    visible: 'Member Card Information'
+    timeout: 5000
+
+- takeScreenshot: '06-scout-inspect-result'
+- assertVisible: 'Member Card Information'
+- assertVisible: 'Balance'
+- assertVisible: 'Status'

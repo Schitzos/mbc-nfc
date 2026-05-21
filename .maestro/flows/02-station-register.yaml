@@ -1,0 +1,23 @@
+appId: com.mbcnfc
+---
+# 02 - Station: Register Card
+# Navigate to Station, ensure Register tab is active, tap RadarZone
+
+- tapOn: 'Station'
+- assertVisible: 'The Station'
+
+# Ensure Register tab is selected
+- tapOn: 'Register'
+- takeScreenshot: '02-station-register-ready'
+
+# Tap the RadarZone to register
+- tapOn:
+    accessibilityLabel: 'Tap Card to Register'
+
+# Wait for result
+- extendedWaitUntil:
+    visible: 'Success'
+    timeout: 5000
+
+- takeScreenshot: '02-station-register-success'
+- assertVisible: 'Success'

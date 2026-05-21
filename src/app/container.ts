@@ -9,6 +9,7 @@ import { createTopUpMemberCardUseCase } from '@application/use-cases/top-up-memb
 import { createSqliteLedgerRepository } from '@infrastructure/local-ledger/sqlite-ledger.repository';
 import { createDeviceNfcStatusRepository } from '@infrastructure/nfc/device-nfc-status.repository';
 import { createRealMbcCardRepository } from '@infrastructure/nfc/real-mbc-card.repository';
+import { createMockMbcCardRepository } from '@infrastructure/nfc/mock-mbc-card.repository';
 import type { AppServices } from '@app/services-contract';
 
 let cachedServices: AppServices | null = null;
@@ -19,7 +20,10 @@ export function createAppServices(): AppServices {
   }
 
   const db = open({ name: 'mbc-ledger.db', location: 'default' });
-  const cardRepository = createRealMbcCardRepository();
+  const cardRepository =
+    process.env.E2E === 'true'
+      ? createMockMbcCardRepository()
+      : createRealMbcCardRepository();
   const nfcStatusRepository = createDeviceNfcStatusRepository();
   const ledgerRepository = createSqliteLedgerRepository(db);
 

@@ -1,0 +1,49 @@
+appId: com.mbcnfc
+---
+# 07 - Error: Double Check-in
+# Register card, check in, then try to check in again — expect error
+
+# Start at role switcher
+- assertVisible: 'Select Operating Role'
+
+# Register a card first
+- tapOn: 'Station'
+- tapOn: 'Register'
+- tapOn:
+    accessibilityLabel: 'Tap Card to Register'
+- extendedWaitUntil:
+    visible: 'Success'
+    timeout: 5000
+
+# Top up so card has balance
+- tapOn: 'Top Up'
+- tapOn: '50k'
+- tapOn:
+    accessibilityLabel: 'Tap Card to Top Up'
+- extendedWaitUntil:
+    visible: 'Success'
+    timeout: 5000
+
+# Check in at Gate
+- tapOn:
+    accessibilityLabel: 'Go back'
+- tapOn: 'Gate'
+- tapOn:
+    accessibilityLabel: 'Tap Card to Check In'
+- extendedWaitUntil:
+    visible: 'Check-in Successful'
+    timeout: 5000
+
+# Reset gate to show RadarZone again
+- tapOn:
+    id: 'gate-scan-another'
+
+# Try to check in again — should fail
+- tapOn:
+    accessibilityLabel: 'Tap Card to Check In'
+- extendedWaitUntil:
+    visible: 'Blocked'
+    timeout: 5000
+
+- takeScreenshot: '07-error-double-checkin'
+- assertVisible: 'Blocked'

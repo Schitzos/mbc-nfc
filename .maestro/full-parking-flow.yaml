@@ -1,0 +1,65 @@
+appId: com.mbcnfc
+---
+# Full Parking Flow: Register → Top Up → Check In → Check Out → Inspect
+
+# === REGISTER ===
+- assertVisible: 'Select Operating Role'
+- tapOn: 'Station'
+- assertVisible: 'The Station'
+- tapOn: 'Register'
+- tapOn:
+    accessibilityLabel: 'Tap Card to Register'
+- extendedWaitUntil:
+    visible: 'Success'
+    timeout: 5000
+- takeScreenshot: 'full-01-registered'
+
+# === TOP UP 50k ===
+- tapOn: 'Top Up'
+- tapOn: '50k'
+- tapOn:
+    accessibilityLabel: 'Tap Card to Top Up'
+- extendedWaitUntil:
+    visible: 'Success'
+    timeout: 5000
+- takeScreenshot: 'full-02-topped-up'
+
+# === CHECK IN ===
+- tapOn:
+    accessibilityLabel: 'Go back'
+- tapOn: 'Gate'
+- tapOn:
+    accessibilityLabel: 'Tap Card to Check In'
+- extendedWaitUntil:
+    visible: 'Check-in Successful'
+    timeout: 5000
+- takeScreenshot: 'full-03-checked-in'
+
+# === CHECK OUT ===
+- tapOn:
+    id: 'gate-scan-another'
+- tapOn:
+    accessibilityLabel: 'Go back'
+- tapOn: 'Terminal'
+- tapOn:
+    accessibilityLabel: 'Tap Card to Check Out'
+- extendedWaitUntil:
+    visible: 'Checkout Summary'
+    timeout: 5000
+- assertVisible: 'Duration'
+- assertVisible: 'Fee'
+- takeScreenshot: 'full-04-checked-out'
+
+# === INSPECT ===
+- tapOn:
+    id: 'terminal-scan-another'
+- tapOn:
+    accessibilityLabel: 'Go back'
+- tapOn: 'Scout'
+- tapOn:
+    accessibilityLabel: 'Inspect'
+- extendedWaitUntil:
+    visible: 'Member Card Information'
+    timeout: 5000
+- assertVisible: 'Not checked in'
+- takeScreenshot: 'full-05-inspected'

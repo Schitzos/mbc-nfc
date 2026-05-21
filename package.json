@@ -14,7 +14,11 @@
     "test": "jest --watchman=false",
     "test:ci": "jest --watchman=false --runInBand --coverage --ci --reporters=default --reporters=jest-junit",
     "test:coverage": "jest --watchman=false --runInBand --coverage",
-    "test:quality": "jest --watchman=false --runInBand --coverage --ci --reporters=default --reporters=jest-junit"
+    "test:quality": "jest --watchman=false --runInBand --coverage --ci --reporters=default --reporters=jest-junit",
+    "e2e:android": "E2E=true react-native run-android",
+    "e2e:ios": "E2E=true react-native run-ios",
+    "e2e:test": "maestro test .maestro/",
+    "e2e:flow": "maestro test .maestro/full-parking-flow.yaml"
   },
   "jest-junit": {
     "outputDirectory": "test-results/junit",
