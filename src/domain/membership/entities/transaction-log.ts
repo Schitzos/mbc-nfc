@@ -5,4 +5,5 @@ export type TransactionLog = {
   activity: MbcActivity;
   nominal: number;
   occurredAt: string;
+  isSimulation?: boolean;
 };
