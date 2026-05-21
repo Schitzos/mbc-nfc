@@ -11,11 +11,15 @@ const formatTime = (iso: string): string => {
   return `${hh}.${mm}.${ss}`;
 };
 
-export function NfcLogPanel(): React.JSX.Element {
+export function NfcLogPanel(): React.JSX.Element | null {
   const nfcLogEnabled = useAppStore(state => state.nfcLogEnabled);
   const nfcLogs = useAppStore(state => state.nfcLogs);
   const toggleNfcLogEnabled = useAppStore(state => state.toggleNfcLogEnabled);
   const clearNfcLogs = useAppStore(state => state.clearNfcLogs);
+
+  if (!__DEV__) {
+    return null;
+  }
 
   return (
     <View className="rounded-2xl border border-slate-300 bg-[#0F172A] p-3">
