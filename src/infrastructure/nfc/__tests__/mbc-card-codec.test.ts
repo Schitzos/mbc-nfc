@@ -463,6 +463,43 @@ describe('mbc-card-codec – additional decode error paths', () => {
     expect(decResult.value.card.activeSession?.isSimulation).toBe(true);
   });
 
+  it('encodes simulation log as 4-element tuple', () => {
+    const card: MbcCard = {
+      ...validCard,
+      visitStatus: 'NOT_CHECKED_IN',
+      activeSession: undefined,
+      transactionLogs: [
+        {
+          id: 'L1',
+          activity: 'CHECK_IN',
+          nominal: 0,
+          occurredAt: '2026-05-06T10:00:00+07:00',
+          isSimulation: true,
+        },
+      ],
+    };
+    const result = encode(card, 2);
+    expect(result.ok).toBe(true);
+    if (!result.ok) return;
+    const parsed = JSON.parse(result.value);
+    expect(parsed.x[0]).toEqual(['I', 0, '2026-05-06T10:00:00+07:00', 1]);
+  });
+
+  it('rejects log tuple with invalid 4th element', () => {
+    const raw = JSON.stringify({
+      v: 1,
+      c: 'C1',
+      m: 'M1',
+      b: 0,
+      i: null,
+      x: [['R', 0, '2026-05-06T09:00:00+07:00', 2]],
+      n: 1,
+    });
+    const result = decode(raw);
+    expect(result.ok).toBe(false);
+    if (!result.ok) expect(result.error).toBe('INVALID_TRANSACTION_LOG_ENTRY');
+  });
+
   it('decode omits isSimulation when s field is absent', () => {
     const raw = JSON.stringify({
       v: 1,

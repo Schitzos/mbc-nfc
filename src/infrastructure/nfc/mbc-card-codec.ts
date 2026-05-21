@@ -151,14 +151,27 @@ export function decode(
           ...(p.i.s === 1 ? { isSimulation: true } : {}),
         }
       : undefined,
-    transactionLogs: p.x.map((tuple, idx) => ({
-      id: `${p.c}-LOG-${idx}`,
-      activity:
-        /* istanbul ignore next */ COMPACT_TO_ACTIVITY[tuple[0]] ?? 'REGISTER',
-      nominal: tuple[1],
-      occurredAt: tuple[2],
-      ...(tuple[3] === 1 ? { isSimulation: true } : {}),
-    })),
+    transactionLogs: p.x.map((tuple, idx) => {
+      const log: {
+        id: string;
+        activity: MbcActivity;
+        nominal: number;
+        occurredAt: string;
+        isSimulation?: boolean;
+      } = {
+        id: `${p.c}-LOG-${idx}`,
+        activity:
+          /* istanbul ignore next */ COMPACT_TO_ACTIVITY[tuple[0]] ??
+          'REGISTER',
+        nominal: tuple[1],
+        occurredAt: tuple[2],
+      };
+      /* istanbul ignore else -- false branch hit by non-simulation log tests */
+      if (tuple[3] === 1) {
+        log.isSimulation = true;
+      }
+      return log;
+    }),
   };
 
   return { ok: true, value: { card, writeCounter: p.n } };

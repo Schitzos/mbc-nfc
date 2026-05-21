@@ -228,6 +228,7 @@ describe('Station screen', () => {
       success: false,
       role: 'STATION',
       message: 'This card is already registered.',
+      requiresReset: true,
     });
 
     renderWithServices(<StationScreen />);
@@ -240,7 +241,7 @@ describe('Station screen', () => {
       expect(mockRegisterMemberCardUseCase.execute).toHaveBeenCalled(),
     );
 
-    expect(screen.getByText('Card Already Registered')).toBeTruthy();
+    expect(screen.getByText('Card Has Existing Data')).toBeTruthy();
     expect(screen.getByText('Wipe & Re-register')).toBeTruthy();
     expect(screen.getByText('Skip')).toBeTruthy();
 

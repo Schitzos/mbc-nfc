@@ -83,6 +83,7 @@ describe('useStationActions', () => {
       success: false,
       role: 'STATION',
       message: 'This card is already registered.',
+      requiresReset: true,
     });
 
     const { result } = renderHook(() => useStationActions(mockServices));
@@ -106,6 +107,7 @@ describe('useStationActions', () => {
       success: false,
       role: 'STATION',
       message: 'This card contains existing data from another application.',
+      requiresReset: true,
     });
 
     const { result } = renderHook(() => useStationActions(mockServices));

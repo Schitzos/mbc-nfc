@@ -106,6 +106,7 @@ describe('useStationActions – extended branch coverage', () => {
       success: false,
       role: 'STATION',
       message: 'This card is already registered.',
+      requiresReset: true,
     });
     (
       mockServices.registerMemberCardUseCase.executeWithReset as jest.Mock
@@ -152,6 +153,7 @@ describe('useStationActions – extended branch coverage', () => {
       success: false,
       role: 'STATION',
       message: 'This card is already registered.',
+      requiresReset: true,
     });
     (
       mockServices.registerMemberCardUseCase.executeWithReset as jest.Mock
@@ -184,6 +186,7 @@ describe('useStationActions – extended branch coverage', () => {
       success: false,
       role: 'STATION',
       message: 'This card is already registered.',
+      requiresReset: true,
     });
     (
       mockServices.registerMemberCardUseCase.executeWithReset as jest.Mock
@@ -326,6 +329,7 @@ describe('useStationActions – extended branch coverage', () => {
       success: false,
       role: 'STATION',
       message: 'This card is already registered.',
+      requiresReset: true,
     });
 
     let rejectWipe: (e: unknown) => void;
@@ -404,6 +408,7 @@ describe('useStationActions – existing data confirm onConfirm', () => {
           success: false,
           role: 'STATION',
           message: 'This card contains existing data from another application.',
+          requiresReset: true,
         }),
         executeWithReset: jest.fn().mockResolvedValue({
           success: true,

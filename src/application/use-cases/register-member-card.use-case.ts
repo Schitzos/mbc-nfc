@@ -67,6 +67,8 @@ export function createRegisterMemberCardUseCase(
             success: false,
             role: 'STATION',
             message: error.message,
+            errorCode: 'GENERIC_FAILURE',
+            requiresReset: true,
           };
         }
         throw error;
