@@ -19,6 +19,7 @@ export function SimulationModePanel({
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [showTimePicker, setShowTimePicker] = useState(false);
 
+  /* istanbul ignore next -- __DEV__ is always true in test env */
   if (!__DEV__) {
     return null;
   }
