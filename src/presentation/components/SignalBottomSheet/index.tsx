@@ -1,9 +1,18 @@
 import React from 'react';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import {
+  ImageBackground,
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  Text,
+  View,
+} from 'react-native';
 import type { SignalBottomSheetProps } from './types';
 import { styles } from './styles';
 
 export type { SignalBottomSheetProps } from './types';
+
+const bgImage = require('@presentation/assets/bg-role-switcher.png');
 
 const absoluteRoot = StyleSheet.create({
   container: {
@@ -37,7 +46,12 @@ export function SignalBottomSheet({
         style={styles.overlay}
         onPress={onClose}
       />
-      <View style={[styles.sheet, style]}>
+      <ImageBackground
+        source={bgImage}
+        resizeMode="cover"
+        blurRadius={15}
+        style={[styles.sheet, style]}
+      >
         <View style={styles.header}>
           {title ? (
             <Text numberOfLines={2} style={styles.title}>
@@ -56,7 +70,9 @@ export function SignalBottomSheet({
             </Pressable>
           )}
         </View>
-        <View style={styles.body}>{children}</View>
+        <ScrollView style={styles.body} showsVerticalScrollIndicator={false}>
+          {children}
+        </ScrollView>
         {stickyAction && (
           <View style={styles.sticky}>
             {caption && (
@@ -67,7 +83,7 @@ export function SignalBottomSheet({
             {stickyAction}
           </View>
         )}
-      </View>
+      </ImageBackground>
     </View>
   );
 }

@@ -4,6 +4,7 @@ import type { NfcActionState } from '@presentation/components/NfcActionSheet';
 import { useAppStore } from '@presentation/stores/app-store';
 import { UNKNOWN_ERROR_MESSAGE } from '@shared/constants';
 import type { ScoutServices } from '@presentation/context/service-context';
+import { signalColorTokens } from '@presentation/theme/colors';
 
 const noop = () => {};
 
@@ -38,7 +39,7 @@ export function useScoutActions(services: ScoutServices) {
     setNfcSheet({
       phase: 'scanning',
       message: 'Hold your NFC card to inspect',
-      color: '#FF0025',
+      color: signalColorTokens.brand.primary,
     });
     try {
       appendNfcLog('[NFC] Inspect flow started');

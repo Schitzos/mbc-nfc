@@ -7,6 +7,7 @@ import {
   Text,
   View,
 } from 'react-native';
+import LinearGradient from 'react-native-linear-gradient';
 
 export interface RadarZoneProps {
   color: string;
@@ -202,15 +203,20 @@ export function RadarZone({
         style={[
           styles.scanButton,
           {
-            backgroundColor: color,
             borderColor: hexToRgba(color, 0.6),
             shadowColor: color,
           },
           disabled && styles.scanButtonDisabled,
         ]}
       >
-        <Text style={styles.scanIcon}>{'((•))'}</Text>
-        <Text style={styles.scanLabel}>{displayLabel}</Text>
+        <LinearGradient
+          colors={['#FFB3C1', color]}
+          locations={[0, 0.7]}
+          style={styles.scanButtonGradient}
+        >
+          <Text style={styles.scanIcon}>{'((•))'}</Text>
+          <Text style={styles.scanLabel}>{displayLabel}</Text>
+        </LinearGradient>
       </Pressable>
     </View>
   );
@@ -261,10 +267,18 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     borderWidth: 2,
+    overflow: 'hidden',
     shadowOffset: { width: 0, height: 0 },
     shadowOpacity: 0.4,
     shadowRadius: 20,
     elevation: 8,
+  },
+  scanButtonGradient: {
+    width: '100%',
+    height: '100%',
+    borderRadius: BUTTON_SIZE / 2,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   scanButtonDisabled: {
     opacity: 0.4,

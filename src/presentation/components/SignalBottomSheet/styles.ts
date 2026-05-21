@@ -49,6 +49,7 @@ export const styles = StyleSheet.create({
     color: signalColorTokens.text.primary,
   },
   body: {
+    flex: 1,
     paddingHorizontal: componentTokens.bottomSheet.horizontalPadding,
     gap: componentTokens.bottomSheet.componentGap,
   },

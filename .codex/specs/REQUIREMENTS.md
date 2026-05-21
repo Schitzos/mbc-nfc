@@ -161,6 +161,9 @@ Acceptance criteria:
 - Amount must be positive.
 - App reads current balance, adds the amount, and writes the new balance to card.
 - Top-up writes a transaction log entry with nominal, time, and activity.
+- Top-up must reject if resulting balance would exceed MAX_CARD_BALANCE (Rp 5.000.000).
+- Rejection uses BALANCE_CAP_EXCEEDED error with clear user guidance.
+- The balance cap is defined as a domain config constant in `src/domain/membership/config/balance-limits.ts`.
 
 ### FR-004 Gate Check-In
 
@@ -352,7 +355,7 @@ Acceptance criteria:
 | NFR-010 | UI system                        | The frontend applies the Signal UI design system direction required by the brief.                                                                                                                                                                                   |
 | NFR-011 | Device clarity                   | The app clearly communicates that real card operations require NFC hardware and shows actionable guidance when NFC is unavailable or disabled.                                                                                                                      |
 | NFR-012 | Data separation                  | NFC card member state and local device audit/reporting data remain clearly separated.                                                                                                                                                                               |
-| NFR-013 | Coverage target                  | Automated unit-test coverage should reach at least 90% across the whole executable repository source, excluding only pure type-only contract files and generated artifacts. Actual achievement: 100% line coverage with 444+ automated tests across 65 test suites. |
+| NFR-013 | Coverage target                  | Automated unit-test coverage should reach at least 90% across the whole executable repository source, excluding only pure type-only contract files and generated artifacts. Actual achievement: 100% line coverage with 446+ automated tests across 66 test suites. |
 | NFR-014 | Static quality gate              | The project should integrate with SonarCloud and target a passing quality gate with strong maintainability, reliability, and security ratings.                                                                                                                      |
 | NFR-015 | Branching and release automation | The project shall use feature branches with controlled promotion to `develop` and `main`, and merging to `main` shall trigger automated APK app-distribution publishing.                                                                                            |
 | NFR-016 | Dependency vulnerability gate    | After installing or changing libraries, `npm audit` shall report 0 known vulnerabilities before the task is considered done.                                                                                                                                        |
@@ -408,7 +411,7 @@ Acceptance criteria:
 - Sequential loop prevents double check-in and double check-out.
 - Sensitive identity, balance, parking status details, and transaction values are not readable as plain NFC text in generic NFC apps.
 - Station can show a local offline summary for audit/reporting on that device.
-- Automated unit-test coverage across the whole executable repository source reaches at least 90%. Actual achievement: 100% line coverage (444+ tests, 65 suites; jest.config.js thresholds set to 99% statements/lines/branches, 96% functions).
+- Automated unit-test coverage across the whole executable repository source reaches at least 90%. Actual achievement: 100% line coverage (446+ tests, 66 suites; jest.config.js thresholds set to 99% statements/lines/branches, 96% functions).
 - SonarCloud analysis passes the configured quality gate for the submitted codebase.
 - `npm audit` reports 0 known vulnerabilities after dependency changes.
 - App works offline for all core flows.
@@ -432,7 +435,7 @@ Acceptance criteria:
 ### PO Clarifications (2026-05-07)
 
 - **Minimum parking duration (FR-006/FR-014):** PO confirms 1 second already counts as 1 started hour = Rp 2.000. Any non-zero duration rounds up to the next whole hour. This is correct per spec.
-- **Max balance cap (FR-003):** PO confirms there is no maximum balance cap. Unlimited top-up is acceptable; no upper-bound validation is required on card balance.
+- **Max balance cap (FR-003):** ~~PO confirms there is no maximum balance cap (2026-05-07).~~ **REVERSED (2026-05-22):** PO reverses the no-cap clarification. A balance cap of Rp 5.000.000 (MAX_CARD_BALANCE) is a valid safety measure for the cooperative context. Implemented via T-BUGFIX-002, QA-validated 2026-05-21. Top-up rejects with BALANCE_CAP_EXCEEDED when resulting balance would exceed the cap.
 - **Re-registration behavior (FR-002):** Current prompt-to-overwrite behavior is canonical. Operator must confirm before wipe and re-register. `ALREADY_REGISTERED_CARD` is the detection state, not a hard rejection. PO confirmed 2026-05-07.
 
 ### PO Clarifications (2026-05-08)

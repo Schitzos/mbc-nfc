@@ -11,15 +11,15 @@ export function SegmentedControl({
   setRegisterMode,
 }: Props): React.JSX.Element {
   return (
-    <View className="flex-row bg-white rounded-full p-1 border border-slate-200">
+    <View className="flex-row bg-white/50 rounded-full p-1 border border-white/60">
       <Pressable
         accessibilityRole="tab"
         accessibilityState={{ selected: registerMode }}
         onPress={() => setRegisterMode(true)}
-        className={`flex-1 py-2 rounded-full items-center ${registerMode ? 'bg-[#16A34A]' : ''}`}
+        className={`flex-1 py-2.5 rounded-full items-center ${registerMode ? 'bg-[#FFE4E8]' : ''}`}
       >
         <Text
-          className={`text-sm font-semibold ${registerMode ? 'text-white' : 'text-[#4E5764]'}`}
+          className={`text-sm font-semibold ${registerMode ? 'text-brand' : 'text-[#6B7280]'}`}
         >
           Register
         </Text>
@@ -28,10 +28,10 @@ export function SegmentedControl({
         accessibilityRole="tab"
         accessibilityState={{ selected: !registerMode }}
         onPress={() => setRegisterMode(false)}
-        className={`flex-1 py-2 rounded-full items-center ${!registerMode ? 'bg-[#16A34A]' : ''}`}
+        className={`flex-1 py-2.5 rounded-full items-center ${!registerMode ? 'bg-[#FFE4E8]' : ''}`}
       >
         <Text
-          className={`text-sm font-semibold ${!registerMode ? 'text-white' : 'text-[#4E5764]'}`}
+          className={`text-sm font-semibold ${!registerMode ? 'text-brand' : 'text-[#6B7280]'}`}
         >
           Top Up
         </Text>

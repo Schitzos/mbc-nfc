@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import { View, Text, TouchableOpacity } from 'react-native';
 
 interface ErrorBoundaryProps {
   readonly children: React.ReactNode;
@@ -8,37 +8,6 @@ interface ErrorBoundaryProps {
 interface ErrorBoundaryState {
   readonly hasError: boolean;
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    padding: 24,
-    backgroundColor: '#FFFFFF',
-  },
-  title: {
-    fontSize: 20,
-    fontWeight: '600',
-    marginBottom: 8,
-  },
-  message: {
-    fontSize: 14,
-    color: '#666',
-    textAlign: 'center',
-    marginBottom: 24,
-  },
-  button: {
-    backgroundColor: '#0050AE',
-    paddingHorizontal: 24,
-    paddingVertical: 12,
-    borderRadius: 8,
-  },
-  buttonText: {
-    color: '#FFFFFF',
-    fontWeight: '600',
-  },
-});
 
 export class ErrorBoundary extends React.Component<
   ErrorBoundaryProps,
@@ -60,13 +29,18 @@ export class ErrorBoundary extends React.Component<
   render(): React.ReactNode {
     if (this.state.hasError) {
       return (
-        <View style={styles.container}>
-          <Text style={styles.title}>Something went wrong</Text>
-          <Text style={styles.message}>
+        <View className="flex-1 justify-center items-center p-6 bg-white">
+          <Text className="text-xl font-semibold mb-2">
+            Something went wrong
+          </Text>
+          <Text className="text-sm text-[#666] text-center mb-6">
             The app encountered an unexpected error. Please try again.
           </Text>
-          <TouchableOpacity onPress={this.handleReset} style={styles.button}>
-            <Text style={styles.buttonText}>Try Again</Text>
+          <TouchableOpacity
+            onPress={this.handleReset}
+            className="bg-[#0050AE] px-6 py-3 rounded-lg"
+          >
+            <Text className="text-white font-semibold">Try Again</Text>
           </TouchableOpacity>
         </View>
       );

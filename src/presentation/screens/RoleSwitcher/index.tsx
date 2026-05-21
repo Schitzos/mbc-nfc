@@ -1,19 +1,23 @@
 import React from 'react';
-import { View } from 'react-native';
+import { ImageBackground, StyleSheet, Text, View } from 'react-native';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import type { RootStackParamList } from '@app/navigation';
 import { roleOptions } from '@presentation/config/role-options';
 import { NfcLogPanel } from '@presentation/components/NfcLogPanel';
 import { useAppStore } from '@presentation/stores/app-store';
-import { AppHeaderCard } from '@presentation/components/AppHeaderCard';
 import { RoleOptionList } from './fragments/RoleOptionList';
 import Icon from 'react-native-vector-icons/MaterialIcons';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { signalColorTokens } from '@presentation/theme/colors';
 
 type Props = Readonly<
   Partial<NativeStackScreenProps<RootStackParamList, 'roleSwitcher'>>
 >;
 
+const bgImage = require('@presentation/assets/bg-role-switcher.png');
+
 export function RoleSwitcherScreen({ navigation }: Props): React.JSX.Element {
+  const insets = useSafeAreaInsets();
   const selectedRole = useAppStore(state => state.selectedRole);
   const setSelectedRole = useAppStore(state => state.setSelectedRole);
   const handleSelectRole = (roleKey: (typeof roleOptions)[number]['key']) => {
@@ -22,26 +26,51 @@ export function RoleSwitcherScreen({ navigation }: Props): React.JSX.Element {
   };
 
   return (
-    <View className="flex-1 bg-transparent">
-      <View className="flex-1">
-        <AppHeaderCard
-          title="MBC Card"
-          subTitle="Select Operating Role"
-          rightIcon={<Icon name="info" size={20} color="#fff" />}
-        />
-        <View className="-mt-3 rounded-t-2xl bg-[#F0F2F5] px-5 pt-5 pb-6 flex-1">
-          <View className="flex-1">
-            <RoleOptionList
-              activeRoleKey={selectedRole}
-              roles={roleOptions}
-              onSelect={handleSelectRole}
+    <ImageBackground
+      source={bgImage}
+      className="flex-1"
+      resizeMode="cover"
+      blurRadius={15}
+    >
+      <View style={{ paddingTop: insets.top + 24 }} className="px-6 pb-6">
+        <View className="flex-row items-center justify-between">
+          <Text className="text-[28px] font-bold text-[#111827]">MBC Card</Text>
+          <View
+            className="w-10 h-10 rounded-full bg-white items-center justify-center"
+            style={s.infoButton}
+          >
+            <Icon
+              name="info"
+              size={20}
+              color={signalColorTokens.brand.primary}
             />
           </View>
-          <View className="mt-auto">
-            <NfcLogPanel />
-          </View>
+        </View>
+        <Text className="text-sm text-[#6B7280] mt-1">
+          Select Operating Role
+        </Text>
+      </View>
+
+      <View className="flex-1 px-4">
+        <RoleOptionList
+          activeRoleKey={selectedRole}
+          roles={roleOptions}
+          onSelect={handleSelectRole}
+        />
+        <View className="mt-auto pb-4">
+          <NfcLogPanel variant="light" />
         </View>
       </View>
-    </View>
+    </ImageBackground>
   );
 }
+
+const s = StyleSheet.create({
+  infoButton: {
+    elevation: 3,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+  },
+});

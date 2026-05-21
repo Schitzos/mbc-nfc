@@ -9,6 +9,7 @@ module.exports = {
         foreground: '#14213D',
         muted: '#4F5D75',
         accent: '#0F6EFD',
+        brand: '#FF0025',
       },
     },
   },

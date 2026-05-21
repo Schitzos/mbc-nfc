@@ -516,3 +516,61 @@ describe('mbc-card-codec – additional decode error paths', () => {
     expect(result.value.card.activeSession?.isSimulation).toBeUndefined();
   });
 });
+
+describe('mbc-card-codec – validateLogs 4th element branch', () => {
+  it('rejects transaction log entry with 4th element not equal to 1', () => {
+    const raw = JSON.stringify({
+      v: 1,
+      c: 'C1',
+      m: 'M1',
+      b: 0,
+      n: 0,
+      x: [['R', 0, '2026-01-01T00:00:00Z', 2]],
+      i: null,
+    });
+    const result = decode(raw);
+    expect(result.ok).toBe(false);
+    if (!result.ok) expect(result.error).toBe('INVALID_TRANSACTION_LOG_ENTRY');
+  });
+
+  it('accepts transaction log entry with 4th element equal to 1', () => {
+    const raw = JSON.stringify({
+      v: 1,
+      c: 'C1',
+      m: 'M1',
+      b: 0,
+      n: 0,
+      x: [['R', 0, '2026-01-01T00:00:00Z', 1]],
+      i: null,
+    });
+    const result = decode(raw);
+    expect(result.ok).toBe(true);
+    if (result.ok) {
+      expect(result.value.card.transactionLogs[0].isSimulation).toBe(true);
+    }
+  });
+});
+
+describe('mbc-card-codec – encode simulation transaction log', () => {
+  it('encodes transaction log with isSimulation as 4-element tuple', () => {
+    const card: MbcCard = {
+      ...validCard,
+      visitStatus: 'NOT_CHECKED_IN',
+      activeSession: undefined,
+      transactionLogs: [
+        {
+          id: 'L1',
+          activity: 'CHECK_OUT',
+          nominal: 2000,
+          occurredAt: '2026-05-06T12:00:00+07:00',
+          isSimulation: true,
+        },
+      ],
+    };
+    const result = encode(card, 1);
+    expect(result.ok).toBe(true);
+    if (!result.ok) return;
+    const parsed = JSON.parse(result.value);
+    expect(parsed.x[0]).toEqual(['O', 2000, '2026-05-06T12:00:00+07:00', 1]);
+  });
+});

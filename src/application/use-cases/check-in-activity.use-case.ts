@@ -1,6 +1,6 @@
 import type { MbcCard } from '@domain/membership/entities/membership-card';
 import type { BenefitActivityType } from '@domain/membership/types/card-status';
-import type { MbcCardRepository } from '@domain/membership/repositories/membership-card.repository';
+import type { CardWriter } from '@domain/membership/repositories/membership-card.repository';
 import { applyCheckInState } from '@domain/membership/policies/activity-state-policy';
 import {
   appendTransactionLog,
@@ -14,6 +14,7 @@ import type {
   RoleActionResultDto,
 } from '@application/dto/role-action-result-dto';
 import { toCardSummaryDto } from '@application/dto/card-summary-mapper';
+import { type Clock, systemClock } from '@shared/ports/clock';
 
 export type CheckInActivityRequest = {
   activityId: string;
@@ -61,7 +62,8 @@ function mapCheckInErrorCode(error: unknown): RoleActionErrorCode {
 }
 
 export function createCheckInActivityUseCase(
-  cardRepository: MbcCardRepository,
+  cardRepository: CardWriter,
+  clock: Clock = systemClock,
 ): CheckInActivityUseCase {
   return {
     async execute({
@@ -70,11 +72,11 @@ export function createCheckInActivityUseCase(
       checkedInAt,
       isSimulation,
     }: CheckInActivityRequest): Promise<RoleActionResultDto> {
-      const occurredAt = checkedInAt ?? new Date().toISOString();
+      const occurredAt = checkedInAt ?? clock().toISOString();
 
       if (checkedInAt) {
         const checkedInDate = new Date(checkedInAt);
-        if (checkedInDate.getTime() > Date.now()) {
+        if (checkedInDate.getTime() > clock().getTime()) {
           return {
             success: false,
             role: 'GATE',

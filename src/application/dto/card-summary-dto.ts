@@ -1,3 +1,8 @@
+/**
+ * Thin DTO — intentionally re-uses domain value types (CurrencyCode, VisitStatus,
+ * ActivitySession, TransactionLog) because this offline-first app has no serialization
+ * boundary. Mapping to primitive-only fields would add boilerplate without benefit.
+ */
 import type { ActivitySession } from '@domain/membership/entities/activity-session';
 import type { TransactionLog } from '@domain/membership/entities/transaction-log';
 import type { VisitStatus } from '@domain/membership/types/card-status';

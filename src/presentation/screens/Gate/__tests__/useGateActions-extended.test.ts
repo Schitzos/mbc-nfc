@@ -93,3 +93,46 @@ describe('useGateActions – extended branch coverage', () => {
     expect(result.current.nfcSheet.phase).toBe('idle');
   });
 });
+
+describe('useGateActions – resetResult', () => {
+  it('resetResult clears latestResult to null', async () => {
+    const {
+      renderHook,
+      act,
+      waitFor,
+    } = require('@testing-library/react-native');
+    const { useGateActions } = require('../useGateActions');
+    const { useAppStore } = require('@presentation/stores/app-store');
+    useAppStore.setState({ nfcLogEnabled: false, nfcLogs: [] });
+
+    const services = {
+      checkNfcAvailabilityUseCase: {
+        execute: jest.fn().mockResolvedValue({ status: 'SUPPORTED' }),
+      },
+      checkInActivityUseCase: {
+        execute: jest.fn().mockResolvedValue({
+          success: true,
+          role: 'GATE',
+          message: 'In.',
+          card: { balance: 50000 },
+        }),
+      },
+      cancelNfc: jest.fn().mockResolvedValue(undefined),
+    };
+
+    const { result } = renderHook(() => useGateActions(services));
+    await waitFor(() =>
+      expect(services.checkNfcAvailabilityUseCase.execute).toHaveBeenCalled(),
+    );
+
+    await act(async () => {
+      await result.current.handleCheckIn();
+    });
+    expect(result.current.latestResult).not.toBeNull();
+
+    act(() => {
+      result.current.resetResult();
+    });
+    expect(result.current.latestResult).toBeNull();
+  });
+});
