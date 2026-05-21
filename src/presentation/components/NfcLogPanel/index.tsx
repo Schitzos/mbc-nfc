@@ -17,6 +17,7 @@ export function NfcLogPanel(): React.JSX.Element | null {
   const toggleNfcLogEnabled = useAppStore(state => state.toggleNfcLogEnabled);
   const clearNfcLogs = useAppStore(state => state.clearNfcLogs);
 
+  /* istanbul ignore next -- __DEV__ is always true in test env */
   if (!__DEV__) {
     return null;
   }

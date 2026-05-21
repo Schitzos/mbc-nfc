@@ -92,5 +92,30 @@ describe('createRegisterMemberCardUseCase – reset/re-registration flow', () =>
         'local audit ledger could not be updated',
       );
     });
+
+    it('returns failure when writeCard throws CardRepositoryError', async () => {
+      const cardRepository = createCardRepository({
+        writeCard: jest
+          .fn()
+          .mockRejectedValue(
+            createCardRepositoryError('WRITE_FAILED', 'NFC write failed.'),
+          ),
+      });
+      const useCase = createRegisterMemberCardUseCase(cardRepository);
+
+      const result = await useCase.executeWithReset();
+
+      expect(result.success).toBe(false);
+      expect(result.message).toBe('NFC write failed.');
+    });
+
+    it('rethrows non-CardRepositoryError from writeCard', async () => {
+      const cardRepository = createCardRepository({
+        writeCard: jest.fn().mockRejectedValue(new Error('unexpected')),
+      });
+      const useCase = createRegisterMemberCardUseCase(cardRepository);
+
+      await expect(useCase.executeWithReset()).rejects.toThrow('unexpected');
+    });
   });
 });

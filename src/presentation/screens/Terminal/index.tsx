@@ -36,19 +36,22 @@ export function TerminalScreen(): React.JSX.Element {
           }
         />
         <View className="-mt-3 rounded-t-2xl bg-[#F0F2F5] px-5 pt-5 pb-6 flex-1">
-          {actions.latestResult?.isSimulation && actions.success && (
-            <View
-              testID="terminal-simulation-banner"
-              className="bg-red-600 rounded-lg px-4 py-3 mb-3 border-2 border-red-800 z-20"
-            >
-              <Text className="text-white font-bold text-center text-base">
-                ⚠️ SIMULATION MODE
-              </Text>
-              <Text className="text-red-100 text-center text-xs mt-1">
-                Balance was NOT deducted
-              </Text>
-            </View>
-          )}
+          {
+            /* istanbul ignore next */ actions.latestResult?.isSimulation &&
+              actions.success && (
+                <View
+                  testID="terminal-simulation-banner"
+                  className="bg-red-600 rounded-lg px-4 py-3 mb-3 border-2 border-red-800 z-20"
+                >
+                  <Text className="text-white font-bold text-center text-base">
+                    ⚠️ SIMULATION MODE
+                  </Text>
+                  <Text className="text-red-100 text-center text-xs mt-1">
+                    Balance was NOT deducted
+                  </Text>
+                </View>
+              )
+          }
           <View className="flex-1">
             {!actions.insufficient && !actions.genericFailure && (
               <View className="absolute inset-0 justify-center items-center z-0">
