@@ -136,6 +136,8 @@ describe('Scout screen', () => {
     await waitFor(() =>
       expect(mockInspectMemberCardUseCase.execute).toHaveBeenCalled(),
     );
+    await waitFor(() => expect(screen.getByText('Done')).toBeTruthy());
+    fireEvent.press(screen.getByText('Done'));
     fireEvent.press(screen.getByLabelText('Go back'));
     expect(__mockNavigation.goBack).toHaveBeenCalled();
   });
