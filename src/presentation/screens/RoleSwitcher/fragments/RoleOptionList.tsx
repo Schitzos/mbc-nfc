@@ -57,9 +57,11 @@ export function RoleOptionList({
           </View>
           <View className="flex-1">
             <Text className="text-base font-bold text-white">{role.label}</Text>
-            <Text className="text-xs text-white/60">{roleHint[role.key]}</Text>
+            <Text className="text-xs text-white/[0.72]">
+              {roleHint[role.key]}
+            </Text>
           </View>
-          <Text className="text-lg text-white/40">›</Text>
+          <Text className="text-lg text-white/50">›</Text>
         </Pressable>
       ))}
     </View>
@@ -73,9 +75,9 @@ const s = StyleSheet.create({
     borderRadius: 16,
     paddingHorizontal: 16,
     paddingVertical: 16,
-    backgroundColor: 'rgba(255,255,255,0.08)',
+    backgroundColor: 'rgba(13,27,62,0.88)',
     borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.15)',
+    borderColor: 'rgba(255,255,255,0.12)',
   },
   iconBox: {
     width: 44,
