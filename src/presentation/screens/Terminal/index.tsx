@@ -1,5 +1,12 @@
 import React, { useEffect } from 'react';
 import { Text, View } from 'react-native';
+import LinearGradient from 'react-native-linear-gradient';
+import Animated, {
+  useSharedValue,
+  useAnimatedStyle,
+  withRepeat,
+  withTiming,
+} from 'react-native-reanimated';
 import { RadarZone } from '@presentation/components/RadarZone';
 import { NfcLogPanel } from '@presentation/components/NfcLogPanel';
 import { NfcActionSheet } from '@presentation/components/NfcActionSheet';
@@ -18,9 +25,27 @@ export function TerminalScreen(): React.JSX.Element {
   const services = useTerminalServices();
   const actions = useTerminalActions(services);
 
+  const badgeOpacity = useSharedValue(1);
+
   useEffect(() => {
     setSelectedRole('terminal');
   }, [setSelectedRole]);
+
+  useEffect(() => {
+    if (actions.latestResult?.isSimulation && actions.success) {
+      badgeOpacity.value = withRepeat(
+        withTiming(0.5, { duration: 1000 }),
+        -1,
+        true,
+      );
+    } else {
+      badgeOpacity.value = 1;
+    }
+  }, [actions.latestResult?.isSimulation, actions.success, badgeOpacity]);
+
+  const badgeStyle = useAnimatedStyle(() => ({
+    opacity: badgeOpacity.value,
+  }));
 
   return (
     <View className="flex-1 bg-[#001A41]">
@@ -35,16 +60,41 @@ export function TerminalScreen(): React.JSX.Element {
             </View>
           }
         />
-        <View className="-mt-3 rounded-t-2xl bg-[#F5F6FA] px-5 pt-4 pb-4 flex-1">
+        <LinearGradient
+          colors={['#0D1B3E', '#F5F6FA']}
+          locations={[0, 0.3]}
+          style={{
+            marginTop: -12,
+            borderTopLeftRadius: 16,
+            borderTopRightRadius: 16,
+            paddingHorizontal: 20,
+            paddingTop: 16,
+            paddingBottom: 16,
+            flex: 1,
+          }}
+        >
           {actions.latestResult?.isSimulation && actions.success && (
-            <View
+            <Animated.View
               testID="terminal-simulation-banner"
-              className="self-center bg-[#FEF3D4] border border-[#FED27F] rounded-full px-3 py-1 mb-2"
+              style={[
+                {
+                  alignSelf: 'center',
+                  backgroundColor: '#F59E0B',
+                  borderRadius: 999,
+                  paddingHorizontal: 12,
+                  paddingVertical: 4,
+                  marginBottom: 8,
+                  shadowColor: '#F59E0B',
+                  shadowOffset: { width: 0, height: 0 },
+                  shadowOpacity: 0.5,
+                  shadowRadius: 10,
+                  elevation: 6,
+                },
+                badgeStyle,
+              ]}
             >
-              <Text className="text-xs font-semibold text-[#D9801F]">
-                ⚠️ Simulation
-              </Text>
-            </View>
+              <Text className="text-xs font-bold text-white">⚠️ SIM</Text>
+            </Animated.View>
           )}
 
           <View className="flex-1 justify-center items-center">
@@ -86,7 +136,7 @@ export function TerminalScreen(): React.JSX.Element {
           </View>
 
           <NfcLogPanel />
-        </View>
+        </LinearGradient>
 
         <NfcActionSheet
           state={actions.nfcSheet}

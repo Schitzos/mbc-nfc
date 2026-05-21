@@ -1,5 +1,6 @@
 import React, { useEffect } from 'react';
 import { Text, View } from 'react-native';
+import LinearGradient from 'react-native-linear-gradient';
 import { RadarZone } from '@presentation/components/RadarZone';
 import { NfcLogPanel } from '@presentation/components/NfcLogPanel';
 import { NfcActionSheet } from '@presentation/components/NfcActionSheet';
@@ -34,7 +35,19 @@ export function GateScreen(): React.JSX.Element {
             </View>
           }
         />
-        <View className="-mt-3 rounded-t-2xl bg-[#F5F6FA] px-5 pt-4 pb-4 flex-1">
+        <LinearGradient
+          colors={['#0D1B3E', '#F5F6FA']}
+          locations={[0, 0.35]}
+          style={{
+            marginTop: -12,
+            borderTopLeftRadius: 16,
+            borderTopRightRadius: 16,
+            paddingHorizontal: 20,
+            paddingTop: 16,
+            paddingBottom: 16,
+            flex: 1,
+          }}
+        >
           <SimulationModePanel
             enabled={actions.simulationEnabled}
             onToggle={actions.setSimulationEnabled}
@@ -62,7 +75,7 @@ export function GateScreen(): React.JSX.Element {
           </View>
 
           <NfcLogPanel />
-        </View>
+        </LinearGradient>
 
         <NfcActionSheet
           state={actions.nfcSheet}
