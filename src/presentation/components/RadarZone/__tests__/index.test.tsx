@@ -1,6 +1,6 @@
 import React from 'react';
 import { render, fireEvent } from '@testing-library/react-native';
-import { RadarZone } from '../RadarZone';
+import { RadarZone } from '../../RadarZone';
 import { signalColorTokens } from '@presentation/theme/colors';
 
 const PRIMARY_RED = signalColorTokens.brand.primary;
