@@ -60,7 +60,7 @@ export function LatestResultCard({
   );
 }
 
-function SuccessWrapper({ children }: { children: React.ReactNode }) {
+function SuccessWrapper({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
     <View className="rounded-2xl p-4 bg-white/60 border-l-[3px] border-l-[#16A34A]">
       {children}
@@ -68,7 +68,7 @@ function SuccessWrapper({ children }: { children: React.ReactNode }) {
   );
 }
 
-function ErrorWrapper({ children }: { children: React.ReactNode }) {
+function ErrorWrapper({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
     <View className="rounded-2xl p-4 bg-white/60 border-l-[3px] border-l-[#DC2626]">
       {children}
