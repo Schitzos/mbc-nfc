@@ -21,24 +21,27 @@ describe('RadarZone', () => {
   });
 
   it('starts second pulse animation after 600ms', () => {
-    render(
+    const { getByRole } = render(
       <RadarZone color={PRIMARY_RED} label="Inspect" onPress={jest.fn()} />,
     );
     jest.advanceTimersByTime(900);
+    expect(getByRole('button')).toBeTruthy();
   });
 
   it('cleans up animations on unmount', () => {
-    const { unmount } = render(
+    const { unmount, getByRole } = render(
       <RadarZone color={PRIMARY_RED} label="Inspect" onPress={jest.fn()} />,
     );
     jest.advanceTimersByTime(700);
+    expect(getByRole('button')).toBeTruthy();
     unmount();
   });
 
   it('cleans up timeout when unmounted before delay', () => {
-    const { unmount } = render(
+    const { unmount, getByRole } = render(
       <RadarZone color={PRIMARY_RED} label="Inspect" onPress={jest.fn()} />,
     );
+    expect(getByRole('button')).toBeTruthy();
     unmount();
     jest.advanceTimersByTime(700);
   });
