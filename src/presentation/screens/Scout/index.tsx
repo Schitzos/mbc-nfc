@@ -2,22 +2,25 @@ import React, { useCallback, useEffect, useRef, useState } from 'react';
 import {
   Animated,
   Easing,
+  ImageBackground,
   Pressable,
   ScrollView,
   Text,
   View,
 } from 'react-native';
+import { ScreenHeader } from '@presentation/components/ScreenHeader';
 import { NfcLogPanel } from '@presentation/components/NfcLogPanel';
 import { NfcActionSheet } from '@presentation/components/NfcActionSheet';
 import { RadarZone } from '@presentation/components/RadarZone';
 import { useAppStore } from '@presentation/stores/app-store';
 import { useScoutServices } from '@presentation/context/service-context';
 import { useScoutActions } from './useScoutActions';
-import { AppHeaderCard } from '@presentation/components/AppHeaderCard';
 import { signalColorTokens } from '@presentation/theme/colors';
 import { ScoutErrorCard } from './fragments/MemberCardError';
 import { MemberCardInfo } from './fragments/MemberCardInfo';
 import { LatestLogsCard } from './fragments/LatestLogsCard';
+
+const bgImage = require('@presentation/assets/bg-role-switcher.png');
 
 export function ScoutScreen(): React.JSX.Element {
   const setSelectedRole = useAppStore(state => state.setSelectedRole);
@@ -63,19 +66,21 @@ export function ScoutScreen(): React.JSX.Element {
     : 'Tap to inspect member card';
 
   return (
-    <View className="flex-1">
-      <AppHeaderCard
+    <ImageBackground
+      source={bgImage}
+      className="flex-1"
+      resizeMode="cover"
+      blurRadius={15}
+    >
+      <ScreenHeader
         title="The Scout"
-        subTitle="Card Inspection and Member Info"
-        hasBackButton={true}
-        rightIcon={
-          <View className="bg-[#00B4D8] px-4 py-1 rounded-full">
-            <Text className="text-white text-xs font-semibold">Scout</Text>
-          </View>
-        }
+        subtitle="Card Inspection and Member Info"
+        badgeLabel="Scout"
+        badgeIcon="search"
+        badgeColor="#FF0025"
       />
 
-      <View className="-mt-3 rounded-t-2xl bg-[#F0F2F5] flex-1 overflow-hidden">
+      <View className="flex-1 px-4">
         {!showResult ? (
           <View className="flex-1">
             <View className="absolute inset-0 justify-center items-center z-0">
@@ -92,7 +97,7 @@ export function ScoutScreen(): React.JSX.Element {
 
             <View className="z-10 pointer-events-none">
               <Text
-                className={`text-center text-sm ${actions.busy ? 'text-[#00B4D8] font-semibold' : 'text-[#8BA3C7]'} mt-6`}
+                className={`text-center text-sm ${actions.busy ? 'text-[#00B4D8] font-semibold' : 'text-[#6B7280]'} mt-6`}
                 accessibilityLiveRegion="polite"
               >
                 {statusText}
@@ -100,10 +105,7 @@ export function ScoutScreen(): React.JSX.Element {
             </View>
           </View>
         ) : (
-          <ScrollView
-            className="flex-1"
-            contentContainerClassName="px-5 pt-5 pb-4"
-          >
+          <ScrollView className="flex-1" contentContainerClassName="pt-2 pb-4">
             {actions.latestResult && (
               <Animated.View
                 className="gap-3"
@@ -127,20 +129,20 @@ export function ScoutScreen(): React.JSX.Element {
             )}
 
             <Pressable
-              className="mt-4 bg-[#00B4D8] rounded-xl py-3 items-center"
+              className="mt-4 rounded-xl py-3 items-center bg-[rgba(0,180,216,0.15)] border border-[rgba(0,180,216,0.4)]"
               onPress={handleScanAgain}
               accessibilityRole="button"
               accessibilityLabel="Scan another card"
             >
-              <Text className="text-white font-semibold text-sm">
+              <Text className="text-[#00B4D8] font-semibold text-sm">
                 Scan Another Card
               </Text>
             </Pressable>
           </ScrollView>
         )}
 
-        <View className="px-5 pb-4 pt-2">
-          <NfcLogPanel />
+        <View className="pb-4 pt-2">
+          <NfcLogPanel variant="light" />
         </View>
       </View>
 
@@ -148,6 +150,6 @@ export function ScoutScreen(): React.JSX.Element {
         state={actions.nfcSheet}
         onDismiss={() => actions.handleDismissSheet()}
       />
-    </View>
+    </ImageBackground>
   );
 }
