@@ -1,5 +1,5 @@
 import type { RoleActionResultDto } from '@application/dto/role-action-result-dto';
-import type { MbcCardRepository } from '@domain/membership/repositories/membership-card.repository';
+import type { CardWriter } from '@domain/membership/repositories/membership-card.repository';
 import { isCardRepositoryError } from '@domain/membership/errors/membership-card-repository-error';
 import {
   isDomainError,
@@ -14,6 +14,7 @@ import { toCardSummaryDto } from '@application/dto/card-summary-mapper';
 import type { LocalLedgerRepository } from '@domain/membership/repositories/ledger.repository';
 import { maskMemberReference } from '@shared/utils/mask-member-reference';
 import { MAX_CARD_BALANCE } from '@domain/membership/config/balance-limits';
+import { type Clock, systemClock } from '@shared/ports/clock';
 
 export interface TopUpMemberCardRequest {
   amount: number;
@@ -24,8 +25,9 @@ export type TopUpMemberCardUseCase = {
 };
 
 export function createTopUpMemberCardUseCase(
-  cardRepository: MbcCardRepository,
+  cardRepository: CardWriter,
   localLedgerRepository?: LocalLedgerRepository,
+  clock: Clock = systemClock,
 ): TopUpMemberCardUseCase {
   return {
     async execute({
@@ -53,7 +55,7 @@ export function createTopUpMemberCardUseCase(
               id: createRandomId('LOG'),
               activity: 'TOP_UP',
               nominal: amount,
-              occurredAt: new Date().toISOString(),
+              occurredAt: clock().toISOString(),
             }),
           );
         });
@@ -70,7 +72,7 @@ export function createTopUpMemberCardUseCase(
                 nextCard.member.memberId,
               ),
               amount,
-              occurredAt: new Date().toISOString(),
+              occurredAt: clock().toISOString(),
             });
           } catch {
             message =

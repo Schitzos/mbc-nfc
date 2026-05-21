@@ -1,12 +1,13 @@
 import type { MbcCard } from '@domain/membership/entities/membership-card';
 import { createInitialCard } from '@domain/membership/factories/membership-card.factory';
-import type { MbcCardRepository } from '@domain/membership/repositories/membership-card.repository';
+import type { CardWriter } from '@domain/membership/repositories/membership-card.repository';
 import type { RoleActionResultDto } from '@application/dto/role-action-result-dto';
 import { toCardSummaryDto } from '@application/dto/card-summary-mapper';
 import { isCardRepositoryError } from '@domain/membership/errors/membership-card-repository-error';
 import { createRandomId } from '@shared/utils/create-random-id';
 import type { LocalLedgerRepository } from '@domain/membership/repositories/ledger.repository';
 import { maskMemberReference } from '@shared/utils/mask-member-reference';
+import { type Clock, systemClock } from '@shared/ports/clock';
 
 export type RegisterMemberCardUseCase = {
   execute: () => Promise<RoleActionResultDto>;
@@ -14,8 +15,9 @@ export type RegisterMemberCardUseCase = {
 };
 
 export function createRegisterMemberCardUseCase(
-  cardRepository: MbcCardRepository,
+  cardRepository: CardWriter,
   localLedgerRepository?: LocalLedgerRepository,
+  clock: Clock = systemClock,
 ): RegisterMemberCardUseCase {
   async function buildSuccessResult(
     card: MbcCard,
@@ -29,7 +31,7 @@ export function createRegisterMemberCardUseCase(
           role: 'STATION',
           action: 'REGISTER',
           maskedMemberReference: maskMemberReference(card.member.memberId),
-          occurredAt: new Date().toISOString(),
+          occurredAt: clock().toISOString(),
         });
       } catch {
         message =

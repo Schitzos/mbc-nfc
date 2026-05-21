@@ -4,6 +4,7 @@ import type { NfcActionState } from '@presentation/components/NfcActionSheet';
 import { useAppStore } from '@presentation/stores/app-store';
 import { UNKNOWN_ERROR_MESSAGE } from '@shared/constants';
 import type { GateServices } from '@presentation/context/service-context';
+import { signalColorTokens } from '@presentation/theme/colors';
 
 const noop = () => {};
 
@@ -40,7 +41,7 @@ export function useGateActions(services: GateServices) {
     setNfcSheet({
       phase: 'scanning',
       message: 'Hold your NFC card to check in',
-      color: '#FF0025',
+      color: signalColorTokens.brand.primary,
     });
     try {
       appendNfcLog('[NFC] Check-in flow started');

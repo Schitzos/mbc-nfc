@@ -8,6 +8,7 @@ import { useAppStore } from '@presentation/stores/app-store';
 import { RoleOptionList } from './fragments/RoleOptionList';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { signalColorTokens } from '@presentation/theme/colors';
 
 type Props = Readonly<
   Partial<NativeStackScreenProps<RootStackParamList, 'roleSwitcher'>>
@@ -38,7 +39,11 @@ export function RoleSwitcherScreen({ navigation }: Props): React.JSX.Element {
             className="w-10 h-10 rounded-full bg-white items-center justify-center"
             style={s.infoButton}
           >
-            <Icon name="info" size={20} color="#FF0025" />
+            <Icon
+              name="info"
+              size={20}
+              color={signalColorTokens.brand.primary}
+            />
           </View>
         </View>
         <Text className="text-sm text-[#6B7280] mt-1">

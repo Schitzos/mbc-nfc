@@ -1,4 +1,4 @@
-import type { MbcCardRepository } from '@domain/membership/repositories/membership-card.repository';
+import type { CardReader } from '@domain/membership/repositories/membership-card.repository';
 import { isCardRepositoryError } from '@domain/membership/errors/membership-card-repository-error';
 import type { RoleActionResultDto } from '@application/dto/role-action-result-dto';
 import { toCardSummaryDto } from '@application/dto/card-summary-mapper';
@@ -8,7 +8,7 @@ export type InspectMemberCardUseCase = {
 };
 
 export function createInspectMemberCardUseCase(
-  cardRepository: MbcCardRepository,
+  cardRepository: CardReader,
 ): InspectMemberCardUseCase {
   return {
     async execute(): Promise<RoleActionResultDto> {

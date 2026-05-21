@@ -70,7 +70,7 @@ export function CheckoutSummaryCard({
         </View>
         <View className="flex-row justify-between">
           <Text className="text-xs text-[#6B7280]">Fee</Text>
-          <Text className="text-xs font-bold text-[#FF0025]">
+          <Text className="text-xs font-bold text-brand">
             Rp {latestResult.chargedAmount?.toLocaleString(LOCALE_ID) ?? '0'}
             {isSimulation ? ' (not deducted)' : ''}
           </Text>
@@ -79,7 +79,7 @@ export function CheckoutSummaryCard({
       {onReset && (
         <Pressable
           testID="terminal-scan-another"
-          className="mt-4 items-center justify-center h-10 rounded-full bg-[#FF0025]"
+          className="mt-4 items-center justify-center h-10 rounded-full bg-brand"
           onPress={onReset}
         >
           <Text className="text-sm font-semibold text-white">

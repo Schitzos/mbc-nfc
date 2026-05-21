@@ -61,7 +61,7 @@ export function GateResultState({
         {onReset && (
           <Pressable
             testID="gate-scan-another"
-            className="mt-4 items-center justify-center h-10 rounded-full bg-[#FF0025]"
+            className="mt-4 items-center justify-center h-10 rounded-full bg-brand"
             onPress={onReset}
           >
             <Text className="text-sm font-semibold text-white">
@@ -86,7 +86,7 @@ export function GateResultState({
       {onReset && (
         <Pressable
           testID="gate-scan-another"
-          className="mt-4 items-center justify-center h-10 rounded-full bg-[#FF0025]"
+          className="mt-4 items-center justify-center h-10 rounded-full bg-brand"
           onPress={onReset}
         >
           <Text className="text-sm font-semibold text-white">

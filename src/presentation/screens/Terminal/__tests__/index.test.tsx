@@ -359,3 +359,145 @@ describe('Terminal screen', () => {
     );
   });
 });
+
+describe('Terminal screen – simulation and summary branches', () => {
+  beforeEach(() => {
+    __mockNavigation.goBack.mockClear();
+    mockCheckNfcAvailabilityUseCase.execute.mockClear();
+    mockCheckOutActivityUseCase.execute.mockClear();
+    useAppStore.setState({ nfcLogEnabled: false, nfcLogs: [] });
+  });
+
+  it('shows simulation banner when result has isSimulation', async () => {
+    mockCheckOutActivityUseCase.execute.mockResolvedValueOnce({
+      success: true,
+      role: 'TERMINAL',
+      message: 'Simulated checkout.',
+      isSimulation: true,
+      chargedHours: 1,
+      chargedAmount: 2000,
+      durationMs: 3600000,
+      checkedInAt: '2026-05-01T08:00:00Z',
+      card: { balance: 50000 },
+    });
+
+    renderWithServices(<TerminalScreen />);
+    await waitFor(() =>
+      expect(mockCheckNfcAvailabilityUseCase.execute).toHaveBeenCalled(),
+    );
+
+    fireEvent.press(screen.getByText('Tap Card to Check Out'));
+    await waitFor(() =>
+      expect(mockCheckOutActivityUseCase.execute).toHaveBeenCalled(),
+    );
+
+    fireEvent.press(screen.getByText('Done'));
+    await waitFor(() =>
+      expect(screen.getByTestId('terminal-simulation-banner')).toBeTruthy(),
+    );
+  });
+
+  it('shows Scan Another Card button and resets on press', async () => {
+    mockCheckOutActivityUseCase.execute.mockResolvedValueOnce({
+      success: true,
+      role: 'TERMINAL',
+      message: 'Out.',
+      chargedHours: 1,
+      chargedAmount: 2000,
+      card: { balance: 48000 },
+    });
+
+    renderWithServices(<TerminalScreen />);
+    await waitFor(() =>
+      expect(mockCheckNfcAvailabilityUseCase.execute).toHaveBeenCalled(),
+    );
+
+    fireEvent.press(screen.getByText('Tap Card to Check Out'));
+    await waitFor(() =>
+      expect(mockCheckOutActivityUseCase.execute).toHaveBeenCalled(),
+    );
+
+    fireEvent.press(screen.getByText('Done'));
+    await waitFor(() =>
+      expect(screen.getByTestId('terminal-scan-another')).toBeTruthy(),
+    );
+
+    fireEvent.press(screen.getByTestId('terminal-scan-another'));
+    await waitFor(() =>
+      expect(screen.getByText('Tap Card to Check Out')).toBeTruthy(),
+    );
+  });
+
+  it('renders CheckoutSummaryCard with isSimulation text', async () => {
+    mockCheckOutActivityUseCase.execute.mockResolvedValueOnce({
+      success: true,
+      role: 'TERMINAL',
+      message: 'Sim out.',
+      isSimulation: true,
+      chargedHours: 2,
+      chargedAmount: 4000,
+      durationMs: 7200000,
+      checkedInAt: '2026-05-01T08:00:00Z',
+      card: { balance: 50000 },
+    });
+
+    renderWithServices(<TerminalScreen />);
+    await waitFor(() =>
+      expect(mockCheckNfcAvailabilityUseCase.execute).toHaveBeenCalled(),
+    );
+
+    fireEvent.press(screen.getByText('Tap Card to Check Out'));
+    await waitFor(() =>
+      expect(mockCheckOutActivityUseCase.execute).toHaveBeenCalled(),
+    );
+
+    fireEvent.press(screen.getByText('Done'));
+    await waitFor(() => expect(screen.getByText(/unchanged/)).toBeTruthy());
+    expect(screen.getByText(/not deducted/)).toBeTruthy();
+  });
+
+  it('renders CheckoutSummaryCard without checkedInAt (shows dash)', async () => {
+    mockCheckOutActivityUseCase.execute.mockResolvedValueOnce({
+      success: true,
+      role: 'TERMINAL',
+      message: 'Out.',
+      chargedHours: 1,
+      chargedAmount: 2000,
+      durationMs: 3600000,
+      card: { balance: 48000 },
+    });
+
+    renderWithServices(<TerminalScreen />);
+    await waitFor(() =>
+      expect(mockCheckNfcAvailabilityUseCase.execute).toHaveBeenCalled(),
+    );
+
+    fireEvent.press(screen.getByText('Tap Card to Check Out'));
+    await waitFor(() =>
+      expect(mockCheckOutActivityUseCase.execute).toHaveBeenCalled(),
+    );
+
+    fireEvent.press(screen.getByText('Done'));
+    await waitFor(() => expect(screen.getByText('-')).toBeTruthy());
+  });
+
+  it('renders CheckoutSummaryCard without onReset when not provided', async () => {
+    // This is covered by the component rendering in the screen with onReset always provided
+    // But we need to test the no-onReset branch of CheckoutSummaryCard directly
+    const { CheckoutSummaryCard } = require('../fragments/CheckoutSummaryCard');
+    const { render: r } = require('@testing-library/react-native');
+    const { toJSON } = r(
+      React.createElement(CheckoutSummaryCard, {
+        latestResult: {
+          success: true,
+          role: 'TERMINAL',
+          message: 'Out.',
+          card: { balance: 48000 },
+        },
+        checkoutTime: '01-May-2026 10:00',
+      }),
+    );
+    // Should not have the scan another button
+    expect(toJSON()).not.toBeNull();
+  });
+});

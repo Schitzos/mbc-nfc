@@ -33,9 +33,7 @@ export function LocalStationLedgerCard({
                 refreshSummary();
               }}
             >
-              <Text className="text-xs font-semibold text-[#FF0025]">
-                Refresh
-              </Text>
+              <Text className="text-xs font-semibold text-brand">Refresh</Text>
             </Pressable>
           </View>
           <View className="mt-2 gap-1">

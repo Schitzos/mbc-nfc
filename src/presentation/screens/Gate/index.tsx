@@ -34,7 +34,7 @@ export function GateScreen(): React.JSX.Element {
         subtitle="Checking in for Parking"
         badgeLabel="Gate"
         badgeIcon="sensor-door"
-        badgeColor="#FF0025"
+        badgeColor={signalColorTokens.brand.primary}
       />
 
       <View className="flex-1 px-4">

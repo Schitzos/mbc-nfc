@@ -1,11 +1,12 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import type { CheckNfcAvailabilityResultDto } from '@application/dto/check-nfc-availability-result-dto';
 import type { RoleActionResultDto } from '@application/dto/role-action-result-dto';
 import type { StationLedgerSummaryDto } from '@application/dto/station-ledger-summary-dto';
-import type { NfcActionState } from '@presentation/components/NfcActionSheet';
 import { useAppStore } from '@presentation/stores/app-store';
 import { UNKNOWN_ERROR_MESSAGE } from '@shared/constants';
 import type { StationServices } from '@presentation/context/service-context';
+import { useNfcSheet } from '@presentation/hooks/useNfcSheet';
+import { signalColorTokens } from '@presentation/theme/colors';
 
 const noop = () => {};
 
@@ -29,7 +30,6 @@ export function useStationActions(services: StationServices) {
   const [resultTime, setResultTime] = useState<Date | null>(null);
   const [topUpAmount, setTopUpAmount] = useState('50000');
   const [registerMode, setRegisterMode] = useState(true);
-  const dismissedRef = useRef(false);
 
   const handleSetRegisterMode = useCallback(
     (value: boolean | ((prev: boolean) => boolean)) => {
@@ -42,7 +42,19 @@ export function useStationActions(services: StationServices) {
   const [busyAction, setBusyAction] = useState<'register' | 'topup' | null>(
     null,
   );
-  const [nfcSheet, setNfcSheet] = useState<NfcActionState>({ phase: 'idle' });
+
+  const {
+    nfcSheet,
+    setNfcSheet,
+    dismissedRef,
+    handleDismissSheet: rawDismiss,
+    resetDismissed,
+  } = useNfcSheet(services.cancelNfc);
+
+  const handleDismissSheet = useCallback(() => {
+    rawDismiss();
+    setBusyAction(null);
+  }, [rawDismiss]);
 
   const refreshSummary = useCallback(async () => {
     const next = await services.getStationLedgerSummaryUseCase.execute();
@@ -65,7 +77,7 @@ export function useStationActions(services: StationServices) {
     setNfcSheet({
       phase: 'scanning',
       message: 'Hold the same card to wipe and re-register',
-      color: '#FF0025',
+      color: signalColorTokens.brand.primary,
     });
     try {
       appendNfcLog('[NFC] Wipe & re-register flow started');
@@ -98,15 +110,15 @@ export function useStationActions(services: StationServices) {
     } finally {
       setBusyAction(null);
     }
-  }, [appendNfcLog, refreshSummary, services]);
+  }, [appendNfcLog, dismissedRef, refreshSummary, services, setNfcSheet]);
 
   const handleRegister = useCallback(async () => {
-    dismissedRef.current = false;
+    resetDismissed();
     setBusyAction('register');
     setNfcSheet({
       phase: 'scanning',
       message: 'Hold your NFC card to register',
-      color: '#FF0025',
+      color: signalColorTokens.brand.primary,
     });
     try {
       appendNfcLog('[NFC] Register flow started');
@@ -171,15 +183,23 @@ export function useStationActions(services: StationServices) {
     } finally {
       setBusyAction(null);
     }
-  }, [appendNfcLog, handleWipeAndRegister, refreshSummary, services]);
+  }, [
+    appendNfcLog,
+    dismissedRef,
+    handleWipeAndRegister,
+    refreshSummary,
+    resetDismissed,
+    services,
+    setNfcSheet,
+  ]);
 
   const handleTopUp = useCallback(async () => {
-    dismissedRef.current = false;
+    resetDismissed();
     setBusyAction('topup');
     setNfcSheet({
       phase: 'scanning',
       message: 'Hold your NFC card to top up',
-      color: '#FF0025',
+      color: signalColorTokens.brand.primary,
     });
     try {
       appendNfcLog('[NFC] Top-up flow started');
@@ -218,14 +238,15 @@ export function useStationActions(services: StationServices) {
     } finally {
       setBusyAction(null);
     }
-  }, [appendNfcLog, refreshSummary, services, topUpAmount]);
-
-  const handleDismissSheet = useCallback(() => {
-    dismissedRef.current = true;
-    setNfcSheet({ phase: 'idle' });
-    setBusyAction(null);
-    services.cancelNfc().catch(noop);
-  }, [services]);
+  }, [
+    appendNfcLog,
+    dismissedRef,
+    refreshSummary,
+    resetDismissed,
+    services,
+    setNfcSheet,
+    topUpAmount,
+  ]);
 
   return {
     nfcStatus,

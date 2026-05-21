@@ -19,7 +19,7 @@ export function SegmentedControl({
         className={`flex-1 py-2.5 rounded-full items-center ${registerMode ? 'bg-[#FFE4E8]' : ''}`}
       >
         <Text
-          className={`text-sm font-semibold ${registerMode ? 'text-[#FF0025]' : 'text-[#6B7280]'}`}
+          className={`text-sm font-semibold ${registerMode ? 'text-brand' : 'text-[#6B7280]'}`}
         >
           Register
         </Text>
@@ -31,7 +31,7 @@ export function SegmentedControl({
         className={`flex-1 py-2.5 rounded-full items-center ${!registerMode ? 'bg-[#FFE4E8]' : ''}`}
       >
         <Text
-          className={`text-sm font-semibold ${!registerMode ? 'text-[#FF0025]' : 'text-[#6B7280]'}`}
+          className={`text-sm font-semibold ${!registerMode ? 'text-brand' : 'text-[#6B7280]'}`}
         >
           Top Up
         </Text>

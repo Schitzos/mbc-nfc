@@ -50,7 +50,7 @@ export function StationScreen(): React.JSX.Element {
         subtitle="Register & Top Up Cards"
         badgeLabel="Station"
         badgeIcon="add-circle-outline"
-        badgeColor="#FF0025"
+        badgeColor={signalColorTokens.brand.primary}
       />
 
       <View className="flex-1 px-4">

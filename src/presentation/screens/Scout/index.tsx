@@ -77,7 +77,7 @@ export function ScoutScreen(): React.JSX.Element {
         subtitle="Card Inspection and Member Info"
         badgeLabel="Scout"
         badgeIcon="search"
-        badgeColor="#FF0025"
+        badgeColor={signalColorTokens.brand.primary}
       />
 
       <View className="flex-1 px-4">

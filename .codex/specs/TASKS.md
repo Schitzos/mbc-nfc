@@ -841,3 +841,43 @@ Acceptance Criteria:
 - Coverage remains >=90%
 
 Status: (in-progress)
+
+### T-SA-AUDIT-001 — Audit Clean Architecture and SOLID violations
+
+Owner: @SA
+Refs: `DESIGN.md`, `REQUIREMENTS.md`
+Do: Audit all source files under `src/` for Clean Architecture layer violations and SOLID principle violations. Produce a categorized list of all violations found. Do not fix anything — only identify and list.
+Acceptance Criteria:
+
+- Every file in src/ reviewed for Clean Architecture layer boundary violations
+- Every file checked for SOLID principle violations (SRP, OCP, LSP, ISP, DIP)
+- All violations documented with file path, principle violated, and description
+- Categorized output produced (by layer and by principle)
+
+Status: in-progress
+
+### T-FE-SOLID-001 — Fix Clean Architecture and SOLID violations
+
+Owner: @FE
+Refs: `DESIGN.md`, `CODE_AUDIT_REPORT.md`, `T-SA-AUDIT-001`
+Do: Fix all SA-reported Clean Architecture and SOLID violations. No behavioral changes allowed.
+
+Violations to fix:
+
+1. Domain factory uses concrete `createRandomId` — inject ID generator via parameter (DIP)
+2. Use cases call `new Date()` directly — inject clock abstraction, default to system clock (DIP)
+3. `CardSummaryDto` exposes raw domain types — document thin-DTO decision as intentional (ISP)
+4. `StationLedgerSummaryDto` is naked alias — document intentional alias as acceptable (trivial)
+5. `useStationActions` fat hook — split into smaller focused hooks (SRP)
+6. Use cases accept full `MbcCardRepository` — use `CardReader`/`CardWriter` narrow interfaces (ISP)
+7. Hardcoded `#FF0025` — use theme token reference (DIP/maintainability)
+
+Acceptance Criteria:
+
+- All 7 SA-reported violations fixed or documented as intentional
+- No behavioral changes — all existing tests pass
+- TSC compiles clean (no new errors)
+- Coverage remains >=90%
+
+Status: ✅ DONE — QA validated 2026-05-22. tsc clean, 67 suites / 425 tests pass. All 7 violations fixed, no behavioral changes.
+Done: All SOLID/Clean Architecture violations fixed: DIP (idGenerator, clock, theme token), ISP (CardReader/CardWriter narrow interfaces, DTO docs), SRP (useNfcSheet extraction).

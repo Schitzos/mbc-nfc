@@ -2,6 +2,7 @@ import React from 'react';
 import { Pressable, Text, View } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import type { RoleOption } from '@presentation/config/role-options';
+import { signalColorTokens } from '@presentation/theme/colors';
 
 interface RoleOptionListProps {
   activeRoleKey: RoleOption['key'] | null;
@@ -37,7 +38,11 @@ export function RoleOptionList({
           onPress={() => onSelect(role.key)}
         >
           <View className="w-[52px] h-[52px] rounded-[14px] items-center justify-center mr-3.5 bg-[#FFE4E8]">
-            <Icon name={roleIcon[role.key]} size={26} color="#FF0025" />
+            <Icon
+              name={roleIcon[role.key]}
+              size={26}
+              color={signalColorTokens.brand.primary}
+            />
           </View>
           <View className="flex-1">
             <Text className="text-[16px] font-bold text-[#111827]">
@@ -47,7 +52,11 @@ export function RoleOptionList({
               {roleHint[role.key]}
             </Text>
           </View>
-          <Icon name="chevron-right" size={24} color="#FF0025" />
+          <Icon
+            name="chevron-right"
+            size={24}
+            color={signalColorTokens.brand.primary}
+          />
         </Pressable>
       ))}
     </View>

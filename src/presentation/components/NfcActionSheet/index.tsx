@@ -100,7 +100,7 @@ export function NfcActionSheet({
               </Text>
             </View>
             <View className="flex-row items-center gap-2 bg-[#FFF1F2] px-5 py-2.5 rounded-full border border-[#FFE4E8]">
-              <View className="w-2.5 h-2.5 rounded-full bg-[#FF0025]" />
+              <View className="w-2.5 h-2.5 rounded-full bg-brand" />
               <Text className="text-[13px] font-medium text-[#111827]">
                 Waiting for NFC card
               </Text>

@@ -95,3 +95,85 @@ describe('useTerminalActions – extended branch coverage', () => {
     expect(result.current.nfcSheet.phase).toBe('idle');
   });
 });
+
+describe('useTerminalActions – resetResult and simulation', () => {
+  it('resetResult clears latestResult to null', async () => {
+    const {
+      renderHook,
+      act,
+      waitFor,
+    } = require('@testing-library/react-native');
+    const { useTerminalActions } = require('../useTerminalActions');
+    const { useAppStore } = require('@presentation/stores/app-store');
+    useAppStore.setState({ nfcLogEnabled: false, nfcLogs: [] });
+
+    const services = {
+      checkNfcAvailabilityUseCase: {
+        execute: jest.fn().mockResolvedValue({ status: 'SUPPORTED' }),
+      },
+      checkOutActivityUseCase: {
+        execute: jest.fn().mockResolvedValue({
+          success: true,
+          role: 'TERMINAL',
+          message: 'Out.',
+          card: { balance: 46000 },
+        }),
+      },
+      cancelNfc: jest.fn().mockResolvedValue(undefined),
+    };
+
+    const { result } = renderHook(() => useTerminalActions(services));
+    await waitFor(() =>
+      expect(services.checkNfcAvailabilityUseCase.execute).toHaveBeenCalled(),
+    );
+
+    await act(async () => {
+      await result.current.handleCheckout();
+    });
+    expect(result.current.latestResult).not.toBeNull();
+
+    act(() => {
+      result.current.resetResult();
+    });
+    expect(result.current.latestResult).toBeNull();
+  });
+
+  it('sets isSimulation success title when result has isSimulation', async () => {
+    const {
+      renderHook,
+      act,
+      waitFor,
+    } = require('@testing-library/react-native');
+    const { useTerminalActions } = require('../useTerminalActions');
+    const { useAppStore } = require('@presentation/stores/app-store');
+    useAppStore.setState({ nfcLogEnabled: false, nfcLogs: [] });
+
+    const services = {
+      checkNfcAvailabilityUseCase: {
+        execute: jest.fn().mockResolvedValue({ status: 'SUPPORTED' }),
+      },
+      checkOutActivityUseCase: {
+        execute: jest.fn().mockResolvedValue({
+          success: true,
+          role: 'TERMINAL',
+          message: 'Simulated checkout.',
+          isSimulation: true,
+          card: { balance: 50000 },
+        }),
+      },
+      cancelNfc: jest.fn().mockResolvedValue(undefined),
+    };
+
+    const { result } = renderHook(() => useTerminalActions(services));
+    await waitFor(() =>
+      expect(services.checkNfcAvailabilityUseCase.execute).toHaveBeenCalled(),
+    );
+
+    await act(async () => {
+      await result.current.handleCheckout();
+    });
+
+    expect(result.current.nfcSheet.phase).toBe('success');
+    expect((result.current.nfcSheet as any).title).toContain('Simulation');
+  });
+});

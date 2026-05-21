@@ -1,4 +1,4 @@
-import type { MbcCardRepository } from '@domain/membership/repositories/membership-card.repository';
+import type { CardWriter } from '@domain/membership/repositories/membership-card.repository';
 import { isCardRepositoryError } from '@domain/membership/errors/membership-card-repository-error';
 import {
   createDomainError,
@@ -19,6 +19,7 @@ import { toCardSummaryDto } from '@application/dto/card-summary-mapper';
 import type { LocalLedgerRepository } from '@domain/membership/repositories/ledger.repository';
 import { maskMemberReference } from '@shared/utils/mask-member-reference';
 import type { BenefitActivityType } from '@domain/membership/types/card-status';
+import { type Clock, systemClock } from '@shared/ports/clock';
 
 export type CheckOutActivityRequest = {
   checkedOutAt?: string;
@@ -35,14 +36,15 @@ function mapCardRepoErrorCode(code: string): RoleActionErrorCode {
 }
 
 export function createCheckOutActivityUseCase(
-  cardRepository: MbcCardRepository,
+  cardRepository: CardWriter,
   localLedgerRepository?: LocalLedgerRepository,
+  clock: Clock = systemClock,
 ): CheckOutActivityUseCase {
   return {
     async execute({
       checkedOutAt,
     }: CheckOutActivityRequest = {}): Promise<RoleActionResultDto> {
-      const occurredAt = checkedOutAt ?? new Date().toISOString();
+      const occurredAt = checkedOutAt ?? clock().toISOString();
       let tariffResult = { chargedAmount: 0, chargedHours: 0, durationMs: 0 };
 
       try {

@@ -44,7 +44,7 @@ export function LatestLogsCard({
                   {index + 1}. {log.activity.replace('_', ' ')}
                   {log.isSimulation ? ' (S)' : ''}
                 </Text>
-                <Text className="text-[11px] text-[#FF0025] font-semibold ml-2">
+                <Text className="text-[11px] text-brand font-semibold ml-2">
                   {log.nominal > 0
                     ? `Rp ${log.nominal.toLocaleString(LOCALE_ID)}`
                     : ''}

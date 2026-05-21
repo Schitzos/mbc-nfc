@@ -35,7 +35,7 @@ export function AmountInput({
             key={amount}
             onPress={() => setTopUpAmount(String(amount))}
             className={`rounded-full px-3 py-1.5 ${
-              topUpAmount === String(amount) ? 'bg-[#FF0025]' : 'bg-[#111827]'
+              topUpAmount === String(amount) ? 'bg-brand' : 'bg-[#111827]'
             }`}
           >
             <Text className="text-xs font-semibold text-white">

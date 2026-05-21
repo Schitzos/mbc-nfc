@@ -5,12 +5,14 @@ import {
 } from '../policies/transaction-log-policy';
 import { createRandomId } from '@shared/utils/create-random-id';
 
-export function createInitialCard(): MbcCard {
+export function createInitialCard(
+  idGenerator: (prefix: string) => string = createRandomId,
+): MbcCard {
   const occurredAt = new Date().toISOString();
   const card: MbcCard = {
     version: 1,
-    cardId: createRandomId('CARD'),
-    member: { memberId: createRandomId('MEM') },
+    cardId: idGenerator('CARD'),
+    member: { memberId: idGenerator('MEM') },
     balance: 0,
     currency: 'IDR',
     visitStatus: 'NOT_CHECKED_IN',
@@ -20,7 +22,7 @@ export function createInitialCard(): MbcCard {
   return appendTransactionLog(
     card,
     createTransactionLog({
-      id: createRandomId('LOG'),
+      id: idGenerator('LOG'),
       activity: 'REGISTER',
       nominal: 0,
       occurredAt,
