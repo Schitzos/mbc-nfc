@@ -439,4 +439,43 @@ describe('mbc-card-codec – additional decode error paths', () => {
     expect(result.ok).toBe(false);
     if (!result.ok) expect(result.error).toBe('INVALID_TRANSACTION_LOG_ENTRY');
   });
+
+  it('round-trips isSimulation flag through encode/decode', () => {
+    const card: MbcCard = {
+      ...validCard,
+      activeSession: {
+        activityId: 'ACT-1',
+        activityType: 'PARKING',
+        checkedInAt: '2026-05-06T08:00:00+07:00',
+        isSimulation: true,
+      },
+    };
+    const encResult = encode(card, 5);
+    expect(encResult.ok).toBe(true);
+    if (!encResult.ok) return;
+
+    const parsed = JSON.parse(encResult.value);
+    expect(parsed.i.s).toBe(1);
+
+    const decResult = decode(encResult.value);
+    expect(decResult.ok).toBe(true);
+    if (!decResult.ok) return;
+    expect(decResult.value.card.activeSession?.isSimulation).toBe(true);
+  });
+
+  it('decode omits isSimulation when s field is absent', () => {
+    const raw = JSON.stringify({
+      v: 1,
+      c: 'C1',
+      m: 'M1',
+      b: 100,
+      i: { a: 1, t: '2026-05-06T10:00:00+07:00' },
+      x: [],
+      n: 1,
+    });
+    const result = decode(raw);
+    expect(result.ok).toBe(true);
+    if (!result.ok) return;
+    expect(result.value.card.activeSession?.isSimulation).toBeUndefined();
+  });
 });

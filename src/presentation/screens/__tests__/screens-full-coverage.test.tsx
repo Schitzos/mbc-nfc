@@ -522,4 +522,132 @@ describe('screens – full branch coverage', () => {
       ),
     );
   });
+
+  it('Gate simulation toggle shows banner and date picker UI', async () => {
+    renderWithServices(<GateScreen />);
+    await waitFor(() =>
+      expect(mockCheckNfcAvailabilityUseCase.execute).toHaveBeenCalled(),
+    );
+
+    // Toggle simulation on
+    const toggle = screen.getByTestId('simulation-toggle');
+    fireEvent(toggle, 'valueChange', true);
+
+    await waitFor(() =>
+      expect(screen.getByTestId('simulation-banner')).toBeTruthy(),
+    );
+
+    // Press date button to open date picker
+    fireEvent.press(screen.getByTestId('simulation-date-button'));
+    await waitFor(() =>
+      expect(screen.getByTestId('simulation-date-picker')).toBeTruthy(),
+    );
+
+    // Simulate date selection
+    fireEvent(
+      screen.getByTestId('simulation-date-picker'),
+      'onChange',
+      {
+        nativeEvent: { timestamp: Date.now() },
+      },
+      new Date('2026-05-01T08:00:00.000Z'),
+    );
+
+    // Time picker should appear
+    await waitFor(() =>
+      expect(screen.getByTestId('simulation-time-picker')).toBeTruthy(),
+    );
+
+    // Simulate time selection
+    fireEvent(
+      screen.getByTestId('simulation-time-picker'),
+      'onChange',
+      {
+        nativeEvent: { timestamp: Date.now() },
+      },
+      new Date('2026-05-01T08:30:00.000Z'),
+    );
+  });
+
+  it('Gate date picker handles cancel (no date)', async () => {
+    renderWithServices(<GateScreen />);
+    await waitFor(() =>
+      expect(mockCheckNfcAvailabilityUseCase.execute).toHaveBeenCalled(),
+    );
+
+    const toggle = screen.getByTestId('simulation-toggle');
+    fireEvent(toggle, 'valueChange', true);
+
+    await waitFor(() =>
+      expect(screen.getByTestId('simulation-date-button')).toBeTruthy(),
+    );
+
+    fireEvent.press(screen.getByTestId('simulation-date-button'));
+    await waitFor(() =>
+      expect(screen.getByTestId('simulation-date-picker')).toBeTruthy(),
+    );
+
+    // Cancel date picker (no date passed)
+    fireEvent(
+      screen.getByTestId('simulation-date-picker'),
+      'onChange',
+      {
+        nativeEvent: { timestamp: Date.now() },
+      },
+      undefined,
+    );
+
+    // Date picker should be dismissed, time picker should NOT appear
+    await waitFor(() =>
+      expect(screen.queryByTestId('simulation-date-picker')).toBeNull(),
+    );
+    expect(screen.queryByTestId('simulation-time-picker')).toBeNull();
+  });
+
+  it('Gate time picker handles cancel (no time)', async () => {
+    renderWithServices(<GateScreen />);
+    await waitFor(() =>
+      expect(mockCheckNfcAvailabilityUseCase.execute).toHaveBeenCalled(),
+    );
+
+    const toggle = screen.getByTestId('simulation-toggle');
+    fireEvent(toggle, 'valueChange', true);
+
+    await waitFor(() =>
+      expect(screen.getByTestId('simulation-date-button')).toBeTruthy(),
+    );
+
+    fireEvent.press(screen.getByTestId('simulation-date-button'));
+    await waitFor(() =>
+      expect(screen.getByTestId('simulation-date-picker')).toBeTruthy(),
+    );
+
+    // Select a date to trigger time picker
+    fireEvent(
+      screen.getByTestId('simulation-date-picker'),
+      'onChange',
+      {
+        nativeEvent: { timestamp: Date.now() },
+      },
+      new Date('2026-05-01T08:00:00.000Z'),
+    );
+
+    await waitFor(() =>
+      expect(screen.getByTestId('simulation-time-picker')).toBeTruthy(),
+    );
+
+    // Cancel time picker (no time passed)
+    fireEvent(
+      screen.getByTestId('simulation-time-picker'),
+      'onChange',
+      {
+        nativeEvent: { timestamp: Date.now() },
+      },
+      undefined,
+    );
+
+    await waitFor(() =>
+      expect(screen.queryByTestId('simulation-time-picker')).toBeNull(),
+    );
+  });
 });

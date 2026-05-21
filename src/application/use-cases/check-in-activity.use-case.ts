@@ -18,9 +18,15 @@ import { toCardSummaryDto } from '@application/dto/card-summary-mapper';
 export type CheckInActivityRequest = {
   activityId: string;
   activityType: BenefitActivityType;
+  checkedInAt?: string;
+  isSimulation?: boolean;
 };
 
-function createCheckInLog(card: MbcCard, occurredAt: string): MbcCard {
+function createCheckInLog(
+  card: MbcCard,
+  occurredAt: string,
+  isSimulation?: boolean,
+): MbcCard {
   return appendTransactionLog(
     card,
     createTransactionLog({
@@ -28,6 +34,7 @@ function createCheckInLog(card: MbcCard, occurredAt: string): MbcCard {
       activity: 'CHECK_IN',
       nominal: 0,
       occurredAt,
+      isSimulation,
     }),
   );
 }
@@ -60,8 +67,21 @@ export function createCheckInActivityUseCase(
     async execute({
       activityId,
       activityType,
+      checkedInAt,
+      isSimulation,
     }: CheckInActivityRequest): Promise<RoleActionResultDto> {
-      const occurredAt = new Date().toISOString();
+      const occurredAt = checkedInAt ?? new Date().toISOString();
+
+      if (checkedInAt) {
+        const checkedInDate = new Date(checkedInAt);
+        if (checkedInDate.getTime() > Date.now()) {
+          return {
+            success: false,
+            role: 'GATE',
+            message: 'Simulation time cannot be in the future.',
+          };
+        }
+      }
 
       try {
         const updatedCard = await cardRepository.readWriteCard(card => {
@@ -69,8 +89,9 @@ export function createCheckInActivityUseCase(
             activityId,
             activityType,
             checkedInAt: occurredAt,
+            isSimulation,
           });
-          return createCheckInLog(checkedInCard, occurredAt);
+          return createCheckInLog(checkedInCard, occurredAt, isSimulation);
         });
 
         return {

@@ -36,8 +36,8 @@ export type CompactPayload = {
   c: string;
   m: string;
   b: number;
-  i: { a: number; t: string } | null;
-  x: [string, number, string][];
+  i: { a: number; t: string; s?: 1 } | null;
+  x: ([string, number, string] | [string, number, string, 1])[];
   n: number;
 };
 
@@ -59,14 +59,25 @@ export function encode(
     c: card.cardId,
     m: card.member.memberId,
     b: card.balance,
-    i: card.activeSession ? { a: 1, t: card.activeSession.checkedInAt } : null,
+    i: card.activeSession
+      ? {
+          a: 1,
+          t: card.activeSession.checkedInAt,
+          ...(card.activeSession.isSimulation ? { s: 1 as const } : {}),
+        }
+      : null,
     x: card.transactionLogs
       .slice(-MAX_TRANSACTION_LOGS)
-      .map(log => [
-        ACTIVITY_TO_COMPACT[log.activity],
-        log.nominal,
-        log.occurredAt,
-      ]),
+      .map(log =>
+        log.isSimulation
+          ? [
+              ACTIVITY_TO_COMPACT[log.activity],
+              log.nominal,
+              log.occurredAt,
+              1 as const,
+            ]
+          : [ACTIVITY_TO_COMPACT[log.activity], log.nominal, log.occurredAt],
+      ),
     n: writeCounter,
   };
 
@@ -137,6 +148,7 @@ export function decode(
           activityId: `ACT-${p.c}`,
           activityType: 'PARKING',
           checkedInAt: p.i.t,
+          ...(p.i.s === 1 ? { isSimulation: true } : {}),
         }
       : undefined,
     transactionLogs: p.x.map((tuple, idx) => ({
@@ -145,6 +157,7 @@ export function decode(
         /* istanbul ignore next */ COMPACT_TO_ACTIVITY[tuple[0]] ?? 'REGISTER',
       nominal: tuple[1],
       occurredAt: tuple[2],
+      ...(tuple[3] === 1 ? { isSimulation: true } : {}),
     })),
   };
 
@@ -192,7 +205,7 @@ function validateCheckIn(i: unknown): string | null {
 
 function validateLogs(x: unknown[]): string | null {
   for (const entry of x) {
-    if (!Array.isArray(entry) || entry.length !== 3) {
+    if (!Array.isArray(entry) || entry.length < 3 || entry.length > 4) {
       return 'INVALID_TRANSACTION_LOG_ENTRY';
     }
     const [activity, nominal, time] = entry;
@@ -203,6 +216,9 @@ function validateLogs(x: unknown[]): string | null {
       return 'INVALID_TRANSACTION_LOG_ENTRY';
     }
     if (typeof time !== 'string' || !time) {
+      return 'INVALID_TRANSACTION_LOG_ENTRY';
+    }
+    if (entry.length === 4 && entry[3] !== 1) {
       return 'INVALID_TRANSACTION_LOG_ENTRY';
     }
   }

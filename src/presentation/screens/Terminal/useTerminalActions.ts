@@ -57,8 +57,12 @@ export function useTerminalActions(services: TerminalServices) {
         setCheckoutTime(formatTime(new Date()));
         setNfcSheet({
           phase: 'success',
-          title: 'Checkout Complete',
-          message: result.message,
+          title: result.isSimulation
+            ? '⚠️ Simulation Checkout'
+            : 'Checkout Complete',
+          message: result.isSimulation
+            ? `${result.message}\nBalance NOT deducted (simulation)`
+            : result.message,
         });
         appendNfcLog('[NFC] Checkout succeeded');
       } else {

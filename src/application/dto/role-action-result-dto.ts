@@ -22,4 +22,6 @@ export type RoleActionResultDto = {
   chargedAmount?: number;
   durationMs?: number;
   requiresReset?: boolean;
+  isSimulation?: boolean;
+  checkedInAt?: string;
 };
