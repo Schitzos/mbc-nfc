@@ -263,6 +263,26 @@ Expected outcome:
 - Terminal skips balance deduction for simulation checkouts and shows a banner.
 - Dependency added: `@react-native-community/datetimepicker@8.3.0`.
 
+### Phase 9C Bug Fixes and Hardening ✅ COMPLETE
+
+Goal:
+
+- Fix registration overwrite bug and add balance cap safety measure.
+
+Order:
+
+1. `T-BUGFIX-001` Fix registerCard silent overwrite of tags with existing data ✅ DONE
+2. `T-BUGFIX-002` Add max balance cap (Rp 5.000.000) on top-up ✅ DONE
+3. `T-UI-THEME-001` Implement vibrant theme tokens ✅ DONE
+4. `T-UI-HEADER-001` Implement ScreenHeader shared component ✅ DONE
+
+Expected outcome:
+
+- Registration correctly detects and handles tags with existing non-MBC data.
+- Top-up rejects amounts that would exceed MAX_CARD_BALANCE (Rp 5.000.000) with BALANCE_CAP_EXCEEDED error.
+- Vibrant theme tokens available for presentation layer.
+- ScreenHeader provides consistent header across all role screens.
+
 ### Phase 10 Demo And Submission
 
 Goal:

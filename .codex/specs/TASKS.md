@@ -1,6 +1,6 @@
 # Membership Benefit Card — Codex Task Plan Lite
 
-> Current status: 444+ tests | 65 suites | 100% line coverage | jest.config.js thresholds: 99% statements/lines/branches, 96% functions
+> Current status: 446+ tests | 66 suites | 100% line coverage | jest.config.js thresholds: 99% statements/lines/branches, 96% functions
 
 Purpose: compact, Codex-friendly task cards. Execute task order from `EXECUTION_ORDER.md`. Use detailed docs only when the task references them.
 
@@ -463,6 +463,37 @@ Acceptance Criteria:
 
 Done: All RadarZone instances use Signal UI primary red #FF0025; all tests pass.
 
+### T-UI-THEME-001 — Implement vibrant theme tokens in colors.ts ✅ DONE
+
+Owner: @FE + @UI/UX
+Refs: `SIGNAL_UI_GUIDE.md`, `VIBRANT_THEME_SPEC.md`
+Do: Add `vibrantTokens` export to `src/presentation/theme/colors.ts` with extended color tokens for dark card gradients, success states, and immersive UI surfaces.
+Acceptance Criteria:
+
+- `vibrantTokens` object exported from colors.ts
+- Tokens include dark card gradient, success gradient, and immersive surface colors
+- All existing tests pass
+- Coverage remains >=90%
+
+Status: ✅ DONE
+Done: Vibrant theme tokens implemented in colors.ts; used by presentation layer components.
+
+### T-UI-HEADER-001 — Implement ScreenHeader shared component ✅ DONE
+
+Owner: @FE + @UI/UX
+Refs: `SIGNAL_UI_GUIDE.md`, `DESIGN.md`
+Do: Create `src/presentation/components/ScreenHeader/index.tsx` — a shared header component providing consistent role title, subtitle, and optional action elements for all 4 role screens.
+Acceptance Criteria:
+
+- ScreenHeader component created under src/presentation/components/ScreenHeader/
+- Used by Station, Gate, Terminal, and Scout screens
+- Provides role title, subtitle, and optional action slot
+- All existing tests pass
+- Coverage remains >=90%
+
+Status: ✅ DONE
+Done: ScreenHeader component implemented and used by all role screens.
+
 ### T-UI-STATION-003 — Revamp Station screen layout and add scanning animation to NfcActionSheet ✅ DONE
 
 Owner: Senior RN FE + UI/UX Designer
@@ -701,5 +732,112 @@ Acceptance Criteria:
 - BUG-3: Transaction log in Scout shows "(S)" suffix on activity name for simulation entries — no change to log structure, just display "(S)" in Scout for the check-in that matches the simulation session time.
 - BUG-4: Skip `localLedgerRepository.append` when `wasSimulation` is true in checkout use case
 - BUG-5: Gate check-in success message indicates simulation (e.g., "Card checked in (simulation).")
+
+Status: (in-progress)
+
+### T-UI-APP-005 — Apply Gate background gradient to all screens and fix bottom sheet to white
+
+Owner: @FE + @UI/UX
+Refs: `SIGNAL_UI_GUIDE.md`
+Do: Apply the Gate screen's LinearGradient background (colors=['#0D1B3E', '#F5F6FA'], locations=[0, 0.35]) to ALL role screens (Station, Terminal, Scout, RoleSwitcher). Fix NfcActionSheet bottom sheet to use white solid background (#FFFFFF) instead of dark gradient.
+
+Files:
+
+- `src/presentation/screens/Station/index.tsx` (replace solid bg with LinearGradient)
+- `src/presentation/screens/Scout/index.tsx` (replace solid bg with LinearGradient)
+- `src/presentation/screens/RoleSwitcher/index.tsx` (replace solid bg with LinearGradient)
+- `src/presentation/screens/Terminal/index.tsx` (fix locations from [0, 0.3] to [0, 0.35])
+- `src/presentation/components/NfcActionSheet/index.tsx` (remove dark gradient, use white bg)
+
+Acceptance Criteria:
+
+- All 5 screens (Station, Gate, Terminal, Scout, RoleSwitcher) use the same LinearGradient background: colors=['#0D1B3E', '#F5F6FA'], locations=[0, 0.35]
+- NfcActionSheet bottom sheet uses white solid background (#FFFFFF) instead of dark gradient
+- Bottom sheet text colors updated for readability on white background
+- All existing tests pass
+- Coverage remains >=90%
+
+Status: ✅ DONE
+
+### T-UI-APP-006 — Fix RoleSwitcher card text readability — dark-glass glassmorphism
+
+Owner: @FE + @UI/UX
+Refs: `SIGNAL_UI_GUIDE.md`
+Do: Fix RoleSwitcher card text readability by switching from light-glass to dark-glass glassmorphism. Role option cards have white text on near-transparent background (rgba(255,255,255,0.08)), unreadable when gradient transitions to light grey. Apply dark semi-opaque card fill so cards carry their own contrast.
+
+Files:
+
+- `src/presentation/screens/RoleSwitcher/fragments/RoleOptionList.tsx`
+
+Acceptance Criteria:
+
+- Card background changed from `rgba(255,255,255,0.08)` to `rgba(13,27,62,0.88)`
+- Card border changed from `rgba(255,255,255,0.15)` to `rgba(255,255,255,0.12)`
+- Subtitle text opacity increased from 60% to 72% (text-white/60 → text-white/[0.72])
+- Chevron opacity increased from 40% to 50% (text-white/40 → text-white/50)
+- All 4 role cards are readable on both dark and light portions of the gradient
+- All existing tests pass
+- Coverage remains >=90%
+
+Status: ✅ DONE — QA validated 2026-05-21. Code review passed: all 4 acceptance criteria verified in diff. 70 suites / 468 tests pass. RoleOptionList.tsx 100% coverage. TypeScript compiles cleanly. WCAG contrast ratio ~16:1 (white on dark navy).
+Done: RoleSwitcher cards use dark-glass glassmorphism with readable white text on both dark and light gradient portions; all tests pass.
+
+### T-UI-APP-007 — Redesign RoleSwitcher to light theme per reference image
+
+Owner: @FE + @UI/UX
+Refs: `SIGNAL_UI_GUIDE.md`
+Do: Redesign the RoleSwitcher screen to match the provided reference image with a full LIGHT theme. Replace dark navy header and dark-glass cards with light gradient background, custom inline light header, and white frosted glass cards with red monochrome icons. Do NOT modify shared AppHeaderCard — just don't use it in RoleSwitcher.
+
+Files:
+
+- `src/presentation/screens/RoleSwitcher/index.tsx`
+- `src/presentation/screens/RoleSwitcher/fragments/RoleOptionList.tsx`
+
+Acceptance Criteria:
+
+- RoleSwitcher uses full light gradient background (light grey/pinkish, no dark navy)
+- Header has transparent/light background with dark (black) title text, grey subtitle, red info icon in white circle
+- Role cards are white/frosted glass with subtle grey border
+- Card titles are black, subtitles are grey
+- Card icons are red (#FF0025) on pink (#FFE4E8) circular backgrounds
+- Chevrons are red (#FF0025)
+- NfcLogPanel adapted for light theme (light bg, dark text)
+- All existing tests pass
+- Coverage remains >=90%
+
+Status: (in-progress)
+
+### T-UI-REFACTOR-001 — Remove inline styles, use NativeWind/StyleSheet
+
+Owner: @FE
+Refs: `SIGNAL_UI_GUIDE.md`, `DESIGN.md`
+Do: Refactor all presentation layer components, screens, and fragments to eliminate inline styles. Replace inline `style={{...}}` with NativeWind className utilities wherever possible. If NativeWind cannot express a style (e.g., dynamic values, complex shadows), use StyleSheet.create instead. Priority: NativeWind > StyleSheet > inline style. Scope: `src/presentation/components/**`, `src/presentation/screens/**`. Do NOT change any logic or behavior — only style declarations.
+
+Files:
+
+- `src/presentation/screens/Terminal/fragments/CheckoutSummaryCard.tsx`
+- `src/presentation/screens/Terminal/fragments/TariffPreviewCard.tsx`
+- `src/presentation/screens/Terminal/fragments/InsufficientBalanceCard.tsx`
+- `src/presentation/screens/Terminal/fragments/GenericFailureCard.tsx`
+- `src/presentation/screens/Terminal/index.tsx`
+- `src/presentation/screens/Scout/index.tsx`
+- `src/presentation/screens/Station/index.tsx`
+- `src/presentation/screens/Station/fragments/AmountInput.tsx`
+- `src/presentation/screens/Gate/index.tsx`
+- `src/presentation/screens/Gate/fragments/GateResultState.tsx`
+- `src/presentation/screens/Gate/fragments/SimulationModePanel.tsx`
+- `src/presentation/screens/Gate/fragments/SelectedActivityCard.tsx`
+- `src/presentation/screens/RoleSwitcher/index.tsx`
+- `src/presentation/components/ScreenHeader/index.tsx`
+- `src/presentation/components/AppHeaderCard/index.tsx`
+
+Acceptance Criteria:
+
+- All inline `style={{}}` in `src/presentation/` replaced with NativeWind className where possible
+- Where NativeWind cannot express the style, use StyleSheet.create
+- No behavioral or visual changes
+- All 468 tests pass
+- TypeScript compiles clean
+- Coverage remains >=90%
 
 Status: (in-progress)

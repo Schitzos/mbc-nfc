@@ -83,7 +83,7 @@ A quality-sensitive delivery is done when:
 - Changed-file unit-test rule passes for all feature branches.
 - Every approved test exception includes reason, impacted file, owner, and follow-up.
 
-- Automated unit-test coverage across the whole executable repository source is at least 90%. Actual achievement: 100% line coverage (444+ tests, 65 suites).
+- Automated unit-test coverage across the whole executable repository source is at least 90%. Actual achievement: 100% line coverage (446+ tests, 66 suites).
 - SonarCloud analysis is configured and reports coverage.
 - SonarCloud quality gate passes, or any temporary exception is explicitly documented.
 - `npm audit` reports 0 known vulnerabilities after dependency changes.
