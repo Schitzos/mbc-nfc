@@ -64,7 +64,7 @@ The PDF uses member parking as the concrete required assessment scenario. Parkin
 - Member benefit fee deduction.
 - Parking activity as the required MVP activity, with configurable activity context treated as future-friendly design support.
 - Sequential flow integrity, with no double check-in or double check-out.
-- Simulation mode at The Gate to set entry time in the past for testing (removed in Phase 9; Gate uses real device time only).
+- Simulation mode at The Gate to set entry time in the past for testing/demo purposes.
 - Last five transaction logs stored on card.
 - Local SQLite ledger for offline reporting and audit on the device.
 - Sensitive data protection so identity and balance are not readable in plain form by generic NFC apps.
@@ -89,7 +89,7 @@ The PDF uses member parking as the concrete required assessment scenario. Parkin
 
 - Target cards are NFC/HF RFID cards readable and writable by supported phones.
 - Real card scan, read, and write flows require a physical device with NFC hardware enabled.
-- Devices without NFC cannot perform real MBC card operations. No simulation mode or mock scenario selectors are included in the production app.
+- Devices without NFC cannot perform real MBC card operations.
 - Android is the primary MVP NFC read/write validation target, using ASUS ROG Phone 9 FE (Android 14+) as the validated real-device test baseline.
 - iOS NFC read/write is out of MVP and may be treated as best-effort/read-only unless validated later on real device.
 - The MVP target NFC tag is NTAG215. NFC payload design, card capacity validation, and real-card tests must be validated against NTAG215 behavior and capacity.
@@ -110,7 +110,7 @@ The PDF uses member parking as the concrete required assessment scenario. Parkin
 | US-001 | As a cooperative admin, I can register a member card at The Station.                                           | Must     |
 | US-002 | As a cooperative admin, I can top up a member balance at The Station.                                          | Must     |
 | US-003 | As a gate operator, I can check in a member to an activity by tapping the card at The Gate.                    | Must     |
-| US-004 | As a gate operator, I can check in a member using real device time (simulation mode removed).                  | Must     |
+| US-004 | As a gate operator, I can check in a member using real device time or a simulated past time for testing/demo.  | Must     |
 | US-005 | As a terminal operator, I can check out a member from an activity by tapping the card at The Terminal.         | Must     |
 | US-006 | As a terminal operator, I can see activity duration and fee after successful checkout tap.                     | Must     |
 | US-007 | As a terminal operator, I can block checkout when balance is insufficient and show clear top-up guidance.      | Must     |
@@ -172,11 +172,21 @@ Acceptance criteria:
 - Operator can use the default parking activity or another configured activity context.
 - If the card is not currently checked in, app writes activity ID, entry timestamp, and checked-in status.
 - If the card is already checked in, app rejects the action as double check-in.
+- Gate provides a simulation toggle that allows the operator to set a custom entry timestamp (in the past) for testing and demo purposes. When simulation is off, real device time is used.
 - Check-in writes a transaction log entry.
 
-### FR-005 Gate Simulation Mode (Removed)
+### FR-005 Gate Simulation Mode
 
-Gate simulation mode was removed in Phase 9. The Gate now uses real device time for check-in timestamps. This simplifies the Gate flow and removes mock scenario selectors from all screens.
+The Gate shall provide a simulation mode for testing and demo purposes.
+
+Acceptance criteria:
+
+- Gate provides a toggle to enable/disable simulation mode.
+- When simulation mode is enabled, the operator can set a custom entry timestamp (must be in the past relative to device time).
+- When simulation mode is disabled, real device time is used for check-in.
+- Simulation mode is clearly indicated in the UI so operators know which mode is active.
+- The simulated timestamp is written to the card as the check-in time.
+- Terminal checkout calculates duration from the simulated entry time to real device exit time.
 
 ### FR-006 Terminal Check-Out
 
@@ -295,7 +305,7 @@ The app shall explicitly handle common offline/NFC operational edge cases so fie
 
 Acceptance criteria:
 
-- Gate uses real device time for check-in; simulation mode is not part of production flow.
+- Gate uses real device time for check-in by default; simulation mode is available for testing/demo purposes.
 - If the device clock causes checkout time to be earlier than or equal to check-in time, checkout is rejected before any balance deduction.
 - If a card is removed during write, `writeNdefMessage` throws and success is not shown.
 - If SQLite/local reporting data is deleted, the card remains operational source of truth but local reports for that device may be incomplete.

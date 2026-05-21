@@ -143,22 +143,22 @@ Use this format for every test case:
 | Status          | Pass (Mock sweep 2026-05-02)                                                                      |
 | Evidence        | `.codex/specs/test-evidence/2026-05-02-sweep/31-gate-normal-success.png`                          |
 
-### E2E-GATE-002 Simulation Check-In (Removed)
+### E2E-GATE-002 Simulation Check-In (Reinstated)
 
-| Field           | Value                                                             |
-| --------------- | ----------------------------------------------------------------- |
-| Test Case ID    | E2E-GATE-002                                                      |
-| Feature         | Gate - Simulation Mode (Removed)                                  |
-| Objective       | Historical reference only; production flow uses real device time. |
-| Preconditions   | N/A                                                               |
-| Test Data       | N/A                                                               |
-| Steps           | N/A                                                               |
-| Expected Result | N/A                                                               |
-| Priority        | Medium                                                            |
-| Type            | Both                                                              |
-| Owner           | Senior QA + Test Automation Engineer                              |
-| Status          | Removed in Phase 9                                                |
-| Evidence        | N/A                                                               |
+| Field           | Value                                                                                                                                          |
+| --------------- | ---------------------------------------------------------------------------------------------------------------------------------------------- |
+| Test Case ID    | E2E-GATE-002                                                                                                                                   |
+| Feature         | Gate - Simulation Mode                                                                                                                         |
+| Objective       | Verify Gate simulation mode writes past timestamp and isSimulation flag to card; Terminal skips balance deduction.                             |
+| Preconditions   | Registered card with sufficient balance; Gate simulation toggle enabled.                                                                       |
+| Test Data       | Past time selected via DateTimePicker (e.g., 2 hours ago).                                                                                     |
+| Steps           | 1. Enable simulation toggle on Gate. 2. Select past time. 3. Tap card to check in. 4. Go to Terminal. 5. Tap card to check out.                |
+| Expected Result | Card stores `isSimulation` flag; Terminal shows fee/duration but does NOT deduct balance; simulation banner visible on both Gate and Terminal. |
+| Priority        | Medium                                                                                                                                         |
+| Type            | Both                                                                                                                                           |
+| Owner           | Senior QA + Test Automation Engineer                                                                                                           |
+| Status          | Reinstated — implemented in T-FEAT-GATE-001                                                                                                    |
+| Evidence        | N/A                                                                                                                                            |
 
 ### E2E-GATE-003 Reject Double Check-In
 

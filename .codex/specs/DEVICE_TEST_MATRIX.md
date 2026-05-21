@@ -39,23 +39,23 @@ Supporting roles:
 
 ## 5. Test Cases
 
-| ID       | Scenario                     | Device                                                   | Card     | Expected                                                                               | Result |
-| -------- | ---------------------------- | -------------------------------------------------------- | -------- | -------------------------------------------------------------------------------------- | ------ |
-| DTM-001  | NFC availability             | DEV-ANDROID-001 / ASUS ROG 9 FE                          | None     | App shows NFC status                                                                   | PASS   |
-| DTM-002  | iOS NFC availability         | iOS / optional                                           | None     | Documented as out of MVP unless separately validated                                   | N/A    |
-| DTM-002A | NFC unsupported              | Non-NFC device                                           | None     | App explains real card operations require NFC-capable device                           | PASS   |
-| DTM-002B | NFC disabled                 | DEV-ANDROID-001 / ASUS ROG 9 FE                          | None     | App asks user to enable NFC before scan/read/write                                     | PASS   |
-| DTM-003  | Station registration         | DEV-ANDROID-001 / ASUS ROG 9 FE                          | CARD-001 | Registered MBC payload written                                                         | PASS   |
-| DTM-004  | Station top-up               | DEV-ANDROID-001 / ASUS ROG 9 FE                          | CARD-001 | Balance increases                                                                      | PASS   |
-| DTM-005  | Gate parking check-in        | DEV-ANDROID-001 / ASUS ROG 9 FE                          | CARD-001 | Parking status becomes checked in                                                      | PASS   |
-| DTM-006  | Gate simulation mode         | DEV-ANDROID-001 / ASUS ROG 9 FE                          | CARD-001 | Removed — Gate uses real device time only                                              | N/A    |
-| DTM-007  | Terminal parking checkout    | DEV-ANDROID-001 / ASUS ROG 9 FE                          | CARD-001 | Fee deducted and status cleared                                                        | PASS   |
-| DTM-008  | Insufficient balance         | DEV-ANDROID-001 / ASUS ROG 9 FE                          | CARD-002 | Top-up guidance shown                                                                  | PASS   |
-| DTM-009  | Scout inspect                | DEV-ANDROID-001 / ASUS ROG 9 FE                          | CARD-001 | Balance, status, logs shown                                                            | PASS   |
-| DTM-010  | Silent Shield                | DEV-ANDROID-001 / ASUS ROG 9 FE + generic NFC reader app | CARD-001 | Sensitive fields not plain in generic NFC app                                          | PASS   |
-| DTM-011  | Unsupported card             | DEV-ANDROID-001 / ASUS ROG 9 FE                          | CARD-003 | Safe unsupported message                                                               | PASS   |
-| DTM-012  | Cancel scan                  | DEV-ANDROID-001 / ASUS ROG 9 FE                          | None     | NFC session cleaned up                                                                 | PASS   |
-| DTM-013  | Station local ledger summary | DEV-ANDROID-001 / ASUS ROG 9 FE                          | None     | Device-local summary reflects executed register/top-up/checkout actions on that device | PASS   |
+| ID       | Scenario                     | Device                                                   | Card     | Expected                                                                                                 | Result |
+| -------- | ---------------------------- | -------------------------------------------------------- | -------- | -------------------------------------------------------------------------------------------------------- | ------ |
+| DTM-001  | NFC availability             | DEV-ANDROID-001 / ASUS ROG 9 FE                          | None     | App shows NFC status                                                                                     | PASS   |
+| DTM-002  | iOS NFC availability         | iOS / optional                                           | None     | Documented as out of MVP unless separately validated                                                     | N/A    |
+| DTM-002A | NFC unsupported              | Non-NFC device                                           | None     | App explains real card operations require NFC-capable device                                             | PASS   |
+| DTM-002B | NFC disabled                 | DEV-ANDROID-001 / ASUS ROG 9 FE                          | None     | App asks user to enable NFC before scan/read/write                                                       | PASS   |
+| DTM-003  | Station registration         | DEV-ANDROID-001 / ASUS ROG 9 FE                          | CARD-001 | Registered MBC payload written                                                                           | PASS   |
+| DTM-004  | Station top-up               | DEV-ANDROID-001 / ASUS ROG 9 FE                          | CARD-001 | Balance increases                                                                                        | PASS   |
+| DTM-005  | Gate parking check-in        | DEV-ANDROID-001 / ASUS ROG 9 FE                          | CARD-001 | Parking status becomes checked in                                                                        | PASS   |
+| DTM-006  | Gate simulation mode         | DEV-ANDROID-001 / ASUS ROG 9 FE                          | CARD-001 | Simulation toggle + DateTimePicker sets past time; isSimulation stored on card; Terminal skips deduction | PASS   |
+| DTM-007  | Terminal parking checkout    | DEV-ANDROID-001 / ASUS ROG 9 FE                          | CARD-001 | Fee deducted and status cleared                                                                          | PASS   |
+| DTM-008  | Insufficient balance         | DEV-ANDROID-001 / ASUS ROG 9 FE                          | CARD-002 | Top-up guidance shown                                                                                    | PASS   |
+| DTM-009  | Scout inspect                | DEV-ANDROID-001 / ASUS ROG 9 FE                          | CARD-001 | Balance, status, logs shown                                                                              | PASS   |
+| DTM-010  | Silent Shield                | DEV-ANDROID-001 / ASUS ROG 9 FE + generic NFC reader app | CARD-001 | Sensitive fields not plain in generic NFC app                                                            | PASS   |
+| DTM-011  | Unsupported card             | DEV-ANDROID-001 / ASUS ROG 9 FE                          | CARD-003 | Safe unsupported message                                                                                 | PASS   |
+| DTM-012  | Cancel scan                  | DEV-ANDROID-001 / ASUS ROG 9 FE                          | None     | NFC session cleaned up                                                                                   | PASS   |
+| DTM-013  | Station local ledger summary | DEV-ANDROID-001 / ASUS ROG 9 FE                          | None     | Device-local summary reflects executed register/top-up/checkout actions on that device                   | PASS   |
 
 ## 6. Notes
 
@@ -71,3 +71,4 @@ Supporting roles:
 - Android NFC permissions and intent filters configured in AndroidManifest.xml.
 - `react-native-reanimated/plugin` added to `babel.config.js` for NfcActionSheet animations.
 - Current quality status: 444+ automated tests, 65 suites, 100% line coverage.
+- Simulation mode validated: Gate toggle + DateTimePicker writes `isSimulation` flag to card; Terminal reads flag and skips balance deduction. Dependency: `@react-native-community/datetimepicker@8.3.0`.

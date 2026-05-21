@@ -33,6 +33,7 @@ Layer responsibilities:
 | UI system         | Signal UI, guided by `.codex/specs/SIGNAL_UI_GUIDE.md`    |
 | Navigation        | React Navigation                                          |
 | Animations        | `react-native-reanimated`                                 |
+| Date/time picker  | `@react-native-community/datetimepicker`                  |
 | State management  | Zustand (presentation state) + React Context (service DI) |
 | Testing           | Jest, React Native Testing Library                        |
 | Static analysis   | SonarCloud                                                |
@@ -174,6 +175,7 @@ export type ActivitySession = {
   activityId: string;
   activityType: BenefitActivityType;
   checkedInAt: string;
+  isSimulation?: boolean;
 };
 
 export type MemberProfile = {
@@ -319,7 +321,7 @@ export function calculateActivityTariff(input: {
 - A card with `CHECKED_IN` can be checked out if balance is sufficient.
 - A card with `NOT_CHECKED_IN` cannot be checked out.
 - A card can only have one active activity session at a time.
-- Gate writes check-in using real device time in production flow.
+- Gate writes check-in using real device time in production flow. In simulation mode, a past timestamp selected via DateTimePicker is used and `isSimulation` is stored in `activeSession`.
 
 ### Transaction Logs
 
@@ -382,8 +384,8 @@ All role screens use `NfcActionSheet` — a bottom sheet component that provides
 All four role screens (Station, Gate, Terminal, Scout) use `RadarZone` as the shared NFC trigger component — a dark immersive zone with concentric radar rings, sweep line animation, and a colored circular action button. All roles use the unified Signal UI primary red (#FF0025) as the RadarZone accent color.
 
 - Station uses RadarZone with a segmented control (Register | Top Up tabs) to switch between registration and top-up modes. The local ledger summary is displayed as a collapsible accordion (collapsed by default). Top-up accepts numeric input (free-text allowed) with validation to ensure only numbers are entered. Preset buttons (10k/20k/50k/100k) are also available as shortcuts.
-- Gate: parking check-in action via RadarZone tap, NFC write action, status result. No simulation mode or mock scenario selectors.
-- Terminal: checkout action via RadarZone tap, fixed tariff display, duration/fee summary, tap-out time displayed in `dd-MMM-YYYY hh:mm` format, insufficient balance guidance, NFC write action, status result.
+- Gate: parking check-in action via RadarZone tap, NFC write action, status result. Simulation mode toggle + DateTimePicker allows operator to set a past entry time for testing/demo. When simulation is active, a red "⚠️ SIMULATION MODE ACTIVE" banner is shown with note "Balance will NOT be deducted on checkout".
+- Terminal: checkout action via RadarZone tap, fixed tariff display, duration/fee summary, tap-out time displayed in `dd-MMM-YYYY hh:mm` format, insufficient balance guidance, NFC write action, status result. When checking out a simulation session (`activeSession.isSimulation`), fee/duration are calculated and displayed but balance is NOT deducted; a red "⚠️ SIMULATION MODE" banner is shown with fee annotated "(not deducted)" and balance "(unchanged)".
 - Scout: one-tap read-only card summary via RadarZone tap. After scan, the radar hides and card results appear at the top of the screen (balance, visit status, last five logs with timestamps). A "Scan Another Card" button resets the view back to radar mode.
 - Shared: NFC Log panel is scrollable with a fixed max height, can be toggled on/off and cleared by the operator. It records safe operational events only (no sensitive payload data).
 

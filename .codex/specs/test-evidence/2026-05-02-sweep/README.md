@@ -27,7 +27,7 @@ This folder is the cleaned evidence set for the emulator mock-flow sweep.
 
 - Happy:
   - Check in `Normal card` (`31-gate-normal-success.png`)
-  - Check in with simulation time (`35-gate-simulation-success.png`) — legacy; simulation mode removed in Phase 9
+  - Check in with simulation time (`35-gate-simulation-success.png`) — simulation mode reinstated in T-FEAT-GATE-001
 - Failure:
   - `Already checked in` (`32-gate-checkedin-failure.png`)
   - `Unregistered` (`33-gate-unregistered-failure.png`)
