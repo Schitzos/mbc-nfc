@@ -1,6 +1,5 @@
 import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
-import LinearGradient from 'react-native-linear-gradient';
+import { Text, View } from 'react-native';
 import dayjs from 'dayjs';
 import { LOCALE_ID } from '@shared/constants';
 
@@ -31,107 +30,46 @@ export function MemberCardInfo({
     : 'Not checked in';
 
   return (
-    <LinearGradient colors={['#0F172A', '#1E293B']} style={s.card}>
-      <Text style={s.title}>Member Card Information</Text>
-      <View style={s.rows}>
-        <View style={s.row}>
-          <Text style={s.label}>ID</Text>
-          <Text style={s.value}>{card.maskedMemberReference ?? 'MBC-***'}</Text>
+    <View className="rounded-[20px] p-4 bg-white/55 border border-white/70">
+      <Text className="text-sm font-bold text-[#111827]">
+        Member Card Information
+      </Text>
+      <View className="mt-3 gap-2">
+        <View className="flex-row justify-between items-center">
+          <Text className="text-xs text-[#6B7280]">ID</Text>
+          <Text className="text-xs font-semibold text-[#111827]">
+            {card.maskedMemberReference ?? 'MBC-***'}
+          </Text>
         </View>
-        <View style={s.row}>
-          <Text style={s.label}>Balance</Text>
+        <View className="flex-row justify-between items-center">
+          <Text className="text-xs text-[#6B7280]">Balance</Text>
           <Text
-            style={[
-              s.balanceValue,
-              card.balance > 0 ? s.balancePositive : s.balanceZero,
-            ]}
+            className={`text-lg font-extrabold ${card.balance > 0 ? 'text-[#059669]' : 'text-[#DC2626]'}`}
           >
             Rp {card.balance.toLocaleString(LOCALE_ID)}
           </Text>
         </View>
-        <View style={s.row}>
-          <Text style={s.label}>Status</Text>
-          <View style={[s.statusBadge, isCheckedIn ? s.statusIn : s.statusOut]}>
+        <View className="flex-row justify-between items-center">
+          <Text className="text-xs text-[#6B7280]">Status</Text>
+          <View
+            className={`px-2.5 py-0.5 rounded-xl ${isCheckedIn ? 'bg-[rgba(5,150,105,0.15)]' : 'bg-[rgba(107,114,128,0.1)]'}`}
+          >
             <Text
-              style={[
-                s.statusText,
-                isCheckedIn ? s.statusTextIn : s.statusTextOut,
-              ]}
+              className={`text-xs font-semibold ${isCheckedIn ? 'text-[#059669]' : 'text-[#6B7280]'}`}
             >
               {statusLabel}
             </Text>
           </View>
         </View>
         {!!card.activeSession?.checkedInAt && (
-          <View style={s.row}>
-            <Text style={s.label}>Since</Text>
-            <Text style={s.value}>
+          <View className="flex-row justify-between items-center">
+            <Text className="text-xs text-[#6B7280]">Since</Text>
+            <Text className="text-xs font-semibold text-[#111827]">
               {formatLogTime(card.activeSession.checkedInAt)}
             </Text>
           </View>
         )}
       </View>
-    </LinearGradient>
+    </View>
   );
 }
-
-const s = StyleSheet.create({
-  card: {
-    borderRadius: 16,
-    padding: 16,
-  },
-  title: {
-    fontSize: 14,
-    fontWeight: '700',
-    color: '#FFFFFF',
-  },
-  rows: {
-    marginTop: 12,
-    gap: 8,
-  },
-  row: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-  label: {
-    fontSize: 12,
-    color: 'rgba(255,255,255,0.6)',
-  },
-  value: {
-    fontSize: 12,
-    fontWeight: '600',
-    color: '#FFFFFF',
-  },
-  balanceValue: {
-    fontSize: 18,
-    fontWeight: '800',
-  },
-  balancePositive: {
-    color: '#00E676',
-  },
-  balanceZero: {
-    color: '#FF5252',
-  },
-  statusBadge: {
-    paddingHorizontal: 10,
-    paddingVertical: 3,
-    borderRadius: 12,
-  },
-  statusIn: {
-    backgroundColor: 'rgba(0, 230, 118, 0.15)',
-  },
-  statusOut: {
-    backgroundColor: 'rgba(255,255,255,0.1)',
-  },
-  statusText: {
-    fontSize: 12,
-    fontWeight: '600',
-  },
-  statusTextIn: {
-    color: '#00E676',
-  },
-  statusTextOut: {
-    color: 'rgba(255,255,255,0.6)',
-  },
-});

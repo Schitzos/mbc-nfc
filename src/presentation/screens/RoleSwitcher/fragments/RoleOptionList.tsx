@@ -1,5 +1,5 @@
 import React from 'react';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { Pressable, Text, View } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import type { RoleOption } from '@presentation/config/role-options';
 
@@ -16,13 +16,6 @@ const roleIcon: Record<RoleOption['key'], string> = {
   scout: 'search',
 };
 
-const roleIconColorHex: Record<RoleOption['key'], string> = {
-  station: '#00E676',
-  gate: '#60A5FA',
-  terminal: '#FB923C',
-  scout: '#A78BFA',
-};
-
 const roleHint: Record<RoleOption['key'], string> = {
   station: 'Register and top up member card',
   gate: 'Tap in to activity',
@@ -35,56 +28,28 @@ export function RoleOptionList({
   onSelect,
 }: Readonly<RoleOptionListProps>): React.JSX.Element {
   return (
-    <View className="gap-3">
+    <View className="gap-4">
       {roles.map(role => (
         <Pressable
           key={role.key}
           accessibilityRole="button"
-          style={s.card}
+          className="flex-row items-center rounded-[20px] px-4 py-5 bg-white/55 border border-white/70"
           onPress={() => onSelect(role.key)}
         >
-          <View
-            style={[
-              s.iconBox,
-              { backgroundColor: `${roleIconColorHex[role.key]}22` },
-            ]}
-          >
-            <Icon
-              name={roleIcon[role.key]}
-              size={24}
-              color={roleIconColorHex[role.key]}
-            />
+          <View className="w-[52px] h-[52px] rounded-[14px] items-center justify-center mr-3.5 bg-[#FFE4E8]">
+            <Icon name={roleIcon[role.key]} size={26} color="#FF0025" />
           </View>
           <View className="flex-1">
-            <Text className="text-base font-bold text-white">{role.label}</Text>
-            <Text className="text-xs text-white/[0.72]">
+            <Text className="text-[16px] font-bold text-[#111827]">
+              {role.label}
+            </Text>
+            <Text className="text-[13px] text-[#6B7280] mt-0.5">
               {roleHint[role.key]}
             </Text>
           </View>
-          <Text className="text-lg text-white/50">›</Text>
+          <Icon name="chevron-right" size={24} color="#FF0025" />
         </Pressable>
       ))}
     </View>
   );
 }
-
-const s = StyleSheet.create({
-  card: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    borderRadius: 16,
-    paddingHorizontal: 16,
-    paddingVertical: 16,
-    backgroundColor: 'rgba(13,27,62,0.88)',
-    borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.12)',
-  },
-  iconBox: {
-    width: 44,
-    height: 44,
-    borderRadius: 12,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginRight: 12,
-  },
-});

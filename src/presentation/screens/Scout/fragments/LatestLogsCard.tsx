@@ -1,6 +1,5 @@
 import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
-import LinearGradient from 'react-native-linear-gradient';
+import { Text, View } from 'react-native';
 import dayjs from 'dayjs';
 import { LOCALE_ID } from '@shared/constants';
 
@@ -25,78 +24,41 @@ export function LatestLogsCard({
   logs,
 }: Readonly<LatestLogsCardProps>): React.JSX.Element {
   return (
-    <LinearGradient colors={['#0F172A', '#1E293B']} style={s.card}>
-      <Text style={s.title}>Latest Five Logs</Text>
-      {logs.length ? (
-        <View style={s.logList}>
-          {logs.slice(0, 5).map((log, index) => (
-            <View
-              key={log.id}
-              style={[
-                s.logRow,
-                index < Math.min(logs.length, 5) - 1 && s.logRowBorder,
-              ]}
-            >
-              <Text style={s.logActivity}>
-                {index + 1}. {log.activity.replace('_', ' ')}
-                {log.isSimulation ? ' (S)' : ''}
-              </Text>
-              <Text style={s.logAmount}>
-                Rp {log.nominal.toLocaleString(LOCALE_ID)}
-              </Text>
-              <Text style={s.logTime}>{formatLogTime(log.occurredAt)}</Text>
-            </View>
-          ))}
+    <View className="rounded-[20px] p-4 bg-white/55 border border-white/70">
+      <Text className="text-sm font-bold text-[#111827]">Latest Five Logs</Text>
+      {logs.length > 0 && (
+        <View className="mt-2">
+          {[...logs]
+            .reverse()
+            .slice(0, 5)
+            .map((log, index) => (
+              <View
+                key={log.id}
+                className={`flex-row items-center justify-between py-1.5 ${
+                  index < Math.min(logs.length, 5) - 1
+                    ? 'border-b border-black/5'
+                    : ''
+                }`}
+              >
+                <Text className="text-[11px] text-[#111827] flex-1">
+                  {index + 1}. {log.activity.replace('_', ' ')}
+                  {log.isSimulation ? ' (S)' : ''}
+                </Text>
+                <Text className="text-[11px] text-[#FF0025] font-semibold ml-2">
+                  {log.nominal > 0
+                    ? `Rp ${log.nominal.toLocaleString(LOCALE_ID)}`
+                    : ''}
+                </Text>
+                <Text className="text-[11px] text-[#6B7280] ml-2">
+                  {formatLogTime(log.occurredAt)}
+                </Text>
+              </View>
+            ))}
         </View>
-      ) : (
-        <Text style={s.emptyText}>No logs yet.</Text>
       )}
-    </LinearGradient>
+      {logs.length === 0 && (
+        <Text className="mt-2 text-xs text-[#6B7280]">No logs yet.</Text>
+      )}
+    </View>
   );
 }
-
-const s = StyleSheet.create({
-  card: {
-    borderRadius: 16,
-    padding: 16,
-  },
-  title: {
-    fontSize: 14,
-    fontWeight: '700',
-    color: '#FFFFFF',
-  },
-  logList: {
-    marginTop: 8,
-  },
-  logRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingVertical: 6,
-  },
-  logRowBorder: {
-    borderBottomWidth: 1,
-    borderBottomColor: 'rgba(255,255,255,0.1)',
-  },
-  logActivity: {
-    fontSize: 11,
-    color: '#FFFFFF',
-    flex: 1,
-  },
-  logAmount: {
-    fontSize: 11,
-    color: '#F59E0B',
-    fontWeight: '600',
-    marginLeft: 8,
-  },
-  logTime: {
-    fontSize: 11,
-    color: 'rgba(255,255,255,0.5)',
-    marginLeft: 8,
-  },
-  emptyText: {
-    marginTop: 8,
-    fontSize: 12,
-    color: 'rgba(255,255,255,0.5)',
-  },
-});

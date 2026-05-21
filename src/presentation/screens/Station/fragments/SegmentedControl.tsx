@@ -11,22 +11,30 @@ export function SegmentedControl({
   setRegisterMode,
 }: Props): React.JSX.Element {
   return (
-    <View className="flex-row bg-[#0F172A] rounded-full p-1">
+    <View className="flex-row bg-white/50 rounded-full p-1 border border-white/60">
       <Pressable
         accessibilityRole="tab"
         accessibilityState={{ selected: registerMode }}
         onPress={() => setRegisterMode(true)}
-        className={`flex-1 py-2 rounded-full items-center ${registerMode ? 'bg-[#DC2626]' : ''}`}
+        className={`flex-1 py-2.5 rounded-full items-center ${registerMode ? 'bg-[#FFE4E8]' : ''}`}
       >
-        <Text className="text-sm font-semibold text-white">Register</Text>
+        <Text
+          className={`text-sm font-semibold ${registerMode ? 'text-[#FF0025]' : 'text-[#6B7280]'}`}
+        >
+          Register
+        </Text>
       </Pressable>
       <Pressable
         accessibilityRole="tab"
         accessibilityState={{ selected: !registerMode }}
         onPress={() => setRegisterMode(false)}
-        className={`flex-1 py-2 rounded-full items-center ${!registerMode ? 'bg-[#DC2626]' : ''}`}
+        className={`flex-1 py-2.5 rounded-full items-center ${!registerMode ? 'bg-[#FFE4E8]' : ''}`}
       >
-        <Text className="text-sm font-semibold text-white">Top Up</Text>
+        <Text
+          className={`text-sm font-semibold ${!registerMode ? 'text-[#FF0025]' : 'text-[#6B7280]'}`}
+        >
+          Top Up
+        </Text>
       </Pressable>
     </View>
   );

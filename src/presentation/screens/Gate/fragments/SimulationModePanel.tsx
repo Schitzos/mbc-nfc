@@ -51,45 +51,24 @@ export function SimulationModePanel({
     <View className="mb-2">
       <View
         testID="simulation-banner"
-        className="flex-row items-center justify-between rounded-xl px-3 py-2"
-        style={{
-          backgroundColor: 'rgba(255, 255, 255, 0.85)',
-          borderColor: enabled
-            ? 'rgba(245, 158, 11, 0.5)'
-            : 'rgba(255, 255, 255, 0.4)',
-          borderWidth: 1.5,
-          ...(enabled && {
-            shadowColor: '#F59E0B',
-            shadowOffset: { width: 0, height: 0 },
-            shadowOpacity: 0.4,
-            shadowRadius: 8,
-            elevation: 6,
-          }),
-        }}
+        className={`flex-row items-center justify-between rounded-xl px-3 py-2 bg-white/40 border-[1.5px] ${enabled ? 'border-[rgba(245,158,11,0.5)]' : 'border-white'}`}
       >
         <View className="flex-row items-center">
           {enabled && (
             <Animated.View
               testID="simulation-pulse-dot"
-              style={[
-                {
-                  width: 8,
-                  height: 8,
-                  borderRadius: 4,
-                  backgroundColor: '#F59E0B',
-                  marginRight: 4,
-                },
-                dotStyle,
-              ]}
+              className="w-2 h-2 rounded-full mr-1 bg-[#F59E0B]"
+              style={dotStyle}
             />
           )}
-          <Text className="text-xs font-semibold text-[#D9801F]">🧪 Sim</Text>
+          <Text className="text-xs font-semibold text-[#F00]">
+            {enabled ? '' : '🧪'} Simulation
+          </Text>
         </View>
         {enabled && (
           <Pressable
             testID="simulation-date-button"
-            className="rounded-full px-3 py-1"
-            style={{ backgroundColor: '#F59E0B' }}
+            className="rounded-full px-3 py-1 bg-[#F59E0B]"
             onPress={() => setShowDatePicker(true)}
           >
             <Text className="text-xs font-medium text-white">

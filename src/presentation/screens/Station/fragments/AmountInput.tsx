@@ -12,21 +12,16 @@ export function AmountInput({
   setTopUpAmount,
 }: Props): React.JSX.Element {
   return (
-    <View
-      className="mt-3 rounded-xl p-3"
-      style={{
-        backgroundColor: 'rgba(255,255,255,0.12)',
-        borderWidth: 1,
-        borderColor: 'rgba(255,255,255,0.2)',
-      }}
-    >
-      <Text className="text-xs font-semibold text-white/70">Top Up Amount</Text>
+    <View className="mt-3 rounded-xl p-3 bg-white/55 border border-white/70">
+      <Text className="text-xs font-semibold text-[#6B7280]">
+        Top Up Amount
+      </Text>
       <View className="mt-1 flex-row items-center">
-        <Text className="text-2xl font-bold text-white">Rp </Text>
+        <Text className="text-2xl font-bold text-[#111827]">Rp </Text>
         <TextInput
-          className="flex-1 text-2xl font-bold text-white p-0"
+          className="flex-1 text-2xl font-bold text-[#111827] p-0"
           keyboardType="numeric"
-          placeholderTextColor="rgba(255,255,255,0.4)"
+          placeholderTextColor="rgba(0,0,0,0.3)"
           value={Number(topUpAmount).toLocaleString(LOCALE_ID)}
           onChangeText={text => {
             const numeric = text.replaceAll(/\D/g, '');
@@ -40,7 +35,7 @@ export function AmountInput({
             key={amount}
             onPress={() => setTopUpAmount(String(amount))}
             className={`rounded-full px-3 py-1.5 ${
-              topUpAmount === String(amount) ? 'bg-[#DC2626]' : 'bg-[#1E293B]'
+              topUpAmount === String(amount) ? 'bg-[#FF0025]' : 'bg-[#111827]'
             }`}
           >
             <Text className="text-xs font-semibold text-white">

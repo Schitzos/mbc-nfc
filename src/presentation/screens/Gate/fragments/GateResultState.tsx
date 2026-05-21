@@ -1,6 +1,5 @@
 import React from 'react';
 import { Pressable, Text, View } from 'react-native';
-import LinearGradient from 'react-native-linear-gradient';
 import dayjs from 'dayjs';
 import type { RoleActionResultDto } from '@application/dto/role-action-result-dto';
 
@@ -24,63 +23,33 @@ export function GateResultState({
 
   if (latestResult.success) {
     return (
-      <LinearGradient
-        colors={['#059669', '#10B981']}
-        start={{ x: 0, y: 0 }}
-        end={{ x: 1, y: 1 }}
-        style={{
-          borderRadius: 16,
-          padding: 20,
-          width: '100%',
-          shadowColor: '#10B981',
-          shadowOffset: { width: 0, height: 8 },
-          shadowOpacity: 0.4,
-          shadowRadius: 16,
-          elevation: 8,
-        }}
-      >
+      <View className="rounded-[20px] p-5 w-full bg-white/40 border border-white/40">
         <View className="items-center">
-          <View
-            className="h-12 w-12 items-center justify-center rounded-full"
-            style={{ backgroundColor: 'rgba(255,255,255,0.2)' }}
-          >
-            <Text className="text-2xl text-white">✓</Text>
+          <View className="h-12 w-12 items-center justify-center rounded-full bg-white">
+            <Text className="text-3xl text-[#059669]">✓</Text>
           </View>
-          <Text className="mt-3 text-lg font-bold text-white">
+          <Text className="mt-3 text-lg font-bold text-[#111827]">
             Check-in Successful
           </Text>
         </View>
         {latestResult.card && (
-          <View className="mt-4 gap-2">
-            <View className="flex-row justify-between">
-              <Text
-                className="text-xs"
-                style={{ color: 'rgba(255,255,255,0.7)' }}
-              >
-                Activity
+          <View className="mt-4 gap-4">
+            <View className="flex-row justify-between border-white border-t-2 border-b-2 pb-4 pt-4">
+              <Text className="text-xs text-[#6B7280]">Activity</Text>
+              <Text className="text-xs font-semibold text-[#111827]">
+                Parking
               </Text>
-              <Text className="text-xs font-semibold text-white">Parking</Text>
             </View>
-            <View className="flex-row justify-between">
-              <Text
-                className="text-xs"
-                style={{ color: 'rgba(255,255,255,0.7)' }}
-              >
-                Balance
-              </Text>
-              <Text className="text-xs font-semibold text-white">
+            <View className="flex-row justify-between border-white border-b-2 pb-4">
+              <Text className="text-xs text-[#6B7280]">Balance</Text>
+              <Text className="text-xs font-semibold text-[#111827]">
                 Rp {latestResult.card.balance.toLocaleString('id-ID')}
               </Text>
             </View>
             {latestResult.card.activeSession?.checkedInAt && (
-              <View className="flex-row justify-between">
-                <Text
-                  className="text-xs"
-                  style={{ color: 'rgba(255,255,255,0.7)' }}
-                >
-                  Checked in at:
-                </Text>
-                <Text className="text-xs font-semibold text-white">
+              <View className="flex-row justify-between border-white border-b-2 pb-4">
+                <Text className="text-xs text-[#6B7280]">Checked in at:</Text>
+                <Text className="text-xs font-semibold text-[#111827]">
                   {formatCheckinDate(
                     latestResult.card.activeSession.checkedInAt,
                   )}
@@ -92,7 +61,7 @@ export function GateResultState({
         {onReset && (
           <Pressable
             testID="gate-scan-another"
-            className="mt-4 items-center justify-center h-10 rounded-full border border-white"
+            className="mt-4 items-center justify-center h-10 rounded-full bg-[#FF0025]"
             onPress={onReset}
           >
             <Text className="text-sm font-semibold text-white">
@@ -100,38 +69,27 @@ export function GateResultState({
             </Text>
           </Pressable>
         )}
-      </LinearGradient>
+      </View>
     );
   }
 
   return (
-    <View
-      className="rounded-2xl bg-white p-4 w-full"
-      style={{
-        borderLeftWidth: 4,
-        borderLeftColor: '#FF0025',
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.1,
-        shadowRadius: 8,
-        elevation: 4,
-      }}
-    >
+    <View className="rounded-[20px] p-4 w-full bg-white/40 border border-[rgba(255,82,82,0.4)]">
       <Text className="text-xs font-semibold uppercase text-red-700">
         {latestResult.errorCode === 'ALREADY_CHECKED_IN'
           ? 'Blocked'
           : 'Card cannot be processed'}
       </Text>
-      <Text className="mt-1 text-sm font-semibold text-red-900">
+      <Text className="mt-1 text-sm font-semibold text-[#111827]">
         {latestResult.message}
       </Text>
       {onReset && (
         <Pressable
           testID="gate-scan-another"
-          className="mt-4 items-center justify-center h-10 rounded-full border border-[#FF0025]"
+          className="mt-4 items-center justify-center h-10 rounded-full bg-[#FF0025]"
           onPress={onReset}
         >
-          <Text className="text-sm font-semibold text-[#FF0025]">
+          <Text className="text-sm font-semibold text-white">
             Scan Another Card
           </Text>
         </Pressable>
