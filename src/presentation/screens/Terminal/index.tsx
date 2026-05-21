@@ -35,23 +35,24 @@ export function TerminalScreen(): React.JSX.Element {
             </View>
           }
         />
-        <View className="-mt-3 rounded-t-2xl bg-[#F0F2F5] px-5 pt-5 pb-6 flex-1">
+        <View className="-mt-3 rounded-t-2xl bg-[#F5F6FA] px-5 pt-4 pb-4 flex-1">
           {actions.latestResult?.isSimulation && actions.success && (
             <View
               testID="terminal-simulation-banner"
-              className="bg-red-600 rounded-lg px-4 py-3 mb-3 border-2 border-red-800 z-20"
+              className="self-center bg-[#FEF3D4] border border-[#FED27F] rounded-full px-3 py-1 mb-2"
             >
-              <Text className="text-white font-bold text-center text-base">
-                ⚠️ SIMULATION MODE
-              </Text>
-              <Text className="text-red-100 text-center text-xs mt-1">
-                Balance was NOT deducted
+              <Text className="text-xs font-semibold text-[#D9801F]">
+                ⚠️ Simulation
               </Text>
             </View>
           )}
-          <View className="flex-1">
-            {!actions.insufficient && !actions.genericFailure && (
-              <View className="absolute inset-0 justify-center items-center z-0">
+
+          <View className="flex-1 justify-center items-center">
+            {!actions.latestResult ? (
+              <>
+                <View className="absolute top-0 left-0 right-0">
+                  <TariffPreviewCard />
+                </View>
                 <RadarZone
                   color={signalColorTokens.brand.primary}
                   label="Tap Card to Check Out"
@@ -61,41 +62,30 @@ export function TerminalScreen(): React.JSX.Element {
                     void actions.handleCheckout();
                   }}
                 />
-              </View>
+              </>
+            ) : actions.success ? (
+              <CheckoutSummaryCard
+                latestResult={actions.latestResult}
+                checkoutTime={actions.checkoutTime}
+                isSimulation={actions.latestResult.isSimulation}
+                onReset={actions.resetResult}
+              />
+            ) : actions.insufficient ? (
+              <InsufficientBalanceCard
+                latestResult={actions.latestResult}
+                onRetry={() => {
+                  void actions.handleCheckout();
+                }}
+              />
+            ) : (
+              <GenericFailureCard
+                latestResult={actions.latestResult}
+                onReset={actions.resetResult}
+              />
             )}
-            <View className="z-10">
-              {!actions.insufficient && !actions.genericFailure && (
-                <TariffPreviewCard />
-              )}
-            </View>
-            <View
-              className={`z-10${!actions.insufficient && !actions.genericFailure ? ' mt-auto' : ''}`}
-            >
-              {actions.success && actions.latestResult && (
-                <CheckoutSummaryCard
-                  latestResult={actions.latestResult}
-                  checkoutTime={actions.checkoutTime}
-                  isSimulation={actions.latestResult.isSimulation}
-                />
-              )}
-
-              {actions.insufficient && actions.latestResult && (
-                <InsufficientBalanceCard
-                  latestResult={actions.latestResult}
-                  onRetry={() => {
-                    void actions.handleCheckout();
-                  }}
-                />
-              )}
-
-              {actions.genericFailure && actions.latestResult && (
-                <GenericFailureCard latestResult={actions.latestResult} />
-              )}
-            </View>
           </View>
-          <View className="mt-auto">
-            <NfcLogPanel />
-          </View>
+
+          <NfcLogPanel />
         </View>
 
         <NfcActionSheet

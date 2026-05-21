@@ -86,6 +86,10 @@ export function useTerminalActions(services: TerminalServices) {
     }
   }, [appendNfcLog, services]);
 
+  const resetResult = useCallback(() => {
+    setLatestResult(null);
+  }, []);
+
   const insufficient = Boolean(
     latestResult &&
     !latestResult.success &&
@@ -107,5 +111,6 @@ export function useTerminalActions(services: TerminalServices) {
     insufficient,
     genericFailure,
     success,
+    resetResult,
   };
 }

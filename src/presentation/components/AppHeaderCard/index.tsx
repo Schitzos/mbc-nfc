@@ -9,16 +9,21 @@ export function AppHeaderCard({
   subTitle,
   hasBackButton,
   rightIcon,
+  statusIndicator,
 }: Readonly<{
   title: string;
   subTitle?: string;
   hasBackButton?: boolean;
   rightIcon?: React.JSX.Element;
+  statusIndicator?: 'simulation' | undefined;
 }>): React.JSX.Element {
   const navigation = useNavigation();
   const insets = useSafeAreaInsets();
   return (
-    <View style={{ paddingTop: insets.top + 32 }} className="bg-[#001A41] px-6 pb-12">
+    <View
+      style={{ paddingTop: insets.top + 32 }}
+      className="bg-[#001A41] px-6 pb-12"
+    >
       <View className="flex-row items-center gap-2 w-max justify-between">
         <View className="flex-row items-center gap-4 ">
           {hasBackButton && (
@@ -32,11 +37,19 @@ export function AppHeaderCard({
           )}
           <Text className="text-2xl font-bold text-white">{title}</Text>
         </View>
-        {rightIcon && <View className="items-center justify-center">
-          {rightIcon}
-        </View>}
+        {rightIcon && (
+          <View className="items-center justify-center">{rightIcon}</View>
+        )}
       </View>
-      <Text className="mt-1 text-sm text-slate-300">{subTitle || ''}</Text>
+      <View className="flex-row items-center mt-1 gap-1">
+        <Text className="text-sm text-slate-300">{subTitle || ''}</Text>
+        {statusIndicator === 'simulation' && (
+          <View
+            testID="header-simulation-dot"
+            className="w-2 h-2 rounded-full bg-[#FDA22B]"
+          />
+        )}
+      </View>
     </View>
   );
 }

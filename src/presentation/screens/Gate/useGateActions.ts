@@ -84,6 +84,10 @@ export function useGateActions(services: GateServices) {
     }
   }, [appendNfcLog, services, simulationEnabled, simulatedDate]);
 
+  const resetResult = useCallback(() => {
+    setLatestResult(null);
+  }, []);
+
   return {
     latestResult,
     busy,
@@ -95,5 +99,6 @@ export function useGateActions(services: GateServices) {
     setSimulationEnabled,
     simulatedDate,
     setSimulatedDate,
+    resetResult,
   };
 }
