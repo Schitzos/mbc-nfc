@@ -15,6 +15,8 @@ export function useGateActions(services: GateServices) {
   const [busy, setBusy] = useState(false);
   const [nfcSheet, setNfcSheet] = useState<NfcActionState>({ phase: 'idle' });
   const dismissedRef = useRef(false);
+  const [simulationEnabled, setSimulationEnabled] = useState(false);
+  const [simulatedDate, setSimulatedDate] = useState<Date>(new Date());
 
   useEffect(() => {
     services.checkNfcAvailabilityUseCase
@@ -45,15 +47,19 @@ export function useGateActions(services: GateServices) {
       const result = await services.checkInActivityUseCase.execute({
         activityId: 'parking-main-gate',
         activityType: 'PARKING',
+        ...(simulationEnabled
+          ? { checkedInAt: simulatedDate.toISOString(), isSimulation: true }
+          : {}),
       });
       if (dismissedRef.current) {
         return;
       }
       setLatestResult(result);
       if (result.success) {
+        const simLabel = simulationEnabled ? ' (Simulation)' : '';
         setNfcSheet({
           phase: 'success',
-          title: 'Checked In',
+          title: `Checked In${simLabel}`,
           message: `${result.message}\nBalance: Rp ${result.card?.balance?.toLocaleString('id-ID') ?? '0'}`,
         });
         appendNfcLog('[NFC] Check-in succeeded');
@@ -76,7 +82,7 @@ export function useGateActions(services: GateServices) {
     } finally {
       setBusy(false);
     }
-  }, [appendNfcLog, services]);
+  }, [appendNfcLog, services, simulationEnabled, simulatedDate]);
 
   return {
     latestResult,
@@ -85,5 +91,9 @@ export function useGateActions(services: GateServices) {
     setNfcSheet,
     handleCheckIn,
     handleDismissSheet,
+    simulationEnabled,
+    setSimulationEnabled,
+    simulatedDate,
+    setSimulatedDate,
   };
 }

@@ -68,6 +68,25 @@ describe('createRegisterMemberCardUseCase', () => {
     expect(result.message).toContain('already registered');
   });
 
+  it('returns failure when card has existing foreign data', async () => {
+    const cardRepository = createCardRepository({
+      registerCard: jest
+        .fn()
+        .mockRejectedValue(
+          createCardRepositoryError(
+            'CARD_HAS_EXISTING_DATA',
+            'This card contains existing data from another application.',
+          ),
+        ),
+    });
+    const useCase = createRegisterMemberCardUseCase(cardRepository);
+
+    const result = await useCase.execute();
+
+    expect(result.success).toBe(false);
+    expect(result.message).toContain('existing data');
+  });
+
   it('appends a local ledger record after successful registration', async () => {
     const cardRepository = createCardRepository();
     const ledgerRepository = createLedgerRepository();

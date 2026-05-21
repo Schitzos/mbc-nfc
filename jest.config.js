@@ -1,14 +1,15 @@
 module.exports = {
   preset: '@react-native/jest-preset',
   moduleNameMapper: {
-    'react-native-reanimated':
-      '<rootDir>/__mocks__/react-native-reanimated.js',
+    'react-native-reanimated': '<rootDir>/__mocks__/react-native-reanimated.js',
     'react-native-linear-gradient':
       '<rootDir>/__mocks__/react-native-linear-gradient.js',
     'react-native-vector-icons/(.*)':
       '<rootDir>/__mocks__/react-native-vector-icons.js',
     '@react-navigation/native':
       '<rootDir>/__mocks__/@react-navigation/native.js',
+    '@react-native-community/datetimepicker':
+      '<rootDir>/__mocks__/@react-native-community/datetimepicker.js',
     '^@app/(.*)$': '<rootDir>/src/app/$1',
     '^@domain/(.*)$': '<rootDir>/src/domain/$1',
     '^@application/(.*)$': '<rootDir>/src/application/$1',

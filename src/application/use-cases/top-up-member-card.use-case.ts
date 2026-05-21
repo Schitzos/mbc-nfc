@@ -2,6 +2,10 @@ import type { RoleActionResultDto } from '@application/dto/role-action-result-dt
 import type { MbcCardRepository } from '@domain/membership/repositories/membership-card.repository';
 import { isCardRepositoryError } from '@domain/membership/errors/membership-card-repository-error';
 import {
+  isDomainError,
+  createDomainError,
+} from '@domain/membership/errors/domain-error';
+import {
   createTransactionLog,
   appendTransactionLog,
 } from '@domain/membership/policies/transaction-log-policy';
@@ -9,6 +13,7 @@ import { createRandomId } from '@shared/utils/create-random-id';
 import { toCardSummaryDto } from '@application/dto/card-summary-mapper';
 import type { LocalLedgerRepository } from '@domain/membership/repositories/ledger.repository';
 import { maskMemberReference } from '@shared/utils/mask-member-reference';
+import { MAX_CARD_BALANCE } from '@domain/membership/config/balance-limits';
 
 export interface TopUpMemberCardRequest {
   amount: number;
@@ -35,8 +40,14 @@ export function createTopUpMemberCardUseCase(
       }
 
       try {
-        const nextCard = await cardRepository.readWriteCard(card =>
-          appendTransactionLog(
+        const nextCard = await cardRepository.readWriteCard(card => {
+          if (card.balance + amount > MAX_CARD_BALANCE) {
+            throw createDomainError(
+              'BALANCE_CAP_EXCEEDED',
+              `Top-up rejected. Resulting balance would exceed the maximum allowed balance of Rp 5.000.000.`,
+            );
+          }
+          return appendTransactionLog(
             { ...card, balance: card.balance + amount },
             createTransactionLog({
               id: createRandomId('LOG'),
@@ -44,8 +55,8 @@ export function createTopUpMemberCardUseCase(
               nominal: amount,
               occurredAt: new Date().toISOString(),
             }),
-          ),
-        );
+          );
+        });
 
         let message = 'Top-up completed successfully.';
 
@@ -74,6 +85,14 @@ export function createTopUpMemberCardUseCase(
           card: toCardSummaryDto(nextCard),
         };
       } catch (error) {
+        if (isDomainError(error)) {
+          return {
+            success: false,
+            role: 'STATION',
+            message: error.message,
+          };
+        }
+
         if (isCardRepositoryError(error)) {
           return {
             success: false,

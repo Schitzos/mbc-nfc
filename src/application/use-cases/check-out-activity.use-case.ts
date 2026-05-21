@@ -47,6 +47,8 @@ export function createCheckOutActivityUseCase(
 
       try {
         let sessionActivityType: BenefitActivityType = 'PARKING';
+        let wasSimulation = false;
+        let sessionCheckedInAt = '';
 
         const updatedCard = await cardRepository.readWriteCard(card => {
           if (!card.activeSession) {
@@ -57,13 +59,19 @@ export function createCheckOutActivityUseCase(
           }
 
           sessionActivityType = card.activeSession.activityType;
+          wasSimulation = card.activeSession.isSimulation === true;
+          sessionCheckedInAt = card.activeSession.checkedInAt;
           tariffResult = calculateActivityTariff({
             checkedInAt: card.activeSession.checkedInAt,
             checkedOutAt: occurredAt,
           });
 
+          const chargedAmount = card.activeSession.isSimulation
+            ? 0
+            : tariffResult.chargedAmount;
+
           const checkedOutCard = applyCheckOutState(card, {
-            chargedAmount: tariffResult.chargedAmount,
+            chargedAmount,
           });
 
           return appendTransactionLog(
@@ -73,13 +81,14 @@ export function createCheckOutActivityUseCase(
               activity: 'CHECK_OUT',
               nominal: tariffResult.chargedAmount,
               occurredAt,
+              isSimulation: wasSimulation || undefined,
             }),
           );
         });
 
         let message = 'Card checked out successfully.';
 
-        if (localLedgerRepository) {
+        if (localLedgerRepository && !wasSimulation) {
           try {
             await localLedgerRepository.append({
               id: createRandomId('LEDGER'),
@@ -106,6 +115,8 @@ export function createCheckOutActivityUseCase(
           chargedAmount: tariffResult.chargedAmount,
           durationMs: tariffResult.durationMs,
           card: toCardSummaryDto(updatedCard),
+          isSimulation: wasSimulation,
+          checkedInAt: sessionCheckedInAt,
         };
       } catch (error) {
         if (isCardRepositoryError(error)) {

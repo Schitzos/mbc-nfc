@@ -154,8 +154,8 @@ describe('createRealMbcCardRepository', () => {
     // First write succeeds
     await repository.writeCard(cardFixture);
 
-    // registerCard should detect existing valid data
-    mockGetTag.mockResolvedValue(makeEncryptedTag(cardFixture, 2));
+    // registerCard should detect existing valid data via getNdefMessage
+    mockGetNdefMessage.mockResolvedValueOnce(makeEncryptedTag(cardFixture, 2));
     await expect(repository.registerCard(cardFixture)).rejects.toMatchObject({
       code: 'CARD_ALREADY_REGISTERED',
     });
@@ -264,8 +264,11 @@ describe('createRealMbcCardRepository – additional error paths', () => {
   });
 
   it('registerCard error path maps to readable error', async () => {
-    // First getTag for assertSupportedTag, second for registerCard's own check
+    // First getTag for assertSupportedTag
     mockGetTag.mockResolvedValueOnce({});
+    // getNdefMessage for registerCard's existing-data check
+    mockGetNdefMessage.mockRejectedValueOnce(new Error('not available'));
+    // Fallback getTag returns empty ndefMessage
     mockGetTag.mockResolvedValueOnce({ ndefMessage: [] });
     mockWriteNdefMessage.mockRejectedValueOnce(new Error('write failed'));
     await expect(repository.registerCard(cardFixture)).rejects.toMatchObject({
@@ -302,8 +305,11 @@ describe('createRealMbcCardRepository – additional error paths', () => {
       // eslint-disable-next-line no-bitwise
       corrupted[i] ^= 0xff;
     }
-    // First getTag for assertSupportedTag, second for registerCard's own check
+    // First getTag for assertSupportedTag
     mockGetTag.mockResolvedValueOnce({});
+    // getNdefMessage for registerCard's existing-data check
+    mockGetNdefMessage.mockRejectedValueOnce(new Error('not available'));
+    // Fallback getTag returns corrupted MBC envelope
     mockGetTag.mockResolvedValueOnce({
       ndefMessage: [{ payload: Array.from(corrupted) }],
     });
@@ -311,13 +317,26 @@ describe('createRealMbcCardRepository – additional error paths', () => {
     await expect(repository.registerCard(cardFixture)).resolves.toBeUndefined();
   });
 
-  it('registerCard proceeds when card has non-MBC NDEF data', async () => {
-    // First getTag for assertSupportedTag, second for registerCard's own check
+  it('registerCard throws CARD_HAS_EXISTING_DATA when card has non-MBC NDEF data', async () => {
+    // First getTag for assertSupportedTag, second for registerCard's fallback
     mockGetTag.mockResolvedValueOnce({});
+    mockGetNdefMessage.mockRejectedValueOnce(new Error('not available'));
     mockGetTag.mockResolvedValueOnce({
       ndefMessage: [{ payload: [0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07] }],
     });
-    await expect(repository.registerCard(cardFixture)).resolves.toBeUndefined();
+    await expect(repository.registerCard(cardFixture)).rejects.toMatchObject({
+      code: 'CARD_HAS_EXISTING_DATA',
+    });
+  });
+
+  it('registerCard uses getNdefMessage to detect foreign data', async () => {
+    mockGetTag.mockResolvedValueOnce({});
+    mockGetNdefMessage.mockResolvedValueOnce({
+      ndefMessage: [{ payload: [0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07] }],
+    });
+    await expect(repository.registerCard(cardFixture)).rejects.toMatchObject({
+      code: 'CARD_HAS_EXISTING_DATA',
+    });
   });
 });
 

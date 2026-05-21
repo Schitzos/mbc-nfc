@@ -40,7 +40,9 @@ An MBC role flow is done when:
 - Station can show a local device-side ledger summary for audit/reporting.
 - Gate can check in to an activity and reject double check-in.
 - Gate uses real device time to write activity entry timestamp.
+- Gate provides simulation mode toggle + DateTimePicker to set a past entry time for testing/demo; `isSimulation` flag is stored on the NFC card in `activeSession`.
 - Terminal can calculate activity fee and checkout.
+- Terminal skips balance deduction for simulation-flagged sessions and shows a simulation banner.
 - Terminal rejects double checkout and insufficient balance safely.
 - Scout can inspect balance, status, and latest logs without modifying card data.
 - Scout radar hides after scan; card results appear at top; "Scan Another Card" button resets to radar view.

@@ -246,6 +246,23 @@ Expected outcome:
 - NfcActionSheet scanning phase uses ScanningRings animation.
 - Station uses segmented control (Register | Top Up) tabs.
 
+### Phase 9B Feature Enhancements ✅ COMPLETE
+
+Goal:
+
+- Reinstate simulation mode for Gate check-in to support testing/demo with past entry times.
+
+Order:
+
+1. `T-FEAT-GATE-001` Implement Gate Simulation Mode ✅ DONE
+
+Expected outcome:
+
+- Gate has simulation toggle + DateTimePicker for past entry time.
+- `isSimulation` flag stored on NFC card in `activeSession` (codec field `s:1`).
+- Terminal skips balance deduction for simulation checkouts and shows a banner.
+- Dependency added: `@react-native-community/datetimepicker@8.3.0`.
+
 ### Phase 10 Demo And Submission
 
 Goal:

@@ -7,7 +7,7 @@ interface CardData {
   maskedMemberReference?: string;
   balance: number;
   visitStatus: string;
-  activeSession?: { checkedInAt: string };
+  activeSession?: { checkedInAt: string; isSimulation?: boolean };
 }
 
 interface MemberCardInfoProps {
@@ -24,8 +24,9 @@ export function MemberCardInfo({
 }: Readonly<MemberCardInfoProps>): React.JSX.Element {
   const activitySuffix = card.activeSession ? ' - Parking' : '';
   const isCheckedIn = card.visitStatus === 'CHECKED_IN';
+  const simSuffix = card.activeSession?.isSimulation ? ' (S)' : '';
   const statusLabel = isCheckedIn
-    ? `Checked in${activitySuffix}`
+    ? `Checked in${simSuffix}${activitySuffix}`
     : 'Not checked in';
 
   return (

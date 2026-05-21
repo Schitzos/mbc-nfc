@@ -69,7 +69,7 @@ Talking points:
 
 - Happy path: Register → Top-up → Check-in → Check-out → Inspect
 - Error states: NFC disabled, insufficient balance, double tap, tampered card
-- All flows use real NFC — no simulation mode or mock scenario selectors remain
+- All flows use real NFC — simulation mode is available at Gate for testing/demo (flag stored on card; Terminal skips deduction)
 
 ---
 

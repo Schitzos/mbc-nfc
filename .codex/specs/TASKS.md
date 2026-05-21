@@ -560,6 +560,69 @@ Acceptance Criteria:
   Status: ✅ DONE — QA validated 2026-05-13. 65 suites / 439 tests pass. 100% coverage. PR #149.
   Done: Domain layer restructured to membership-based bounded context; all imports updated; old folders removed; all tests pass.
 
+---
+
+## Phase 8 — Bug Fixes
+
+### T-BUGFIX-001 — Fix registerCard silent overwrite of tags with existing data ✅ DONE
+
+Owner: @NFC + @FE
+Refs: `DESIGN.md`, `CARD_DATA_SECURITY_LEDGER_SPEC.md`
+Do: Fix bug where `NfcManager.getTag()` does not reliably return `ndefMessage` on Android, causing the existing-data check to be skipped. Tags with unknown/foreign NDEF data get silently overwritten without warning.
+
+Fix:
+
+1. Replace `getTag()` with `NfcManager.ndefHandler.getNdefMessage()` in `registerCard` (same pattern as `readCardFromActiveSession`) to actively read NDEF content.
+2. Add `CARD_HAS_EXISTING_DATA` error code for tags with non-MBC foreign data.
+3. Handle new error in use case (return failure DTO like `CARD_ALREADY_REGISTERED`).
+4. Handle in presentation layer (show confirmation dialog to wipe or cancel).
+
+Files:
+
+- `src/domain/membership/errors/membership-card-repository-error.ts`
+- `src/infrastructure/nfc/real-mbc-card.repository.ts`
+- `src/application/use-cases/register-member-card.use-case.ts`
+- `src/presentation/screens/Station/useStationActions.ts`
+- Related test files
+
+Acceptance Criteria:
+
+- `registerCard` uses `ndefHandler.getNdefMessage()` instead of `getTag()` to read existing NDEF content
+- New error code `CARD_HAS_EXISTING_DATA` exists in `MembershipCardRepositoryErrorCode`
+- Use case returns a distinct failure DTO when `CARD_HAS_EXISTING_DATA` is thrown
+- Presentation layer shows a confirmation dialog allowing user to wipe or cancel when foreign data is detected
+- All existing tests pass; new tests cover the new error path
+- Coverage remains >=90%
+
+Status: ✅ DONE — QA validated 2026-05-21. 65 suites / 442 tests pass. Coverage 99.6%. TypeScript compiles cleanly. All acceptance criteria met.
+
+---
+
+### T-BUGFIX-002 — Add max balance cap (Rp 5.000.000) on top-up ✅ DONE
+
+Owner: @FE
+Refs: `REQUIREMENTS.md`, `EDGE_CASES.md`, `CARD_DATA_SECURITY_LEDGER_SPEC.md`
+Do: Add maximum balance cap of Rp 5.000.000 on top-up. Reject top-up if resulting balance would exceed the cap.
+
+Files:
+
+- `src/domain/membership/config/balance-limits.ts` (NEW)
+- `src/domain/membership/errors/domain-error.ts`
+- `src/application/use-cases/top-up-member-card.use-case.ts`
+- `src/application/use-cases/__tests__/top-up-balance-cap.use-case.test.ts` (NEW)
+
+Acceptance Criteria:
+
+- A domain config constant `MAX_CARD_BALANCE = 5_000_000` exists in `src/domain/membership/config/`
+- Top-up use case rejects with a clear message if `card.balance + amount > MAX_CARD_BALANCE`
+- The validation happens BEFORE the card write (inside the `readWriteCard` transform or before calling it)
+- Existing tests pass, new tests cover the cap scenario
+- Coverage remains >=90%
+
+Status: ✅ DONE — QA validated 2026-05-21. 66 suites / 446 tests pass. Coverage 99.6%. TypeScript compiles cleanly. Android build and runtime verified on physical device (T1AIGF005808BV4). All acceptance criteria met.
+
+---
+
 ### T-029 — Demo Capture
 
 Owner: Release Engineer / Writer / UI Designer  
@@ -573,3 +636,70 @@ Owner: Release Engineer / Writer / PM
 Refs: `PO_FINAL_GO_NO_GO_CHECKLIST.md`, `RELEASE_PLAN.md`  
 Do: Confirm repository, docs, tests, QA evidence, demo evidence, Firebase notes, known limitations, and parking MVP scope.  
 Done: Package is ready for final PO GO/NO-GO review.
+
+---
+
+## Phase 9 — Feature Enhancements
+
+### T-FEAT-GATE-001 — Implement Gate Simulation Mode ✅ DONE
+
+Owner: @FE
+Refs: `REQUIREMENTS.md`, `DESIGN.md`, `EDGE_CASES.md`
+Do: Implement Gate Simulation Mode — allow operator to set a past entry time for check-in. When simulation mode is active: (1) custom past timestamp is written to card, (2) Terminal checkout uses real device time but does NOT deduct balance, (3) UI shows a clear simulation mode indicator.
+
+Files:
+
+- `src/domain/membership/types/card-status.ts` (add `isSimulation` to ActiveSession)
+- `src/domain/membership/policies/activity-state-policy.ts` (pass isSimulation through)
+- `src/application/use-cases/check-in-activity.use-case.ts` (accept optional `checkedInAt` + `isSimulation`)
+- `src/application/use-cases/check-out-activity.use-case.ts` (skip deduction when `isSimulation`)
+- `src/infrastructure/nfc/mbc-card-codec.ts` (encode/decode `s:1` in `i` field)
+- `src/presentation/screens/Gate/useGateActions.ts` (simulation state + pass to use case)
+- `src/presentation/screens/Gate/index.tsx` (toggle UI + DateTimePicker + banner)
+- `src/presentation/screens/Terminal/index.tsx` (simulation banner + annotated fee/balance)
+
+Acceptance Criteria:
+
+- Gate screen has a simulation mode toggle
+- When enabled, a native DateTimePicker allows selecting a past time
+- Check-in use case accepts optional `checkedInAt` (ISO string) and `isSimulation` (boolean) parameters
+- When simulation mode is active, the simulated timestamp and `isSimulation: true` are written to card activeSession
+- Codec encodes `isSimulation` as `s: 1` in the compact payload `i` field: `{ a: 1, t: "...", s: 1 }`
+- Terminal checkout reads `activeSession.isSimulation` — if true, calculates fee/duration but does NOT deduct balance (charges 0)
+- Terminal UI shows a red "⚠️ SIMULATION MODE" banner and annotates fee as "(not deducted)" and balance as "(unchanged)"
+- Gate UI shows a red "⚠️ SIMULATION MODE ACTIVE" banner with note "Balance will NOT be deducted on checkout"
+- All existing tests pass, new tests cover simulation paths
+- Coverage remains >=90%
+- Dependency added: `@react-native-community/datetimepicker@8.3.0`
+
+Status: ✅ DONE
+Done: Gate simulation mode fully implemented with toggle, DateTimePicker, card-stored isSimulation flag, Terminal skip-deduction logic, and UI banners on both screens.
+
+### T-FEAT-GATE-002 — Fix simulation mode edge cases and bugs
+
+Owner: @FE
+Refs: `REQUIREMENTS.md`, `DESIGN.md`, `EDGE_CASES.md`
+Do: Fix simulation mode edge cases and bugs — default date, min/max date limits, release mode hide, Scout simulation indicator, ledger skip, transaction log flag, future-time guard, success message.
+
+Files:
+
+- `src/presentation/screens/Gate/useGateActions.ts` (EC-1, BUG-5)
+- `src/presentation/screens/Gate/index.tsx` (EC-4, EC-5)
+- `src/application/use-cases/check-in-activity.use-case.ts` (BUG-1)
+- `src/application/use-cases/check-out-activity.use-case.ts` (BUG-4)
+- Scout screen or card display component (EC-8)
+- Related test files
+
+Acceptance Criteria:
+
+- EC-1: `simulatedDate` defaults to `new Date()` (current time) instead of null
+- EC-2: DateTimePicker `maximumDate` already set (verify)
+- EC-4: DateTimePicker `minimumDate` set to 3 months ago
+- EC-5: Simulation toggle only visible when `__DEV__` is true (hidden in release builds)
+- EC-8: Scout shows "CHECKED_IN (S)" when card has `isSimulation` in activeSession
+- BUG-1: Check-in use case rejects `checkedInAt` if it's in the future
+- BUG-3: Transaction log in Scout shows "(S)" suffix on activity name for simulation entries — no change to log structure, just display "(S)" in Scout for the check-in that matches the simulation session time.
+- BUG-4: Skip `localLedgerRepository.append` when `wasSimulation` is true in checkout use case
+- BUG-5: Gate check-in success message indicates simulation (e.g., "Card checked in (simulation).")
+
+Status: (in-progress)

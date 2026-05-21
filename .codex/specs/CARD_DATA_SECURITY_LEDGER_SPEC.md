@@ -51,6 +51,24 @@ Use short keys and compact values before encryption. The app may expose readable
 }
 ```
 
+Simulation mode example (when checked in via Gate simulation):
+
+```json
+{
+  "v": 1,
+  "c": "C000001",
+  "m": "M000001",
+  "b": 50000,
+  "i": { "a": 1, "t": "2026-05-06T08:00:00+07:00", "s": 1 },
+  "x": [
+    ["R", 0, "2026-05-06T09:00:00+07:00"],
+    ["U", 50000, "2026-05-06T09:05:00+07:00"],
+    ["I", 0, "2026-05-06T10:00:00+07:00"]
+  ],
+  "n": 3
+}
+```
+
 ### 2.3 Compact field meaning
 
 | Compact field | Meaning                         | Required                   | Notes                                                                                                    |
@@ -62,6 +80,7 @@ Use short keys and compact values before encryption. The app may expose readable
 | `i`           | Active visit state              | Yes                        | Use `null` when not checked in, or object when checked in. Visit status is derived from presence of `i`. |
 | `i.a`         | Active visit flag               | Yes when `i` object exists | `1` checked in. If checked out, prefer `i:null`.                                                         |
 | `i.t`         | Check-in time                   | Yes when checked in        | ISO timestamp is allowed for MVP readability if protected payload fits NTAG215.                          |
+| `i.s`         | Simulation flag                 | No                         | `1` when check-in was performed in simulation mode. Absent or omitted when normal mode.                  |
 | `x`           | Latest card transaction records | Yes                        | Max 5, FIFO rolling window, stored oldest-to-newest among retained records.                              |
 | `n`           | Monotonic write counter         | Yes                        | Increment after every successful card-state write.                                                       |
 
@@ -109,7 +128,7 @@ The authoritative field definitions for MVP are the compact fields in Section 2.
 Normalization rules:
 
 - Checked-out state should use `i:null`.
-- Checked-in state must use `i:{"a":1,"t":"<ISO timestamp>"}`.
+- Checked-in state must use `i:{"a":1,"t":"<ISO timestamp>"}`. When simulation mode, include `"s":1`: `i:{"a":1,"t":"<ISO timestamp>","s":1}`.
 - ISO timestamp strings may be used by default for readability if the final protected payload fits NTAG215.
 - `x` must never exceed five entries.
 - `x` uses FIFO latest-five behavior: remove oldest, append newest.
@@ -322,14 +341,14 @@ Rules:
 3. Reject if not checked in.
 4. Calculate charged started hours from check-in and checkout time.
 5. Calculate fee using the fixed MVP tariff Rp 2.000 per started hour.
-6. Reject if balance is insufficient.
-7. Deduct fee.
+6. If activeSession.isSimulation is true, skip balance deduction (charge 0) and proceed to step 8.
+7. Reject if balance is insufficient. Deduct fee.
 8. Clear active check-in state.
 9. Add CHECKOUT transaction.
 10. Increment ctr.
 11. Sign/protect payload with Silent Shield.
 12. Write card (`writeNdefMessage` throws on failure).
-13. Display tariff, charged hours, and calculated fee immediately after successful checkout tap.
+13. Display tariff, charged hours, and calculated fee immediately after successful checkout tap. If simulation, annotate fee as "(not deducted)" and balance as "(unchanged)".
 14. Insert SQLite ledger record for the successful checkout.
 ```
 

@@ -137,6 +137,20 @@ export function useStationActions(services: StationServices) {
         appendNfcLog('[NFC] Card already registered — awaiting user decision');
         setBusyAction(null);
         return;
+      } else if (result.message.toLowerCase().includes('existing data')) {
+        setNfcSheet({
+          phase: 'confirm',
+          title: 'Card Has Existing Data',
+          message:
+            'This card contains data from another application. Wipe and register as a new member?',
+          confirmLabel: 'Wipe & Re-register',
+          onConfirm: () => {
+            handleWipeAndRegister().catch(noop);
+          },
+        });
+        appendNfcLog('[NFC] Card has foreign data — awaiting user decision');
+        setBusyAction(null);
+        return;
       } else {
         setNfcSheet({
           phase: 'error',

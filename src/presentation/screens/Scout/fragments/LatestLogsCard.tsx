@@ -8,6 +8,7 @@ interface LogEntry {
   activity: string;
   nominal: number;
   occurredAt: string;
+  isSimulation?: boolean;
 }
 
 interface LatestLogsCardProps {
@@ -37,6 +38,7 @@ export function LatestLogsCard({
             >
               <Text style={styles.logActivity}>
                 {index + 1}. {log.activity.replace('_', ' ')}
+                {log.isSimulation ? ' (S)' : ''}
               </Text>
               <Text style={styles.logMuted}>
                 Rp {log.nominal.toLocaleString(LOCALE_ID)}

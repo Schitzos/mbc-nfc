@@ -101,6 +101,9 @@ Required cases:
 - Station, Gate, Terminal, and Scout presentation states do not expose the full internal member ID.
 - Station top-up increases balance and adds log.
 - Gate check-in sets activity ID/type, status, and timestamp.
+- Gate check-in accepts optional `checkedInAt` and `isSimulation` parameters for simulation mode.
+- Gate simulation check-in writes `isSimulation: true` to card activeSession.
+- Terminal checkout skips balance deduction when `activeSession.isSimulation` is true (charges 0).
 - Gate check-in appends a local ledger audit row with amount `0`.
 - Gate check-in uses real device time and records current timestamp.
 - Terminal checkout rejects invalid duration/time before deduction.
@@ -121,7 +124,8 @@ Must test:
 - Station top-up validation.
 - Station segmented control (Register | Top Up) switching.
 - Station local ledger summary panel displays local totals clearly.
-- Gate screen has no simulation controls in production flow.
+- Gate screen has simulation mode toggle, DateTimePicker, and red banner when active.
+- Terminal simulation checkout shows "⚠️ SIMULATION MODE" banner with "(not deducted)" fee annotation.
 - Terminal missing card/scan timeout recovery guidance.
 - Scout one-tap balance, status, and transaction log display.
 - Scout radar-hides-on-result and "Scan Another Card" reset behavior.
@@ -148,6 +152,8 @@ Must test:
 | NFC-003  | Top-up                   | Station tops up card                                    | Balance increases and log is added                                                   |
 | NFC-004  | Activity check-in        | Gate checks in card                                     | Activity status becomes checked in                                                   |
 | NFC-005  | Real-time check-in       | Gate checks in with current device time                 | Current entry time is stored                                                         |
+| NFC-005A | Simulation check-in      | Gate checks in with simulation mode enabled + past time | Past timestamp and isSimulation flag stored on card                                  |
+| NFC-005B | Simulation checkout      | Terminal checks out a simulation-flagged card           | Fee/duration calculated but balance NOT deducted; simulation banner shown            |
 | NFC-006  | Activity checkout        | Terminal checks out card                                | Fee is deducted, status clears, and write succeeds                                   |
 | NFC-007  | Double check-in          | Gate checks in same card twice                          | Second action is rejected                                                            |
 | NFC-008  | Double check-out         | Terminal checks out unchecked card                      | Action is rejected                                                                   |
