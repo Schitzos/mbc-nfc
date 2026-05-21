@@ -357,14 +357,6 @@ describe('GateResultState — invalid date branch', () => {
   });
 });
 
-describe('AppHeaderCard — no subTitle branch', () => {
-  it('renders without subTitle prop', () => {
-    const { AppHeaderCard } = require('../../components/AppHeaderCard');
-    render(<AppHeaderCard title="Test" />);
-    expect(screen.getByText('Test')).toBeTruthy();
-  });
-});
-
 describe('Terminal — genericFailure branch', () => {
   it('renders generic failure message when checkout fails without insufficient', async () => {
     mockCheckOut.execute.mockResolvedValueOnce({

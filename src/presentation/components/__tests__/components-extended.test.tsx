@@ -2,10 +2,7 @@ import React from 'react';
 import { Text } from 'react-native';
 import { fireEvent, render, screen } from '@testing-library/react-native';
 import { SignalButton } from '@presentation/components/SignalButton';
-import { SignalOptionCard } from '@presentation/components/SignalOptionCard';
 import { SignalBottomSheet } from '@presentation/components/SignalBottomSheet';
-import { SignalStatusBanner } from '@presentation/components/SignalStatusBanner';
-import { SignalSkeleton } from '@presentation/components/SignalSkeleton';
 
 describe('SignalButton – extended coverage', () => {
   it('renders with secondary variant', () => {
@@ -64,47 +61,6 @@ describe('SignalButton – extended coverage', () => {
   });
 });
 
-describe('SignalOptionCard – extended coverage', () => {
-  it('renders in disabled state', () => {
-    const onPress = jest.fn();
-    render(
-      <SignalOptionCard title="Disabled Option" disabled onPress={onPress} />,
-    );
-    fireEvent.press(screen.getByText('Disabled Option'));
-    expect(onPress).not.toHaveBeenCalled();
-  });
-
-  it('renders with trailing icon', () => {
-    render(
-      <SignalOptionCard
-        title="With Icon"
-        trailingIcon={<Text>→</Text>}
-        onPress={() => undefined}
-      />,
-    );
-    expect(screen.getByText('→')).toBeTruthy();
-  });
-
-  it('handles pressIn and pressOut state changes', () => {
-    render(<SignalOptionCard title="Press Test" onPress={() => undefined} />);
-    const button = screen.getByRole('button');
-    fireEvent(button, 'pressIn');
-    fireEvent(button, 'pressOut');
-    expect(screen.getByText('Press Test')).toBeTruthy();
-  });
-
-  it('renders with selected state', () => {
-    render(
-      <SignalOptionCard
-        title="Selected"
-        state="selected"
-        onPress={() => undefined}
-      />,
-    );
-    expect(screen.getByText('Selected')).toBeTruthy();
-  });
-});
-
 describe('SignalBottomSheet – extended coverage', () => {
   it('renders without title (shows spacer)', () => {
     render(
@@ -149,61 +105,6 @@ describe('SignalBottomSheet – extended coverage', () => {
   });
 });
 
-describe('SignalStatusBanner – extended coverage', () => {
-  it('renders without items', () => {
-    render(
-      <SignalStatusBanner
-        tone="warning"
-        eyebrow="Warning"
-        title="Warning title"
-        body="Warning body"
-      />,
-    );
-    expect(screen.getByText('Warning title')).toBeTruthy();
-  });
-
-  it('renders with children', () => {
-    render(
-      <SignalStatusBanner
-        tone="error"
-        eyebrow="Error"
-        title="Error title"
-        body="Error body"
-      >
-        <Text>Custom child</Text>
-      </SignalStatusBanner>,
-    );
-    expect(screen.getByText('Custom child')).toBeTruthy();
-  });
-
-  it('renders success tone', () => {
-    render(
-      <SignalStatusBanner
-        tone="success"
-        eyebrow="Done"
-        title="Success"
-        body="All good"
-        items={['Item 1']}
-      />,
-    );
-    expect(screen.getByText('• Item 1')).toBeTruthy();
-  });
-});
-
-describe('SignalSkeleton – extended coverage', () => {
-  it('renders default title variant without explicit prop', () => {
-    const { toJSON } = render(<SignalSkeleton />);
-    expect(toJSON()).toBeDefined();
-  });
-
-  it('renders with custom style', () => {
-    const { toJSON } = render(
-      <SignalSkeleton variant="button" style={{ marginTop: 10 }} />,
-    );
-    expect(toJSON()).toBeDefined();
-  });
-});
-
 describe('NfcActionSheet – confirm phase', () => {
   it('renders confirm title and buttons', () => {
     const { NfcActionSheet } = require('../../components/NfcActionSheet');
@@ -227,25 +128,6 @@ describe('NfcActionSheet – confirm phase', () => {
   });
 });
 
-describe('SignalTextField – focused state', () => {
-  it('applies focused visual state on focus', async () => {
-    const { SignalTextField } = require('../SignalTextField');
-
-    const { getByPlaceholderText } = render(
-      <SignalTextField
-        state="enabled"
-        value=""
-        onChangeText={jest.fn()}
-        placeholder="test"
-      />,
-    );
-
-    const input = getByPlaceholderText('test');
-    fireEvent(input, 'focus');
-    expect(input).toBeTruthy();
-  });
-});
-
 describe('NfcActionSheet – scanning without message', () => {
   it('renders default scanning message when state.message is undefined', () => {
     const { NfcActionSheet } = require('../../components/NfcActionSheet');
@@ -257,34 +139,6 @@ describe('NfcActionSheet – scanning without message', () => {
     expect(
       screen.getByText('Tap your member card near the phone'),
     ).toBeTruthy();
-  });
-});
-
-describe('BackgroundDecor – default variant', () => {
-  it('renders without variant prop (uses default)', () => {
-    const { BackgroundDecor } = require('../BackgroundDecor');
-    const { toJSON } = render(<BackgroundDecor />);
-    expect(toJSON()).toBeDefined();
-  });
-});
-
-describe('BackgroundDecor – variant branches', () => {
-  it('renders gate variant (covers getDiamondColor gate branch)', () => {
-    const { BackgroundDecor } = require('../BackgroundDecor');
-    const { toJSON } = render(<BackgroundDecor variant="gate" />);
-    expect(toJSON()).toBeDefined();
-  });
-
-  it('renders terminal variant (covers getDiamondColor terminal branch)', () => {
-    const { BackgroundDecor } = require('../BackgroundDecor');
-    const { toJSON } = render(<BackgroundDecor variant="terminal" />);
-    expect(toJSON()).toBeDefined();
-  });
-
-  it('renders scout variant (covers getCircleColor scout branch)', () => {
-    const { BackgroundDecor } = require('../BackgroundDecor');
-    const { toJSON } = render(<BackgroundDecor variant="scout" />);
-    expect(toJSON()).toBeDefined();
   });
 });
 

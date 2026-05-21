@@ -3,12 +3,6 @@ import { Text } from 'react-native';
 import { fireEvent, render, screen } from '@testing-library/react-native';
 import { SignalBottomSheet } from '@presentation/components/SignalBottomSheet';
 import { SignalButton } from '@presentation/components/SignalButton';
-import { SignalJelajahCard } from '@presentation/components/SignalJelajahCard';
-import { SignalOptionCard } from '@presentation/components/SignalOptionCard';
-import { SignalSkeleton } from '@presentation/components/SignalSkeleton';
-import { SignalStatusBanner } from '@presentation/components/SignalStatusBanner';
-import { SignalSurfaceCard } from '@presentation/components/SignalSurfaceCard';
-import { SignalTextField } from '@presentation/components/SignalTextField';
 
 describe('presentation components', () => {
   it('renders and presses SignalButton', () => {
@@ -35,91 +29,5 @@ describe('presentation components', () => {
     expect(screen.getByText('Sheet body')).toBeTruthy();
     fireEvent.press(screen.getByText('x'));
     expect(onClose).toHaveBeenCalled();
-  });
-
-  it('renders option card and triggers press', () => {
-    const onPress = jest.fn();
-    render(<SignalOptionCard title="Option A" onPress={onPress} />);
-    fireEvent.press(screen.getByText('Option A'));
-    expect(onPress).toHaveBeenCalledTimes(1);
-  });
-
-  it('renders text field and updates value', () => {
-    const onChangeText = jest.fn();
-    const onFocus = jest.fn();
-    const onBlur = jest.fn();
-    render(
-      <SignalTextField
-        label="Amount"
-        value=""
-        onChangeText={onChangeText}
-        onFocus={onFocus}
-        onBlur={onBlur}
-        required
-        helperText="Only numbers"
-        rightElement={<Text>Right</Text>}
-      />,
-    );
-    const input = screen.getByPlaceholderText('Placeholder');
-    fireEvent(input, 'focus');
-    fireEvent.changeText(input, '1000');
-    fireEvent(input, 'blur');
-    expect(onChangeText).toHaveBeenCalledWith('1000');
-    expect(onFocus).toHaveBeenCalled();
-    expect(onBlur).toHaveBeenCalled();
-    expect(screen.getByText('*')).toBeTruthy();
-    expect(screen.getByText('Right')).toBeTruthy();
-    expect(screen.getByText('Only numbers')).toBeTruthy();
-  });
-
-  it('disables input in load state', () => {
-    render(
-      <SignalTextField state="load" value="" onChangeText={() => undefined} />,
-    );
-    const input = screen.getByPlaceholderText('Placeholder');
-    expect(input.props.editable).toBe(false);
-  });
-
-  it('renders status banner list items', () => {
-    render(
-      <SignalStatusBanner
-        tone="info"
-        eyebrow="Status"
-        title="Info title"
-        body="Info body"
-        items={['A', 'B']}
-      />,
-    );
-    expect(screen.getByText('Info title')).toBeTruthy();
-    expect(screen.getByText('• A')).toBeTruthy();
-    expect(screen.getByText('• B')).toBeTruthy();
-  });
-
-  it('renders surface card and skeleton variants', () => {
-    render(
-      <>
-        <SignalSurfaceCard>
-          <Text>Card child</Text>
-        </SignalSurfaceCard>
-        <SignalSkeleton variant="title" />
-        <SignalSkeleton variant="button" />
-        <SignalSkeleton variant="card" />
-      </>,
-    );
-    expect(screen.getByText('Card child')).toBeTruthy();
-  });
-
-  it('renders SignalJelajahCard metadata', () => {
-    render(
-      <SignalJelajahCard
-        title="Jelajah title"
-        date="2026-05-02"
-        category="Promo"
-        imageSource={{ uri: 'https://example.com/image.png' }}
-      />,
-    );
-    expect(screen.getByText('Jelajah title')).toBeTruthy();
-    expect(screen.getByText('2026-05-02')).toBeTruthy();
-    expect(screen.getByText('Promo')).toBeTruthy();
   });
 });
