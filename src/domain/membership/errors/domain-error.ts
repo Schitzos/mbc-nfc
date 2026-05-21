@@ -5,7 +5,8 @@ export type DomainErrorCode =
   | 'CARD_NOT_CHECKED_IN'
   | 'ACTIVE_SESSION_EXISTS'
   | 'ACTIVE_SESSION_MISSING'
-  | 'INSUFFICIENT_BALANCE';
+  | 'INSUFFICIENT_BALANCE'
+  | 'BALANCE_CAP_EXCEEDED';
 
 export type DomainError = Error & {
   readonly name: 'DomainError';
