@@ -1,5 +1,5 @@
 import React from 'react';
-import { Pressable, Text, View } from 'react-native';
+import { Pressable, StyleSheet, Text, View } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import type { RoleOption } from '@presentation/config/role-options';
 
@@ -17,17 +17,10 @@ const roleIcon: Record<RoleOption['key'], string> = {
 };
 
 const roleIconColorHex: Record<RoleOption['key'], string> = {
-  station: '#15803d',
-  gate: '#1d4ed8',
-  terminal: '#c2410c',
-  scout: '#7e22ce',
-};
-
-const roleColor: Record<RoleOption['key'], string> = {
-  station: 'bg-green-100',
-  gate: 'bg-blue-100',
-  terminal: 'bg-orange-100',
-  scout: 'bg-purple-100',
+  station: '#00E676',
+  gate: '#60A5FA',
+  terminal: '#FB923C',
+  scout: '#A78BFA',
 };
 
 const roleHint: Record<RoleOption['key'], string> = {
@@ -47,23 +40,49 @@ export function RoleOptionList({
         <Pressable
           key={role.key}
           accessibilityRole="button"
-          className="flex-row items-center rounded-2xl bg-white px-4 py-4 shadow-sm"
+          style={s.card}
           onPress={() => onSelect(role.key)}
         >
           <View
-            className={`mr-3 h-11 w-11 items-center justify-center rounded-xl ${roleColor[role.key]}`}
+            style={[
+              s.iconBox,
+              { backgroundColor: `${roleIconColorHex[role.key]}22` },
+            ]}
           >
-            <Icon name={roleIcon[role.key]} size={24} color={roleIconColorHex[role.key]} />
+            <Icon
+              name={roleIcon[role.key]}
+              size={24}
+              color={roleIconColorHex[role.key]}
+            />
           </View>
           <View className="flex-1">
-            <Text className="text-base font-bold text-foreground">
-              {role.label}
-            </Text>
-            <Text className="text-xs text-muted">{roleHint[role.key]}</Text>
+            <Text className="text-base font-bold text-white">{role.label}</Text>
+            <Text className="text-xs text-white/60">{roleHint[role.key]}</Text>
           </View>
-          <Text className="text-lg text-muted">›</Text>
+          <Text className="text-lg text-white/40">›</Text>
         </Pressable>
       ))}
     </View>
   );
 }
+
+const s = StyleSheet.create({
+  card: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    borderRadius: 16,
+    paddingHorizontal: 16,
+    paddingVertical: 16,
+    backgroundColor: 'rgba(255,255,255,0.08)',
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.15)',
+  },
+  iconBox: {
+    width: 44,
+    height: 44,
+    borderRadius: 12,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: 12,
+  },
+});

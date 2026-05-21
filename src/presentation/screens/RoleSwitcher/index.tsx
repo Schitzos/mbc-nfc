@@ -29,7 +29,7 @@ export function RoleSwitcherScreen({ navigation }: Props): React.JSX.Element {
           subTitle="Select Operating Role"
           rightIcon={<Icon name="info" size={20} color="#fff" />}
         />
-        <View className="-mt-3 rounded-t-2xl bg-[#F0F2F5] px-5 pt-5 pb-6 flex-1">
+        <View className="-mt-3 rounded-t-2xl bg-[#0F172A] px-5 pt-5 pb-6 flex-1">
           <View className="flex-1">
             <RoleOptionList
               activeRoleKey={selectedRole}

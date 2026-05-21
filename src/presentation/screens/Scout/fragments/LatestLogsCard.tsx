@@ -1,5 +1,6 @@
 import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
+import LinearGradient from 'react-native-linear-gradient';
 import dayjs from 'dayjs';
 import { LOCALE_ID } from '@shared/constants';
 
@@ -24,50 +25,45 @@ export function LatestLogsCard({
   logs,
 }: Readonly<LatestLogsCardProps>): React.JSX.Element {
   return (
-    <View style={styles.card}>
-      <Text style={styles.title}>Latest Five Logs</Text>
+    <LinearGradient colors={['#0F172A', '#1E293B']} style={s.card}>
+      <Text style={s.title}>Latest Five Logs</Text>
       {logs.length ? (
-        <View style={styles.logList}>
+        <View style={s.logList}>
           {logs.slice(0, 5).map((log, index) => (
             <View
               key={log.id}
               style={[
-                styles.logRow,
-                index < Math.min(logs.length, 5) - 1 && styles.logRowBorder,
+                s.logRow,
+                index < Math.min(logs.length, 5) - 1 && s.logRowBorder,
               ]}
             >
-              <Text style={styles.logActivity}>
+              <Text style={s.logActivity}>
                 {index + 1}. {log.activity.replace('_', ' ')}
                 {log.isSimulation ? ' (S)' : ''}
               </Text>
-              <Text style={styles.logMuted}>
+              <Text style={s.logAmount}>
                 Rp {log.nominal.toLocaleString(LOCALE_ID)}
               </Text>
-              <Text style={styles.logMuted}>
-                {formatLogTime(log.occurredAt)}
-              </Text>
+              <Text style={s.logTime}>{formatLogTime(log.occurredAt)}</Text>
             </View>
           ))}
         </View>
       ) : (
-        <Text style={styles.emptyText}>No logs yet.</Text>
+        <Text style={s.emptyText}>No logs yet.</Text>
       )}
-    </View>
+    </LinearGradient>
   );
 }
 
-const styles = StyleSheet.create({
+const s = StyleSheet.create({
   card: {
-    backgroundColor: 'white',
     borderRadius: 16,
     padding: 16,
-    borderWidth: 1,
-    borderColor: 'rgba(0, 180, 216, 0.2)',
   },
   title: {
     fontSize: 14,
     fontWeight: '700',
-    color: '#1A1A1A',
+    color: '#FFFFFF',
   },
   logList: {
     marginTop: 8,
@@ -80,21 +76,27 @@ const styles = StyleSheet.create({
   },
   logRowBorder: {
     borderBottomWidth: 1,
-    borderBottomColor: 'rgba(0, 180, 216, 0.1)',
+    borderBottomColor: 'rgba(255,255,255,0.1)',
   },
   logActivity: {
     fontSize: 11,
-    color: '#1A1A1A',
+    color: '#FFFFFF',
     flex: 1,
   },
-  logMuted: {
+  logAmount: {
     fontSize: 11,
-    color: '#8BA3C7',
+    color: '#F59E0B',
+    fontWeight: '600',
+    marginLeft: 8,
+  },
+  logTime: {
+    fontSize: 11,
+    color: 'rgba(255,255,255,0.5)',
     marginLeft: 8,
   },
   emptyText: {
     marginTop: 8,
     fontSize: 12,
-    color: '#8BA3C7',
+    color: 'rgba(255,255,255,0.5)',
   },
 });

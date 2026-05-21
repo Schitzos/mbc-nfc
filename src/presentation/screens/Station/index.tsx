@@ -49,7 +49,7 @@ export function StationScreen(): React.JSX.Element {
             </View>
           }
         />
-        <View className="-mt-3 rounded-t-3xl bg-[#F0F2F5] px-5 pt-5 pb-6 flex-1">
+        <View className="-mt-3 rounded-t-3xl bg-[#0D1B3E] px-5 pt-5 pb-6 flex-1">
           <View className="flex-1">
             {/* RadarZone centered */}
             <View className="absolute inset-0 justify-center items-center z-0">

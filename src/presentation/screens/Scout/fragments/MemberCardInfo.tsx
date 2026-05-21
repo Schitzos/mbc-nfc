@@ -1,5 +1,6 @@
 import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
+import LinearGradient from 'react-native-linear-gradient';
 import dayjs from 'dayjs';
 import { LOCALE_ID } from '@shared/constants';
 
@@ -30,38 +31,31 @@ export function MemberCardInfo({
     : 'Not checked in';
 
   return (
-    <View style={styles.card}>
-      <Text style={styles.title}>Member Card Information</Text>
-      <View style={styles.rows}>
-        <View style={styles.row}>
-          <Text style={styles.label}>ID</Text>
-          <Text style={styles.value}>
-            {card.maskedMemberReference ?? 'MBC-***'}
-          </Text>
+    <LinearGradient colors={['#0F172A', '#1E293B']} style={s.card}>
+      <Text style={s.title}>Member Card Information</Text>
+      <View style={s.rows}>
+        <View style={s.row}>
+          <Text style={s.label}>ID</Text>
+          <Text style={s.value}>{card.maskedMemberReference ?? 'MBC-***'}</Text>
         </View>
-        <View style={styles.row}>
-          <Text style={styles.label}>Balance</Text>
+        <View style={s.row}>
+          <Text style={s.label}>Balance</Text>
           <Text
             style={[
-              styles.value,
-              card.balance > 0 ? styles.balancePositive : styles.balanceZero,
+              s.balanceValue,
+              card.balance > 0 ? s.balancePositive : s.balanceZero,
             ]}
           >
             Rp {card.balance.toLocaleString(LOCALE_ID)}
           </Text>
         </View>
-        <View style={styles.row}>
-          <Text style={styles.label}>Status</Text>
-          <View
-            style={[
-              styles.statusBadge,
-              isCheckedIn ? styles.statusIn : styles.statusOut,
-            ]}
-          >
+        <View style={s.row}>
+          <Text style={s.label}>Status</Text>
+          <View style={[s.statusBadge, isCheckedIn ? s.statusIn : s.statusOut]}>
             <Text
               style={[
-                styles.statusText,
-                isCheckedIn ? styles.statusTextIn : styles.statusTextOut,
+                s.statusText,
+                isCheckedIn ? s.statusTextIn : s.statusTextOut,
               ]}
             >
               {statusLabel}
@@ -69,30 +63,27 @@ export function MemberCardInfo({
           </View>
         </View>
         {!!card.activeSession?.checkedInAt && (
-          <View style={styles.row}>
-            <Text style={styles.label}>Since</Text>
-            <Text style={styles.value}>
+          <View style={s.row}>
+            <Text style={s.label}>Since</Text>
+            <Text style={s.value}>
               {formatLogTime(card.activeSession.checkedInAt)}
             </Text>
           </View>
         )}
       </View>
-    </View>
+    </LinearGradient>
   );
 }
 
-const styles = StyleSheet.create({
+const s = StyleSheet.create({
   card: {
-    backgroundColor: 'white',
     borderRadius: 16,
     padding: 16,
-    borderWidth: 1,
-    borderColor: 'rgba(0, 180, 216, 0.2)',
   },
   title: {
     fontSize: 14,
     fontWeight: '700',
-    color: '#1A1A1A',
+    color: '#FFFFFF',
   },
   rows: {
     marginTop: 12,
@@ -105,12 +96,16 @@ const styles = StyleSheet.create({
   },
   label: {
     fontSize: 12,
-    color: '#8BA3C7',
+    color: 'rgba(255,255,255,0.6)',
   },
   value: {
     fontSize: 12,
     fontWeight: '600',
-    color: '#1A1A1A',
+    color: '#FFFFFF',
+  },
+  balanceValue: {
+    fontSize: 18,
+    fontWeight: '800',
   },
   balancePositive: {
     color: '#00E676',
@@ -127,7 +122,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(0, 230, 118, 0.15)',
   },
   statusOut: {
-    backgroundColor: 'rgba(139, 163, 199, 0.15)',
+    backgroundColor: 'rgba(255,255,255,0.1)',
   },
   statusText: {
     fontSize: 12,
@@ -137,6 +132,6 @@ const styles = StyleSheet.create({
     color: '#00E676',
   },
   statusTextOut: {
-    color: '#8BA3C7',
+    color: 'rgba(255,255,255,0.6)',
   },
 });
