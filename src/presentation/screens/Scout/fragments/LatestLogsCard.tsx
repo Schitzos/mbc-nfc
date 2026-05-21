@@ -28,26 +28,29 @@ export function LatestLogsCard({
       <Text style={styles.title}>Latest Five Logs</Text>
       {logs.length ? (
         <View style={styles.logList}>
-          {logs.slice(0, 5).map((log, index) => (
-            <View
-              key={log.id}
-              style={[
-                styles.logRow,
-                index < Math.min(logs.length, 5) - 1 && styles.logRowBorder,
-              ]}
-            >
-              <Text style={styles.logActivity}>
-                {index + 1}. {log.activity.replace('_', ' ')}
-                {log.isSimulation ? ' (S)' : ''}
-              </Text>
-              <Text style={styles.logMuted}>
-                Rp {log.nominal.toLocaleString(LOCALE_ID)}
-              </Text>
-              <Text style={styles.logMuted}>
-                {formatLogTime(log.occurredAt)}
-              </Text>
-            </View>
-          ))}
+          {[...logs]
+            .reverse()
+            .slice(0, 5)
+            .map((log, index) => (
+              <View
+                key={log.id}
+                style={[
+                  styles.logRow,
+                  index < Math.min(logs.length, 5) - 1 && styles.logRowBorder,
+                ]}
+              >
+                <Text style={styles.logActivity}>
+                  {index + 1}. {log.activity.replace('_', ' ')}
+                  {log.isSimulation ? ' (S)' : ''}
+                </Text>
+                <Text style={styles.logMuted}>
+                  Rp {log.nominal.toLocaleString(LOCALE_ID)}
+                </Text>
+                <Text style={styles.logMuted}>
+                  {formatLogTime(log.occurredAt)}
+                </Text>
+              </View>
+            ))}
         </View>
       ) : (
         <Text style={styles.emptyText}>No logs yet.</Text>
