@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { ImageBackground, View } from 'react-native';
+import { Image, ImageBackground, View } from 'react-native';
 import { ScreenHeader } from '@presentation/components/ScreenHeader';
 import { RadarZone } from '@presentation/components/RadarZone';
 import { NfcLogPanel } from '@presentation/components/NfcLogPanel';
@@ -12,6 +12,7 @@ import { useGateActions } from './useGateActions';
 import { signalColorTokens } from '@presentation/theme/colors';
 
 const bgImage = require('@presentation/assets/bg-role-switcher.png');
+const gateIllustration = require('@presentation/assets/illustration-nfc-gate.png');
 
 export function GateScreen(): React.JSX.Element {
   const setSelectedRole = useAppStore(state => state.setSelectedRole);
@@ -47,10 +48,22 @@ export function GateScreen(): React.JSX.Element {
 
         <View className="flex-1 mt-4">
           {actions.latestResult ? (
-            <GateResultState
-              latestResult={actions.latestResult}
-              onReset={actions.resetResult}
-            />
+            <View className="flex-1">
+              <GateResultState
+                latestResult={actions.latestResult}
+                onReset={actions.resetResult}
+              />
+              <View
+                className="flex-1 items-center justify-center"
+                pointerEvents="none"
+              >
+                <Image
+                  source={gateIllustration}
+                  className="w-[480px] h-[430px] opacity-60"
+                  resizeMode="contain"
+                />
+              </View>
+            </View>
           ) : (
             <RadarZone
               color={signalColorTokens.brand.primary}

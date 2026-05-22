@@ -1,7 +1,9 @@
 import React from 'react';
-import { Text, View } from 'react-native';
+import { Image, Text, View } from 'react-native';
 import { SignalButton } from '@presentation/components/SignalButton';
 import type { RoleActionResultDto } from '@application/dto/role-action-result-dto';
+
+const cardErrorIcon = require('@presentation/assets/icon-card-error.png');
 
 interface GenericFailureCardProps {
   latestResult: RoleActionResultDto;
@@ -13,13 +15,22 @@ export function GenericFailureCard({
   onReset,
 }: Readonly<GenericFailureCardProps>): React.JSX.Element {
   return (
-    <View className="rounded-[20px] p-4 w-full bg-white/40 border border-[rgba(255,82,82,0.4)] gap-2">
-      <Text className="text-xs font-semibold uppercase text-red-700">
-        Card cannot be processed
-      </Text>
-      <Text className="text-sm font-semibold text-foreground">
-        {latestResult.message}
-      </Text>
+    <View className="rounded-[20px] p-5 w-full bg-white/60 border border-pink-light gap-4">
+      <View className="flex-row items-center gap-4">
+        <Image
+          source={cardErrorIcon}
+          className="w-[80px] h-[80px]"
+          resizeMode="contain"
+        />
+        <View className="flex-1">
+          <Text className="text-xs font-bold uppercase text-brand">
+            CARD CANNOT BE PROCESSED
+          </Text>
+          <Text className="mt-1 text-sm font-semibold text-foreground">
+            {latestResult.message}
+          </Text>
+        </View>
+      </View>
       {onReset && (
         <SignalButton
           testID="terminal-scan-another"

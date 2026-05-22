@@ -42,7 +42,7 @@ describe('GateResultState', () => {
 
   it('renders error without onReset', () => {
     render(<GateResultState latestResult={errorResult} />);
-    expect(screen.getByText('Card cannot be processed')).toBeTruthy();
+    expect(screen.getByText('CARD CANNOT BE PROCESSED')).toBeTruthy();
     expect(screen.queryByTestId('gate-scan-another')).toBeNull();
   });
 
