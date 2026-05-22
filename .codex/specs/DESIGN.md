@@ -434,7 +434,7 @@ Presentation assets include: `bg-role-switcher.png` (role switcher background), 
 ## 11. Quality Strategy
 
 - Domain and application logic should be written for high automated testability.
-- The repository should target at least 90% automated unit-test coverage across the whole executable source base, excluding only pure type-only contract files and generated artifacts. Actual achievement: 100% line coverage (446+ tests, 66 suites; jest.config.js enforces 99% statements/lines/branches, 96% functions).
+- The repository should target at least 90% automated unit-test coverage across the whole executable source base, excluding only pure type-only contract files and generated artifacts. Actual achievement: 100% line coverage (472+ tests, 75 suites; jest.config.js enforces 99% statements/lines/branches, 96% functions).
 - SonarCloud should analyze the repository with coverage input, lint/test results where applicable, and a passing quality gate before submission.
 - Dependency changes should be followed by `npm audit`, and the working dependency set should remain at 0 known vulnerabilities.
 - Coverage and static-analysis targets should not encourage shallow tests; critical balance, status, tariff, codec, and ledger paths must be meaningfully asserted.

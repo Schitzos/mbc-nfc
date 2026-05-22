@@ -37,8 +37,8 @@
 
 | Metric           | Value                            |
 | ---------------- | -------------------------------- |
-| Automated tests  | 444+                             |
-| Test suites      | 65                               |
+| Automated tests  | 472+                             |
+| Test suites      | 75                               |
 | Line coverage    | 100%                             |
 | Encryption       | AES-256-GCM                      |
 | Payload size     | 362 bytes (worst-case encrypted) |
@@ -664,8 +664,8 @@ Based on **Telkomsel Signal UI** design system with vibrant theme extensions.
 
 | Metric                    | Value      | Target |
 | ------------------------- | ---------- | ------ |
-| Automated tests           | **444+**   | —      |
-| Test suites               | **65**     | —      |
+| Automated tests           | **472+**   | —      |
+| Test suites               | **75**     | —      |
 | Statement coverage        | **100%**   | ≥99%   |
 | Line coverage             | **100%**   | ≥99%   |
 | Branch coverage           | **99%+**   | ≥99%   |
@@ -707,7 +707,7 @@ Build fails automatically if coverage drops below these thresholds.
 | `register-member-card-reset.use-case.test.ts` | Wipe & re-register flow                    |
 | `useGateActions-simulation.test.ts`           | Gate hook simulation state management      |
 
-## How 444+ Tests Run Without NFC Hardware
+## How 472+ Tests Run Without NFC Hardware
 
 ```mermaid
 graph LR
@@ -723,7 +723,7 @@ graph LR
     style IF fill:#FFD54F,color:#000
 ```
 
-> Clean Architecture makes this possible: mock repositories replace real NFC/OP-SQLite. All 444+ tests run in CI without physical devices.
+> Clean Architecture makes this possible: mock repositories replace real NFC/OP-SQLite. All 472+ tests run in CI without physical devices.
 
 ## Quality Gates Enforced
 
@@ -732,6 +732,43 @@ graph LR
 - ✅ Husky pre-commit hooks — lint-staged (eslint + prettier)
 - ✅ PR requires QA screenshot evidence
 - ✅ `npm audit` — 0 vulnerabilities enforced
+- ✅ Maestro autonomous E2E — full parking MVP cycle validated
+
+## 🤖 Autonomous E2E Testing — Maestro
+
+Maestro provides **autonomous, scriptable E2E testing** that validates the full parking MVP cycle without manual intervention or real NFC hardware.
+
+### How It Works
+
+```
+src/infrastructure/utils/e2e.config.ts (E2E_MODE = true)
+  → container.ts reads flag
+  → MockMbcCardRepository (in-memory singleton)
+  → Maestro drives UI flows autonomously
+```
+
+### Flows Covered
+
+| Flow                 | Scenario                 | Validation               |
+| -------------------- | ------------------------ | ------------------------ |
+| Role Switch          | Navigate all 4 roles     | All roles accessible     |
+| Register             | Station register card    | Success state            |
+| Top-Up               | Station top-up Rp 50.000 | Balance updated          |
+| Check-In             | Gate parking entry       | Checked-in status        |
+| Check-Out            | Terminal parking exit    | Fee calculated, deducted |
+| Inspect              | Scout read card          | Balance, status, logs    |
+| Double Check-In      | Gate error case          | Rejection shown          |
+| Insufficient Balance | Terminal error case      | Top-up guidance          |
+
+### Execution
+
+```bash
+# Set E2E_MODE = true in src/infrastructure/utils/e2e.config.ts, then:
+npm run e2e:android   # Build with mock NFC
+npm run e2e:test      # Run all Maestro flows
+```
+
+> Runs on Android emulator — no NFC hardware needed. CI-compatible.
 
 ---
 
@@ -813,7 +850,7 @@ flowchart LR
 | R-004 | Demo key confused with production | Medium | Documented + ADR                                | ✅ Closed |
 | R-005 | Write interrupted mid-operation   | Medium | writeNdefMessage throws on failure              | ✅ Closed |
 | R-006 | Double check-in/out               | Medium | applyCheckInState/applyCheckOutState validation | ✅ Closed |
-| R-007 | Coverage gaps                     | Medium | 100% achieved (444+ tests)                      | ✅ Closed |
+| R-007 | Coverage gaps                     | Medium | 100% achieved (472+ tests)                      | ✅ Closed |
 | R-008 | Clock manipulation                | Low    | Operational procedure documented                | ✅ Closed |
 | R-009 | Card removed during write         | Medium | NFC session error handling                      | ✅ Closed |
 | R-010 | Insufficient balance at exit      | Medium | Clear top-up guidance shown                     | ✅ Closed |
@@ -874,7 +911,7 @@ flowchart LR
 | 4     | Terminal feature       | Checkout + tariff                                   | ✅     |
 | 5     | Scout feature          | Read-only inspect                                   | ✅     |
 | 6     | Shared app experience  | Role switcher, Signal UI                            | ✅     |
-| 7     | Quality & verification | 444+ tests, SonarCloud, Firebase CI                 | ✅     |
+| 7     | Quality & verification | 472+ tests, SonarCloud, Firebase CI                 | ✅     |
 | 8     | Real NFC integration   | Silent Shield, codec, device tests                  | ✅     |
 | 9     | Design hardening       | RadarZone, ScreenHeader, fragments                  | ✅     |
 | 9B    | Feature enhancements   | **Simulation mode**                                 | ✅     |
@@ -918,7 +955,7 @@ flowchart LR
 | **Date/Time**  | @react-native-community/datetimepicker + dayjs | Simulation mode date picking                 |
 | **Icons**      | react-native-vector-icons (MaterialIcons)      | ScreenHeader badges, UI elements             |
 | **Gradients**  | react-native-linear-gradient                   | RadarZone button gradient                    |
-| **Testing**    | Jest + React Native Testing Library            | 444+ tests, CI-friendly                      |
+| **Testing**    | Jest + React Native Testing Library            | 472+ tests, CI-friendly                      |
 | **Quality**    | SonarCloud + Husky + lint-staged               | Automated quality gates                      |
 | **CI/CD**      | GitHub Actions → Firebase                      | Automated distribution                       |
 
@@ -1026,7 +1063,7 @@ sequenceDiagram
 
 | Metric                    | Value            |
 | ------------------------- | ---------------- |
-| 🧪 Automated tests        | **444+**         |
+| 🧪 Automated tests        | **472+**         |
 | 📦 Test suites            | **65**           |
 | 📈 Line coverage          | **100%**         |
 | 🔒 Vulnerabilities        | **0**            |
@@ -1044,7 +1081,7 @@ sequenceDiagram
 | Promise                   | Evidence                                          |
 | ------------------------- | ------------------------------------------------- |
 | Offline-first             | All flows work without internet                   |
-| Testable without hardware | 444+ tests in CI, no NFC needed                   |
+| Testable without hardware | 472+ tests in CI, no NFC needed                   |
 | Secure                    | AES-256-GCM, tamper detection validated on device |
 | Extensible                | New activities = TariffStrategy config only       |
 | Simple for staff          | Role-based UI, RadarZone one-tap actions          |
@@ -1090,7 +1127,7 @@ sequenceDiagram
 | **Demo**          | Screenshot/video evidence of all flows                            | ✅     |
 | **Documentation** | Technical + non-technical docs + 6 explainer guides               | ✅     |
 | **Presentation**  | Covers UI/UX, Design, Construction, Quality, Deployment, Security | ✅     |
-| **Tests**         | 444+ tests, 100% coverage, 0 vulnerabilities                      | ✅     |
+| **Tests**         | 472+ tests, 100% coverage, 0 vulnerabilities                      | ✅     |
 | **Quality**       | SonarCloud PASSED                                                 | ✅     |
 | **Security**      | Silent Shield validated, tamper detection working                 | ✅     |
 | **Device**        | Real NFC validated (ASUS ROG Phone 9 FE + NTAG215)                | ✅     |

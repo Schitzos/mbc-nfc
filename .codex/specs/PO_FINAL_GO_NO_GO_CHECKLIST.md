@@ -112,7 +112,7 @@ Before Codex/dev feature work is considered complete:
 - [ ] Changed-file unit-test policy passes for every implementation task.
 - [ ] Every changed executable source file has a created or updated unit test, or an approved documented exception.
 - [ ] Focused tests for changed files pass.
-- [x] Full coverage report shows at least 90% executable-source unit coverage. Actual: 100% (444+ tests, 65 suites).
+- [x] Full coverage report shows at least 90% executable-source unit coverage. Actual: 100% (472+ tests, 75 suites).
 - [ ] Feature branch result includes changed source files, changed test files, commands run, and coverage status.
 
 Final assessment submission remains **NO-GO** if the 90% coverage gate is not met or if major feature changes lack matching tests. Current status: gate exceeded (100% coverage achieved).
