@@ -30,7 +30,7 @@ Both Senior QA and Test Automation Engineer must maintain detailed E2E case docu
 
 Quality targets:
 
-- Automated unit-test coverage target across the whole executable repository source is at least 90%. Actual achievement: 100% line coverage (472+ tests, 75 suites; jest.config.js enforces 99% statements/lines/branches, 96% functions).
+- Automated unit-test coverage target across the whole executable repository source is at least 90%. Actual achievement: 90%+ line coverage (477+ tests, 75 suites; jest.config.js enforces 99% statements/lines/branches, 96% functions).
 - Coverage results should be exported in a format that can be consumed by SonarCloud.
 
 ## 3A. Changed-File Unit Test Policy
@@ -130,7 +130,7 @@ Must test:
 - Scout one-tap balance, status, and transaction log display.
 - Scout radar-hides-on-result and "Scan Another Card" reset behavior.
 - RadarZone renders with correct color per role screen.
-- ScanningRings animation renders in NfcActionSheet scanning phase.
+- PulseRing (inline) animation renders in NfcActionSheet scanning phase.
 - NFC loading, success, and error states.
 - Signal UI direction is applied consistently enough for assessment/demo review.
 

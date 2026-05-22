@@ -175,7 +175,7 @@ actionRed: '#FF0025',
   - Text: white (`text-white`) for title, `text-[#94A3B8]` for hint
   - Icon bg: keep colored but reduce opacity (`opacity: 0.2` bg)
   - On press: add colored border glow matching role color
-- [ ] **App title in header:** Already white on navy via `AppHeaderCard` ✅
+- [ ] **App title in header:** Already white on navy via `ScreenHeader` ✅
 
 ### 6.2 Station (`src/presentation/screens/Station/`)
 
@@ -250,7 +250,7 @@ This is the **highest-impact change** — convert from plain white sheet to dark
 
 - [ ] **Scanning state:**
   - Bg: dark (inherited from sheet)
-  - ScanningRings: keep existing animation ✅
+  - PulseRing (inline): keep existing animation ✅
   - Ring container bg: `rgba(255,255,255,0.05)` instead of `bg-[#0050AE]/[0.08]`
   - Primary text: `text-white font-semibold`
   - Secondary text: `text-[#94A3B8]`
@@ -313,7 +313,7 @@ This is the **highest-impact change** — convert from plain white sheet to dark
 ## 9. Do NOT Change
 
 - RadarZone component (already themed per-role via `color` prop)
-- AppHeaderCard (already navy gradient header)
+- ScreenHeader (already navy gradient header)
 - Domain/application layer code
 - NFC business logic
 - Test files (update only if component props change)

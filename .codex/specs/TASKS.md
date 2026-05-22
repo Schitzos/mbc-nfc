@@ -1,6 +1,6 @@
 # Membership Benefit Card — Codex Task Plan Lite
 
-> Current status: 472+ tests | 75 suites | 100% line coverage | jest.config.js thresholds: 99% statements/lines/branches, 96% functions
+> Current status: 477+ tests | 75 suites | 90%+ line coverage | jest.config.js thresholds: 99% statements/lines/branches, 96% functions
 
 Purpose: compact, Codex-friendly task cards. Execute task order from `EXECUTION_ORDER.md`. Use detailed docs only when the task references them.
 
@@ -428,7 +428,7 @@ Done: NfcLogPanel renders at the bottom of the screen on all role screens; all t
 Owner: Senior RN FE + UI/UX Designer
 Refs: `SIGNAL_UI_GUIDE.md`
 Do: Make the Inspect button circular and centered (vertically and horizontally) on the Scout screen. Enhance the Scout screen visual design to be more lively and demo-ready per UI/UX recommendation.
-Status: **DONE** — QA validated 2026-05-09. Circular 120px button centered, pulse animation, purple theme. 65 suites / 436 tests pass. 100% coverage on Scout/index.tsx. Runtime verified on Pixel 7 Pro emulator (Android 16).
+Status: **DONE** — QA validated 2026-05-09. Circular 120px button centered, pulse animation, purple theme. 65 suites / 436 tests pass. 90%+ coverage on Scout/index.tsx. Runtime verified on Pixel 7 Pro emulator (Android 16).
 Done: Inspect button is circular and centered on screen; Scout screen has enhanced visual design; all tests pass.
 
 ### T-UI-SCOUT-002 — Enhance Scout screen visual design to be more alive and engaging ✅ DONE
@@ -506,7 +506,7 @@ Acceptance Criteria:
 - Scanning animation is smooth, visually consistent with RadarZone theme
 - All existing tests pass (>=90% coverage maintained)
 - No regression in Station register/top-up flows
-  Status: **DONE** — QA validated 2026-05-09. 65 suites / 436 tests pass. 100% coverage. Station uses RadarZone with absolute centering (same as Gate/Terminal/Scout). NfcActionSheet has ScanningRings animation (3 concentric pulsing rings + center NFC icon breathe). Segmented control switches Register/Top-Up modes correctly. Runtime emulator validation deferred per user request.
+  Status: **DONE** — QA validated 2026-05-09. 65 suites / 436 tests pass. 90%+ coverage. Station uses RadarZone with absolute centering (same as Gate/Terminal/Scout). NfcActionSheet has PulseRing animation (2 pulsing rings + nfc-orb asset). Segmented control switches Register/Top-Up modes correctly. Runtime emulator validation deferred per user request.
   Done: Station screen aligned with Gate/Terminal/Scout pattern; NfcActionSheet has scanning animation; all tests pass.
 
 ### T-UI-TERMINAL-001 — Remove blank space above error cards on Terminal screen ✅ DONE
@@ -586,9 +586,9 @@ Acceptance Criteria:
 - New `src/domain/membership/` structure with entities, types, policies, repositories, factories, errors, config sub-folders
 - Old `src/domain/entities/`, `src/domain/services/`, `src/domain/repositories/`, `src/domain/factories/`, `src/domain/errors/` removed
 - All imports updated to `@domain/membership/...` paths
-- All tests pass with 100% coverage maintained
+- All tests pass with 90%+ coverage maintained
 - No stale imports remain
-  Status: ✅ DONE — QA validated 2026-05-13. 65 suites / 439 tests pass. 100% coverage. PR #149.
+  Status: ✅ DONE — QA validated 2026-05-13. 65 suites / 439 tests pass. 90%+ coverage. PR #149.
   Done: Domain layer restructured to membership-based bounded context; all imports updated; old folders removed; all tests pass.
 
 ---
@@ -779,7 +779,7 @@ Acceptance Criteria:
 - All existing tests pass
 - Coverage remains >=90%
 
-Status: ✅ DONE — QA validated 2026-05-21. Code review passed: all 4 acceptance criteria verified in diff. 70 suites / 468 tests pass. RoleOptionList.tsx 100% coverage. TypeScript compiles cleanly. WCAG contrast ratio ~16:1 (white on dark navy).
+Status: ✅ DONE — QA validated 2026-05-21. Code review passed: all 4 acceptance criteria verified in diff. 70 suites / 468 tests pass. RoleOptionList.tsx 90%+ coverage. TypeScript compiles cleanly. WCAG contrast ratio ~16:1 (white on dark navy).
 Done: RoleSwitcher cards use dark-glass glassmorphism with readable white text on both dark and light gradient portions; all tests pass.
 
 ### T-UI-APP-007 — Redesign RoleSwitcher to light theme per reference image
@@ -826,7 +826,7 @@ Files:
 - `src/presentation/screens/Gate/index.tsx`
 - `src/presentation/screens/Gate/fragments/GateResultState.tsx`
 - `src/presentation/screens/Gate/fragments/SimulationModePanel.tsx`
-- `src/presentation/screens/Gate/fragments/SelectedActivityCard.tsx`
+- `src/presentation/screens/Gate/fragments/GateResultState.tsx`
 - `src/presentation/screens/RoleSwitcher/index.tsx`
 - `src/presentation/components/ScreenHeader/index.tsx`
 - `src/presentation/components/AppHeaderCard/index.tsx`

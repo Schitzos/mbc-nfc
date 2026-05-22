@@ -8,8 +8,8 @@
 [![Code Smells](https://sonarcloud.io/api/project_badges/measure?project=Schitzos_mbc-nfc&metric=code_smells)](https://sonarcloud.io/summary/new_code?id=Schitzos_mbc-nfc)
 [![Coverage](https://sonarcloud.io/api/project_badges/measure?project=Schitzos_mbc-nfc&metric=coverage)](https://sonarcloud.io/summary/new_code?id=Schitzos_mbc-nfc)
 [![Duplicated Lines (%)](https://sonarcloud.io/api/project_badges/measure?project=Schitzos_mbc-nfc&metric=duplicated_lines_density)](https://sonarcloud.io/summary/new_code?id=Schitzos_mbc-nfc)
-![Coverage](https://img.shields.io/badge/coverage-100%25-brightgreen)
-![Tests](https://img.shields.io/badge/tests-472%20passed-brightgreen)
+![Coverage](https://img.shields.io/badge/coverage-90%25+-brightgreen)
+![Tests](https://img.shields.io/badge/tests-477+%20passed-brightgreen)
 ![Platform](https://img.shields.io/badge/platform-Android-blue)
 ![NFC](https://img.shields.io/badge/NFC-NTAG215-orange)
 
@@ -55,7 +55,7 @@ Infrastructure → Application/Domain contracts
 | State      | Zustand + React Context (DI)              |
 | Navigation | React Navigation                          |
 | Splash     | `react-native-bootsplash`                 |
-| Testing    | Jest (472+ tests, 100% coverage)          |
+| Testing    | Jest (477+ tests, 90%+ coverage)          |
 | E2E        | Maestro (autonomous UI flows)             |
 | Quality    | SonarCloud, Husky hooks                   |
 
@@ -110,7 +110,7 @@ src/
 │   └── utils/           # E2E config
 ├── presentation/        # UI layer
 │   ├── screens/         # Splash, RoleSwitcher, Station, Gate, Terminal, Scout
-│   ├── components/      # RadarZone, NfcActionSheet, SignalButton, etc.
+│   ├── components/      # ScreenHeader, RadarZone, NfcActionSheet, SignalButton, etc.
 │   ├── hooks/           # Custom React hooks
 │   ├── stores/          # Zustand state
 │   └── theme/           # Colors, typography, spacing, shadows

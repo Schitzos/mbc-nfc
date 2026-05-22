@@ -150,7 +150,7 @@ env:
 - assertVisible: 'Check-In Failed'
 - takeScreenshot: '.maestro/screenshots/bad-07d-double-checkin-sheet'
 - tapOn: 'Dismiss'
-- assertVisible: 'Blocked'
+- assertVisible: 'Already checked in'
 - takeScreenshot: '.maestro/screenshots/bad-07e-double-checkin-blocked'
 
 # === BACK TO ROLE SWITCHER ===
