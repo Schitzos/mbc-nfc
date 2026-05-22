@@ -30,7 +30,7 @@ Both Senior QA and Test Automation Engineer must maintain detailed E2E case docu
 
 Quality targets:
 
-- Automated unit-test coverage target across the whole executable repository source is at least 90%. Actual achievement: 100% line coverage (444+ tests, 65 suites; jest.config.js enforces 99% statements/lines/branches, 96% functions).
+- Automated unit-test coverage target across the whole executable repository source is at least 90%. Actual achievement: 90%+ line coverage (477+ tests, 75 suites; jest.config.js enforces 99% statements/lines/branches, 96% functions).
 - Coverage results should be exported in a format that can be consumed by SonarCloud.
 
 ## 3A. Changed-File Unit Test Policy
@@ -101,6 +101,9 @@ Required cases:
 - Station, Gate, Terminal, and Scout presentation states do not expose the full internal member ID.
 - Station top-up increases balance and adds log.
 - Gate check-in sets activity ID/type, status, and timestamp.
+- Gate check-in accepts optional `checkedInAt` and `isSimulation` parameters for simulation mode.
+- Gate simulation check-in writes `isSimulation: true` to card activeSession.
+- Terminal checkout skips balance deduction when `activeSession.isSimulation` is true (charges 0).
 - Gate check-in appends a local ledger audit row with amount `0`.
 - Gate check-in uses real device time and records current timestamp.
 - Terminal checkout rejects invalid duration/time before deduction.
@@ -121,12 +124,13 @@ Must test:
 - Station top-up validation.
 - Station segmented control (Register | Top Up) switching.
 - Station local ledger summary panel displays local totals clearly.
-- Gate screen has no simulation controls in production flow.
+- Gate screen has simulation mode toggle, DateTimePicker, and red banner when active.
+- Terminal simulation checkout shows "⚠️ SIMULATION MODE" banner with "(not deducted)" fee annotation.
 - Terminal missing card/scan timeout recovery guidance.
 - Scout one-tap balance, status, and transaction log display.
 - Scout radar-hides-on-result and "Scan Another Card" reset behavior.
 - RadarZone renders with correct color per role screen.
-- ScanningRings animation renders in NfcActionSheet scanning phase.
+- PulseRing (inline) animation renders in NfcActionSheet scanning phase.
 - NFC loading, success, and error states.
 - Signal UI direction is applied consistently enough for assessment/demo review.
 
@@ -148,6 +152,8 @@ Must test:
 | NFC-003  | Top-up                   | Station tops up card                                    | Balance increases and log is added                                                   |
 | NFC-004  | Activity check-in        | Gate checks in card                                     | Activity status becomes checked in                                                   |
 | NFC-005  | Real-time check-in       | Gate checks in with current device time                 | Current entry time is stored                                                         |
+| NFC-005A | Simulation check-in      | Gate checks in with simulation mode enabled + past time | Past timestamp and isSimulation flag stored on card                                  |
+| NFC-005B | Simulation checkout      | Terminal checks out a simulation-flagged card           | Fee/duration calculated but balance NOT deducted; simulation banner shown            |
 | NFC-006  | Activity checkout        | Terminal checks out card                                | Fee is deducted, status clears, and write succeeds                                   |
 | NFC-007  | Double check-in          | Gate checks in same card twice                          | Second action is rejected                                                            |
 | NFC-008  | Double check-out         | Terminal checks out unchecked card                      | Action is rejected                                                                   |
@@ -185,18 +191,57 @@ Must test:
 | SEC-013 | Capacity guard                | Oversized protected payload is rejected before write                                                                           |
 | SEC-014 | Local report scope            | Station summary reflects operations processed on this device                                                                   |
 
-## 11. Entry Criteria
+## 11. Autonomous E2E Testing — Maestro
+
+Maestro is the autonomous E2E testing tool for validating full user flows on Android without manual intervention.
+
+### Strategy
+
+- Maestro YAML flows exercise the complete parking MVP cycle through the UI layer.
+- A `MockMbcCardRepository` (in-memory singleton) replaces real NFC hardware during E2E runs, activated via `E2E_MODE` flag in `src/infrastructure/utils/e2e.config.ts`.
+- Tests run on Android emulator or real device without NFC dependency.
+
+### Covered Flows
+
+| Flow ID                | Scenario                      | Assertion                        |
+| ---------------------- | ----------------------------- | -------------------------------- |
+| maestro-role-switch    | Role switcher navigation      | All 4 roles accessible           |
+| maestro-register       | Station register card         | Success state shown              |
+| maestro-topup          | Station top-up Rp 50.000      | Balance updated                  |
+| maestro-checkin        | Gate check-in                 | Checked-in status                |
+| maestro-checkout       | Terminal check-out            | Fee calculated, balance deducted |
+| maestro-inspect        | Scout inspect                 | Balance, status, logs displayed  |
+| maestro-double-checkin | Gate double check-in          | Error rejected                   |
+| maestro-insufficient   | Terminal insufficient balance | Top-up guidance shown            |
+
+### Execution
+
+```bash
+npm run e2e           # Run all Maestro flows
+npm run e2e:record    # Run with screenshot capture
+```
+
+### Ownership
+
+| Role                     | Responsibility                                  |
+| ------------------------ | ----------------------------------------------- |
+| Test Automation Engineer | Maintain Maestro YAML flows and mock repository |
+| Senior QA                | Review E2E coverage and validate results        |
+| Demo/Release Engineer    | Include Maestro evidence in submission package  |
+
+## 12. Entry Criteria
 
 - Requirements match the MBC assessment brief.
 - Design has card repository, codec, use-case, and role boundaries.
 - Tasks are traceable to requirements.
 - NTAG215 tags/cards and real devices are available for device tests.
 
-## 12. Exit Criteria
+## 13. Exit Criteria
 
 - Unit tests pass.
 - Application tests pass.
 - Presentation tests pass for key screens.
+- Maestro autonomous E2E flows pass for the full parking MVP cycle.
 - Real NFC read/write demo succeeds where platform support allows.
 - Station, Gate, Terminal, and Scout flows are demo-ready.
 - Silent Shield security checklist passes production-grade assessment mode, including authenticated encryption and generic NFC reader validation.

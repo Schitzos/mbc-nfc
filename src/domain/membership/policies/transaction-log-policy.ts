@@ -8,6 +8,7 @@ interface CreateTransactionLogInput {
   activity: MbcActivity;
   nominal: number;
   occurredAt: string;
+  isSimulation?: boolean;
 }
 
 function parseIsoDate(value: string): void {
@@ -31,6 +32,7 @@ export function createTransactionLog(
     activity: input.activity,
     nominal: input.nominal,
     occurredAt: input.occurredAt,
+    ...(input.isSimulation ? { isSimulation: true } : {}),
   };
 }
 

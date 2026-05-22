@@ -40,13 +40,15 @@ An MBC role flow is done when:
 - Station can show a local device-side ledger summary for audit/reporting.
 - Gate can check in to an activity and reject double check-in.
 - Gate uses real device time to write activity entry timestamp.
+- Gate provides simulation mode toggle + DateTimePicker to set a past entry time for testing/demo; `isSimulation` flag is stored on the NFC card in `activeSession`.
 - Terminal can calculate activity fee and checkout.
+- Terminal skips balance deduction for simulation-flagged sessions and shows a simulation banner.
 - Terminal rejects double checkout and insufficient balance safely.
 - Scout can inspect balance, status, and latest logs without modifying card data.
 - Scout radar hides after scan; card results appear at top; "Scan Another Card" button resets to radar view.
 - Scout inspection works with one NFC tap.
 - All 4 role screens use RadarZone as the shared NFC trigger component.
-- NfcActionSheet uses ScanningRings animation (3 concentric pulsing rings + breathing center icon) during scan phase.
+- NfcActionSheet uses PulseRing (inline) animation (3 concentric pulsing rings + breathing center icon) during scan phase.
 - Transaction logs keep only the latest five records.
 - Parking MVP flow is implemented with clean boundaries so future non-parking activities can be added later without changing card/source-of-truth principles.
 
@@ -81,7 +83,8 @@ A quality-sensitive delivery is done when:
 - Changed-file unit-test rule passes for all feature branches.
 - Every approved test exception includes reason, impacted file, owner, and follow-up.
 
-- Automated unit-test coverage across the whole executable repository source is at least 90%. Actual achievement: 100% line coverage (444+ tests, 65 suites).
+- Automated unit-test coverage across the whole executable repository source is at least 90%. Actual achievement: 90%+ line coverage (477+ tests, 75 suites).
+- Maestro autonomous E2E flows pass for the full parking MVP cycle (register, top-up, check-in, check-out, inspect, error cases).
 - SonarCloud analysis is configured and reports coverage.
 - SonarCloud quality gate passes, or any temporary exception is explicitly documented.
 - `npm audit` reports 0 known vulnerabilities after dependency changes.

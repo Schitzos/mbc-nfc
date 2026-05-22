@@ -15,7 +15,7 @@ export function LocalStationLedgerCard({
   const [expanded, setExpanded] = useState(false);
 
   return (
-    <View className="rounded-2xl bg-white p-4 shadow-sm mt-4 mb-4">
+    <View className="rounded-2xl p-4 my-4 bg-white/55 border border-white/70">
       <Pressable
         onPress={() => setExpanded(prev => !prev)}
         className="flex-row items-center justify-between"
@@ -33,9 +33,7 @@ export function LocalStationLedgerCard({
                 refreshSummary();
               }}
             >
-              <Text className="text-xs font-semibold text-[#0050AE]">
-                Refresh
-              </Text>
+              <Text className="text-xs font-semibold text-brand">Refresh</Text>
             </Pressable>
           </View>
           <View className="mt-2 gap-1">
@@ -52,9 +50,9 @@ export function LocalStationLedgerCard({
               </Text>
             </View>
           </View>
-          <View className="mt-3 flex-row justify-around border-t border-slate-100 pt-3">
+          <View className="mt-3 flex-row justify-around border-t border-black/10 pt-3">
             <View className="items-center">
-              <View className="h-8 w-8 items-center justify-center rounded-lg bg-slate-100">
+              <View className="h-8 w-8 items-center justify-center rounded-lg bg-pink-light">
                 <Text className="text-xs">📋</Text>
               </View>
               <Text className="mt-1 text-xs text-muted">Registers</Text>
@@ -63,7 +61,7 @@ export function LocalStationLedgerCard({
               </Text>
             </View>
             <View className="items-center">
-              <View className="h-8 w-8 items-center justify-center rounded-lg bg-slate-100">
+              <View className="h-8 w-8 items-center justify-center rounded-lg bg-pink-light">
                 <Text className="text-xs">↑</Text>
               </View>
               <Text className="mt-1 text-xs text-muted">Top-ups</Text>
@@ -72,7 +70,7 @@ export function LocalStationLedgerCard({
               </Text>
             </View>
             <View className="items-center">
-              <View className="h-8 w-8 items-center justify-center rounded-lg bg-slate-100">
+              <View className="h-8 w-8 items-center justify-center rounded-lg bg-pink-light">
                 <Text className="text-xs">↓</Text>
               </View>
               <Text className="mt-1 text-xs text-muted">Checkouts</Text>

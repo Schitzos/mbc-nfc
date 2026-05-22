@@ -143,22 +143,22 @@ Use this format for every test case:
 | Status          | Pass (Mock sweep 2026-05-02)                                                                      |
 | Evidence        | `.codex/specs/test-evidence/2026-05-02-sweep/31-gate-normal-success.png`                          |
 
-### E2E-GATE-002 Simulation Check-In (Removed)
+### E2E-GATE-002 Simulation Check-In (Reinstated)
 
-| Field           | Value                                                             |
-| --------------- | ----------------------------------------------------------------- |
-| Test Case ID    | E2E-GATE-002                                                      |
-| Feature         | Gate - Simulation Mode (Removed)                                  |
-| Objective       | Historical reference only; production flow uses real device time. |
-| Preconditions   | N/A                                                               |
-| Test Data       | N/A                                                               |
-| Steps           | N/A                                                               |
-| Expected Result | N/A                                                               |
-| Priority        | Medium                                                            |
-| Type            | Both                                                              |
-| Owner           | Senior QA + Test Automation Engineer                              |
-| Status          | Removed in Phase 9                                                |
-| Evidence        | N/A                                                               |
+| Field           | Value                                                                                                                                          |
+| --------------- | ---------------------------------------------------------------------------------------------------------------------------------------------- |
+| Test Case ID    | E2E-GATE-002                                                                                                                                   |
+| Feature         | Gate - Simulation Mode                                                                                                                         |
+| Objective       | Verify Gate simulation mode writes past timestamp and isSimulation flag to card; Terminal skips balance deduction.                             |
+| Preconditions   | Registered card with sufficient balance; Gate simulation toggle enabled.                                                                       |
+| Test Data       | Past time selected via DateTimePicker (e.g., 2 hours ago).                                                                                     |
+| Steps           | 1. Enable simulation toggle on Gate. 2. Select past time. 3. Tap card to check in. 4. Go to Terminal. 5. Tap card to check out.                |
+| Expected Result | Card stores `isSimulation` flag; Terminal shows fee/duration but does NOT deduct balance; simulation banner visible on both Gate and Terminal. |
+| Priority        | Medium                                                                                                                                         |
+| Type            | Both                                                                                                                                           |
+| Owner           | Senior QA + Test Automation Engineer                                                                                                           |
+| Status          | Reinstated — implemented in T-FEAT-GATE-001                                                                                                    |
+| Evidence        | N/A                                                                                                                                            |
 
 ### E2E-GATE-003 Reject Double Check-In
 
@@ -403,3 +403,47 @@ Security E2E evidence should show that a generic NFC reader cannot read plain me
 ## Android 9 FE Real NFC Evidence Rule
 
 Final physical-card E2E evidence must use Android 9 FE with NTAG215 for the MVP read/write baseline. iOS write evidence is not required for MVP.
+
+## 7. Autonomous E2E Testing — Maestro
+
+Maestro provides autonomous, scriptable E2E testing that validates the full parking MVP cycle without manual intervention or real NFC hardware.
+
+### Architecture
+
+```
+src/infrastructure/utils/e2e.config.ts (E2E_MODE = true)
+  → container.ts reads flag
+  → MockMbcCardRepository (in-memory singleton)
+  → Maestro drives UI flows autonomously
+```
+
+### Maestro E2E Flow Coverage
+
+| Flow ID                  | Maps To       | Scenario                  | Validation                    |
+| ------------------------ | ------------- | ------------------------- | ----------------------------- |
+| `maestro-register`       | E2E-REG-001   | Station register card     | Success UI state              |
+| `maestro-topup`          | E2E-TOP-001   | Station top-up Rp 50.000  | Balance updated               |
+| `maestro-checkin`        | E2E-GATE-001  | Gate parking check-in     | Checked-in status             |
+| `maestro-checkout`       | E2E-TERM-001  | Terminal parking checkout | Fee shown, balance deducted   |
+| `maestro-inspect`        | E2E-SCOUT-001 | Scout inspect card        | Balance, status, logs visible |
+| `maestro-double-checkin` | E2E-GATE-002  | Double check-in rejection | Error message shown           |
+| `maestro-insufficient`   | E2E-TERM-002  | Insufficient balance      | Top-up guidance shown         |
+| `maestro-role-switch`    | —             | Role switcher navigation  | All 4 roles accessible        |
+
+### Execution Commands
+
+```bash
+# 1. Set E2E_MODE = true in src/infrastructure/utils/e2e.config.ts
+# 2. Build and run
+npm run e2e:android   # Build with mock NFC
+npm run e2e:test      # Run all Maestro flows
+npm run e2e:happy-flow # Run happy path only
+npm run e2e:bad-flow   # Run error cases only
+# 3. Set E2E_MODE = false after testing
+```
+
+### Evidence
+
+- Maestro screenshots stored under `.maestro/screenshots/`
+- Each flow captures key assertion points automatically
+- CI-compatible: runs on Android emulator without NFC hardware

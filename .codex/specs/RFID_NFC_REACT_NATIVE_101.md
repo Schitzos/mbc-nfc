@@ -83,9 +83,9 @@ Top-up must not clear an active parking visit. If a member is checked in and has
 
 ### Gate Check-In
 
-### Gate Simulation Mode (Removed)
+### Gate Simulation Mode
 
-Removed in Phase 9. Gate uses real device time only for check-in timestamps.
+Gate provides a simulation mode toggle with a native DateTimePicker. When enabled, the operator selects a past entry time. The check-in use case writes the simulated timestamp and an `isSimulation` flag to the card's `activeSession`. The flag travels with the card (codec field `s:1`). At Terminal checkout, if `activeSession.isSimulation` is true, fee and duration are calculated and displayed but balance is NOT deducted.
 
 ### Terminal Check-Out
 
@@ -187,4 +187,4 @@ This MBC MVP targets NTAG215 on Android. Because NTAG215 capacity is limited, th
 
 The MVP real-card implementation is validated on **Android 9 FE** using **NTAG215** tags. iOS NFC write support is not required for MVP.
 
-Quality status: 444+ automated tests, 65 suites, 100% line coverage achieved.
+Quality status: 477+ automated tests, 75 suites, 90%+ line coverage achieved.

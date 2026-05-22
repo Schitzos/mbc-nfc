@@ -83,6 +83,31 @@ describe('useStationActions', () => {
       success: false,
       role: 'STATION',
       message: 'This card is already registered.',
+      requiresReset: true,
+    });
+
+    const { result } = renderHook(() => useStationActions(mockServices));
+    await waitFor(() =>
+      expect(
+        mockServices.checkNfcAvailabilityUseCase.execute,
+      ).toHaveBeenCalled(),
+    );
+
+    await act(async () => {
+      await result.current.handleRegister();
+    });
+
+    expect(result.current.nfcSheet.phase).toBe('confirm');
+  });
+
+  it('handleRegister shows confirm sheet when card has existing foreign data', async () => {
+    (
+      mockServices.registerMemberCardUseCase.execute as jest.Mock
+    ).mockResolvedValueOnce({
+      success: false,
+      role: 'STATION',
+      message: 'This card contains existing data from another application.',
+      requiresReset: true,
     });
 
     const { result } = renderHook(() => useStationActions(mockServices));

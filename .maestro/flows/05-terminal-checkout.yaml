@@ -1,0 +1,24 @@
+appId: com.mbcnfc
+---
+# 05 - Terminal: Check Out
+# Navigate to Terminal, tap RadarZone, assert checkout with fee/duration
+
+- tapOn:
+    label: 'Go back'
+- tapOn: 'Terminal'
+- assertVisible: 'The Terminal'
+- takeScreenshot: '05-terminal-checkout-ready'
+
+# Tap RadarZone to check out
+- tapOn:
+    label: 'Tap Card to Check Out'
+
+# Wait for checkout summary
+- extendedWaitUntil:
+    visible: 'Checkout Summary'
+    timeout: 5000
+
+- takeScreenshot: '05-terminal-checkout-success'
+- assertVisible: 'Checkout Summary'
+- assertVisible: 'Duration'
+- assertVisible: 'Fee'

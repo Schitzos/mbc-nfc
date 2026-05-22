@@ -12,48 +12,66 @@ export function LatestResultCard({
   latestResult,
   registerMode,
 }: Readonly<LatestResultCardProps>): React.JSX.Element {
+  const Wrapper = latestResult.success ? SuccessWrapper : ErrorWrapper;
+
   return (
-    <View className="rounded-2xl bg-white p-4 shadow-sm">
-      <Text className="text-sm font-bold text-foreground">Latest result</Text>
+    <Wrapper>
+      <Text className="text-sm font-bold text-black">Latest result</Text>
       <Text
         className={`mt-1 text-xs font-semibold ${
-          latestResult.success ? 'text-green-700' : 'text-red-700'
+          latestResult.success ? 'text-success' : 'text-error'
         }`}
       >
         {latestResult.success ? 'Success' : 'Unable to complete'}
       </Text>
-      <Text className="mt-1 text-xs text-muted">{latestResult.message}</Text>
+      <Text className="mt-1 text-xs text-black/70">{latestResult.message}</Text>
       {latestResult.card && (
-        <View className="mt-2 flex-row items-center gap-2 border-t border-slate-100 pt-2">
-          <View className="h-8 w-8 items-center justify-center rounded-lg bg-[#EAF4FF]">
-            <Text className="text-xs text-[#0050AE]">💳</Text>
+        <View className="mt-2 flex-row items-center gap-2 border-t border-black/10 pt-2">
+          <View className="h-8 w-8 items-center justify-center rounded-lg bg-black/10">
+            <Text className="text-xs">💳</Text>
           </View>
           <View className="flex-1">
-            <Text className="text-xs text-muted">
+            <Text className="text-xs text-black/60">
               {latestResult.card.maskedMemberReference ?? 'MBR-****'}
             </Text>
             {latestResult.card.memberName && (
-              <Text className="text-xs text-muted">
+              <Text className="text-xs text-black/60">
                 {latestResult.card.memberName}
               </Text>
             )}
           </View>
-          <Text className="text-lg font-bold text-foreground">
+          <Text className="text-lg font-bold text-black">
             Rp {latestResult.card.balance.toLocaleString(LOCALE_ID)}
           </Text>
         </View>
       )}
       {latestResult.card && !registerMode && (
-        <Text className="mt-1 text-xs text-muted">Updated just now</Text>
+        <Text className="mt-1 text-xs text-black/50">Updated just now</Text>
       )}
       {latestResult.card && (
-        <Text className="mt-1 text-xs text-muted">
+        <Text className="mt-1 text-xs text-black/50">
           Status:{' '}
           {latestResult.card.visitStatus === 'CHECKED_IN'
             ? 'Checked in'
             : 'Not checked in'}
         </Text>
       )}
+    </Wrapper>
+  );
+}
+
+function SuccessWrapper({ children }: Readonly<{ children: React.ReactNode }>) {
+  return (
+    <View className="rounded-2xl p-4 bg-white/60 border-l-[3px] border-l-success-border">
+      {children}
+    </View>
+  );
+}
+
+function ErrorWrapper({ children }: Readonly<{ children: React.ReactNode }>) {
+  return (
+    <View className="rounded-2xl p-4 bg-white/60 border-l-[3px] border-l-error">
+      {children}
     </View>
   );
 }

@@ -7,6 +7,7 @@ interface CheckInInput {
   activityId: string;
   activityType: BenefitActivityType;
   checkedInAt: string;
+  isSimulation?: boolean;
 }
 
 interface CheckOutInput {
@@ -40,6 +41,7 @@ function createActivitySession(input: CheckInInput): ActivitySession {
     activityId: input.activityId,
     activityType: input.activityType,
     checkedInAt: input.checkedInAt,
+    ...(input.isSimulation ? { isSimulation: true } : {}),
   };
 }
 

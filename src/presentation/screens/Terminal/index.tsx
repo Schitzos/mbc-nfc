@@ -1,94 +1,152 @@
 import React, { useEffect } from 'react';
-import { Text, View } from 'react-native';
+import { ImageBackground, Image, Text, View } from 'react-native';
+import Animated, {
+  useSharedValue,
+  useAnimatedStyle,
+  withRepeat,
+  withTiming,
+} from 'react-native-reanimated';
+import { ScreenHeader } from '@presentation/components/ScreenHeader';
 import { RadarZone } from '@presentation/components/RadarZone';
 import { NfcLogPanel } from '@presentation/components/NfcLogPanel';
 import { NfcActionSheet } from '@presentation/components/NfcActionSheet';
 import { useAppStore } from '@presentation/stores/app-store';
 import { useTerminalServices } from '@presentation/context/service-context';
 import { useTerminalActions } from './useTerminalActions';
-import { AppHeaderCard } from '@presentation/components/AppHeaderCard';
 import { CheckoutSummaryCard } from './fragments/CheckoutSummaryCard';
 import { TariffPreviewCard } from './fragments/TariffPreviewCard';
 import { InsufficientBalanceCard } from './fragments/InsufficientBalanceCard';
 import { GenericFailureCard } from './fragments/GenericFailureCard';
 import { signalColorTokens } from '@presentation/theme/colors';
 
+const bgImage = require('@presentation/assets/bg-role-switcher.png');
+const gateIllustration = require('@presentation/assets/illustration-nfc-gate.png');
+
 export function TerminalScreen(): React.JSX.Element {
   const setSelectedRole = useAppStore(state => state.setSelectedRole);
   const services = useTerminalServices();
   const actions = useTerminalActions(services);
 
+  const badgeOpacity = useSharedValue(1);
+
   useEffect(() => {
     setSelectedRole('terminal');
   }, [setSelectedRole]);
 
+  useEffect(() => {
+    if (actions.latestResult?.isSimulation && actions.success) {
+      badgeOpacity.value = withRepeat(
+        withTiming(0.5, { duration: 1000 }),
+        -1,
+        true,
+      );
+    } else {
+      badgeOpacity.value = 1;
+    }
+  }, [actions.latestResult?.isSimulation, actions.success, badgeOpacity]);
+
+  const badgeStyle = useAnimatedStyle(() => ({
+    opacity: badgeOpacity.value,
+  }));
+
   return (
-    <View className="flex-1 bg-[#001A41]">
-      <View className="flex-1">
-        <AppHeaderCard
-          title="The Terminal"
-          subTitle="Checking out for Parking"
-          hasBackButton={true}
-          rightIcon={
-            <View className="bg-yellow-700 px-4 py-1 rounded-full">
-              <Text className="text-white">Terminal</Text>
+    <ImageBackground
+      source={bgImage}
+      className="flex-1"
+      resizeMode="cover"
+      blurRadius={15}
+    >
+      <ScreenHeader
+        title="The Terminal"
+        subtitle="Checking out for Parking"
+        badgeLabel="Terminal"
+        badgeIcon="settings"
+        badgeColor={signalColorTokens.brand.primary}
+      />
+
+      <View className="flex-1 px-4">
+        {actions.latestResult?.isSimulation && actions.success && (
+          <Animated.View
+            testID="terminal-simulation-banner"
+            className="self-center bg-simulation rounded-full px-3 py-1 mb-2"
+            style={badgeStyle}
+          >
+            <Text className="text-xs font-bold text-white">⚠️ SIMULATION</Text>
+          </Animated.View>
+        )}
+
+        <View className="flex-1">
+          {!actions.latestResult && (
+            <View className="flex-1 justify-center items-center">
+              <View className="absolute top-0 left-0 right-0">
+                <TariffPreviewCard />
+              </View>
+              <RadarZone
+                color={signalColorTokens.brand.primary}
+                label="Tap Card to Check Out"
+                busyLabel="Processing..."
+                disabled={actions.busy}
+                onPress={() => {
+                  void actions.handleCheckout();
+                }}
+              />
             </View>
-          }
-        />
-        <View className="-mt-3 rounded-t-2xl bg-[#F0F2F5] px-5 pt-5 pb-6 flex-1">
-          <View className="flex-1">
-            {!actions.insufficient && !actions.genericFailure && (
-              <View className="absolute inset-0 justify-center items-center z-0">
-                <RadarZone
-                  color={signalColorTokens.brand.primary}
-                  label="Tap Card to Check Out"
-                  busyLabel="Processing..."
-                  disabled={actions.busy}
-                  onPress={() => {
-                    void actions.handleCheckout();
-                  }}
+          )}
+          {actions.latestResult && actions.success && (
+            <View className="flex-1 justify-center items-center">
+              <CheckoutSummaryCard
+                latestResult={actions.latestResult}
+                checkoutTime={actions.checkoutTime}
+                isSimulation={actions.latestResult.isSimulation}
+                onReset={actions.resetResult}
+              />
+            </View>
+          )}
+          {actions.latestResult && actions.insufficient && (
+            <View className="flex-1">
+              <InsufficientBalanceCard
+                latestResult={actions.latestResult}
+                onRetry={() => {
+                  void actions.handleCheckout();
+                }}
+              />
+              <View className="flex-1 items-center justify-center">
+                <Image
+                  source={gateIllustration}
+                  className="w-[480px] h-[430px] opacity-60"
+                  resizeMode="contain"
                 />
               </View>
+            </View>
+          )}
+          {actions.latestResult &&
+            !actions.success &&
+            !actions.insufficient && (
+              <View className="flex-1">
+                <GenericFailureCard
+                  latestResult={actions.latestResult}
+                  onReset={actions.resetResult}
+                />
+                <View className="flex-1 items-center justify-center">
+                  <Image
+                    source={gateIllustration}
+                    className="w-[480px] h-[430px] opacity-60"
+                    resizeMode="contain"
+                  />
+                </View>
+              </View>
             )}
-            <View className="z-10">
-              {!actions.insufficient && !actions.genericFailure && (
-                <TariffPreviewCard />
-              )}
-            </View>
-            <View
-              className={`z-10${!actions.insufficient && !actions.genericFailure ? ' mt-auto' : ''}`}
-            >
-              {actions.success && actions.latestResult && (
-                <CheckoutSummaryCard
-                  latestResult={actions.latestResult}
-                  checkoutTime={actions.checkoutTime}
-                />
-              )}
-
-              {actions.insufficient && actions.latestResult && (
-                <InsufficientBalanceCard
-                  latestResult={actions.latestResult}
-                  onRetry={() => {
-                    void actions.handleCheckout();
-                  }}
-                />
-              )}
-
-              {actions.genericFailure && actions.latestResult && (
-                <GenericFailureCard latestResult={actions.latestResult} />
-              )}
-            </View>
-          </View>
-          <View className="mt-auto">
-            <NfcLogPanel />
-          </View>
         </View>
 
-        <NfcActionSheet
-          state={actions.nfcSheet}
-          onDismiss={() => actions.handleDismissSheet()}
-        />
+        <View className="pb-4">
+          <NfcLogPanel variant="light" />
+        </View>
       </View>
-    </View>
+
+      <NfcActionSheet
+        state={actions.nfcSheet}
+        onDismiss={() => actions.handleDismissSheet()}
+      />
+    </ImageBackground>
   );
 }

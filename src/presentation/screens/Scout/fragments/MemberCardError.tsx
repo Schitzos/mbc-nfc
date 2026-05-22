@@ -1,39 +1,42 @@
 import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { Image, Text, View } from 'react-native';
+import { SignalButton } from '@presentation/components/SignalButton';
+
+const cardErrorIcon = require('@presentation/assets/icon-card-error.png');
 
 interface ScoutErrorCardProps {
   message: string;
+  onReset?: () => void;
 }
 
 export function ScoutErrorCard({
   message,
+  onReset,
 }: Readonly<ScoutErrorCardProps>): React.JSX.Element {
   return (
-    <View style={styles.card}>
-      <Text style={styles.title}>Card cannot be processed</Text>
-      <Text style={styles.message}>{message}</Text>
+    <View className="rounded-[20px] p-5 w-full bg-white/60 border border-pink-light gap-4">
+      <View className="flex-row items-center gap-4">
+        <Image
+          source={cardErrorIcon}
+          className="w-[120px] h-[120px]"
+          resizeMode="contain"
+        />
+        <View className="flex-1">
+          <Text className="text-xs font-bold uppercase text-brand">
+            CARD CANNOT BE PROCESSED
+          </Text>
+          <Text className="mt-1 text-sm font-semibold text-foreground">
+            {message}
+          </Text>
+        </View>
+      </View>
+      {onReset && (
+        <SignalButton
+          testID="scout-scan-another"
+          label="Scan Another Card"
+          onPress={onReset}
+        />
+      )}
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  card: {
-    backgroundColor: 'rgba(255, 82, 82, 0.1)',
-    borderRadius: 16,
-    padding: 16,
-    borderWidth: 1,
-    borderColor: 'rgba(255, 82, 82, 0.4)',
-  },
-  title: {
-    fontSize: 12,
-    fontWeight: '600',
-    color: '#FF5252',
-    textTransform: 'uppercase',
-  },
-  message: {
-    marginTop: 4,
-    fontSize: 14,
-    fontWeight: '600',
-    color: '#FFFFFF',
-  },
-});

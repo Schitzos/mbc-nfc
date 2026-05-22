@@ -106,6 +106,7 @@ describe('useStationActions – extended branch coverage', () => {
       success: false,
       role: 'STATION',
       message: 'This card is already registered.',
+      requiresReset: true,
     });
     (
       mockServices.registerMemberCardUseCase.executeWithReset as jest.Mock
@@ -152,6 +153,7 @@ describe('useStationActions – extended branch coverage', () => {
       success: false,
       role: 'STATION',
       message: 'This card is already registered.',
+      requiresReset: true,
     });
     (
       mockServices.registerMemberCardUseCase.executeWithReset as jest.Mock
@@ -184,6 +186,7 @@ describe('useStationActions – extended branch coverage', () => {
       success: false,
       role: 'STATION',
       message: 'This card is already registered.',
+      requiresReset: true,
     });
     (
       mockServices.registerMemberCardUseCase.executeWithReset as jest.Mock
@@ -326,6 +329,7 @@ describe('useStationActions – extended branch coverage', () => {
       success: false,
       role: 'STATION',
       message: 'This card is already registered.',
+      requiresReset: true,
     });
 
     let rejectWipe: (e: unknown) => void;
@@ -381,5 +385,73 @@ describe('useStationActions – extended branch coverage', () => {
     });
     expect(result.current.registerMode).toBe(false);
     expect(result.current.latestResult).toBeNull();
+  });
+});
+
+describe('useStationActions – existing data confirm onConfirm', () => {
+  it('triggers handleWipeAndRegister from existing data confirm', async () => {
+    const {
+      renderHook,
+      act,
+      waitFor,
+    } = require('@testing-library/react-native');
+    const { useStationActions } = require('../useStationActions');
+    const { useAppStore } = require('@presentation/stores/app-store');
+    useAppStore.setState({ nfcLogEnabled: false, nfcLogs: [] });
+
+    const services = {
+      checkNfcAvailabilityUseCase: {
+        execute: jest.fn().mockResolvedValue({ status: 'SUPPORTED' }),
+      },
+      registerMemberCardUseCase: {
+        execute: jest.fn().mockResolvedValue({
+          success: false,
+          role: 'STATION',
+          message: 'This card contains existing data from another application.',
+          requiresReset: true,
+        }),
+        executeWithReset: jest.fn().mockResolvedValue({
+          success: true,
+          role: 'STATION',
+          message: 'Re-registered.',
+          card: { balance: 0 },
+        }),
+      },
+      topUpMemberCardUseCase: { execute: jest.fn() },
+      getStationLedgerSummaryUseCase: {
+        execute: jest.fn().mockResolvedValue({
+          topUpTotal: 0,
+          checkoutTotal: 0,
+          registerCount: 0,
+          topUpCount: 0,
+          checkoutCount: 0,
+          latestEntries: [],
+        }),
+      },
+      cancelNfc: jest.fn().mockResolvedValue(undefined),
+    };
+
+    const { result } = renderHook(() => useStationActions(services));
+    await waitFor(() =>
+      expect(services.checkNfcAvailabilityUseCase.execute).toHaveBeenCalled(),
+    );
+
+    await act(async () => {
+      await result.current.handleRegister();
+    });
+
+    expect(result.current.nfcSheet.phase).toBe('confirm');
+
+    const sheet = result.current.nfcSheet as { onConfirm?: () => void };
+    await act(async () => {
+      sheet.onConfirm?.();
+      await new Promise(r => setTimeout(r, 10));
+    });
+
+    await waitFor(() =>
+      expect(
+        services.registerMemberCardUseCase.executeWithReset,
+      ).toHaveBeenCalled(),
+    );
   });
 });

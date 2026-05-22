@@ -5,6 +5,7 @@ import type { NfcActionState } from '@presentation/components/NfcActionSheet';
 import { useAppStore } from '@presentation/stores/app-store';
 import { UNKNOWN_ERROR_MESSAGE } from '@shared/constants';
 import type { TerminalServices } from '@presentation/context/service-context';
+import { signalColorTokens } from '@presentation/theme/colors';
 
 function formatTime(d: Date): string {
   return dayjs(d).format('DD-MMM-YYYY HH:mm');
@@ -44,7 +45,7 @@ export function useTerminalActions(services: TerminalServices) {
     setNfcSheet({
       phase: 'scanning',
       message: 'Hold your NFC card to check out',
-      color: '#FF0025',
+      color: signalColorTokens.brand.primary,
     });
     try {
       appendNfcLog('[NFC] Checkout flow started');
@@ -57,8 +58,12 @@ export function useTerminalActions(services: TerminalServices) {
         setCheckoutTime(formatTime(new Date()));
         setNfcSheet({
           phase: 'success',
-          title: 'Checkout Complete',
-          message: result.message,
+          title: result.isSimulation
+            ? '⚠️ Simulation Checkout'
+            : 'Checkout Complete',
+          message: result.isSimulation
+            ? `${result.message}\nBalance NOT deducted (simulation)`
+            : result.message,
         });
         appendNfcLog('[NFC] Checkout succeeded');
       } else {
@@ -82,6 +87,10 @@ export function useTerminalActions(services: TerminalServices) {
     }
   }, [appendNfcLog, services]);
 
+  const resetResult = useCallback(() => {
+    setLatestResult(null);
+  }, []);
+
   const insufficient = Boolean(
     latestResult &&
     !latestResult.success &&
@@ -103,5 +112,6 @@ export function useTerminalActions(services: TerminalServices) {
     insufficient,
     genericFailure,
     success,
+    resetResult,
   };
 }

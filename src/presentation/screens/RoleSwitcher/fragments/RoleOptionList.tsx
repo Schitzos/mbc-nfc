@@ -2,6 +2,7 @@ import React from 'react';
 import { Pressable, Text, View } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import type { RoleOption } from '@presentation/config/role-options';
+import { signalColorTokens } from '@presentation/theme/colors';
 
 interface RoleOptionListProps {
   activeRoleKey: RoleOption['key'] | null;
@@ -16,20 +17,6 @@ const roleIcon: Record<RoleOption['key'], string> = {
   scout: 'search',
 };
 
-const roleIconColorHex: Record<RoleOption['key'], string> = {
-  station: '#15803d',
-  gate: '#1d4ed8',
-  terminal: '#c2410c',
-  scout: '#7e22ce',
-};
-
-const roleColor: Record<RoleOption['key'], string> = {
-  station: 'bg-green-100',
-  gate: 'bg-blue-100',
-  terminal: 'bg-orange-100',
-  scout: 'bg-purple-100',
-};
-
 const roleHint: Record<RoleOption['key'], string> = {
   station: 'Register and top up member card',
   gate: 'Tap in to activity',
@@ -42,26 +29,34 @@ export function RoleOptionList({
   onSelect,
 }: Readonly<RoleOptionListProps>): React.JSX.Element {
   return (
-    <View className="gap-3">
+    <View className="gap-4">
       {roles.map(role => (
         <Pressable
           key={role.key}
           accessibilityRole="button"
-          className="flex-row items-center rounded-2xl bg-white px-4 py-4 shadow-sm"
+          className="flex-row items-center rounded-[20px] px-4 py-5 bg-white/55 border border-white/70"
           onPress={() => onSelect(role.key)}
         >
-          <View
-            className={`mr-3 h-11 w-11 items-center justify-center rounded-xl ${roleColor[role.key]}`}
-          >
-            <Icon name={roleIcon[role.key]} size={24} color={roleIconColorHex[role.key]} />
+          <View className="w-[52px] h-[52px] rounded-[14px] items-center justify-center mr-3.5 bg-pink-light">
+            <Icon
+              name={roleIcon[role.key]}
+              size={26}
+              color={signalColorTokens.brand.primary}
+            />
           </View>
           <View className="flex-1">
-            <Text className="text-base font-bold text-foreground">
+            <Text className="text-[16px] font-bold text-foreground">
               {role.label}
             </Text>
-            <Text className="text-xs text-muted">{roleHint[role.key]}</Text>
+            <Text className="text-[13px] text-muted mt-0.5">
+              {roleHint[role.key]}
+            </Text>
           </View>
-          <Text className="text-lg text-muted">›</Text>
+          <Icon
+            name="chevron-right"
+            size={24}
+            color={signalColorTokens.brand.primary}
+          />
         </Pressable>
       ))}
     </View>

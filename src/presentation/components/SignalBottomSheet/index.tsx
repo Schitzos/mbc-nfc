@@ -1,9 +1,17 @@
 import React from 'react';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import {
+  ImageBackground,
+  Pressable,
+  StyleSheet,
+  Text,
+  View,
+} from 'react-native';
 import type { SignalBottomSheetProps } from './types';
 import { styles } from './styles';
 
 export type { SignalBottomSheetProps } from './types';
+
+const bgImage = require('@presentation/assets/bg-role-switcher.png');
 
 const absoluteRoot = StyleSheet.create({
   container: {
@@ -38,6 +46,12 @@ export function SignalBottomSheet({
         onPress={onClose}
       />
       <View style={[styles.sheet, style]}>
+        <ImageBackground
+          source={bgImage}
+          resizeMode="cover"
+          blurRadius={15}
+          style={StyleSheet.absoluteFill}
+        />
         <View style={styles.header}>
           {title ? (
             <Text numberOfLines={2} style={styles.title}>

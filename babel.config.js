@@ -15,6 +15,7 @@ module.exports = {
         },
       },
     ],
+    ['transform-inline-environment-variables', { include: ['E2E'] }],
     'react-native-reanimated/plugin',
   ],
 };

@@ -33,6 +33,7 @@ Layer responsibilities:
 | UI system         | Signal UI, guided by `.codex/specs/SIGNAL_UI_GUIDE.md`    |
 | Navigation        | React Navigation                                          |
 | Animations        | `react-native-reanimated`                                 |
+| Date/time picker  | `@react-native-community/datetimepicker`                  |
 | State management  | Zustand (presentation state) + React Context (service DI) |
 | Testing           | Jest, React Native Testing Library                        |
 | Static analysis   | SonarCloud                                                |
@@ -48,20 +49,32 @@ src/
     providers.tsx
     container.ts
   domain/
-    entities/
-      mbc-card.ts
-      station-ledger-summary.ts
-    repositories/
-      mbc-card-repository.ts
-      local-ledger-repository.ts
-      nfc-availability-repository.ts
-    services/
-      activity-tariff-calculator.ts
-      activity-state-policy.ts
-      transaction-log-policy.ts
-    errors/
-      domain-error.ts
-      membership-card-repository-error.ts
+    membership/
+      entities/
+        membership-card.ts
+        activity-session.ts
+        transaction-log.ts
+        ledger-entry.ts
+      policies/
+        tariff-policy.ts
+        activity-state-policy.ts
+        transaction-log-policy.ts
+      config/
+        balance-limits.ts
+        parking-tariff.ts
+      factories/
+        membership-card.factory.ts
+      types/
+        card-status.ts
+        member-id.ts
+        money.ts
+      repositories/
+        membership-card.repository.ts
+        ledger.repository.ts
+        nfc-availability.repository.ts
+      errors/
+        domain-error.ts
+        membership-card-repository-error.ts
   application/
     use-cases/
       check-nfc-availability-use-case.ts
@@ -121,20 +134,14 @@ src/
         index.tsx
         useScoutActions.ts
     components/
-      AppHeaderCard/
       NfcActionSheet/
       NfcLogPanel/
       RadarZone/
-      ScanningRings/
+      PulseRing (inline)/
       SignalButton/
-      SignalTextField/
-      SignalOptionCard/
       SignalBottomSheet/
-      SignalStatusBanner/
-      SignalSurfaceCard/
-      SignalJelajahCard/
-      SignalSkeleton/
-      BackgroundDecor/
+      ScreenHeader/
+      ErrorBoundary/
     assets/
       icons/
   shared/
@@ -174,6 +181,7 @@ export type ActivitySession = {
   activityId: string;
   activityType: BenefitActivityType;
   checkedInAt: string;
+  isSimulation?: boolean;
 };
 
 export type MemberProfile = {
@@ -186,6 +194,7 @@ export type TransactionLog = {
   activity: MbcActivity;
   nominal: number;
   occurredAt: string;
+  isSimulation?: boolean;
 };
 
 export type LedgerEntry = {
@@ -211,7 +220,12 @@ export type MbcCard = {
 };
 
 export const PARKING_TARIFF_PER_STARTED_HOUR = 2000;
+export const MAX_CARD_BALANCE = 5_000_000; // Rp 5.000.000 cap (domain/membership/config/balance-limits.ts)
 ```
+
+Domain error codes (`DomainErrorCode`): `INVALID_TIMESTAMP`, `INVALID_DURATION`, `CARD_ALREADY_CHECKED_IN`, `CARD_NOT_CHECKED_IN`, `ACTIVE_SESSION_EXISTS`, `ACTIVE_SESSION_MISSING`, `INSUFFICIENT_BALANCE`, `BALANCE_CAP_EXCEEDED`.
+
+Card repository error codes (`CardRepositoryErrorCode`): `UNREGISTERED_CARD`, `CARD_TAMPERED`, `CARD_ALREADY_REGISTERED`, `CARD_HAS_EXISTING_DATA`, `CARD_CAPACITY_INSUFFICIENT`, `CARD_UNSUPPORTED`, `NFC_UNSUPPORTED`, `NFC_DISABLED`, `NFC_UNAVAILABLE`, `SCAN_CANCELLED`, `SCAN_TIMEOUT`, `READ_FAILED`, `WRITE_FAILED`.
 
 ## 6. Application DTOs
 
@@ -231,10 +245,14 @@ export type RoleActionResultDto = {
   success: boolean;
   role: MbcRole;
   message: string;
+  errorCode?: RoleActionErrorCode;
   card?: CardSummaryDto;
   chargedHours?: number;
   chargedAmount?: number;
   durationMs?: number;
+  requiresReset?: boolean;
+  isSimulation?: boolean;
+  checkedInAt?: string;
 };
 
 export type RoleActionErrorCode =
@@ -249,7 +267,8 @@ export type RoleActionErrorCode =
   | 'GENERIC_FAILURE';
 
 export type StationLedgerSummaryDto = StationLedgerSummary;
-// StationLedgerSummary is defined in domain/entities/station-ledger-summary.ts:
+// StationLedgerSummary is defined in domain/membership/entities/ledger-entry.ts,
+// re-exported from domain/membership/repositories/ledger.repository.ts:
 // { topUpTotal, checkoutTotal, registerCount, topUpCount, checkoutCount, latestEntries }
 ```
 
@@ -319,7 +338,7 @@ export function calculateActivityTariff(input: {
 - A card with `CHECKED_IN` can be checked out if balance is sufficient.
 - A card with `NOT_CHECKED_IN` cannot be checked out.
 - A card can only have one active activity session at a time.
-- Gate writes check-in using real device time in production flow.
+- Gate writes check-in using real device time in production flow. In simulation mode, a past timestamp selected via DateTimePicker is used and `isSimulation` is stored in `activeSession`.
 
 ### Transaction Logs
 
@@ -377,20 +396,22 @@ The app starts with role selection and then shows the active role surface.
 
 Before any real card operation, the presentation layer checks NFC availability through the application use case. If NFC is unsupported or disabled, the role screen must show a clear message that real MBC card scan/read/write requires an NFC-capable device with NFC enabled.
 
-All role screens use `NfcActionSheet` — a bottom sheet component that provides scan/success/error feedback during NFC operations. The scanning phase uses `ScanningRings` animation (3 concentric pulsing rings + breathing center NFC icon) consistent with the RadarZone visual language.
+All role screens use `NfcActionSheet` — a bottom sheet component that provides scan/success/error feedback during NFC operations. The scanning phase uses `PulseRing (inline)` animation (3 concentric pulsing rings + breathing center NFC icon) consistent with the RadarZone visual language.
+
+All four role screens use `ScreenHeader` — a shared header component providing consistent role title, subtitle, and optional action elements across Station, Gate, Terminal, and Scout.
 
 All four role screens (Station, Gate, Terminal, Scout) use `RadarZone` as the shared NFC trigger component — a dark immersive zone with concentric radar rings, sweep line animation, and a colored circular action button. All roles use the unified Signal UI primary red (#FF0025) as the RadarZone accent color.
 
 - Station uses RadarZone with a segmented control (Register | Top Up tabs) to switch between registration and top-up modes. The local ledger summary is displayed as a collapsible accordion (collapsed by default). Top-up accepts numeric input (free-text allowed) with validation to ensure only numbers are entered. Preset buttons (10k/20k/50k/100k) are also available as shortcuts.
-- Gate: parking check-in action via RadarZone tap, NFC write action, status result. No simulation mode or mock scenario selectors.
-- Terminal: checkout action via RadarZone tap, fixed tariff display, duration/fee summary, tap-out time displayed in `dd-MMM-YYYY hh:mm` format, insufficient balance guidance, NFC write action, status result.
+- Gate: parking check-in action via RadarZone tap, NFC write action, status result. Simulation mode toggle + DateTimePicker allows operator to set a past entry time for testing/demo. When simulation is active, a red "⚠️ SIMULATION MODE ACTIVE" banner is shown with note "Balance will NOT be deducted on checkout".
+- Terminal: checkout action via RadarZone tap, fixed tariff display, duration/fee summary, tap-out time displayed in `dd-MMM-YYYY hh:mm` format, insufficient balance guidance, NFC write action, status result. When checking out a simulation session (`activeSession.isSimulation`), fee/duration are calculated and displayed but balance is NOT deducted; a red "⚠️ SIMULATION MODE" banner is shown with fee annotated "(not deducted)" and balance "(unchanged)".
 - Scout: one-tap read-only card summary via RadarZone tap. After scan, the radar hides and card results appear at the top of the screen (balance, visit status, last five logs with timestamps). A "Scan Another Card" button resets the view back to radar mode.
 - Shared: NFC Log panel is scrollable with a fixed max height, can be toggled on/off and cleared by the operator. It records safe operational events only (no sensitive payload data).
 
 NFC operational log design rules:
 
 - Keep log state in presentation store, isolated from domain/application business state.
-- Use bounded in-memory list (for example latest 100-200 lines) to avoid unbounded growth.
+- Use bounded in-memory list (max 200 lines, enforced by `nfcLogs: next.slice(-200)` in app-store) to avoid unbounded growth.
 - Log format should be concise. MVP uses plain `[NFC] message` prefix. Categorized format (`HH.mm.ss [NFC:READ]`, `[NFC:WRITE]`, `[NFC:ERROR]`) is a future enhancement.
 - Logs must never include raw decrypted payload, private keys, full internal member IDs, or security secrets.
 
@@ -398,10 +419,14 @@ The UI applies the Signal UI design system direction, stays simple and direct, a
 
 Signal UI adoption is documented in `.codex/specs/SIGNAL_UI_GUIDE.md`. Role screens must preserve the MBC business flows while using Signal UI colors, typography, icon style, components, and interaction patterns once the Figma tokens are fully extracted.
 
+The theme layer includes `vibrantTokens` in `colors.ts` providing extended color tokens for dark card gradients, success states, and immersive UI surfaces beyond the base Signal UI palette.
+
+Presentation assets include: `bg-role-switcher.png` (role switcher background), `nfc-orb.png` (NFC orb visual), `nfc-scan-icon.png` (scan icon for NfcActionSheet), and an `icons/` directory for role and action icons.
+
 ## 11. Quality Strategy
 
 - Domain and application logic should be written for high automated testability.
-- The repository should target at least 90% automated unit-test coverage across the whole executable source base, excluding only pure type-only contract files and generated artifacts. Actual achievement: 100% line coverage (444+ tests, 65 suites; jest.config.js enforces 99% statements/lines/branches, 96% functions).
+- The repository should target at least 90% automated unit-test coverage across the whole executable source base, excluding only pure type-only contract files and generated artifacts. Actual achievement: 90%+ line coverage (477+ tests, 75 suites; jest.config.js enforces 99% statements/lines/branches, 96% functions).
 - SonarCloud should analyze the repository with coverage input, lint/test results where applicable, and a passing quality gate before submission.
 - Dependency changes should be followed by `npm audit`, and the working dependency set should remain at 0 known vulnerabilities.
 - Coverage and static-analysis targets should not encourage shallow tests; critical balance, status, tariff, codec, and ledger paths must be meaningfully asserted.

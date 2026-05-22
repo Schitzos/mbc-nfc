@@ -4,4 +4,5 @@ export type ActivitySession = {
   activityId: string;
   activityType: BenefitActivityType;
   checkedInAt: string;
+  isSimulation?: boolean;
 };

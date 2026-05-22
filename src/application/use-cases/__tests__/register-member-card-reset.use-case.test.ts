@@ -92,5 +92,78 @@ describe('createRegisterMemberCardUseCase – reset/re-registration flow', () =>
         'local audit ledger could not be updated',
       );
     });
+
+    it('returns failure when writeCard throws CardRepositoryError', async () => {
+      const cardRepository = createCardRepository({
+        writeCard: jest
+          .fn()
+          .mockRejectedValue(
+            createCardRepositoryError('WRITE_FAILED', 'NFC write failed.'),
+          ),
+      });
+      const useCase = createRegisterMemberCardUseCase(cardRepository);
+
+      const result = await useCase.executeWithReset();
+
+      expect(result.success).toBe(false);
+      expect(result.message).toBe('NFC write failed.');
+    });
+
+    it('rethrows non-CardRepositoryError from writeCard', async () => {
+      const cardRepository = createCardRepository({
+        writeCard: jest.fn().mockRejectedValue(new Error('unexpected')),
+      });
+      const useCase = createRegisterMemberCardUseCase(cardRepository);
+
+      await expect(useCase.executeWithReset()).rejects.toThrow('unexpected');
+    });
+  });
+});
+
+describe('createRegisterMemberCardUseCase – executeWithReset error paths', () => {
+  it('returns failure when writeCard throws a CardRepositoryError', async () => {
+    const {
+      createRegisterMemberCardUseCase,
+    } = require('@application/use-cases/register-member-card.use-case');
+    const {
+      createCardRepositoryError,
+    } = require('@domain/membership/errors/membership-card-repository-error');
+
+    const cardRepository = {
+      isSupported: jest.fn(),
+      readCard: jest.fn(),
+      writeCard: jest
+        .fn()
+        .mockRejectedValue(
+          createCardRepositoryError('WRITE_FAILED', 'NFC write error'),
+        ),
+      readWriteCard: jest.fn(),
+      registerCard: jest.fn(),
+      cancel: jest.fn(),
+    };
+    const useCase = createRegisterMemberCardUseCase(cardRepository);
+
+    const result = await useCase.executeWithReset();
+
+    expect(result.success).toBe(false);
+    expect(result.message).toBe('NFC write error');
+  });
+
+  it('re-throws non-CardRepositoryError from executeWithReset', async () => {
+    const {
+      createRegisterMemberCardUseCase,
+    } = require('@application/use-cases/register-member-card.use-case');
+
+    const cardRepository = {
+      isSupported: jest.fn(),
+      readCard: jest.fn(),
+      writeCard: jest.fn().mockRejectedValue(new Error('unexpected')),
+      readWriteCard: jest.fn(),
+      registerCard: jest.fn(),
+      cancel: jest.fn(),
+    };
+    const useCase = createRegisterMemberCardUseCase(cardRepository);
+
+    await expect(useCase.executeWithReset()).rejects.toThrow('unexpected');
   });
 });

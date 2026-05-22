@@ -43,7 +43,7 @@ This patch applies the final platform/security/device decisions after the NTAG21
 
 ## UI changes
 
-- Bottom sheet height set to 50% of device screen.
+- Bottom sheet uses auto-height (maxHeight 85% of screen).
 - Dark overlay (`rgba(0,0,0,0.5)`) shown when bottom sheet is open.
 - Bottom sheet dismissable in all states including scanning (tap overlay to cancel).
 - Dismissed scanning state suppresses subsequent error sheet (all screens use `dismissedRef` pattern).

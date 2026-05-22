@@ -4,6 +4,7 @@ import type { NfcActionState } from '@presentation/components/NfcActionSheet';
 import { useAppStore } from '@presentation/stores/app-store';
 import { UNKNOWN_ERROR_MESSAGE } from '@shared/constants';
 import type { GateServices } from '@presentation/context/service-context';
+import { signalColorTokens } from '@presentation/theme/colors';
 
 const noop = () => {};
 
@@ -15,6 +16,8 @@ export function useGateActions(services: GateServices) {
   const [busy, setBusy] = useState(false);
   const [nfcSheet, setNfcSheet] = useState<NfcActionState>({ phase: 'idle' });
   const dismissedRef = useRef(false);
+  const [simulationEnabled, setSimulationEnabled] = useState(false);
+  const [simulatedDate, setSimulatedDate] = useState<Date>(new Date());
 
   useEffect(() => {
     services.checkNfcAvailabilityUseCase
@@ -38,22 +41,26 @@ export function useGateActions(services: GateServices) {
     setNfcSheet({
       phase: 'scanning',
       message: 'Hold your NFC card to check in',
-      color: '#FF0025',
+      color: signalColorTokens.brand.primary,
     });
     try {
       appendNfcLog('[NFC] Check-in flow started');
       const result = await services.checkInActivityUseCase.execute({
         activityId: 'parking-main-gate',
         activityType: 'PARKING',
+        ...(simulationEnabled
+          ? { checkedInAt: simulatedDate.toISOString(), isSimulation: true }
+          : {}),
       });
       if (dismissedRef.current) {
         return;
       }
       setLatestResult(result);
       if (result.success) {
+        const simLabel = simulationEnabled ? ' (Simulation)' : '';
         setNfcSheet({
           phase: 'success',
-          title: 'Checked In',
+          title: `Checked In${simLabel}`,
           message: `${result.message}\nBalance: Rp ${result.card?.balance?.toLocaleString('id-ID') ?? '0'}`,
         });
         appendNfcLog('[NFC] Check-in succeeded');
@@ -76,7 +83,11 @@ export function useGateActions(services: GateServices) {
     } finally {
       setBusy(false);
     }
-  }, [appendNfcLog, services]);
+  }, [appendNfcLog, services, simulationEnabled, simulatedDate]);
+
+  const resetResult = useCallback(() => {
+    setLatestResult(null);
+  }, []);
 
   return {
     latestResult,
@@ -85,5 +96,10 @@ export function useGateActions(services: GateServices) {
     setNfcSheet,
     handleCheckIn,
     handleDismissSheet,
+    simulationEnabled,
+    setSimulationEnabled,
+    simulatedDate,
+    setSimulatedDate,
+    resetResult,
   };
 }

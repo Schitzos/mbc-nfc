@@ -7,6 +7,7 @@ import {
   Text,
   View,
 } from 'react-native';
+import LinearGradient from 'react-native-linear-gradient';
 
 export interface RadarZoneProps {
   color: string;
@@ -139,42 +140,40 @@ export function RadarZone({
   const displayLabel = disabled && busyLabel ? busyLabel : label;
 
   return (
-    <View style={styles.radarZone}>
+    <View className="flex-1 items-center justify-center min-h-[340px]">
       <View
-        style={[styles.radialGlow, { backgroundColor: hexToRgba(color, 0.08) }]}
+        className="absolute w-[360px] h-[360px] rounded-full"
+        style={{ backgroundColor: hexToRgba(color, 0.08) }}
       />
 
       {RING_SIZES.map((size, i) => (
         <Animated.View
           key={size}
-          style={[
-            styles.radarRing,
-            {
-              width: size,
-              height: size,
-              borderRadius: size / 2,
-              borderColor: hexToRgba(color, 0.4),
-              opacity: 0.3 - i * 0.1,
-              transform: [{ scale: ringScales[i] }],
-            },
-          ]}
+          className="absolute border"
+          style={{
+            width: size,
+            height: size,
+            borderRadius: size / 2,
+            borderColor: hexToRgba(color, 0.4),
+            opacity: 0.3 - i * 0.1,
+            transform: [{ scale: ringScales[i] }],
+          }}
         />
       ))}
 
       <Animated.View
-        style={[styles.sweepLine, { transform: [{ rotate: sweepSpin }] }]}
+        className="absolute w-[170px] h-[170px] items-center justify-start"
+        style={{ transform: [{ rotate: sweepSpin }] }}
       >
         <View
-          style={[
-            styles.sweepLineInner,
-            { backgroundColor: hexToRgba(color, 0.3) },
-          ]}
+          className="w-px h-[85px]"
+          style={{ backgroundColor: hexToRgba(color, 0.3) }}
         />
       </Animated.View>
 
       <Animated.View
         style={[
-          styles.pulseRing,
+          s.pulseRing,
           {
             borderColor: hexToRgba(color, 0.5),
             transform: [{ scale: pulseAnim1 }],
@@ -184,8 +183,8 @@ export function RadarZone({
       />
       <Animated.View
         style={[
-          styles.pulseRing,
-          styles.pulseRing2,
+          s.pulseRing,
+          s.pulseRing2,
           {
             borderColor: hexToRgba(color, 0.3),
             transform: [{ scale: pulseAnim2 }],
@@ -200,50 +199,30 @@ export function RadarZone({
         disabled={disabled}
         onPress={onPress}
         style={[
-          styles.scanButton,
+          s.scanButton,
           {
-            backgroundColor: color,
             borderColor: hexToRgba(color, 0.6),
             shadowColor: color,
           },
-          disabled && styles.scanButtonDisabled,
+          disabled && s.scanButtonDisabled,
         ]}
       >
-        <Text style={styles.scanIcon}>{'((•))'}</Text>
-        <Text style={styles.scanLabel}>{displayLabel}</Text>
+        <LinearGradient
+          colors={['#FFB3C1', color]}
+          locations={[0, 0.7]}
+          style={s.scanButtonGradient}
+        >
+          <Text className="text-white text-[20px] mb-1">{'((•))'}</Text>
+          <Text className="text-white text-sm font-semibold text-center">
+            {displayLabel}
+          </Text>
+        </LinearGradient>
       </Pressable>
     </View>
   );
 }
 
-const styles = StyleSheet.create({
-  radarZone: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    minHeight: 340,
-  },
-  radialGlow: {
-    position: 'absolute',
-    width: 360,
-    height: 360,
-    borderRadius: 180,
-  },
-  radarRing: {
-    position: 'absolute',
-    borderWidth: 1,
-  },
-  sweepLine: {
-    position: 'absolute',
-    width: 170,
-    height: 170,
-    alignItems: 'center',
-    justifyContent: 'flex-start',
-  },
-  sweepLineInner: {
-    width: 1,
-    height: 85,
-  },
+const s = StyleSheet.create({
   pulseRing: {
     position: 'absolute',
     width: BUTTON_SIZE + 10,
@@ -261,23 +240,20 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     borderWidth: 2,
+    overflow: 'hidden',
     shadowOffset: { width: 0, height: 0 },
     shadowOpacity: 0.4,
     shadowRadius: 20,
     elevation: 8,
   },
+  scanButtonGradient: {
+    width: '100%',
+    height: '100%',
+    borderRadius: BUTTON_SIZE / 2,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
   scanButtonDisabled: {
     opacity: 0.4,
-  },
-  scanIcon: {
-    color: '#FFFFFF',
-    fontSize: 20,
-    marginBottom: 4,
-  },
-  scanLabel: {
-    color: '#FFFFFF',
-    fontSize: 14,
-    fontWeight: '600',
-    textAlign: 'center',
   },
 });

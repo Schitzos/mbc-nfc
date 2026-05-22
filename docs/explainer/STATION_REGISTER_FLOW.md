@@ -1,19 +1,34 @@
 # Station Register Flow
 
-This document explains the complete flow when a user selects the Station role and registers a new NFC membership card. It covers every layer from UI tap to physical NFC write.
+This document explains the complete flow when a cooperative admin registers a new NFC membership card at the Station. It covers every layer from UI tap to physical NFC write, including the wipe & re-register safety flow.
+
+> **Analogy:** Think of it like issuing a new ID card at a government office. You fill in the form (create card data), laminate it (encrypt with Silent Shield), stamp it onto the physical card (NFC write), and file a copy (ledger entry). If someone brings an old ID card, you ask "Want me to destroy the old one and issue a fresh one?"
+
+## What Changed Since May 13
+
+| Area                        | Before                             | After                                                 |
+| --------------------------- | ---------------------------------- | ----------------------------------------------------- |
+| Mode switching              | Boolean state + conditional button | `SegmentedControl` fragment (Register \| Top Up tabs) |
+| NFC trigger                 | `SignalButton`                     | `RadarZone` (animated radar with gradient button)     |
+| Header                      | `AppHeaderCard`                    | `ScreenHeader` with badge + back button               |
+| Background                  | Plain color                        | `ImageBackground` with `blurRadius={15}`              |
+| Result display              | Inline text                        | `LatestResultCard` fragment (success/error styling)   |
+| Already-registered handling | Error message only                 | `NfcActionSheet` `confirm` phase → wipe & re-register |
+| Use case API                | Single `execute()`                 | `execute()` + `executeWithReset()`                    |
+| Ledger display              | Not shown                          | `LocalStationLedgerCard` (collapsible accordion)      |
+
+---
 
 ## High-Level Summary
 
-When the user presses "Tap NFC Card to Register":
+When the user taps the RadarZone button in Register mode:
 
-1. A bottom sheet appears asking them to hold the card
-2. The app creates a fresh member card in memory
-3. It opens an NFC session and checks if the card is already registered
-4. It encodes the card data into compact JSON, encrypts it with AES-256-GCM, and writes it to the physical tag
-5. It logs the registration in the local SQLite ledger
-6. The bottom sheet shows success or error
-
-> **Analogy:** Think of it like issuing a new ID card at a government office. You fill in the form (create card data), laminate it (encrypt), stamp it onto the physical card (NFC write), and file a copy (ledger entry).
+1. `NfcActionSheet` appears in scanning phase (PulseRing animation + nfc-orb image)
+2. The app creates a fresh member card in memory (`createInitialCard()`)
+3. It opens an NFC session and checks if the card already has data
+4. **If blank:** encodes → encrypts → writes → logs to ledger → shows success
+5. **If already registered:** returns error → NfcActionSheet shows `confirm` phase → user decides wipe or skip
+6. **If tampered:** returns `CARD_TAMPERED` error — no wipe option offered
 
 ---
 
@@ -22,415 +37,280 @@ When the user presses "Tap NFC Card to Register":
 ```mermaid
 sequenceDiagram
     participant User
-    participant UI as RoleSwitcherScreen
-    participant Station as StationScreen
+    participant UI as StationScreen
     participant Hook as useStationActions
     participant Sheet as NfcActionSheet
     participant UC as RegisterMemberCardUseCase
     participant Factory as createInitialCard
     participant Repo as RealMbcCardRepository
     participant Shield as Silent Shield
-    participant Codec as Card Codec
     participant NFC as NfcManager
     participant DB as SQLite Ledger
 
-    User->>UI: Taps Station role
-    UI->>Station: navigate to station
-    Station->>Hook: useStationActions
-    User->>Hook: Presses Register button
-    Hook->>Sheet: phase=scanning
-    Hook->>UC: execute
-    UC->>Factory: createInitialCard
-    Factory-->>UC: MbcCard with cardId, memberId, balance 0
-    UC->>Repo: registerCard
-    Repo->>NFC: requestTechnology Ndef
+    User->>UI: Taps RadarZone (Register mode)
+    UI->>Hook: handleRegister()
+    Hook->>Sheet: phase=scanning (PulseRing + nfc-orb)
+    Hook->>UC: execute()
+    UC->>Factory: createInitialCard()
+    Factory-->>UC: MbcCard {cardId, memberId, balance:0}
+    UC->>Repo: registerCard(card)
+    Repo->>NFC: requestTechnology(Ndef)
     Note over Repo,NFC: User holds card to phone
-    Repo->>NFC: getTag - read existing data
+    Repo->>NFC: read existing tag data
+
+    alt Card is blank
+        Repo->>Shield: encrypt(encode(card))
+        Shield-->>Repo: MBC1 binary envelope
+        Repo->>NFC: writeNdefMessage(envelope)
+        Repo-->>UC: success
+        UC->>DB: append(REGISTER ledger entry)
+        UC-->>Hook: {success: true, card: CardSummaryDto}
+        Hook->>Sheet: phase=success
+    end
+
     alt Card has valid MBC data
         Repo-->>UC: throw CARD_ALREADY_REGISTERED
-        UC-->>Hook: success false, already registered
-        Hook->>Sheet: phase=confirm with wipe option
-    else Card is blank or non-MBC
-        Repo->>Shield: encrypt card and writeCounter
-        Shield->>Codec: encode card and writeCounter
-        Codec-->>Shield: compact JSON string
-        Shield-->>Repo: encrypted Buffer envelope
-        Repo->>NFC: writeNdefMessage envelope
-        NFC-->>Repo: write complete
-        Repo->>NFC: cancelTechnologyRequest
-        Repo-->>UC: success
+        UC-->>Hook: {success: false, message: "already registered"}
+        Hook->>Sheet: phase=confirm (Wipe & Re-register / Skip)
+        User->>Sheet: Taps "Wipe & Re-register"
+        Sheet->>Hook: onConfirm → handleWipeAndRegister()
+        Hook->>UC: executeWithReset()
+        UC->>Factory: createInitialCard() (new IDs)
+        UC->>Repo: writeCard(freshCard)
+        Repo->>Shield: encrypt(encode(freshCard))
+        Repo->>NFC: writeNdefMessage(envelope)
+        UC->>DB: append(REGISTER ledger entry)
+        UC-->>Hook: {success: true}
+        Hook->>Sheet: phase=success "Card Re-registered"
     end
-    UC->>DB: ledgerRepository.append REGISTER
-    UC-->>Hook: success true with card data
-    Hook->>Sheet: phase=success, Card Registered
-    Hook->>DB: refreshSummary
+
+    alt Card has non-MBC data
+        Repo-->>UC: throw CARD_HAS_EXISTING_DATA
+        UC-->>Hook: {success: false, message: "existing data"}
+        Hook->>Sheet: phase=confirm (same wipe flow)
+    end
+
+    alt Card is tampered (Silent Shield integrity failure)
+        Repo-->>UC: throw CARD_TAMPERED
+        UC-->>Hook: {success: false, errorCode: CARD_TAMPERED}
+        Hook->>Sheet: phase=error (NO wipe option)
+    end
 ```
 
 ---
 
-## Data Transformation Flowchart
+## Step-by-Step Breakdown
 
-```mermaid
-flowchart LR
-    A[MbcCard Object] -->|encode| B[Compact JSON]
-    B -->|AES-256-GCM| C[Encrypted Envelope]
-    C -->|Ndef.encodeMessage| D[NDEF Record]
-    D -->|writeNdefMessage| E[NFC Tag NTAG215]
+### 1. Station Screen UI Layout
 
-    style A fill:#E3F2FD
-    style B fill:#FFF3E0
-    style C fill:#FCE4EC
-    style D fill:#E8F5E9
-    style E fill:#F3E5F5
-```
-
-### Each transformation step:
-
-| Step                      | Input                    | Output                                                       | Size          |
-| ------------------------- | ------------------------ | ------------------------------------------------------------ | ------------- |
-| Domain Object             | —                        | `MbcCard` TypeScript object                                  | In memory     |
-| Codec `encode()`          | `MbcCard` + writeCounter | Compact JSON string (`{v,c,m,b,i,x,n}`)                      | ≤337 bytes    |
-| Silent Shield `encrypt()` | JSON string              | Binary envelope (magic + header + IV + authTag + ciphertext) | ≤372 bytes    |
-| NDEF encoding             | Envelope buffer          | NDEF message with MIME type `application/vnd.mbc.v1`         | ≤504 bytes    |
-| NFC write                 | NDEF message             | Physical bytes on NTAG215 tag                                | 504 bytes max |
-
----
-
-## Clean Architecture Layer Diagram
-
-```mermaid
-graph TB
-    subgraph Presentation["Presentation Layer"]
-        Screen[StationScreen]
-        Hook[useStationActions]
-        Sheet[NfcActionSheet]
-        Context[ServiceProvider / useStationServices]
-    end
-
-    subgraph Application["Application Layer"]
-        UseCase[RegisterMemberCardUseCase]
-        DTO[RoleActionResultDto]
-    end
-
-    subgraph Domain["Domain Layer"]
-        Entity[MbcCard Entity]
-        Factory[mbc-card-factory]
-        RepoInterface[MbcCardRepository Interface]
-        LedgerInterface[LocalLedgerRepository Interface]
-    end
-
-    subgraph Infrastructure["Infrastructure Layer"]
-        RealRepo[RealMbcCardRepository]
-        Codec[mbc-card-codec]
-        Shield[silent-shield]
-        SQLite[SqliteLedgerRepository]
-        NfcHW[react-native-nfc-manager]
-        Crypto[react-native-quick-crypto]
-    end
-
-    Screen --> Hook
-    Hook --> Context
-    Context --> UseCase
-    UseCase --> Factory
-    UseCase --> RepoInterface
-    UseCase --> LedgerInterface
-    RealRepo -.->|implements| RepoInterface
-    SQLite -.->|implements| LedgerInterface
-    RealRepo --> Shield
-    Shield --> Codec
-    RealRepo --> NfcHW
-    Shield --> Crypto
-```
-
-**Dependency rule:** Arrows point inward. Infrastructure implements domain interfaces. The domain layer has zero dependencies on outer layers.
-
----
-
-## Detailed Step-by-Step
-
-### 1. RoleSwitcher → Station Navigation
-
-When the user taps "Station" on the role switcher:
+**File:** `src/presentation/screens/Station/index.tsx`
 
 ```tsx
-// RoleSwitcherScreen
-const handleSelectRole = roleKey => {
-  setSelectedRole(roleKey); // Zustand store
-  navigation?.navigate?.(roleKey); // Navigate to 'station'
-};
+<ImageBackground source={bgImage} style={{ flex: 1 }} resizeMode="cover" blurRadius={15}>
+  <ScreenHeader title="The Station" subtitle="Register & Top Up Cards" badgeLabel="Station" ... />
+  <SegmentedControl registerMode={...} setRegisterMode={...} />
+  {!registerMode && <AmountInput ... />}
+  <RadarZone label="Tap Card to Register" onPress={handlePress} />
+  <LatestResultCard latestResult={...} />
+  <LocalStationLedgerCard summary={...} refreshSummary={...} />
+  <NfcLogPanel variant="light" />
+  <NfcActionSheet state={...} onDismiss={...} />
+</ImageBackground>
 ```
 
-### 2. StationScreen Loads
+Visual stack (top to bottom):
+| Element | Purpose |
+|---------|---------|
+| `ScreenHeader` | "The Station" title, "Register & Top Up Cards" subtitle, red badge |
+| `SegmentedControl` | Register \| Top Up tab switcher |
+| `RadarZone` | Animated NFC trigger button (center of screen) |
+| `LatestResultCard` | Shows last operation result (success green border / error red border) |
+| `LocalStationLedgerCard` | Collapsible accordion showing device-local audit summary |
+| `NfcLogPanel` | Dev-only operational log (glassmorphic light variant) |
+| `NfcActionSheet` | Bottom sheet overlay during NFC operations |
 
-The Station screen grabs its services from the DI container and initializes the action hook:
+### 2. SegmentedControl — Mode Switching
+
+**File:** `src/presentation/screens/Station/fragments/SegmentedControl.tsx`
 
 ```tsx
-export function StationScreen() {
-  const services = useStationServices(); // from React Context
-  const actions = useStationActions(services);
-  // ...renders RegisterActions, TopUpActions, NfcActionSheet
-}
+<View className="flex-row bg-white/50 rounded-full p-1 border border-white/60">
+  <Pressable
+    onPress={() => setRegisterMode(true)}
+    className={registerMode ? 'bg-[#FFE4E8]' : ''}
+  >
+    <Text>Register</Text>
+  </Pressable>
+  <Pressable
+    onPress={() => setRegisterMode(false)}
+    className={!registerMode ? 'bg-[#FFE4E8]' : ''}
+  >
+    <Text>Top Up</Text>
+  </Pressable>
+</View>
 ```
 
-### 3. User Presses Register Button
+Switching modes clears `latestResult` so stale results from the other mode don't confuse the operator.
 
-The `RegisterActions` fragment renders the button:
+### 3. Pressing the RadarZone Button (Register Mode)
 
-```tsx
-<SignalButton
-  label={
-    busyAction === 'register' ? 'Registering...' : 'Tap NFC Card to Register'
+When the user taps the RadarZone in Register mode, `handleRegister()` fires in `useStationActions`:
+
+```ts
+const handleRegister = useCallback(async () => {
+  setBusyAction('register');
+  setNfcSheet({ phase: 'scanning', message: 'Hold your NFC card to register', color: '#FF0025' });
+
+  const result = await services.registerMemberCardUseCase.execute();
+
+  if (result.success) {
+    setNfcSheet({ phase: 'success', title: 'Card Registered', message: result.message });
+  } else if (result.message.includes('already registered')) {
+    // Trigger confirm phase for wipe decision
+    setNfcSheet({
+      phase: 'confirm',
+      title: 'Card Already Registered',
+      message: 'This card has existing data. Wipe and register as a new member?',
+      confirmLabel: 'Wipe & Re-register',
+      onConfirm: () => { handleWipeAndRegister(); },
+    });
   }
-  disabled={busyAction !== null}
-  onPress={() => {
-    handleRegister();
-  }}
-/>
+}, [...]);
 ```
 
-### 4. NfcActionSheet Appears (Scanning Phase)
+### 4. RegisterMemberCardUseCase — Two Methods
 
-Inside `handleRegister()`:
+**File:** `src/application/use-cases/register-member-card.use-case.ts`
 
-```ts
-setBusyAction('register');
-setNfcSheet({ phase: 'scanning', message: 'Hold your NFC card to register' });
-```
+The use case exposes **two methods** following the **Command pattern**:
 
-The `NfcActionSheet` component renders a bottom sheet with a spinner and the message. The user now holds their NFC card to the phone.
-
-### 5. RegisterMemberCardUseCase.execute()
+| Method               | When Used                | What It Does                                                |
+| -------------------- | ------------------------ | ----------------------------------------------------------- |
+| `execute()`          | First attempt            | Calls `registerCard()` which checks for existing data first |
+| `executeWithReset()` | After user confirms wipe | Calls `writeCard()` which overwrites unconditionally        |
 
 ```ts
-const result = await services.registerMemberCardUseCase.execute();
-```
-
-Inside the use case:
-
-```ts
+// execute() — safe registration (checks first)
 async execute(): Promise<RoleActionResultDto> {
-  try {
-    return await performRegistration();
-  } catch (error) {
-    if (isCardRepositoryError(error) && error.code === 'CARD_ALREADY_REGISTERED') {
-      return { success: false, role: 'STATION', message: error.message };
-    }
-    throw error;
-  }
+  const card = createInitialCard();
+  await cardRepository.registerCard(card); // throws if card has data
+  return buildSuccessResult(card);
+}
+
+// executeWithReset() — forced overwrite (user confirmed)
+async executeWithReset(): Promise<RoleActionResultDto> {
+  const card = createInitialCard(); // NEW cardId + memberId
+  await cardRepository.writeCard(card); // overwrites without checking
+  return buildSuccessResult(card);
 }
 ```
 
-### 6. createInitialCard() — Domain Factory
+**Why two methods?** This follows the **Single Responsibility Principle** — the use case doesn't make UI decisions about whether to wipe. It provides both capabilities; the presentation layer decides which to call based on user input.
+
+### 5. createInitialCard() — Fresh Card Factory
+
+Every registration (including re-registration) generates completely new IDs:
 
 ```ts
-export function createInitialCard(): MbcCard {
-  const card: MbcCard = {
+function createInitialCard(): MbcCard {
+  return {
     version: 1,
-    cardId: createRandomId('CARD'), // e.g. "CARD-a1b2c3d4"
-    member: { memberId: createRandomId('MEM') }, // e.g. "MEM-e5f6g7h8"
+    cardId: createRandomId('CARD'),
+    member: { memberId: createRandomId('MBR') },
     balance: 0,
     currency: 'IDR',
     visitStatus: 'NOT_CHECKED_IN',
-    transactionLogs: [],
+    transactionLogs: [
+      /* initial REGISTER log */
+    ],
   };
-
-  // Appends a REGISTER transaction log entry
-  return appendTransactionLog(
-    card,
-    createTransactionLog({
-      id: createRandomId('LOG'),
-      activity: 'REGISTER',
-      nominal: 0,
-      occurredAt: new Date().toISOString(),
-    }),
-  );
 }
 ```
 
-This creates a fresh card with zero balance and one transaction log entry recording the registration.
+No initial balance field is presented. New cards always start at zero.
 
-### 7. cardRepository.registerCard() — NFC Session
+### 6. NFC Write: Encode → Encrypt → Write
 
-```ts
-async registerCard(card: MbcCard): Promise<void> {
-  await ensureStarted();           // NfcManager.start() once
-  await requestNdefTechnology();   // Opens NFC session, waits for card
+The repository performs these steps in a single NFC session:
 
-  // Check if card already has valid MBC data
-  const currentTag = await NfcManager.getTag();
-  if (currentTag?.ndefMessage?.length) {
-    const payloadBytes = Buffer.from(currentTag.ndefMessage[0].payload);
-    if (isMbcEnvelope(payloadBytes)) {
-      const decryptResult = decrypt(payloadBytes);
-      if (decryptResult.ok) {
-        throw new CardRepositoryError('CARD_ALREADY_REGISTERED', '...');
-      }
-    }
-  }
+1. **Encode** — `MbcCard` → compact comma-separated format: `v,c,m,b,i,x,n`
+2. **Encrypt** — AES-256-GCM via `react-native-quick-crypto` → `MBC1` binary envelope
+3. **Write** — `writeNdefMessage()` to NTAG215 tag
 
-  // Card is blank — proceed with write
-  await writeToActiveSession(card);
-  await cancel(); // Close NFC session
-}
-```
+The envelope structure: `MBC1` magic (4B) + version (1B) + kid (1B) + alg (1B) + IV (12B) + authTag (16B) + ciphertext.
 
-> **Key insight:** The entire read-check-write happens in a single NFC session. The user only needs to tap once.
+### 7. SQLite Ledger Entry
 
-### 8. Card Codec encode() — Compact JSON
-
-The codec converts the full `MbcCard` object into a minimal JSON format to fit within NTAG215's 504-byte limit:
-
-```ts
-// Full card object → compact payload
-const compact: CompactPayload = {
-  v: 1, // version
-  c: 'CARD-a1b2c3d4', // cardId
-  m: 'MEM-e5f6g7h8', // memberId
-  b: 0, // balance
-  i: null, // activeSession (null = not checked in)
-  x: [['R', 0, '2026-05-08T07:00:00.000Z']], // transaction logs (compact)
-  n: 1, // write counter
-};
-// Output: '{"v":1,"c":"CARD-a1b2c3d4","m":"MEM-e5f6g7h8","b":0,"i":null,"x":[["R",0,"2026-05-08T07:00:00.000Z"]],"n":1}'
-```
-
-Field mapping:
-| Compact | Full Name | Example |
-|---------|-----------|---------|
-| `v` | version | `1` |
-| `c` | cardId | `"CARD-a1b2c3d4"` |
-| `m` | memberId | `"MEM-e5f6g7h8"` |
-| `b` | balance | `0` |
-| `i` | activeSession | `null` or `{a:1, t:"..."}` |
-| `x` | transactionLogs | `[["R", 0, "2026-..."]]` |
-| `n` | writeCounter | `1` |
-
-Budget: ≤337 bytes of plaintext JSON.
-
-### 9. Silent Shield encrypt() — AES-256-GCM Envelope
-
-```ts
-export function encrypt(
-  card: MbcCard,
-  writeCounter: number,
-): ShieldResult<Buffer> {
-  const encodeResult = encode(card, writeCounter); // Step 8
-  const plaintext = Buffer.from(encodeResult.value, 'utf8');
-  const iv = Crypto.randomBytes(12); // Fresh IV every write
-
-  const cipher = Crypto.createCipheriv('aes-256-gcm', DEMO_KEY, iv);
-  const encrypted = Buffer.concat([cipher.update(plaintext), cipher.final()]);
-  const authTag = cipher.getAuthTag(); // 16 bytes integrity proof
-
-  // Assemble envelope
-  const envelope = Buffer.concat([
-    MAGIC, // "MBC1" (4 bytes) — identifies this as our format
-    Buffer.from([ENVELOPE_VERSION, KEY_ID, ALG_A256GCM]), // header (3 bytes)
-    iv, // 12 bytes — never reused
-    authTag, // 16 bytes — tamper detection
-    encrypted, // variable — the actual ciphertext
-  ]);
-
-  return { ok: true, value: envelope };
-}
-```
-
-Envelope binary layout:
-
-```
-[MBC1][v01][kid01][alg01][IV 12B][AuthTag 16B][Ciphertext...]
- 4B     1B    1B     1B    12B      16B          variable
-```
-
-Total overhead: 35 bytes. With ≤337 bytes plaintext → ≤372 bytes envelope.
-
-> **Why AES-256-GCM?** It provides both confidentiality (nobody can read the card data) and integrity (nobody can modify it without detection). The `authTag` acts like a tamper-evident seal.
-
-### 10. writeNdefMessage() — Physical Write
-
-```ts
-const mimeType = 'application/vnd.mbc.v1';
-const encoded = Ndef.encodeMessage([
-  Ndef.record(Ndef.TNF_MIME_MEDIA, mimeType, '', Array.from(envelope)),
-]);
-await NfcManager.ndefHandler.writeNdefMessage(encoded);
-```
-
-The encrypted envelope is wrapped in an NDEF record with a custom MIME type (`application/vnd.mbc.v1`). This is the standard way to store application-specific data on NFC tags.
-
-### 11. SQLite Ledger Entry
-
-Back in the use case, after the NFC write succeeds:
+After successful card write, the use case appends a ledger entry:
 
 ```ts
 await localLedgerRepository.append({
   id: createRandomId('LEDGER'),
   role: 'STATION',
   action: 'REGISTER',
-  maskedMemberReference: maskMemberReference(card.member.memberId), // e.g. "MEM-****c3d4"
+  maskedMemberReference: maskMemberReference(card.member.memberId),
   occurredAt: new Date().toISOString(),
 });
 ```
 
-This is a device-side audit trail. The NFC card remains the source of truth, but the ledger lets the Station operator review past actions.
+If ledger write fails, the card registration is still considered successful (ledger is audit-only, not source of truth).
 
-### 12. Success/Error Handling Back to UI
+### 8. NfcActionSheet — The Confirm Phase
 
-The use case returns a `RoleActionResultDto`:
+**File:** `src/presentation/components/NfcActionSheet/index.tsx`
 
-```ts
-return {
-  success: true,
-  role: 'STATION',
-  message: 'Member card registered successfully.',
-  card: toCardSummaryDto(card), // { cardId, memberId, balance, visitStatus }
-};
-```
+The `confirm` phase is unique to registration safety:
 
-### 13. NfcActionSheet Success Phase
-
-Back in `handleRegister()`:
-
-```ts
-if (result.success) {
-  setNfcSheet({
-    phase: 'success',
-    title: 'Card Registered',
-    message: result.message,
-  });
-} else if (result.message.includes('already registered')) {
-  setNfcSheet({
-    phase: 'confirm',
-    title: 'Card Already Registered',
-    message: 'This card has existing data. Wipe and register as a new member?',
-    confirmLabel: 'Wipe & Re-register',
-    onConfirm: () => {
-      handleWipeAndRegister();
-    },
-  });
+```tsx
+{
+  state.phase === 'confirm' && (
+    <View>
+      <View className="w-32 h-32 rounded-full bg-[#FEF3C7] border-[#D97706]">
+        <Text>⚠</Text>
+      </View>
+      <Text>{state.title}</Text>
+      <Text>{state.message}</Text>
+      <SignalButton label={state.confirmLabel} onPress={state.onConfirm} />
+      <SignalButton label="Skip" variant="secondary" onPress={onDismiss} />
+    </View>
+  );
 }
 ```
 
-The bottom sheet transitions from the spinner to a green success card, or shows a confirmation dialog if the card was already registered.
+Two buttons:
+
+- **"Wipe & Re-register"** → calls `handleWipeAndRegister()` → `executeWithReset()`
+- **"Skip"** → dismisses sheet, no card modification
+
+### 9. LatestResultCard — Visual Feedback
+
+**File:** `src/presentation/screens/Station/fragments/LatestResultCard.tsx`
+
+Shows the result of the last operation with color-coded borders:
+
+- **Success** (green left border): Shows masked member reference + balance
+- **Error** (red left border): Shows error message
 
 ---
 
 ## Error Scenarios
 
-| Error Code                   | When                                       | User Sees                            |
-| ---------------------------- | ------------------------------------------ | ------------------------------------ |
-| `CARD_ALREADY_REGISTERED`    | Card has valid MBC data                    | Confirm dialog with wipe option      |
-| `SCAN_CANCELLED`             | User pulled card away too early            | "Scan was cancelled" error sheet     |
-| `NFC_UNAVAILABLE`            | NFC session failed                         | "Please retry with card held steady" |
-| `CARD_CAPACITY_INSUFFICIENT` | Payload > 504 bytes                        | "Exceeds NTAG215 capacity"           |
-| `CARD_TAMPERED`              | Encryption/encoding failed (payload error) | "Payload error"                      |
+| Error                     | Source                          | UI Behavior                                  |
+| ------------------------- | ------------------------------- | -------------------------------------------- |
+| `CARD_ALREADY_REGISTERED` | Card has valid MBC payload      | Confirm phase: Wipe & Re-register / Skip     |
+| `CARD_HAS_EXISTING_DATA`  | Card has non-MBC data           | Confirm phase: Wipe & Re-register / Skip     |
+| `CARD_TAMPERED`           | Silent Shield integrity failure | Error phase only — NO wipe option            |
+| NFC write failure         | Hardware/tag issue              | Error phase with message                     |
+| Ledger write failure      | SQLite issue                    | Success (card was written) + warning message |
 
 ---
 
-## Key Design Decisions
+## SOLID Principles in This Flow
 
-1. **Single-tap operation** — Read + check + write happens in one NFC session. No "tap to read, tap again to write."
-2. **Card is source of truth** — The SQLite ledger is only for audit. If the ledger write fails, the registration still succeeds (with a warning message).
-3. **Write counter** — Incremented on every write, stored on the card. Prevents replay attacks.
-4. **Fresh IV per write** — Even if the same card data is written twice, the ciphertext is different. Prevents pattern analysis.
-5. **MIME type identification** — Using `application/vnd.mbc.v1` means other NFC apps won't accidentally interpret our data.
+| Principle                 | Application                                                               |
+| ------------------------- | ------------------------------------------------------------------------- |
+| **Single Responsibility** | Use case handles business logic only; UI handles wipe decision            |
+| **Open/Closed**           | New error types can be added without changing the confirm flow            |
+| **Liskov Substitution**   | Mock repository works identically to real one in tests                    |
+| **Interface Segregation** | `StationServices` only exposes register + top-up + ledger                 |
+| **Dependency Inversion**  | Use case depends on `MbcCardRepository` interface, not NFC implementation |

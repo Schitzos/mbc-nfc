@@ -1,15 +1,18 @@
 import React, { useEffect } from 'react';
-import { Text, View } from 'react-native';
+import { Image, ImageBackground, View } from 'react-native';
+import { ScreenHeader } from '@presentation/components/ScreenHeader';
 import { RadarZone } from '@presentation/components/RadarZone';
 import { NfcLogPanel } from '@presentation/components/NfcLogPanel';
 import { NfcActionSheet } from '@presentation/components/NfcActionSheet';
 import { useAppStore } from '@presentation/stores/app-store';
 import { useGateServices } from '@presentation/context/service-context';
 import { GateResultState } from './fragments/GateResultState';
-import { SelectedActivityCard } from './fragments/SelectedActivityCard';
+import { SimulationModePanel } from './fragments/SimulationModePanel';
 import { useGateActions } from './useGateActions';
-import { AppHeaderCard } from '@presentation/components/AppHeaderCard';
 import { signalColorTokens } from '@presentation/theme/colors';
+
+const bgImage = require('@presentation/assets/bg-role-switcher.png');
+const gateIllustration = require('@presentation/assets/illustration-nfc-gate.png');
 
 export function GateScreen(): React.JSX.Element {
   const setSelectedRole = useAppStore(state => state.setSelectedRole);
@@ -21,48 +24,68 @@ export function GateScreen(): React.JSX.Element {
   }, [setSelectedRole]);
 
   return (
-    <View className="flex-1 bg-[#001A41]">
-      <View className="flex-1">
-        <AppHeaderCard
-          title="The Gate"
-          subTitle="Checking in for Parking"
-          hasBackButton={true}
-          rightIcon={
-            <View className="bg-blue-700 px-4 py-1 rounded-full">
-              <Text className="text-white">Gate</Text>
-            </View>
-          }
+    <ImageBackground
+      source={bgImage}
+      className="flex-1"
+      resizeMode="cover"
+      blurRadius={15}
+    >
+      <ScreenHeader
+        title="The Gate"
+        subtitle="Checking in for Parking"
+        badgeLabel="Gate"
+        badgeIcon="sensor-door"
+        badgeColor={signalColorTokens.brand.primary}
+      />
+
+      <View className="flex-1 px-4">
+        <SimulationModePanel
+          enabled={actions.simulationEnabled}
+          onToggle={actions.setSimulationEnabled}
+          simulatedDate={actions.simulatedDate}
+          onDateChange={actions.setSimulatedDate}
         />
-        <View className="-mt-3 rounded-t-2xl bg-[#F0F2F5] px-5 pt-5 pb-6 flex-1">
-          <View className="flex-1">
-            <View className="absolute inset-0 justify-center items-center z-0">
-              <RadarZone
-                color={signalColorTokens.brand.primary}
-                label="Tap Card to Check In"
-                busyLabel="Processing..."
-                disabled={actions.busy}
-                onPress={() => {
-                  void actions.handleCheckIn();
-                }}
+
+        <View className="flex-1 mt-4">
+          {actions.latestResult ? (
+            <View className="flex-1">
+              <GateResultState
+                latestResult={actions.latestResult}
+                onReset={actions.resetResult}
               />
+              <View
+                className="flex-1 items-center justify-center"
+                pointerEvents="none"
+              >
+                <Image
+                  source={gateIllustration}
+                  className="w-[480px] h-[430px] opacity-60"
+                  resizeMode="contain"
+                />
+              </View>
             </View>
-            <View className="z-10">
-              <SelectedActivityCard />
-            </View>
-            <View className="mt-auto z-10">
-              <GateResultState latestResult={actions.latestResult} />
-            </View>
-          </View>
-          <View className="mt-auto">
-            <NfcLogPanel />
-          </View>
+          ) : (
+            <RadarZone
+              color={signalColorTokens.brand.primary}
+              label="Tap Card to Check In"
+              busyLabel="Processing..."
+              disabled={actions.busy}
+              onPress={() => {
+                void actions.handleCheckIn();
+              }}
+            />
+          )}
         </View>
 
-        <NfcActionSheet
-          state={actions.nfcSheet}
-          onDismiss={() => actions.handleDismissSheet()}
-        />
+        <View className="pb-4">
+          <NfcLogPanel variant="light" />
+        </View>
       </View>
-    </View>
+
+      <NfcActionSheet
+        state={actions.nfcSheet}
+        onDismiss={() => actions.handleDismissSheet()}
+      />
+    </ImageBackground>
   );
 }

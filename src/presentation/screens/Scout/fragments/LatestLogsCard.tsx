@@ -1,5 +1,5 @@
 import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { Text, View } from 'react-native';
 import dayjs from 'dayjs';
 import { LOCALE_ID } from '@shared/constants';
 
@@ -8,6 +8,7 @@ interface LogEntry {
   activity: string;
   nominal: number;
   occurredAt: string;
+  isSimulation?: boolean;
 }
 
 interface LatestLogsCardProps {
@@ -23,76 +24,43 @@ export function LatestLogsCard({
   logs,
 }: Readonly<LatestLogsCardProps>): React.JSX.Element {
   return (
-    <View style={styles.card}>
-      <Text style={styles.title}>Latest Five Logs</Text>
-      {logs.length ? (
-        <View style={styles.logList}>
-          {logs.slice(0, 5).map((log, index) => (
-            <View
-              key={log.id}
-              style={[
-                styles.logRow,
-                index < Math.min(logs.length, 5) - 1 && styles.logRowBorder,
-              ]}
-            >
-              <Text style={styles.logActivity}>
-                {index + 1}. {log.activity.replace('_', ' ')}
-              </Text>
-              <Text style={styles.logMuted}>
-                Rp {log.nominal.toLocaleString(LOCALE_ID)}
-              </Text>
-              <Text style={styles.logMuted}>
-                {formatLogTime(log.occurredAt)}
-              </Text>
-            </View>
-          ))}
+    <View className="rounded-[20px] p-4 bg-white/55 border border-white/70">
+      <Text className="text-sm font-bold text-foreground">
+        Latest Five Logs
+      </Text>
+      {logs.length > 0 && (
+        <View className="mt-2">
+          {[...logs]
+            .reverse()
+            .slice(0, 5)
+            .map((log, index) => (
+              <View
+                key={log.id}
+                className={`flex-row items-center justify-between py-1.5 ${
+                  index < Math.min(logs.length, 5) - 1
+                    ? 'border-b border-black/5'
+                    : ''
+                }`}
+              >
+                <Text className="text-[11px] text-foreground flex-1">
+                  {index + 1}. {log.activity.replace('_', ' ')}
+                  {log.isSimulation ? ' (S)' : ''}
+                </Text>
+                <Text className="text-[11px] text-brand font-semibold ml-2">
+                  {log.nominal > 0
+                    ? `Rp ${log.nominal.toLocaleString(LOCALE_ID)}`
+                    : ''}
+                </Text>
+                <Text className="text-[11px] text-muted ml-2">
+                  {formatLogTime(log.occurredAt)}
+                </Text>
+              </View>
+            ))}
         </View>
-      ) : (
-        <Text style={styles.emptyText}>No logs yet.</Text>
+      )}
+      {logs.length === 0 && (
+        <Text className="mt-2 text-xs text-muted">No logs yet.</Text>
       )}
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  card: {
-    backgroundColor: 'white',
-    borderRadius: 16,
-    padding: 16,
-    borderWidth: 1,
-    borderColor: 'rgba(0, 180, 216, 0.2)',
-  },
-  title: {
-    fontSize: 14,
-    fontWeight: '700',
-    color: '#1A1A1A',
-  },
-  logList: {
-    marginTop: 8,
-  },
-  logRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingVertical: 6,
-  },
-  logRowBorder: {
-    borderBottomWidth: 1,
-    borderBottomColor: 'rgba(0, 180, 216, 0.1)',
-  },
-  logActivity: {
-    fontSize: 11,
-    color: '#1A1A1A',
-    flex: 1,
-  },
-  logMuted: {
-    fontSize: 11,
-    color: '#8BA3C7',
-    marginLeft: 8,
-  },
-  emptyText: {
-    marginTop: 8,
-    fontSize: 12,
-    color: '#8BA3C7',
-  },
-});

@@ -12,15 +12,14 @@ export function AmountInput({
   setTopUpAmount,
 }: Props): React.JSX.Element {
   return (
-    <View className="mt-3 rounded-xl bg-white p-3 shadow-sm">
-      <Text className="text-xs font-semibold text-[#4E5764]">
-        Top Up Amount
-      </Text>
+    <View className="mt-3 rounded-xl p-3 bg-white/55 border border-white/70">
+      <Text className="text-xs font-semibold text-muted">Top Up Amount</Text>
       <View className="mt-1 flex-row items-center">
-        <Text className="text-2xl font-bold text-[#1A1A1A]">Rp </Text>
+        <Text className="text-2xl font-bold text-foreground">Rp </Text>
         <TextInput
-          className="flex-1 text-2xl font-bold text-[#1A1A1A] p-0"
+          className="flex-1 text-2xl font-bold text-foreground p-0"
           keyboardType="numeric"
+          placeholderTextColor="rgba(0,0,0,0.3)"
           value={Number(topUpAmount).toLocaleString(LOCALE_ID)}
           onChangeText={text => {
             const numeric = text.replaceAll(/\D/g, '');
@@ -33,17 +32,11 @@ export function AmountInput({
           <Pressable
             key={amount}
             onPress={() => setTopUpAmount(String(amount))}
-            className={`rounded-full border px-3 py-1.5 ${
-              topUpAmount === String(amount)
-                ? 'border-[#16A34A] bg-[#16A34A]'
-                : 'border-slate-200 bg-white'
+            className={`rounded-full px-3 py-1.5 ${
+              topUpAmount === String(amount) ? 'bg-brand' : 'bg-foreground'
             }`}
           >
-            <Text
-              className={`text-xs font-semibold ${
-                topUpAmount === String(amount) ? 'text-white' : 'text-[#4E5764]'
-              }`}
-            >
+            <Text className="text-xs font-semibold text-white">
               {amount / 1000}k
             </Text>
           </Pressable>

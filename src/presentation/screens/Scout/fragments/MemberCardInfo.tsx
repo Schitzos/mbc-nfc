@@ -1,5 +1,5 @@
 import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { Text, View } from 'react-native';
 import dayjs from 'dayjs';
 import { LOCALE_ID } from '@shared/constants';
 
@@ -7,7 +7,7 @@ interface CardData {
   maskedMemberReference?: string;
   balance: number;
   visitStatus: string;
-  activeSession?: { checkedInAt: string };
+  activeSession?: { checkedInAt: string; isSimulation?: boolean };
 }
 
 interface MemberCardInfoProps {
@@ -24,53 +24,47 @@ export function MemberCardInfo({
 }: Readonly<MemberCardInfoProps>): React.JSX.Element {
   const activitySuffix = card.activeSession ? ' - Parking' : '';
   const isCheckedIn = card.visitStatus === 'CHECKED_IN';
+  const simSuffix = card.activeSession?.isSimulation ? ' (S)' : '';
   const statusLabel = isCheckedIn
-    ? `Checked in${activitySuffix}`
+    ? `Checked in${simSuffix}${activitySuffix}`
     : 'Not checked in';
 
   return (
-    <View style={styles.card}>
-      <Text style={styles.title}>Member Card Information</Text>
-      <View style={styles.rows}>
-        <View style={styles.row}>
-          <Text style={styles.label}>ID</Text>
-          <Text style={styles.value}>
+    <View className="rounded-[20px] p-4 bg-white/55 border border-white/70">
+      <Text className="text-sm font-bold text-foreground">
+        Member Card Information
+      </Text>
+      <View className="mt-3 gap-2">
+        <View className="flex-row justify-between items-center">
+          <Text className="text-xs text-muted">ID</Text>
+          <Text className="text-xs font-semibold text-foreground">
             {card.maskedMemberReference ?? 'MBC-***'}
           </Text>
         </View>
-        <View style={styles.row}>
-          <Text style={styles.label}>Balance</Text>
+        <View className="flex-row justify-between items-center">
+          <Text className="text-xs text-muted">Balance</Text>
           <Text
-            style={[
-              styles.value,
-              card.balance > 0 ? styles.balancePositive : styles.balanceZero,
-            ]}
+            className={`text-lg font-extrabold ${card.balance > 0 ? 'text-success' : 'text-error'}`}
           >
             Rp {card.balance.toLocaleString(LOCALE_ID)}
           </Text>
         </View>
-        <View style={styles.row}>
-          <Text style={styles.label}>Status</Text>
+        <View className="flex-row justify-between items-center">
+          <Text className="text-xs text-muted">Status</Text>
           <View
-            style={[
-              styles.statusBadge,
-              isCheckedIn ? styles.statusIn : styles.statusOut,
-            ]}
+            className={`px-2.5 py-0.5 rounded-xl ${isCheckedIn ? 'bg-[rgba(5,150,105,0.15)]' : 'bg-[rgba(107,114,128,0.1)]'}`}
           >
             <Text
-              style={[
-                styles.statusText,
-                isCheckedIn ? styles.statusTextIn : styles.statusTextOut,
-              ]}
+              className={`text-xs font-semibold ${isCheckedIn ? 'text-success' : 'text-muted'}`}
             >
               {statusLabel}
             </Text>
           </View>
         </View>
         {!!card.activeSession?.checkedInAt && (
-          <View style={styles.row}>
-            <Text style={styles.label}>Since</Text>
-            <Text style={styles.value}>
+          <View className="flex-row justify-between items-center">
+            <Text className="text-xs text-muted">Since</Text>
+            <Text className="text-xs font-semibold text-foreground">
               {formatLogTime(card.activeSession.checkedInAt)}
             </Text>
           </View>
@@ -79,63 +73,3 @@ export function MemberCardInfo({
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  card: {
-    backgroundColor: 'white',
-    borderRadius: 16,
-    padding: 16,
-    borderWidth: 1,
-    borderColor: 'rgba(0, 180, 216, 0.2)',
-  },
-  title: {
-    fontSize: 14,
-    fontWeight: '700',
-    color: '#1A1A1A',
-  },
-  rows: {
-    marginTop: 12,
-    gap: 8,
-  },
-  row: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-  label: {
-    fontSize: 12,
-    color: '#8BA3C7',
-  },
-  value: {
-    fontSize: 12,
-    fontWeight: '600',
-    color: '#1A1A1A',
-  },
-  balancePositive: {
-    color: '#00E676',
-  },
-  balanceZero: {
-    color: '#FF5252',
-  },
-  statusBadge: {
-    paddingHorizontal: 10,
-    paddingVertical: 3,
-    borderRadius: 12,
-  },
-  statusIn: {
-    backgroundColor: 'rgba(0, 230, 118, 0.15)',
-  },
-  statusOut: {
-    backgroundColor: 'rgba(139, 163, 199, 0.15)',
-  },
-  statusText: {
-    fontSize: 12,
-    fontWeight: '600',
-  },
-  statusTextIn: {
-    color: '#00E676',
-  },
-  statusTextOut: {
-    color: '#8BA3C7',
-  },
-});

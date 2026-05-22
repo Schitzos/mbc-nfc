@@ -1,11 +1,60 @@
-import React from 'react';
-import { Text, View } from 'react-native';
+import React, { useEffect, useRef } from 'react';
+import { Animated, Image, StyleSheet, Text, View } from 'react-native';
 import { SignalBottomSheet } from '@presentation/components/SignalBottomSheet';
 import { SignalButton } from '@presentation/components/SignalButton';
-import { ScanningRings } from './ScanningRings';
 import type { NfcActionSheetProps } from './types';
 
 export type { NfcActionState, NfcActionSheetProps } from './types';
+
+const sheetStyle = {
+  backgroundColor: '#FFFFFF',
+};
+
+const nfcOrb = require('@presentation/assets/nfc-orb.png');
+const successCheck = require('@presentation/assets/success-check.png');
+
+function PulseRing({ delay }: Readonly<{ delay: number }>) {
+  const scale = useRef(new Animated.Value(1)).current;
+  const opacity = useRef(new Animated.Value(0.6)).current;
+
+  useEffect(() => {
+    const pulse = Animated.loop(
+      Animated.sequence([
+        Animated.delay(delay),
+        Animated.parallel([
+          Animated.timing(scale, {
+            toValue: 1.5,
+            duration: 1500,
+            useNativeDriver: true,
+          }),
+          Animated.timing(opacity, {
+            toValue: 0,
+            duration: 1500,
+            useNativeDriver: true,
+          }),
+        ]),
+        Animated.parallel([
+          Animated.timing(scale, {
+            toValue: 1,
+            duration: 0,
+            useNativeDriver: true,
+          }),
+          Animated.timing(opacity, {
+            toValue: 0.6,
+            duration: 0,
+            useNativeDriver: true,
+          }),
+        ]),
+      ]),
+    );
+    pulse.start();
+    return () => pulse.stop();
+  }, [delay, scale, opacity]);
+
+  return (
+    <Animated.View style={[s.pulseRing, { transform: [{ scale }], opacity }]} />
+  );
+}
 
 export function NfcActionSheet({
   state,
@@ -19,7 +68,7 @@ export function NfcActionSheet({
   if (state.phase === 'scanning') {
     sheetTitle = 'Ready to Scan';
   } else if (state.phase === 'success') {
-    sheetTitle = '✓ Done';
+    sheetTitle = state.title ?? '✓ Done';
   } else if (state.phase === 'confirm') {
     sheetTitle = '⚠ Confirm';
   }
@@ -29,83 +78,127 @@ export function NfcActionSheet({
       visible
       title={sheetTitle}
       onClose={onDismiss}
+      style={sheetStyle}
     >
-      {state.phase === 'scanning' && (
-        <View className="items-center px-6 pt-2 pb-8 gap-5">
-          <View className="w-[120px] h-[120px] rounded-full bg-[#0050AE]/[0.08] items-center justify-center">
-            <ScanningRings color={state.color} />
+      <View>
+        {state.phase === 'scanning' && (
+          <View className="items-center px-6 pt-2 pb-8 gap-5">
+            <View className="w-[200px] h-[200px] items-center justify-center">
+              <PulseRing delay={0} />
+              <PulseRing delay={500} />
+              <Image
+                source={nfcOrb}
+                className="w-[200px] h-[200px]"
+                resizeMode="contain"
+              />
+            </View>
+            <View className="gap-2">
+              <Text className="text-center text-[16px] font-bold text-foreground">
+                {state.message ?? 'Tap your member card near the phone'}
+              </Text>
+              <Text className="text-center text-[13px] text-muted">
+                Keep the card close until the operation is detected.
+              </Text>
+            </View>
+            <View className="flex-row items-center gap-2 bg-rose-50 px-5 py-2.5 rounded-full border border-pink-light">
+              <View className="w-2.5 h-2.5 rounded-full bg-brand" />
+              <Text className="text-[13px] font-medium text-foreground">
+                Waiting for NFC card
+              </Text>
+            </View>
           </View>
-          <View className="gap-1">
-            <Text className="text-center text-[15px] font-semibold leading-[22px] text-[#001A41]">
-              {state.message ?? 'Hold your NFC card to the back of the phone'}
-            </Text>
-            <Text className="text-center text-[13px] leading-[18px] text-[#4E5764]">
-              Keep the card steady until the operation completes
-            </Text>
-          </View>
-        </View>
-      )}
+        )}
 
-      {state.phase === 'success' && (
-        <View className="items-center gap-4 pb-6 px-6">
-          <View className="w-16 h-16 rounded-full bg-[#EDFCF0] border-[1.5px] border-[#008E53] items-center justify-center">
-            <Text className="text-[28px] text-[#008E53] font-bold">✓</Text>
+        {state.phase === 'success' && (
+          <View className="items-center gap-5 pb-6 px-6">
+            <Image
+              source={successCheck}
+              className="w-[120px] h-[120px]"
+              resizeMode="contain"
+            />
+            <View className="w-full rounded-2xl p-4 bg-white/60 border border-white/80 flex-row items-center gap-3">
+              <View className="w-10 h-10 rounded-full bg-pink-light items-center justify-center">
+                <Text className="text-base">💳</Text>
+              </View>
+              <View className="flex-1">
+                <Text className="text-sm font-semibold text-foreground">
+                  {state.message}
+                </Text>
+                <Text className="mt-0.5 text-xs text-muted">
+                  You can close this sheet.
+                </Text>
+              </View>
+            </View>
+            <View className="w-full gap-3">
+              <SignalButton label="Done" onPress={onDismiss} />
+              {state.onConfirm && (
+                <SignalButton
+                  label={state.confirmLabel ?? 'Continue'}
+                  variant="secondary"
+                  onPress={state.onConfirm}
+                />
+              )}
+            </View>
           </View>
-          <View className="w-full rounded-xl bg-[#EDFCF0] border border-[#008E53]/20 p-4 pl-5 overflow-hidden">
-            <View className="absolute left-0 top-3 bottom-3 w-[3px] rounded-full bg-[#008E53]" />
-            <Text className="text-[15px] font-semibold leading-[22px] text-[#001A41]">
-              {state.title}
-            </Text>
-            <Text className="mt-1 text-[13px] leading-[18px] text-[#4E5764]">
-              {state.message}
-            </Text>
-          </View>
-          <View className="w-full">
-            <SignalButton label="Done" onPress={onDismiss} />
-          </View>
-        </View>
-      )}
+        )}
 
-      {state.phase === 'error' && (
-        <View className="items-center gap-4 pb-6 px-6">
-          <View className="w-16 h-16 rounded-full bg-[#FDDDD4] border-[1.5px] border-[#BC1D42] items-center justify-center">
-            <Text className="text-[28px] text-[#DB2941] font-bold">✕</Text>
+        {state.phase === 'error' && (
+          <View className="items-center gap-4 pb-6 px-6">
+            <View className="w-32 h-32 rounded-full bg-error-light border-[1.5px] border-error items-center justify-center">
+              <Text className="text-[48px] text-error font-bold">✕</Text>
+            </View>
+            <View className="w-full rounded-xl p-4 bg-white/60 border border-white">
+              <Text className="text-[15px] font-semibold text-foreground">
+                {state.title}
+              </Text>
+              <Text className="mt-1 text-[13px] text-muted">
+                {state.message}
+              </Text>
+            </View>
+            <View className="w-full">
+              <SignalButton label="Dismiss" onPress={onDismiss} />
+            </View>
           </View>
-          <View className="w-full rounded-xl bg-[#FDDDD4] border border-[#BC1D42]/20 p-4 pl-5 overflow-hidden">
-            <View className="absolute left-0 top-3 bottom-3 w-[3px] rounded-full bg-[#BC1D42]" />
-            <Text className="text-[15px] font-semibold leading-[22px] text-[#001A41]">
-              {state.title}
-            </Text>
-            <Text className="mt-1 text-[13px] leading-[18px] text-[#4E5764]">
-              {state.message}
-            </Text>
-          </View>
-          <View className="w-full">
-            <SignalButton label="Dismiss" onPress={onDismiss} />
-          </View>
-        </View>
-      )}
+        )}
 
-      {state.phase === 'confirm' && (
-        <View className="items-center gap-4 pb-6 px-6">
-          <View className="w-16 h-16 rounded-full bg-[#FEF3D4] border-[1.5px] border-[#D9801F] items-center justify-center">
-            <Text className="text-[28px] text-[#D9801F] font-bold">⚠</Text>
+        {state.phase === 'confirm' && (
+          <View className="items-center gap-4 pb-6 px-6">
+            <View className="w-32 h-32 rounded-full bg-warning-light border-[1.5px] border-warning items-center justify-center">
+              <Text className="text-[48px] text-warning font-bold">⚠</Text>
+            </View>
+            <View className="w-full rounded-xl p-4 bg-white/60 border border-white">
+              <Text className="text-[15px] font-semibold text-foreground">
+                {state.title}
+              </Text>
+              <Text className="mt-1 text-[13px] text-muted">
+                {state.message}
+              </Text>
+            </View>
+            <View className="w-full gap-3">
+              <SignalButton
+                label={state.confirmLabel}
+                onPress={state.onConfirm}
+              />
+              <SignalButton
+                label="Skip"
+                variant="secondary"
+                onPress={onDismiss}
+              />
+            </View>
           </View>
-          <View className="w-full rounded-xl bg-[#FEF3D4] border border-[#D9801F]/20 p-4 pl-5 overflow-hidden">
-            <View className="absolute left-0 top-3 bottom-3 w-[3px] rounded-full bg-[#D9801F]" />
-            <Text className="text-[15px] font-semibold leading-[22px] text-[#001A41]">
-              {state.title}
-            </Text>
-            <Text className="mt-1 text-[13px] leading-[18px] text-[#4E5764]">
-              {state.message}
-            </Text>
-          </View>
-          <View className="w-full gap-3">
-            <SignalButton label={state.confirmLabel} onPress={state.onConfirm} />
-            <SignalButton label="Skip" variant="secondary" onPress={onDismiss} />
-          </View>
-        </View>
-      )}
+        )}
+      </View>
     </SignalBottomSheet>
   );
 }
+
+const s = StyleSheet.create({
+  pulseRing: {
+    position: 'absolute',
+    width: 150,
+    height: 150,
+    borderRadius: 100,
+    borderWidth: 2,
+    borderColor: 'rgba(255, 128, 160, 0.4)',
+  },
+});

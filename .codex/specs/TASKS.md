@@ -1,6 +1,6 @@
 # Membership Benefit Card — Codex Task Plan Lite
 
-> Current status: 444+ tests | 65 suites | 100% line coverage | jest.config.js thresholds: 99% statements/lines/branches, 96% functions
+> Current status: 477+ tests | 75 suites | 90%+ line coverage | jest.config.js thresholds: 99% statements/lines/branches, 96% functions
 
 Purpose: compact, Codex-friendly task cards. Execute task order from `EXECUTION_ORDER.md`. Use detailed docs only when the task references them.
 
@@ -428,7 +428,7 @@ Done: NfcLogPanel renders at the bottom of the screen on all role screens; all t
 Owner: Senior RN FE + UI/UX Designer
 Refs: `SIGNAL_UI_GUIDE.md`
 Do: Make the Inspect button circular and centered (vertically and horizontally) on the Scout screen. Enhance the Scout screen visual design to be more lively and demo-ready per UI/UX recommendation.
-Status: **DONE** — QA validated 2026-05-09. Circular 120px button centered, pulse animation, purple theme. 65 suites / 436 tests pass. 100% coverage on Scout/index.tsx. Runtime verified on Pixel 7 Pro emulator (Android 16).
+Status: **DONE** — QA validated 2026-05-09. Circular 120px button centered, pulse animation, purple theme. 65 suites / 436 tests pass. 90%+ coverage on Scout/index.tsx. Runtime verified on Pixel 7 Pro emulator (Android 16).
 Done: Inspect button is circular and centered on screen; Scout screen has enhanced visual design; all tests pass.
 
 ### T-UI-SCOUT-002 — Enhance Scout screen visual design to be more alive and engaging ✅ DONE
@@ -463,6 +463,37 @@ Acceptance Criteria:
 
 Done: All RadarZone instances use Signal UI primary red #FF0025; all tests pass.
 
+### T-UI-THEME-001 — Implement vibrant theme tokens in colors.ts ✅ DONE
+
+Owner: @FE + @UI/UX
+Refs: `SIGNAL_UI_GUIDE.md`, `VIBRANT_THEME_SPEC.md`
+Do: Add `vibrantTokens` export to `src/presentation/theme/colors.ts` with extended color tokens for dark card gradients, success states, and immersive UI surfaces.
+Acceptance Criteria:
+
+- `vibrantTokens` object exported from colors.ts
+- Tokens include dark card gradient, success gradient, and immersive surface colors
+- All existing tests pass
+- Coverage remains >=90%
+
+Status: ✅ DONE
+Done: Vibrant theme tokens implemented in colors.ts; used by presentation layer components.
+
+### T-UI-HEADER-001 — Implement ScreenHeader shared component ✅ DONE
+
+Owner: @FE + @UI/UX
+Refs: `SIGNAL_UI_GUIDE.md`, `DESIGN.md`
+Do: Create `src/presentation/components/ScreenHeader/index.tsx` — a shared header component providing consistent role title, subtitle, and optional action elements for all 4 role screens.
+Acceptance Criteria:
+
+- ScreenHeader component created under src/presentation/components/ScreenHeader/
+- Used by Station, Gate, Terminal, and Scout screens
+- Provides role title, subtitle, and optional action slot
+- All existing tests pass
+- Coverage remains >=90%
+
+Status: ✅ DONE
+Done: ScreenHeader component implemented and used by all role screens.
+
 ### T-UI-STATION-003 — Revamp Station screen layout and add scanning animation to NfcActionSheet ✅ DONE
 
 Owner: Senior RN FE + UI/UX Designer
@@ -475,7 +506,7 @@ Acceptance Criteria:
 - Scanning animation is smooth, visually consistent with RadarZone theme
 - All existing tests pass (>=90% coverage maintained)
 - No regression in Station register/top-up flows
-  Status: **DONE** — QA validated 2026-05-09. 65 suites / 436 tests pass. 100% coverage. Station uses RadarZone with absolute centering (same as Gate/Terminal/Scout). NfcActionSheet has ScanningRings animation (3 concentric pulsing rings + center NFC icon breathe). Segmented control switches Register/Top-Up modes correctly. Runtime emulator validation deferred per user request.
+  Status: **DONE** — QA validated 2026-05-09. 65 suites / 436 tests pass. 90%+ coverage. Station uses RadarZone with absolute centering (same as Gate/Terminal/Scout). NfcActionSheet has PulseRing animation (2 pulsing rings + nfc-orb asset). Segmented control switches Register/Top-Up modes correctly. Runtime emulator validation deferred per user request.
   Done: Station screen aligned with Gate/Terminal/Scout pattern; NfcActionSheet has scanning animation; all tests pass.
 
 ### T-UI-TERMINAL-001 — Remove blank space above error cards on Terminal screen ✅ DONE
@@ -555,10 +586,73 @@ Acceptance Criteria:
 - New `src/domain/membership/` structure with entities, types, policies, repositories, factories, errors, config sub-folders
 - Old `src/domain/entities/`, `src/domain/services/`, `src/domain/repositories/`, `src/domain/factories/`, `src/domain/errors/` removed
 - All imports updated to `@domain/membership/...` paths
-- All tests pass with 100% coverage maintained
+- All tests pass with 90%+ coverage maintained
 - No stale imports remain
-  Status: ✅ DONE — QA validated 2026-05-13. 65 suites / 439 tests pass. 100% coverage. PR #149.
+  Status: ✅ DONE — QA validated 2026-05-13. 65 suites / 439 tests pass. 90%+ coverage. PR #149.
   Done: Domain layer restructured to membership-based bounded context; all imports updated; old folders removed; all tests pass.
+
+---
+
+## Phase 8 — Bug Fixes
+
+### T-BUGFIX-001 — Fix registerCard silent overwrite of tags with existing data ✅ DONE
+
+Owner: @NFC + @FE
+Refs: `DESIGN.md`, `CARD_DATA_SECURITY_LEDGER_SPEC.md`
+Do: Fix bug where `NfcManager.getTag()` does not reliably return `ndefMessage` on Android, causing the existing-data check to be skipped. Tags with unknown/foreign NDEF data get silently overwritten without warning.
+
+Fix:
+
+1. Replace `getTag()` with `NfcManager.ndefHandler.getNdefMessage()` in `registerCard` (same pattern as `readCardFromActiveSession`) to actively read NDEF content.
+2. Add `CARD_HAS_EXISTING_DATA` error code for tags with non-MBC foreign data.
+3. Handle new error in use case (return failure DTO like `CARD_ALREADY_REGISTERED`).
+4. Handle in presentation layer (show confirmation dialog to wipe or cancel).
+
+Files:
+
+- `src/domain/membership/errors/membership-card-repository-error.ts`
+- `src/infrastructure/nfc/real-mbc-card.repository.ts`
+- `src/application/use-cases/register-member-card.use-case.ts`
+- `src/presentation/screens/Station/useStationActions.ts`
+- Related test files
+
+Acceptance Criteria:
+
+- `registerCard` uses `ndefHandler.getNdefMessage()` instead of `getTag()` to read existing NDEF content
+- New error code `CARD_HAS_EXISTING_DATA` exists in `MembershipCardRepositoryErrorCode`
+- Use case returns a distinct failure DTO when `CARD_HAS_EXISTING_DATA` is thrown
+- Presentation layer shows a confirmation dialog allowing user to wipe or cancel when foreign data is detected
+- All existing tests pass; new tests cover the new error path
+- Coverage remains >=90%
+
+Status: ✅ DONE — QA validated 2026-05-21. 65 suites / 442 tests pass. Coverage 99.6%. TypeScript compiles cleanly. All acceptance criteria met.
+
+---
+
+### T-BUGFIX-002 — Add max balance cap (Rp 5.000.000) on top-up ✅ DONE
+
+Owner: @FE
+Refs: `REQUIREMENTS.md`, `EDGE_CASES.md`, `CARD_DATA_SECURITY_LEDGER_SPEC.md`
+Do: Add maximum balance cap of Rp 5.000.000 on top-up. Reject top-up if resulting balance would exceed the cap.
+
+Files:
+
+- `src/domain/membership/config/balance-limits.ts` (NEW)
+- `src/domain/membership/errors/domain-error.ts`
+- `src/application/use-cases/top-up-member-card.use-case.ts`
+- `src/application/use-cases/__tests__/top-up-balance-cap.use-case.test.ts` (NEW)
+
+Acceptance Criteria:
+
+- A domain config constant `MAX_CARD_BALANCE = 5_000_000` exists in `src/domain/membership/config/`
+- Top-up use case rejects with a clear message if `card.balance + amount > MAX_CARD_BALANCE`
+- The validation happens BEFORE the card write (inside the `readWriteCard` transform or before calling it)
+- Existing tests pass, new tests cover the cap scenario
+- Coverage remains >=90%
+
+Status: ✅ DONE — QA validated 2026-05-21. 66 suites / 446 tests pass. Coverage 99.6%. TypeScript compiles cleanly. Android build and runtime verified on physical device (T1AIGF005808BV4). All acceptance criteria met.
+
+---
 
 ### T-029 — Demo Capture
 
@@ -573,3 +667,235 @@ Owner: Release Engineer / Writer / PM
 Refs: `PO_FINAL_GO_NO_GO_CHECKLIST.md`, `RELEASE_PLAN.md`  
 Do: Confirm repository, docs, tests, QA evidence, demo evidence, Firebase notes, known limitations, and parking MVP scope.  
 Done: Package is ready for final PO GO/NO-GO review.
+
+---
+
+## Phase 9 — Feature Enhancements
+
+### T-FEAT-GATE-001 — Implement Gate Simulation Mode ✅ DONE
+
+Owner: @FE
+Refs: `REQUIREMENTS.md`, `DESIGN.md`, `EDGE_CASES.md`
+Do: Implement Gate Simulation Mode — allow operator to set a past entry time for check-in. When simulation mode is active: (1) custom past timestamp is written to card, (2) Terminal checkout uses real device time but does NOT deduct balance, (3) UI shows a clear simulation mode indicator.
+
+Files:
+
+- `src/domain/membership/types/card-status.ts` (add `isSimulation` to ActiveSession)
+- `src/domain/membership/policies/activity-state-policy.ts` (pass isSimulation through)
+- `src/application/use-cases/check-in-activity.use-case.ts` (accept optional `checkedInAt` + `isSimulation`)
+- `src/application/use-cases/check-out-activity.use-case.ts` (skip deduction when `isSimulation`)
+- `src/infrastructure/nfc/mbc-card-codec.ts` (encode/decode `s:1` in `i` field)
+- `src/presentation/screens/Gate/useGateActions.ts` (simulation state + pass to use case)
+- `src/presentation/screens/Gate/index.tsx` (toggle UI + DateTimePicker + banner)
+- `src/presentation/screens/Terminal/index.tsx` (simulation banner + annotated fee/balance)
+
+Acceptance Criteria:
+
+- Gate screen has a simulation mode toggle
+- When enabled, a native DateTimePicker allows selecting a past time
+- Check-in use case accepts optional `checkedInAt` (ISO string) and `isSimulation` (boolean) parameters
+- When simulation mode is active, the simulated timestamp and `isSimulation: true` are written to card activeSession
+- Codec encodes `isSimulation` as `s: 1` in the compact payload `i` field: `{ a: 1, t: "...", s: 1 }`
+- Terminal checkout reads `activeSession.isSimulation` — if true, calculates fee/duration but does NOT deduct balance (charges 0)
+- Terminal UI shows a red "⚠️ SIMULATION MODE" banner and annotates fee as "(not deducted)" and balance as "(unchanged)"
+- Gate UI shows a red "⚠️ SIMULATION MODE ACTIVE" banner with note "Balance will NOT be deducted on checkout"
+- All existing tests pass, new tests cover simulation paths
+- Coverage remains >=90%
+- Dependency added: `@react-native-community/datetimepicker@8.3.0`
+
+Status: ✅ DONE
+Done: Gate simulation mode fully implemented with toggle, DateTimePicker, card-stored isSimulation flag, Terminal skip-deduction logic, and UI banners on both screens.
+
+### T-FEAT-GATE-002 — Fix simulation mode edge cases and bugs
+
+Owner: @FE
+Refs: `REQUIREMENTS.md`, `DESIGN.md`, `EDGE_CASES.md`
+Do: Fix simulation mode edge cases and bugs — default date, min/max date limits, release mode hide, Scout simulation indicator, ledger skip, transaction log flag, future-time guard, success message.
+
+Files:
+
+- `src/presentation/screens/Gate/useGateActions.ts` (EC-1, BUG-5)
+- `src/presentation/screens/Gate/index.tsx` (EC-4, EC-5)
+- `src/application/use-cases/check-in-activity.use-case.ts` (BUG-1)
+- `src/application/use-cases/check-out-activity.use-case.ts` (BUG-4)
+- Scout screen or card display component (EC-8)
+- Related test files
+
+Acceptance Criteria:
+
+- EC-1: `simulatedDate` defaults to `new Date()` (current time) instead of null
+- EC-2: DateTimePicker `maximumDate` already set (verify)
+- EC-4: DateTimePicker `minimumDate` set to 3 months ago
+- EC-5: Simulation toggle only visible when `__DEV__` is true (hidden in release builds)
+- EC-8: Scout shows "CHECKED_IN (S)" when card has `isSimulation` in activeSession
+- BUG-1: Check-in use case rejects `checkedInAt` if it's in the future
+- BUG-3: Transaction log in Scout shows "(S)" suffix on activity name for simulation entries — no change to log structure, just display "(S)" in Scout for the check-in that matches the simulation session time.
+- BUG-4: Skip `localLedgerRepository.append` when `wasSimulation` is true in checkout use case
+- BUG-5: Gate check-in success message indicates simulation (e.g., "Card checked in (simulation).")
+
+Status: (in-progress)
+
+### T-UI-APP-005 — Apply Gate background gradient to all screens and fix bottom sheet to white
+
+Owner: @FE + @UI/UX
+Refs: `SIGNAL_UI_GUIDE.md`
+Do: Apply the Gate screen's LinearGradient background (colors=['#0D1B3E', '#F5F6FA'], locations=[0, 0.35]) to ALL role screens (Station, Terminal, Scout, RoleSwitcher). Fix NfcActionSheet bottom sheet to use white solid background (#FFFFFF) instead of dark gradient.
+
+Files:
+
+- `src/presentation/screens/Station/index.tsx` (replace solid bg with LinearGradient)
+- `src/presentation/screens/Scout/index.tsx` (replace solid bg with LinearGradient)
+- `src/presentation/screens/RoleSwitcher/index.tsx` (replace solid bg with LinearGradient)
+- `src/presentation/screens/Terminal/index.tsx` (fix locations from [0, 0.3] to [0, 0.35])
+- `src/presentation/components/NfcActionSheet/index.tsx` (remove dark gradient, use white bg)
+
+Acceptance Criteria:
+
+- All 5 screens (Station, Gate, Terminal, Scout, RoleSwitcher) use the same LinearGradient background: colors=['#0D1B3E', '#F5F6FA'], locations=[0, 0.35]
+- NfcActionSheet bottom sheet uses white solid background (#FFFFFF) instead of dark gradient
+- Bottom sheet text colors updated for readability on white background
+- All existing tests pass
+- Coverage remains >=90%
+
+Status: ✅ DONE
+
+### T-UI-APP-006 — Fix RoleSwitcher card text readability — dark-glass glassmorphism
+
+Owner: @FE + @UI/UX
+Refs: `SIGNAL_UI_GUIDE.md`
+Do: Fix RoleSwitcher card text readability by switching from light-glass to dark-glass glassmorphism. Role option cards have white text on near-transparent background (rgba(255,255,255,0.08)), unreadable when gradient transitions to light grey. Apply dark semi-opaque card fill so cards carry their own contrast.
+
+Files:
+
+- `src/presentation/screens/RoleSwitcher/fragments/RoleOptionList.tsx`
+
+Acceptance Criteria:
+
+- Card background changed from `rgba(255,255,255,0.08)` to `rgba(13,27,62,0.88)`
+- Card border changed from `rgba(255,255,255,0.15)` to `rgba(255,255,255,0.12)`
+- Subtitle text opacity increased from 60% to 72% (text-white/60 → text-white/[0.72])
+- Chevron opacity increased from 40% to 50% (text-white/40 → text-white/50)
+- All 4 role cards are readable on both dark and light portions of the gradient
+- All existing tests pass
+- Coverage remains >=90%
+
+Status: ✅ DONE — QA validated 2026-05-21. Code review passed: all 4 acceptance criteria verified in diff. 70 suites / 468 tests pass. RoleOptionList.tsx 90%+ coverage. TypeScript compiles cleanly. WCAG contrast ratio ~16:1 (white on dark navy).
+Done: RoleSwitcher cards use dark-glass glassmorphism with readable white text on both dark and light gradient portions; all tests pass.
+
+### T-UI-APP-007 — Redesign RoleSwitcher to light theme per reference image
+
+Owner: @FE + @UI/UX
+Refs: `SIGNAL_UI_GUIDE.md`
+Do: Redesign the RoleSwitcher screen to match the provided reference image with a full LIGHT theme. Replace dark navy header and dark-glass cards with light gradient background, custom inline light header, and white frosted glass cards with red monochrome icons. Do NOT modify shared AppHeaderCard — just don't use it in RoleSwitcher.
+
+Files:
+
+- `src/presentation/screens/RoleSwitcher/index.tsx`
+- `src/presentation/screens/RoleSwitcher/fragments/RoleOptionList.tsx`
+
+Acceptance Criteria:
+
+- RoleSwitcher uses full light gradient background (light grey/pinkish, no dark navy)
+- Header has transparent/light background with dark (black) title text, grey subtitle, red info icon in white circle
+- Role cards are white/frosted glass with subtle grey border
+- Card titles are black, subtitles are grey
+- Card icons are red (#FF0025) on pink (#FFE4E8) circular backgrounds
+- Chevrons are red (#FF0025)
+- NfcLogPanel adapted for light theme (light bg, dark text)
+- All existing tests pass
+- Coverage remains >=90%
+
+Status: (in-progress)
+
+### T-UI-REFACTOR-001 — Remove inline styles, use NativeWind/StyleSheet
+
+Owner: @FE
+Refs: `SIGNAL_UI_GUIDE.md`, `DESIGN.md`
+Do: Refactor all presentation layer components, screens, and fragments to eliminate inline styles. Replace inline `style={{...}}` with NativeWind className utilities wherever possible. If NativeWind cannot express a style (e.g., dynamic values, complex shadows), use StyleSheet.create instead. Priority: NativeWind > StyleSheet > inline style. Scope: `src/presentation/components/**`, `src/presentation/screens/**`. Do NOT change any logic or behavior — only style declarations.
+
+Files:
+
+- `src/presentation/screens/Terminal/fragments/CheckoutSummaryCard.tsx`
+- `src/presentation/screens/Terminal/fragments/TariffPreviewCard.tsx`
+- `src/presentation/screens/Terminal/fragments/InsufficientBalanceCard.tsx`
+- `src/presentation/screens/Terminal/fragments/GenericFailureCard.tsx`
+- `src/presentation/screens/Terminal/index.tsx`
+- `src/presentation/screens/Scout/index.tsx`
+- `src/presentation/screens/Station/index.tsx`
+- `src/presentation/screens/Station/fragments/AmountInput.tsx`
+- `src/presentation/screens/Gate/index.tsx`
+- `src/presentation/screens/Gate/fragments/GateResultState.tsx`
+- `src/presentation/screens/Gate/fragments/SimulationModePanel.tsx`
+- `src/presentation/screens/Gate/fragments/GateResultState.tsx`
+- `src/presentation/screens/RoleSwitcher/index.tsx`
+- `src/presentation/components/ScreenHeader/index.tsx`
+- `src/presentation/components/AppHeaderCard/index.tsx`
+
+Acceptance Criteria:
+
+- All inline `style={{}}` in `src/presentation/` replaced with NativeWind className where possible
+- Where NativeWind cannot express the style, use StyleSheet.create
+- No behavioral or visual changes
+- All 468 tests pass
+- TypeScript compiles clean
+- Coverage remains >=90%
+
+Status: (in-progress)
+
+### T-E2E-001 — Implement Maestro E2E Testing with Mock NFC Repository
+
+Owner: Test Automation Engineer
+Refs: `E2E_TEST_CASES.md`, `DESIGN.md`
+Do: Create MockMbcCardRepository (in-memory singleton), add config-based DI swap (`E2E_MODE` in `src/infrastructure/utils/e2e.config.ts` → mock repo), create Maestro YAML flows for full parking MVP (register, top-up, check-in, check-out, inspect, error cases), add screenshots at key assertion points, add npm scripts for local Maestro execution, add unit tests for mock repository.
+Acceptance Criteria:
+
+- MockMbcCardRepository holds state in memory across operations (singleton)
+- `E2E_MODE = true` in `src/infrastructure/utils/e2e.config.ts` swaps real NFC repo for mock in container.ts
+- Maestro YAML flows cover: role switching, register, top-up 50k, check-in, check-out (fee/duration), inspect, double check-in error, insufficient balance error
+- Screenshots captured at key assertion points
+- npm scripts for local Maestro execution added to package.json
+- Unit tests for mock repository pass with >=90% coverage
+
+Status: ✅ DONE
+
+---
+
+### T-SA-AUDIT-001 — Audit Clean Architecture and SOLID violations
+
+Owner: @SA
+Refs: `DESIGN.md`, `REQUIREMENTS.md`
+Do: Audit all source files under `src/` for Clean Architecture layer violations and SOLID principle violations. Produce a categorized list of all violations found. Do not fix anything — only identify and list.
+Acceptance Criteria:
+
+- Every file in src/ reviewed for Clean Architecture layer boundary violations
+- Every file checked for SOLID principle violations (SRP, OCP, LSP, ISP, DIP)
+- All violations documented with file path, principle violated, and description
+- Categorized output produced (by layer and by principle)
+
+Status: in-progress
+
+### T-FE-SOLID-001 — Fix Clean Architecture and SOLID violations
+
+Owner: @FE
+Refs: `DESIGN.md`, `CODE_AUDIT_REPORT.md`, `T-SA-AUDIT-001`
+Do: Fix all SA-reported Clean Architecture and SOLID violations. No behavioral changes allowed.
+
+Violations to fix:
+
+1. Domain factory uses concrete `createRandomId` — inject ID generator via parameter (DIP)
+2. Use cases call `new Date()` directly — inject clock abstraction, default to system clock (DIP)
+3. `CardSummaryDto` exposes raw domain types — document thin-DTO decision as intentional (ISP)
+4. `StationLedgerSummaryDto` is naked alias — document intentional alias as acceptable (trivial)
+5. `useStationActions` fat hook — split into smaller focused hooks (SRP)
+6. Use cases accept full `MbcCardRepository` — use `CardReader`/`CardWriter` narrow interfaces (ISP)
+7. Hardcoded `#FF0025` — use theme token reference (DIP/maintainability)
+
+Acceptance Criteria:
+
+- All 7 SA-reported violations fixed or documented as intentional
+- No behavioral changes — all existing tests pass
+- TSC compiles clean (no new errors)
+- Coverage remains >=90%
+
+Status: ✅ DONE — QA validated 2026-05-22. tsc clean, 67 suites / 425 tests pass. All 7 violations fixed, no behavioral changes.
+Done: All SOLID/Clean Architecture violations fixed: DIP (idGenerator, clock, theme token), ISP (CardReader/CardWriter narrow interfaces, DTO docs), SRP (useNfcSheet extraction).

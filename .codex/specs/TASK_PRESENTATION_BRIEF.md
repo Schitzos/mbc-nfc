@@ -1,6 +1,6 @@
 # MBC Task Presentation Brief
 
-> Last updated: 2026-05-09 | Phases 0–9 complete | Phase 10 pending (T-029, T-030 only) | 444+ tests | 100% coverage | SonarCloud + Firebase configured
+> Last updated: 2026-05-09 | Phases 0–9 complete | Phase 10 pending (T-029, T-030 only) | 477+ tests | 90%+ coverage | SonarCloud + Firebase configured
 
 This brief explains the Membership Benefit Card project in a format suitable for assessment presentation slides, stakeholder updates, and technical reviewers.
 
@@ -20,7 +20,7 @@ One mobile app. Four cooperative roles. One NFC card as the portable source of t
 | Tariff       | Fixed Rp 2.000 per started hour (parking MVP)                              |
 | Security     | Silent Shield — AES-256-GCM authenticated encryption                       |
 | Architecture | Clean Architecture (Domain → Application → Infrastructure → Presentation)  |
-| Tests        | 444+ automated tests, 65 suites, 100% line coverage                        |
+| Tests        | 477+ automated tests, 75 suites, 90%+ line coverage                        |
 | CI/CD        | Single `build.yml`: PR validation gates + `main` Firebase App Distribution |
 | Offline      | All core flows work without internet or backend                            |
 
@@ -71,7 +71,7 @@ Use this table to find which tasks support each required presentation section:
 | UI/UX Design          | T-021, T-022–T-025, T-026, T-026A–C    | Signal UI system, role-based screens, one app four roles             |
 | Software Design       | T-005–T-009, T-006, T-019              | Clean Architecture, domain entities, repository contracts, SOLID     |
 | Software Construction | T-001–T-002, T-012–T-016, T-017–T-020A | TypeScript, React Native CLI, feature-by-feature delivery            |
-| Software Quality      | T-027, T-027A, T-027C                  | 444+ tests, 100% coverage, SonarCloud gate, QA evidence              |
+| Software Quality      | T-027, T-027A, T-027C                  | 477+ tests, 90%+ coverage, SonarCloud gate, QA evidence              |
 | Software Deployment   | T-027B, T-029, T-030                   | GitHub Actions, Firebase App Distribution, APK delivery              |
 | Software Security     | T-020, T-019, T-004                    | Silent Shield AES-256-GCM, NTAG215 binary envelope, tamper detection |
 
@@ -145,7 +145,7 @@ Use this table to find which tasks support each required presentation section:
 
 | Task                                            | Purpose                                        | Owner                                            | Output                                                                  | Presentation Value                                                        |
 | ----------------------------------------------- | ---------------------------------------------- | ------------------------------------------------ | ----------------------------------------------------------------------- | ------------------------------------------------------------------------- |
-| T-027 Unit and Use-Case Tests                   | Prove business logic works                     | Test Automation Engineer / Senior QA             | 444+ tests, 100% coverage, `E2E_TEST_CASES.md` with evidence paths      | Shows quality is not only manual demo and has traceable evidence          |
+| T-027 Unit and Use-Case Tests                   | Prove business logic works                     | Test Automation Engineer / Senior QA             | 477+ tests, 90%+ coverage, `E2E_TEST_CASES.md` with evidence paths      | Shows quality is not only manual demo and has traceable evidence          |
 | T-027A SonarCloud Quality Gate                  | Keep automated quality visible and enforceable | Test Automation Engineer / Demo/Release Engineer | SonarCloud setup, coverage import, quality-gate result                  | Shows code quality is measured continuously, not judged only by demo feel |
 | T-027B GitHub Actions Firebase App Distribution | Controlled APK delivery from `main`            | Demo/Release Engineer                            | GitHub Actions workflow → Firebase App Distribution                     | Shows the project has a controlled APK delivery path for reviewers        |
 | T-027C Feature PR QA Screenshot Evidence        | Prove each feature works visually              | Senior QA / Test Automation Engineer             | Screenshot evidence per feature PR                                      | Shows each feature is checked by QA before merge                          |
@@ -210,8 +210,8 @@ Use this table to find which tasks support each required presentation section:
 
 | Metric           | Value                                                       |
 | ---------------- | ----------------------------------------------------------- |
-| Automated tests  | 444+ (65 suites)                                            |
-| Line coverage    | 100%                                                        |
+| Automated tests  | 477+ (75 suites)                                            |
+| Line coverage    | 90%+                                                        |
 | Coverage policy  | ≥90% minimum; jest.config.js enforces 99%/96%               |
 | Static analysis  | SonarCloud quality gate integrated                          |
 | Dependency audit | `npm audit` = 0 vulnerabilities                             |

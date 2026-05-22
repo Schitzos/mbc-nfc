@@ -1,6 +1,10 @@
 import type { RoleActionResultDto } from '@application/dto/role-action-result-dto';
-import type { MbcCardRepository } from '@domain/membership/repositories/membership-card.repository';
+import type { CardWriter } from '@domain/membership/repositories/membership-card.repository';
 import { isCardRepositoryError } from '@domain/membership/errors/membership-card-repository-error';
+import {
+  isDomainError,
+  createDomainError,
+} from '@domain/membership/errors/domain-error';
 import {
   createTransactionLog,
   appendTransactionLog,
@@ -9,6 +13,8 @@ import { createRandomId } from '@shared/utils/create-random-id';
 import { toCardSummaryDto } from '@application/dto/card-summary-mapper';
 import type { LocalLedgerRepository } from '@domain/membership/repositories/ledger.repository';
 import { maskMemberReference } from '@shared/utils/mask-member-reference';
+import { MAX_CARD_BALANCE } from '@domain/membership/config/balance-limits';
+import { type Clock, systemClock } from '@shared/ports/clock';
 
 export interface TopUpMemberCardRequest {
   amount: number;
@@ -19,8 +25,9 @@ export type TopUpMemberCardUseCase = {
 };
 
 export function createTopUpMemberCardUseCase(
-  cardRepository: MbcCardRepository,
+  cardRepository: CardWriter,
   localLedgerRepository?: LocalLedgerRepository,
+  clock: Clock = systemClock,
 ): TopUpMemberCardUseCase {
   return {
     async execute({
@@ -35,17 +42,23 @@ export function createTopUpMemberCardUseCase(
       }
 
       try {
-        const nextCard = await cardRepository.readWriteCard(card =>
-          appendTransactionLog(
+        const nextCard = await cardRepository.readWriteCard(card => {
+          if (card.balance + amount > MAX_CARD_BALANCE) {
+            throw createDomainError(
+              'BALANCE_CAP_EXCEEDED',
+              `Top-up rejected. Resulting balance would exceed the maximum allowed balance of Rp 5.000.000.`,
+            );
+          }
+          return appendTransactionLog(
             { ...card, balance: card.balance + amount },
             createTransactionLog({
               id: createRandomId('LOG'),
               activity: 'TOP_UP',
               nominal: amount,
-              occurredAt: new Date().toISOString(),
+              occurredAt: clock().toISOString(),
             }),
-          ),
-        );
+          );
+        });
 
         let message = 'Top-up completed successfully.';
 
@@ -59,7 +72,7 @@ export function createTopUpMemberCardUseCase(
                 nextCard.member.memberId,
               ),
               amount,
-              occurredAt: new Date().toISOString(),
+              occurredAt: clock().toISOString(),
             });
           } catch {
             message =
@@ -74,6 +87,14 @@ export function createTopUpMemberCardUseCase(
           card: toCardSummaryDto(nextCard),
         };
       } catch (error) {
+        if (isDomainError(error)) {
+          return {
+            success: false,
+            role: 'STATION',
+            message: error.message,
+          };
+        }
+
         if (isCardRepositoryError(error)) {
           return {
             success: false,

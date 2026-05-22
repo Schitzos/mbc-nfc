@@ -224,7 +224,7 @@ Expected outcome:
 Goal:
 
 - Improve implementation fidelity once Figma inputs are ready.
-- Extract shared RadarZone component, add ScanningRings animation, and align all role screens to consistent layout pattern.
+- Extract shared RadarZone component, add PulseRing (inline) animation, and align all role screens to consistent layout pattern.
 
 Dependency:
 
@@ -237,14 +237,69 @@ Order:
 3. `T-026C` Polish Hi-Fi Spacing, Icons, and Visual QA ✅ DONE
 4. `T-UI-SCOUT-002` Enhance Scout screen with radar animation ✅ DONE
 5. `T-UI-RADAR-001` Extract RadarZone as reusable component; add to Gate, Terminal ✅ DONE
-6. `T-UI-STATION-003` Revamp Station layout with RadarZone + segmented control + ScanningRings in NfcActionSheet ✅ DONE
+6. `T-UI-STATION-003` Revamp Station layout with RadarZone + segmented control + PulseRing (inline) in NfcActionSheet ✅ DONE
 
 Expected outcome:
 
 - UI is refined and implementable with stronger visual consistency.
 - All 4 role screens use RadarZone as the shared NFC trigger component.
-- NfcActionSheet scanning phase uses ScanningRings animation.
+- NfcActionSheet scanning phase uses PulseRing (inline) animation.
 - Station uses segmented control (Register | Top Up) tabs.
+
+### Phase 9B Feature Enhancements ✅ COMPLETE
+
+Goal:
+
+- Reinstate simulation mode for Gate check-in to support testing/demo with past entry times.
+
+Order:
+
+1. `T-FEAT-GATE-001` Implement Gate Simulation Mode ✅ DONE
+
+Expected outcome:
+
+- Gate has simulation toggle + DateTimePicker for past entry time.
+- `isSimulation` flag stored on NFC card in `activeSession` (codec field `s:1`).
+- Terminal skips balance deduction for simulation checkouts and shows a banner.
+- Dependency added: `@react-native-community/datetimepicker@8.3.0`.
+
+### Phase 9C Bug Fixes and Hardening ✅ COMPLETE
+
+Goal:
+
+- Fix registration overwrite bug and add balance cap safety measure.
+
+Order:
+
+1. `T-BUGFIX-001` Fix registerCard silent overwrite of tags with existing data ✅ DONE
+2. `T-BUGFIX-002` Add max balance cap (Rp 5.000.000) on top-up ✅ DONE
+3. `T-UI-THEME-001` Implement vibrant theme tokens ✅ DONE
+4. `T-UI-HEADER-001` Implement ScreenHeader shared component ✅ DONE
+
+Expected outcome:
+
+- Registration correctly detects and handles tags with existing non-MBC data.
+- Top-up rejects amounts that would exceed MAX_CARD_BALANCE (Rp 5.000.000) with BALANCE_CAP_EXCEEDED error.
+- Vibrant theme tokens available for presentation layer.
+- ScreenHeader provides consistent header across all role screens.
+
+### Phase 9D Autonomous E2E Testing — Maestro ✅ COMPLETE
+
+Goal:
+
+- Deliver autonomous UI-level E2E testing for the full parking MVP cycle without NFC hardware dependency.
+
+Order:
+
+1. `T-E2E-001` Implement Maestro E2E Testing with Mock NFC Repository ✅ DONE
+
+Expected outcome:
+
+- MockMbcCardRepository (in-memory singleton) enables E2E testing without NFC hardware.
+- `E2E_MODE = true` in `src/infrastructure/utils/e2e.config.ts` swaps real NFC repo for mock in DI container.
+- Maestro YAML flows cover: role switching, register, top-up, check-in, check-out, inspect, double check-in error, insufficient balance error.
+- Screenshots captured at key assertion points.
+- `npm run e2e:android` and `npm run e2e:test` scripts available.
 
 ### Phase 10 Demo And Submission
 

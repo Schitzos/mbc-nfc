@@ -64,7 +64,7 @@ The PDF uses member parking as the concrete required assessment scenario. Parkin
 - Member benefit fee deduction.
 - Parking activity as the required MVP activity, with configurable activity context treated as future-friendly design support.
 - Sequential flow integrity, with no double check-in or double check-out.
-- Simulation mode at The Gate to set entry time in the past for testing (removed in Phase 9; Gate uses real device time only).
+- Simulation mode at The Gate to set entry time in the past for testing/demo purposes.
 - Last five transaction logs stored on card.
 - Local SQLite ledger for offline reporting and audit on the device.
 - Sensitive data protection so identity and balance are not readable in plain form by generic NFC apps.
@@ -89,7 +89,7 @@ The PDF uses member parking as the concrete required assessment scenario. Parkin
 
 - Target cards are NFC/HF RFID cards readable and writable by supported phones.
 - Real card scan, read, and write flows require a physical device with NFC hardware enabled.
-- Devices without NFC cannot perform real MBC card operations. No simulation mode or mock scenario selectors are included in the production app.
+- Devices without NFC cannot perform real MBC card operations.
 - Android is the primary MVP NFC read/write validation target, using ASUS ROG Phone 9 FE (Android 14+) as the validated real-device test baseline.
 - iOS NFC read/write is out of MVP and may be treated as best-effort/read-only unless validated later on real device.
 - The MVP target NFC tag is NTAG215. NFC payload design, card capacity validation, and real-card tests must be validated against NTAG215 behavior and capacity.
@@ -110,7 +110,7 @@ The PDF uses member parking as the concrete required assessment scenario. Parkin
 | US-001 | As a cooperative admin, I can register a member card at The Station.                                           | Must     |
 | US-002 | As a cooperative admin, I can top up a member balance at The Station.                                          | Must     |
 | US-003 | As a gate operator, I can check in a member to an activity by tapping the card at The Gate.                    | Must     |
-| US-004 | As a gate operator, I can check in a member using real device time (simulation mode removed).                  | Must     |
+| US-004 | As a gate operator, I can check in a member using real device time or a simulated past time for testing/demo.  | Must     |
 | US-005 | As a terminal operator, I can check out a member from an activity by tapping the card at The Terminal.         | Must     |
 | US-006 | As a terminal operator, I can see activity duration and fee after successful checkout tap.                     | Must     |
 | US-007 | As a terminal operator, I can block checkout when balance is insufficient and show clear top-up guidance.      | Must     |
@@ -161,6 +161,9 @@ Acceptance criteria:
 - Amount must be positive.
 - App reads current balance, adds the amount, and writes the new balance to card.
 - Top-up writes a transaction log entry with nominal, time, and activity.
+- Top-up must reject if resulting balance would exceed MAX_CARD_BALANCE (Rp 5.000.000).
+- Rejection uses BALANCE_CAP_EXCEEDED error with clear user guidance.
+- The balance cap is defined as a domain config constant in `src/domain/membership/config/balance-limits.ts`.
 
 ### FR-004 Gate Check-In
 
@@ -172,11 +175,21 @@ Acceptance criteria:
 - Operator can use the default parking activity or another configured activity context.
 - If the card is not currently checked in, app writes activity ID, entry timestamp, and checked-in status.
 - If the card is already checked in, app rejects the action as double check-in.
+- Gate provides a simulation toggle that allows the operator to set a custom entry timestamp (in the past) for testing and demo purposes. When simulation is off, real device time is used.
 - Check-in writes a transaction log entry.
 
-### FR-005 Gate Simulation Mode (Removed)
+### FR-005 Gate Simulation Mode
 
-Gate simulation mode was removed in Phase 9. The Gate now uses real device time for check-in timestamps. This simplifies the Gate flow and removes mock scenario selectors from all screens.
+The Gate shall provide a simulation mode for testing and demo purposes.
+
+Acceptance criteria:
+
+- Gate provides a toggle to enable/disable simulation mode.
+- When simulation mode is enabled, the operator can set a custom entry timestamp (must be in the past relative to device time).
+- When simulation mode is disabled, real device time is used for check-in.
+- Simulation mode is clearly indicated in the UI so operators know which mode is active.
+- The simulated timestamp is written to the card as the check-in time.
+- Terminal checkout calculates duration from the simulated entry time to real device exit time.
 
 ### FR-006 Terminal Check-Out
 
@@ -295,7 +308,7 @@ The app shall explicitly handle common offline/NFC operational edge cases so fie
 
 Acceptance criteria:
 
-- Gate uses real device time for check-in; simulation mode is not part of production flow.
+- Gate uses real device time for check-in by default; simulation mode is available for testing/demo purposes.
 - If the device clock causes checkout time to be earlier than or equal to check-in time, checkout is rejected before any balance deduction.
 - If a card is removed during write, `writeNdefMessage` throws and success is not shown.
 - If SQLite/local reporting data is deleted, the card remains operational source of truth but local reports for that device may be incomplete.
@@ -342,7 +355,7 @@ Acceptance criteria:
 | NFR-010 | UI system                        | The frontend applies the Signal UI design system direction required by the brief.                                                                                                                                                                                   |
 | NFR-011 | Device clarity                   | The app clearly communicates that real card operations require NFC hardware and shows actionable guidance when NFC is unavailable or disabled.                                                                                                                      |
 | NFR-012 | Data separation                  | NFC card member state and local device audit/reporting data remain clearly separated.                                                                                                                                                                               |
-| NFR-013 | Coverage target                  | Automated unit-test coverage should reach at least 90% across the whole executable repository source, excluding only pure type-only contract files and generated artifacts. Actual achievement: 100% line coverage with 444+ automated tests across 65 test suites. |
+| NFR-013 | Coverage target                  | Automated unit-test coverage should reach at least 90% across the whole executable repository source, excluding only pure type-only contract files and generated artifacts. Actual achievement: 90%+ line coverage with 477+ automated tests across 75 test suites. |
 | NFR-014 | Static quality gate              | The project should integrate with SonarCloud and target a passing quality gate with strong maintainability, reliability, and security ratings.                                                                                                                      |
 | NFR-015 | Branching and release automation | The project shall use feature branches with controlled promotion to `develop` and `main`, and merging to `main` shall trigger automated APK app-distribution publishing.                                                                                            |
 | NFR-016 | Dependency vulnerability gate    | After installing or changing libraries, `npm audit` shall report 0 known vulnerabilities before the task is considered done.                                                                                                                                        |
@@ -398,7 +411,7 @@ Acceptance criteria:
 - Sequential loop prevents double check-in and double check-out.
 - Sensitive identity, balance, parking status details, and transaction values are not readable as plain NFC text in generic NFC apps.
 - Station can show a local offline summary for audit/reporting on that device.
-- Automated unit-test coverage across the whole executable repository source reaches at least 90%. Actual achievement: 100% line coverage (444+ tests, 65 suites; jest.config.js thresholds set to 99% statements/lines/branches, 96% functions).
+- Automated unit-test coverage across the whole executable repository source reaches at least 90%. Actual achievement: 90%+ line coverage (477+ tests, 75 suites; jest.config.js thresholds set to 99% statements/lines/branches, 96% functions).
 - SonarCloud analysis passes the configured quality gate for the submitted codebase.
 - `npm audit` reports 0 known vulnerabilities after dependency changes.
 - App works offline for all core flows.
@@ -422,7 +435,7 @@ Acceptance criteria:
 ### PO Clarifications (2026-05-07)
 
 - **Minimum parking duration (FR-006/FR-014):** PO confirms 1 second already counts as 1 started hour = Rp 2.000. Any non-zero duration rounds up to the next whole hour. This is correct per spec.
-- **Max balance cap (FR-003):** PO confirms there is no maximum balance cap. Unlimited top-up is acceptable; no upper-bound validation is required on card balance.
+- **Max balance cap (FR-003):** ~~PO confirms there is no maximum balance cap (2026-05-07).~~ **REVERSED (2026-05-22):** PO reverses the no-cap clarification. A balance cap of Rp 5.000.000 (MAX_CARD_BALANCE) is a valid safety measure for the cooperative context. Implemented via T-BUGFIX-002, QA-validated 2026-05-21. Top-up rejects with BALANCE_CAP_EXCEEDED when resulting balance would exceed the cap.
 - **Re-registration behavior (FR-002):** Current prompt-to-overwrite behavior is canonical. Operator must confirm before wipe and re-register. `ALREADY_REGISTERED_CARD` is the detection state, not a hard rejection. PO confirmed 2026-05-07.
 
 ### PO Clarifications (2026-05-08)

@@ -1,3 +1,8 @@
+const tailwindColors = require('./color-tokens.js') as Record<string, string>;
+
+/** Tailwind-shared color tokens (single source of truth for NativeWind classes) */
+export const twColors = tailwindColors;
+
 export const signalColorTokens = {
   brand: {
     primary: '#FF0025',
@@ -79,6 +84,18 @@ export const colors = {
   surfaceInfo: signalColorTokens.background.info02,
   surfaceDisabled: signalColorTokens.background.disable01,
   shadowLow: '#9E9E9E',
+} as const;
+
+export const vibrantTokens = {
+  successGradientStart: '#059669',
+  successGradientEnd: '#10B981',
+  darkCardGradientStart: '#0F172A',
+  darkCardGradientEnd: '#1E293B',
+  simulationAmber: '#F59E0B',
+  simulationAmberGlow: 'rgba(245, 158, 11, 0.3)',
+  glassWhite: 'rgba(255, 255, 255, 0.85)',
+  glassBorder: 'rgba(255, 255, 255, 0.4)',
+  accentBlue: '#3B82F6',
 } as const;
 
 export type ColorToken = keyof typeof colors;

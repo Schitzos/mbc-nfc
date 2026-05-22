@@ -1,0 +1,81 @@
+appId: com.mbcnfc
+env:
+  MAESTRO_WAIT_TIMEOUT: 3000
+---
+# Full Parking Flow: Register → Top Up → Check In → Check Out → Inspect
+
+- clearState
+- launchApp
+
+# === REGISTER ===
+- assertVisible: 'Select Operating Role'
+- takeScreenshot: '.maestro/screenshots/01-role-switcher'
+- tapOn: 'Station'
+- takeScreenshot: '.maestro/screenshots/02-station-screen'
+- tapOn: 'Register'
+- takeScreenshot: '.maestro/screenshots/03-register-tab-selected'
+- tapOn: 'Tap Card to Register'
+- assertVisible: 'Card Registered'
+- takeScreenshot: '.maestro/screenshots/04-register-success-sheet'
+- tapOn: 'Done'
+- takeScreenshot: '.maestro/screenshots/05-register-result'
+
+# === TOP UP 50k ===
+- tapOn: 'Top Up'
+- takeScreenshot: '.maestro/screenshots/06-topup-tab-selected'
+- tapOn: '50k'
+- takeScreenshot: '.maestro/screenshots/07-topup-amount-entered'
+- tapOn: 'Tap Card to Top Up'
+- assertVisible: 'Top-Up Complete'
+- takeScreenshot: '.maestro/screenshots/08-topup-success-sheet'
+- tapOn: 'Done'
+- takeScreenshot: '.maestro/screenshots/09-topup-result'
+
+# === CHECK IN ===
+- tapOn:
+    label: 'Go back'
+- assertVisible: 'Select Operating Role'
+- takeScreenshot: '.maestro/screenshots/10-back-to-role-switcher'
+- tapOn: 'Gate'
+- assertVisible: 'Checking in for Parking'
+- takeScreenshot: '.maestro/screenshots/11-gate-screen'
+- tapOn: 'Tap Card to Check In'
+- assertVisible: 'Checked In'
+- takeScreenshot: '.maestro/screenshots/12-checkin-success-sheet'
+- tapOn: 'Done'
+- takeScreenshot: '.maestro/screenshots/13-checkin-result'
+
+# === CHECK OUT ===
+- tapOn:
+    label: 'Go back'
+- assertVisible: 'Select Operating Role'
+- tapOn: 'Terminal'
+- assertVisible: 'Checking out for Parking'
+- takeScreenshot: '.maestro/screenshots/14-terminal-screen'
+- tapOn: 'Tap Card to Check Out'
+- assertVisible: 'Checkout Complete'
+- takeScreenshot: '.maestro/screenshots/15-checkout-success-sheet'
+- tapOn: 'Done'
+- assertVisible: 'Checkout Summary'
+- takeScreenshot: '.maestro/screenshots/16-checkout-summary'
+
+# === INSPECT ===
+- tapOn:
+    label: 'Go back'
+- assertVisible: 'Select Operating Role'
+- tapOn: 'Scout'
+- assertVisible: 'Card Inspection and Member Info'
+- takeScreenshot: '.maestro/screenshots/17-scout-screen'
+- tapOn: 'Inspect'
+- assertVisible: 'Card Read'
+- takeScreenshot: '.maestro/screenshots/18-scout-success-sheet'
+- tapOn: 'Done'
+- assertVisible: 'Member Card Information'
+- assertVisible: 'Not checked in'
+- takeScreenshot: '.maestro/screenshots/19-scout-inspect-result'
+
+# === BACK TO ROLE SWITCHER ===
+- tapOn:
+    label: 'Go back'
+- assertVisible: 'Select Operating Role'
+- takeScreenshot: '.maestro/screenshots/20-final-role-switcher'
