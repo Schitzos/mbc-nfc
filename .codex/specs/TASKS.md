@@ -1,6 +1,6 @@
 # Membership Benefit Card — Codex Task Plan Lite
 
-> Current status: 446+ tests | 66 suites | 100% line coverage | jest.config.js thresholds: 99% statements/lines/branches, 96% functions
+> Current status: 472+ tests | 75 suites | 100% line coverage | jest.config.js thresholds: 99% statements/lines/branches, 96% functions
 
 Purpose: compact, Codex-friendly task cards. Execute task order from `EXECUTION_ORDER.md`. Use detailed docs only when the task references them.
 
@@ -841,6 +841,24 @@ Acceptance Criteria:
 - Coverage remains >=90%
 
 Status: (in-progress)
+
+### T-E2E-001 — Implement Maestro E2E Testing with Mock NFC Repository
+
+Owner: Test Automation Engineer
+Refs: `E2E_TEST_CASES.md`, `DESIGN.md`
+Do: Create MockMbcCardRepository (in-memory singleton), add config-based DI swap (`E2E_MODE` in `src/infrastructure/utils/e2e.config.ts` → mock repo), create Maestro YAML flows for full parking MVP (register, top-up, check-in, check-out, inspect, error cases), add screenshots at key assertion points, add npm scripts for local Maestro execution, add unit tests for mock repository.
+Acceptance Criteria:
+
+- MockMbcCardRepository holds state in memory across operations (singleton)
+- `E2E_MODE = true` in `src/infrastructure/utils/e2e.config.ts` swaps real NFC repo for mock in container.ts
+- Maestro YAML flows cover: role switching, register, top-up 50k, check-in, check-out (fee/duration), inspect, double check-in error, insufficient balance error
+- Screenshots captured at key assertion points
+- npm scripts for local Maestro execution added to package.json
+- Unit tests for mock repository pass with >=90% coverage
+
+Status: ✅ DONE
+
+---
 
 ### T-SA-AUDIT-001 — Audit Clean Architecture and SOLID violations
 

@@ -283,6 +283,24 @@ Expected outcome:
 - Vibrant theme tokens available for presentation layer.
 - ScreenHeader provides consistent header across all role screens.
 
+### Phase 9D Autonomous E2E Testing — Maestro ✅ COMPLETE
+
+Goal:
+
+- Deliver autonomous UI-level E2E testing for the full parking MVP cycle without NFC hardware dependency.
+
+Order:
+
+1. `T-E2E-001` Implement Maestro E2E Testing with Mock NFC Repository ✅ DONE
+
+Expected outcome:
+
+- MockMbcCardRepository (in-memory singleton) enables E2E testing without NFC hardware.
+- `E2E_MODE = true` in `src/infrastructure/utils/e2e.config.ts` swaps real NFC repo for mock in DI container.
+- Maestro YAML flows cover: role switching, register, top-up, check-in, check-out, inspect, double check-in error, insufficient balance error.
+- Screenshots captured at key assertion points.
+- `npm run e2e:android` and `npm run e2e:test` scripts available.
+
 ### Phase 10 Demo And Submission
 
 Goal:
