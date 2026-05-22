@@ -64,4 +64,17 @@ describe('createAppServices', () => {
     const services = createAppServices();
     expect(() => services.station.cancelNfc()).not.toThrow();
   });
+
+  it('uses mock repository when E2E_MODE is true', () => {
+    jest.resetModules();
+    jest.doMock('@infrastructure/utils/e2e.config', () => ({
+      E2E_MODE: true,
+    }));
+    jest.doMock('@op-engineering/op-sqlite', () => ({
+      open: jest.fn().mockReturnValue({ execute: jest.fn() }),
+    }));
+    const { createAppServices: createE2E } = require('@app/container');
+    const services = createE2E();
+    expect(services.station.registerMemberCardUseCase).toBeTruthy();
+  });
 });
