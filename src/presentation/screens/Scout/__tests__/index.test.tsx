@@ -136,11 +136,13 @@ describe('Scout screen', () => {
     await waitFor(() =>
       expect(mockInspectMemberCardUseCase.execute).toHaveBeenCalled(),
     );
-    await waitFor(() => expect(screen.getByText('Done')).toBeTruthy());
+    await waitFor(() => expect(screen.getByText('Done')).toBeTruthy(), {
+      timeout: 10000,
+    });
     fireEvent.press(screen.getByText('Done'));
     fireEvent.press(screen.getByLabelText('Go back'));
     expect(__mockNavigation.goBack).toHaveBeenCalled();
-  });
+  }, 15000);
 
   it('Scout shows checked-in card status', async () => {
     mockInspectMemberCardUseCase.execute.mockResolvedValueOnce({

@@ -8,7 +8,7 @@ import { isCardRepositoryError } from '@domain/membership/errors/membership-card
 const sampleCard: MbcCard = {
   version: 1,
   cardId: 'CARD-001',
-  member: { memberId: 'MBR-001', name: 'Test User' },
+  member: { memberId: 'MBR-001', displayName: 'Test User' },
   balance: 50_000,
   currency: 'IDR',
   visitStatus: 'NOT_CHECKED_IN',

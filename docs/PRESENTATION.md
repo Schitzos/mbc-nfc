@@ -870,7 +870,67 @@ flowchart LR
 
 ---
 
-# 14. Way of Working — Delivery Workflow
+# 14. Way of Working — Agile AI Agents
+
+## Agent-Driven Development
+
+This project uses an **Agile AI Agent** workflow where each agent is responsible for its own domain, mimicking a real cross-functional team. Tasks flow through a structured pipeline — just like a sprint — with clear ownership, acceptance criteria, and validation gates.
+
+### Agent Roster
+
+| Agent          | Role                         | Responsibility                                                                    |
+| -------------- | ---------------------------- | --------------------------------------------------------------------------------- |
+| **@PM**        | Project Manager              | Creates issues, tracks milestones, manages task board (Todo → In Progress → Done) |
+| **@PO**        | Product Owner                | Defines MVP scope, acceptance criteria, and priority decisions                    |
+| **@SA**        | System Analyst               | Writes requirements, user flows, edge cases, and traceability                     |
+| **@architect** | Software Architect           | Designs layers, domain models, payload strategy, and technical decisions          |
+| **@FE**        | Senior React Native Engineer | Implements features, refactors code, delivers on feature branches                 |
+| **@test**      | Test Automation Engineer     | Writes unit tests, ensures coverage targets, CI-friendly regression               |
+| **@QA**        | Senior QA                    | Validates deliverables on emulator, attaches screenshot evidence                  |
+| **@NFC**       | NFC Specialist               | Handles NFC read/write, tag compatibility, and real-device testing                |
+| **@security**  | Security Pentester           | Audits Silent Shield, reviews tamper handling, checks privacy                     |
+| **@UI**        | UI/UX Designer               | Designs role-based flows, Signal UI alignment, screen states                      |
+| **@TW**        | Technical Writer             | Writes documentation, demo scripts, and presentation materials                    |
+| **@release**   | Release Engineer             | Manages CI/CD, Firebase distribution, and merge reviews                           |
+
+### Task Pipeline (Per Feature)
+
+```mermaid
+flowchart LR
+    PM[📋 @PM<br/>Create Issue<br/>+ TASKS.md] --> W[🔨 Worker Agent<br/>Implement<br/>Move to In Progress]
+    W --> QA[✅ @QA<br/>Validate on Emulator<br/>Move to Done]
+
+    style PM fill:#FFECB3,color:#000
+    style W fill:#B3E5FC,color:#000
+    style QA fill:#C8E6C9,color:#000
+```
+
+Every task follows this mandatory 3-stage pipeline:
+
+1. **@PM creates the issue** — appends to TASKS.md, opens GitHub Issue with `[T-SECTION-NNN]` title, sets status to Todo on the project board.
+2. **Worker agent implements** — moves issue to In Progress, writes code + tests, ensures TSC clean.
+3. **@QA validates** — runs on emulator, confirms acceptance criteria, moves to Done.
+
+### Escalation Protocol
+
+When an agent encounters ambiguity or missing information, it escalates — never assumes:
+
+| Missing Information                               | Escalate To |
+| ------------------------------------------------- | ----------- |
+| Product scope, priority, acceptance criteria      | @PO         |
+| Business requirements, user flows, edge cases     | @SA         |
+| Architecture, module boundaries, technical design | @architect  |
+
+### Key Principles
+
+- **Single Responsibility** — each agent owns one domain, no overlap
+- **Spec-Driven** — agents work from `.codex/specs/` as the single source of truth
+- **No Assumptions** — if it's not in the spec, escalate before implementing
+- **Traceable** — every task has an issue, every issue has acceptance criteria, every deliverable has QA evidence
+
+---
+
+# 15. Delivery Workflow
 
 ## Delivery Pipeline
 
@@ -919,7 +979,7 @@ flowchart LR
 
 ---
 
-# 15. Architecture Decision Records (Key ADRs)
+# 16. Architecture Decision Records (Key ADRs)
 
 | ADR     | Decision                         | Rationale                                        |
 | ------- | -------------------------------- | ------------------------------------------------ |
@@ -940,7 +1000,7 @@ flowchart LR
 
 ---
 
-# 16. Tech Stack
+# 17. Tech Stack
 
 | Area           | Choice                                         | Rationale                                    |
 | -------------- | ---------------------------------------------- | -------------------------------------------- |
@@ -961,7 +1021,7 @@ flowchart LR
 
 ---
 
-# 17. Real Device Validation
+# 18. Real Device Validation
 
 ## Test Environment
 
@@ -991,7 +1051,7 @@ flowchart LR
 
 ---
 
-# 18. Demo Session — Complete Parking Cycle
+# 19. Demo Session — Complete Parking Cycle
 
 ## Demo Script
 
@@ -1057,7 +1117,7 @@ sequenceDiagram
 
 ---
 
-# 19. Key Achievements
+# 20. Key Achievements
 
 ## 📊 Numbers at a Glance
 
@@ -1090,7 +1150,7 @@ sequenceDiagram
 
 ---
 
-# 20. Known Limitations & Production Gaps
+# 21. Known Limitations & Production Gaps
 
 ## Prototype Scope Limitations
 
@@ -1116,7 +1176,7 @@ sequenceDiagram
 
 ---
 
-# 21. Summary & Submission Checklist
+# 22. Summary & Submission Checklist
 
 ## Definition of Done
 
