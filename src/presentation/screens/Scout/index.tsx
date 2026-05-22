@@ -3,12 +3,12 @@ import {
   Animated,
   Easing,
   ImageBackground,
-  Pressable,
   ScrollView,
   Text,
   View,
 } from 'react-native';
 import { ScreenHeader } from '@presentation/components/ScreenHeader';
+import { SignalButton } from '@presentation/components/SignalButton';
 import { NfcLogPanel } from '@presentation/components/NfcLogPanel';
 import { NfcActionSheet } from '@presentation/components/NfcActionSheet';
 import { RadarZone } from '@presentation/components/RadarZone';
@@ -97,7 +97,7 @@ export function ScoutScreen(): React.JSX.Element {
 
             <View className="z-10 pointer-events-none">
               <Text
-                className={`text-center text-sm ${actions.busy ? 'text-[#00B4D8] font-semibold' : 'text-[#6B7280]'} mt-6`}
+                className={`text-center text-sm ${actions.busy ? 'text-scout font-semibold' : 'text-muted'} mt-6`}
                 accessibilityLiveRegion="polite"
               >
                 {statusText}
@@ -105,7 +105,10 @@ export function ScoutScreen(): React.JSX.Element {
             </View>
           </View>
         ) : (
-          <ScrollView className="flex-1" contentContainerClassName="pt-2 pb-4">
+          <ScrollView
+            className="flex-1"
+            contentContainerClassName="pt-2 pb-4 gap-4"
+          >
             {actions.latestResult && (
               <Animated.View
                 className="gap-3"
@@ -128,16 +131,11 @@ export function ScoutScreen(): React.JSX.Element {
               </Animated.View>
             )}
 
-            <Pressable
-              className="mt-4 rounded-xl py-3 items-center bg-[rgba(0,180,216,0.15)] border border-[rgba(0,180,216,0.4)]"
+            <SignalButton
+              label="Scan Another Card"
               onPress={handleScanAgain}
-              accessibilityRole="button"
               accessibilityLabel="Scan another card"
-            >
-              <Text className="text-[#00B4D8] font-semibold text-sm">
-                Scan Another Card
-              </Text>
-            </Pressable>
+            />
           </ScrollView>
         )}
 

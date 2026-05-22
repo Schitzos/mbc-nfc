@@ -1,5 +1,6 @@
 import React from 'react';
-import { Pressable, Text, View } from 'react-native';
+import { Text, View } from 'react-native';
+import { SignalButton } from '@presentation/components/SignalButton';
 import type { RoleActionResultDto } from '@application/dto/role-action-result-dto';
 
 interface GenericFailureCardProps {
@@ -12,23 +13,19 @@ export function GenericFailureCard({
   onReset,
 }: Readonly<GenericFailureCardProps>): React.JSX.Element {
   return (
-    <View className="rounded-[20px] p-4 w-full bg-white/40 border border-[rgba(255,82,82,0.4)]">
+    <View className="rounded-[20px] p-4 w-full bg-white/40 border border-[rgba(255,82,82,0.4)] gap-2">
       <Text className="text-xs font-semibold uppercase text-red-700">
         Card cannot be processed
       </Text>
-      <Text className="mt-1 text-sm font-semibold text-[#111827]">
+      <Text className="text-sm font-semibold text-foreground">
         {latestResult.message}
       </Text>
       {onReset && (
-        <Pressable
+        <SignalButton
           testID="terminal-scan-another"
-          className="mt-4 items-center justify-center h-10 rounded-full bg-brand"
+          label="Scan Another Card"
           onPress={onReset}
-        >
-          <Text className="text-sm font-semibold text-white">
-            Scan Another Card
-          </Text>
-        </Pressable>
+        />
       )}
     </View>
   );
