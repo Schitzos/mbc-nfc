@@ -264,7 +264,7 @@ describe('Scout screen', () => {
     );
 
     await waitFor(() =>
-      expect(screen.getByText('Card cannot be processed')).toBeTruthy(),
+      expect(screen.getByText('CARD CANNOT BE PROCESSED')).toBeTruthy(),
     );
   });
 
