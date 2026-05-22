@@ -38,7 +38,7 @@ export class ErrorBoundary extends React.Component<
           </Text>
           <TouchableOpacity
             onPress={this.handleReset}
-            className="bg-[#0050AE] px-6 py-3 rounded-lg"
+            className="bg-accent px-6 py-3 rounded-lg"
           >
             <Text className="text-white font-semibold">Try Again</Text>
           </TouchableOpacity>

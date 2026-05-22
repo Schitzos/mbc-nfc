@@ -16,10 +16,10 @@ export function SegmentedControl({
         accessibilityRole="tab"
         accessibilityState={{ selected: registerMode }}
         onPress={() => setRegisterMode(true)}
-        className={`flex-1 py-2.5 rounded-full items-center ${registerMode ? 'bg-[#FFE4E8]' : ''}`}
+        className={`flex-1 py-2.5 rounded-full items-center ${registerMode ? 'bg-pink-light' : ''}`}
       >
         <Text
-          className={`text-sm font-semibold ${registerMode ? 'text-brand' : 'text-[#6B7280]'}`}
+          className={`text-sm font-semibold ${registerMode ? 'text-brand' : 'text-muted'}`}
         >
           Register
         </Text>
@@ -28,10 +28,10 @@ export function SegmentedControl({
         accessibilityRole="tab"
         accessibilityState={{ selected: !registerMode }}
         onPress={() => setRegisterMode(false)}
-        className={`flex-1 py-2.5 rounded-full items-center ${!registerMode ? 'bg-[#FFE4E8]' : ''}`}
+        className={`flex-1 py-2.5 rounded-full items-center ${!registerMode ? 'bg-pink-light' : ''}`}
       >
         <Text
-          className={`text-sm font-semibold ${!registerMode ? 'text-brand' : 'text-[#6B7280]'}`}
+          className={`text-sm font-semibold ${!registerMode ? 'text-brand' : 'text-muted'}`}
         >
           Top Up
         </Text>

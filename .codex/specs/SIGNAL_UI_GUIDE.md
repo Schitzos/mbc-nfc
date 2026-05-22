@@ -236,7 +236,6 @@ Extracted mobile option-card variants:
 Option-card implementation:
 
 - `src/presentation/theme/components.ts`
-- `src/presentation/components/SignalOptionCard.tsx`
 
 MBC usage:
 
@@ -294,7 +293,6 @@ Extracted loader variants:
 Loader implementation:
 
 - `src/presentation/theme/components.ts`
-- `src/presentation/components/SignalSkeleton.tsx`
 
 MBC usage:
 
@@ -323,7 +321,6 @@ Extracted text-field variants:
 Text-field implementation:
 
 - `src/presentation/theme/components.ts`
-- `src/presentation/components/SignalTextField.tsx`
 
 MBC usage:
 
@@ -442,13 +439,8 @@ Generated React Native reference:
 - `src/presentation/theme/components.ts`
 - `src/presentation/theme/icons.ts`
 - `src/presentation/components/SignalButton.tsx`
-- `src/presentation/components/SignalOptionCard.tsx`
 - `src/presentation/components/SignalBottomSheet.tsx`
-- `src/presentation/components/SignalSkeleton.tsx`
-- `src/presentation/components/SignalTextField.tsx`
-- `src/presentation/components/SignalJelajahCard.tsx`
 - `src/presentation/components/RadarZone/` — shared NFC trigger component used by all 4 role screens. Dark immersive zone with concentric radar rings, 360° sweep line, pulse animations, and a colored circular action button. Accepts `color` prop for per-role theming.
-- `src/presentation/components/ScanningRings/` — NfcActionSheet scanning-phase animation. 3 concentric pulsing rings + breathing center NFC icon. Replaces plain ActivityIndicator during NFC scan.
 
 Remaining exact Signal values are not yet fully extracted because earlier broad Figma inspection returned a plan/tool-call limit.
 

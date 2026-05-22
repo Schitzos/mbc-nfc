@@ -3,13 +3,14 @@ import {
   Animated,
   Easing,
   ImageBackground,
-  Pressable,
   ScrollView,
   Text,
   View,
+  Image,
 } from 'react-native';
 import { ScreenHeader } from '@presentation/components/ScreenHeader';
 import { NfcLogPanel } from '@presentation/components/NfcLogPanel';
+import { SignalButton } from '@presentation/components/SignalButton';
 import { NfcActionSheet } from '@presentation/components/NfcActionSheet';
 import { RadarZone } from '@presentation/components/RadarZone';
 import { useAppStore } from '@presentation/stores/app-store';
@@ -21,6 +22,7 @@ import { MemberCardInfo } from './fragments/MemberCardInfo';
 import { LatestLogsCard } from './fragments/LatestLogsCard';
 
 const bgImage = require('@presentation/assets/bg-role-switcher.png');
+const gateIllustration = require('@presentation/assets/illustration-nfc-gate.png');
 
 export function ScoutScreen(): React.JSX.Element {
   const setSelectedRole = useAppStore(state => state.setSelectedRole);
@@ -97,7 +99,7 @@ export function ScoutScreen(): React.JSX.Element {
 
             <View className="z-10 pointer-events-none">
               <Text
-                className={`text-center text-sm ${actions.busy ? 'text-[#00B4D8] font-semibold' : 'text-[#6B7280]'} mt-6`}
+                className={`text-center text-sm ${actions.busy ? 'text-scout font-semibold' : 'text-muted'} mt-6`}
                 accessibilityLiveRegion="polite"
               >
                 {statusText}
@@ -105,7 +107,10 @@ export function ScoutScreen(): React.JSX.Element {
             </View>
           </View>
         ) : (
-          <ScrollView className="flex-1" contentContainerClassName="pt-2 pb-4">
+          <ScrollView
+            className="flex-1"
+            contentContainerClassName="pt-2 pb-4 gap-4"
+          >
             {actions.latestResult && (
               <Animated.View
                 className="gap-3"
@@ -115,7 +120,22 @@ export function ScoutScreen(): React.JSX.Element {
                 }}
               >
                 {actions.latestResult.success === false && (
-                  <ScoutErrorCard message={actions.latestResult.message} />
+                  <View className="flex-1">
+                    <ScoutErrorCard
+                      message={actions.latestResult.message}
+                      onReset={handleScanAgain}
+                    />
+                    <View
+                      className="flex-1 items-center justify-center"
+                      pointerEvents="none"
+                    >
+                      <Image
+                        source={gateIllustration}
+                        className="w-[480px] h-[430px] opacity-60"
+                        resizeMode="contain"
+                      />
+                    </View>
+                  </View>
                 )}
                 {actions.latestResult.card && (
                   <MemberCardInfo card={actions.latestResult.card} />
@@ -128,16 +148,13 @@ export function ScoutScreen(): React.JSX.Element {
               </Animated.View>
             )}
 
-            <Pressable
-              className="mt-4 rounded-xl py-3 items-center bg-[rgba(0,180,216,0.15)] border border-[rgba(0,180,216,0.4)]"
-              onPress={handleScanAgain}
-              accessibilityRole="button"
-              accessibilityLabel="Scan another card"
-            >
-              <Text className="text-[#00B4D8] font-semibold text-sm">
-                Scan Another Card
-              </Text>
-            </Pressable>
+            {actions.latestResult?.success && (
+              <SignalButton
+                label="Scan Another Card"
+                onPress={handleScanAgain}
+                accessibilityLabel="Scan another card"
+              />
+            )}
           </ScrollView>
         )}
 

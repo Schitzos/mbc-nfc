@@ -8,8 +8,8 @@
 [![Code Smells](https://sonarcloud.io/api/project_badges/measure?project=Schitzos_mbc-nfc&metric=code_smells)](https://sonarcloud.io/summary/new_code?id=Schitzos_mbc-nfc)
 [![Coverage](https://sonarcloud.io/api/project_badges/measure?project=Schitzos_mbc-nfc&metric=coverage)](https://sonarcloud.io/summary/new_code?id=Schitzos_mbc-nfc)
 [![Duplicated Lines (%)](https://sonarcloud.io/api/project_badges/measure?project=Schitzos_mbc-nfc&metric=duplicated_lines_density)](https://sonarcloud.io/summary/new_code?id=Schitzos_mbc-nfc)
-![Coverage](https://img.shields.io/badge/coverage-100%25-brightgreen)
-![Tests](https://img.shields.io/badge/tests-444%20passed-brightgreen)
+![Coverage](https://img.shields.io/badge/coverage-90%25+-brightgreen)
+![Tests](https://img.shields.io/badge/tests-477+%20passed-brightgreen)
 ![Platform](https://img.shields.io/badge/platform-Android-blue)
 ![NFC](https://img.shields.io/badge/NFC-NTAG215-orange)
 
@@ -54,7 +54,9 @@ Infrastructure → Application/Domain contracts
 | UI         | Signal UI design system                   |
 | State      | Zustand + React Context (DI)              |
 | Navigation | React Navigation                          |
-| Testing    | Jest (444+ tests, 100% coverage)          |
+| Splash     | `react-native-bootsplash`                 |
+| Testing    | Jest (477+ tests, 90%+ coverage)          |
+| E2E        | Maestro (autonomous UI flows)             |
 | Quality    | SonarCloud, Husky hooks                   |
 
 ## Key Features
@@ -70,7 +72,101 @@ Infrastructure → Application/Domain contracts
 - **Single-tap NFC**: Read+validate+transform+write in one session
 - **SQLite Ledger**: Device-local audit trail for Station operations
 
+## Parking Flow
+
+```mermaid
+flowchart LR
+    S[🏪 Station<br/>Register & Top-Up] -->|NFC Card| G[🚧 Gate<br/>Check-In]
+    G -->|NFC Card| T[💳 Terminal<br/>Check-Out & Fee]
+    SC[🔍 Scout<br/>Inspect] -.->|read-only| Card
+
+    S --- Card((🪪 NFC Card<br/>Source of Truth))
+    G --- Card
+    T --- Card
+```
+
+1. **Station** registers a new card → writes member ID + initial balance
+2. **Station** tops up balance → increases stored value
+3. **Gate** checks in → writes entry timestamp to card
+4. **Terminal** checks out → calculates fee (Rp 2.000/started hour), deducts balance
+5. **Scout** inspects → reads card without modifying (balance, status, last 5 logs)
+
+## Project Structure
+
+```
+src/
+├── domain/              # Business rules (zero dependencies)
+│   └── membership/
+│       ├── entities/    # Card, Member, Transaction types
+│       ├── policies/    # Tariff calculator, state policy, log policy
+│       ├── repositories/# Repository interfaces (ports)
+│       └── errors/      # Domain error codes
+├── application/         # Use cases (orchestration)
+│   ├── use-cases/       # Register, TopUp, CheckIn, CheckOut, Inspect
+│   └── dto/             # Presentation-safe data transfer objects
+├── infrastructure/      # External implementations
+│   ├── nfc/             # Real NFC repo, mock repo, codec, Silent Shield
+│   ├── local-ledger/    # SQLite audit repository
+│   └── utils/           # E2E config
+├── presentation/        # UI layer
+│   ├── screens/         # Splash, RoleSwitcher, Station, Gate, Terminal, Scout
+│   ├── components/      # ScreenHeader, RadarZone, NfcActionSheet, SignalButton, etc.
+│   ├── hooks/           # Custom React hooks
+│   ├── stores/          # Zustand state
+│   └── theme/           # Colors, typography, spacing, shadows
+├── shared/              # Cross-layer utilities
+│   ├── ports/           # Clock abstraction
+│   └── utils/           # ID generator, masking
+└── app/                 # Composition root
+    ├── container.ts     # DI wiring
+    ├── navigation.tsx   # React Navigation stack
+    └── providers.tsx    # Context providers
+```
+
+## Security — Silent Shield
+
+Card data is protected with AES-256-GCM authenticated encryption:
+
+```mermaid
+flowchart TB
+    subgraph card["🪪 NFC Card (NTAG215)"]
+        direction LR
+        payload["MBC1 | v | kid | alg | IV (12B) | ciphertext | authTag (16B)"]
+    end
+    card -->|"Generic NFC app"| opaque["❌ Opaque binary — unreadable"]
+    card -->|"MBC app + AES key"| clear["✅ Identity, balance, status, logs"]
+```
+
+- Member ID, balance, activity status, and transaction logs are **never** stored as plain text
+- Tampered payloads are rejected (GCM authentication tag verification)
+- Demo uses app-bundled AES key; production requires secure key provisioning
+
 ## How to Run
+
+### Prerequisites
+
+Set up your React Native development environment following the [official guide](https://reactnative.dev/docs/set-up-your-environment?platform=android).
+
+Minimum requirements:
+
+| Tool                    | Version             |
+| ----------------------- | ------------------- |
+| Node.js                 | ≥ 18                |
+| JDK                     | 17                  |
+| Android Studio          | Latest stable       |
+| Android SDK             | API 35 (Android 15) |
+| Android SDK Build-Tools | 35.0.0              |
+| Android NDK             | 27.1.12297006       |
+
+Ensure the following environment variables are set:
+
+```bash
+export ANDROID_HOME=$HOME/Library/Android/sdk   # macOS
+export PATH=$PATH:$ANDROID_HOME/emulator
+export PATH=$PATH:$ANDROID_HOME/platform-tools
+```
+
+### Run the App
 
 ```bash
 # Install dependencies
@@ -79,11 +175,40 @@ npm install
 # Start Metro
 npm start
 
-# Run on Android
+# Run on Android (device or emulator)
 npm run android
 ```
 
-**Requirements**: Android device with NFC enabled + NTAG215 tags.
+**Hardware requirement**: Android device with NFC enabled + NTAG215 tags for real NFC operations.
+
+## E2E Testing (Maestro)
+
+Autonomous UI-level E2E testing using Maestro with a mock NFC repository (no hardware needed):
+
+### Install Maestro
+
+```bash
+# macOS / Linux
+curl -Ls "https://get.maestro.mobile.dev" | bash
+
+# Verify installation
+maestro --version
+```
+
+### Run E2E Tests
+
+```bash
+# 1. Set E2E_MODE = true in src/infrastructure/utils/e2e.config.ts
+# 2. Build the E2E variant
+npm run e2e:android
+
+# 3. Run Maestro flows
+npm run e2e:test         # All flows
+npm run e2e:happy-flow   # Happy path only
+npm run e2e:bad-flow     # Error cases only
+
+# 4. Set E2E_MODE = false after testing
+```
 
 ## Branch Strategy
 

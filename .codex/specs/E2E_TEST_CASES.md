@@ -403,3 +403,47 @@ Security E2E evidence should show that a generic NFC reader cannot read plain me
 ## Android 9 FE Real NFC Evidence Rule
 
 Final physical-card E2E evidence must use Android 9 FE with NTAG215 for the MVP read/write baseline. iOS write evidence is not required for MVP.
+
+## 7. Autonomous E2E Testing — Maestro
+
+Maestro provides autonomous, scriptable E2E testing that validates the full parking MVP cycle without manual intervention or real NFC hardware.
+
+### Architecture
+
+```
+src/infrastructure/utils/e2e.config.ts (E2E_MODE = true)
+  → container.ts reads flag
+  → MockMbcCardRepository (in-memory singleton)
+  → Maestro drives UI flows autonomously
+```
+
+### Maestro E2E Flow Coverage
+
+| Flow ID                  | Maps To       | Scenario                  | Validation                    |
+| ------------------------ | ------------- | ------------------------- | ----------------------------- |
+| `maestro-register`       | E2E-REG-001   | Station register card     | Success UI state              |
+| `maestro-topup`          | E2E-TOP-001   | Station top-up Rp 50.000  | Balance updated               |
+| `maestro-checkin`        | E2E-GATE-001  | Gate parking check-in     | Checked-in status             |
+| `maestro-checkout`       | E2E-TERM-001  | Terminal parking checkout | Fee shown, balance deducted   |
+| `maestro-inspect`        | E2E-SCOUT-001 | Scout inspect card        | Balance, status, logs visible |
+| `maestro-double-checkin` | E2E-GATE-002  | Double check-in rejection | Error message shown           |
+| `maestro-insufficient`   | E2E-TERM-002  | Insufficient balance      | Top-up guidance shown         |
+| `maestro-role-switch`    | —             | Role switcher navigation  | All 4 roles accessible        |
+
+### Execution Commands
+
+```bash
+# 1. Set E2E_MODE = true in src/infrastructure/utils/e2e.config.ts
+# 2. Build and run
+npm run e2e:android   # Build with mock NFC
+npm run e2e:test      # Run all Maestro flows
+npm run e2e:happy-flow # Run happy path only
+npm run e2e:bad-flow   # Run error cases only
+# 3. Set E2E_MODE = false after testing
+```
+
+### Evidence
+
+- Maestro screenshots stored under `.maestro/screenshots/`
+- Each flow captures key assertion points automatically
+- CI-compatible: runs on Android emulator without NFC hardware

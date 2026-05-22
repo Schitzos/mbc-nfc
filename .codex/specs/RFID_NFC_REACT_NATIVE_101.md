@@ -187,4 +187,4 @@ This MBC MVP targets NTAG215 on Android. Because NTAG215 capacity is limited, th
 
 The MVP real-card implementation is validated on **Android 9 FE** using **NTAG215** tags. iOS NFC write support is not required for MVP.
 
-Quality status: 444+ automated tests, 65 suites, 100% line coverage achieved.
+Quality status: 477+ automated tests, 75 suites, 90%+ line coverage achieved.

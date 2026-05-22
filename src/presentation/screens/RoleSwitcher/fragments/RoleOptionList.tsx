@@ -37,7 +37,7 @@ export function RoleOptionList({
           className="flex-row items-center rounded-[20px] px-4 py-5 bg-white/55 border border-white/70"
           onPress={() => onSelect(role.key)}
         >
-          <View className="w-[52px] h-[52px] rounded-[14px] items-center justify-center mr-3.5 bg-[#FFE4E8]">
+          <View className="w-[52px] h-[52px] rounded-[14px] items-center justify-center mr-3.5 bg-pink-light">
             <Icon
               name={roleIcon[role.key]}
               size={26}
@@ -45,10 +45,10 @@ export function RoleOptionList({
             />
           </View>
           <View className="flex-1">
-            <Text className="text-[16px] font-bold text-[#111827]">
+            <Text className="text-[16px] font-bold text-foreground">
               {role.label}
             </Text>
-            <Text className="text-[13px] text-[#6B7280] mt-0.5">
+            <Text className="text-[13px] text-muted mt-0.5">
               {roleHint[role.key]}
             </Text>
           </View>

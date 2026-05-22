@@ -25,7 +25,9 @@ export function LatestLogsCard({
 }: Readonly<LatestLogsCardProps>): React.JSX.Element {
   return (
     <View className="rounded-[20px] p-4 bg-white/55 border border-white/70">
-      <Text className="text-sm font-bold text-[#111827]">Latest Five Logs</Text>
+      <Text className="text-sm font-bold text-foreground">
+        Latest Five Logs
+      </Text>
       {logs.length > 0 && (
         <View className="mt-2">
           {[...logs]
@@ -40,7 +42,7 @@ export function LatestLogsCard({
                     : ''
                 }`}
               >
-                <Text className="text-[11px] text-[#111827] flex-1">
+                <Text className="text-[11px] text-foreground flex-1">
                   {index + 1}. {log.activity.replace('_', ' ')}
                   {log.isSimulation ? ' (S)' : ''}
                 </Text>
@@ -49,7 +51,7 @@ export function LatestLogsCard({
                     ? `Rp ${log.nominal.toLocaleString(LOCALE_ID)}`
                     : ''}
                 </Text>
-                <Text className="text-[11px] text-[#6B7280] ml-2">
+                <Text className="text-[11px] text-muted ml-2">
                   {formatLogTime(log.occurredAt)}
                 </Text>
               </View>
@@ -57,7 +59,7 @@ export function LatestLogsCard({
         </View>
       )}
       {logs.length === 0 && (
-        <Text className="mt-2 text-xs text-[#6B7280]">No logs yet.</Text>
+        <Text className="mt-2 text-xs text-muted">No logs yet.</Text>
       )}
     </View>
   );

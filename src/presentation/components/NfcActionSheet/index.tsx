@@ -7,10 +7,11 @@ import type { NfcActionSheetProps } from './types';
 export type { NfcActionState, NfcActionSheetProps } from './types';
 
 const sheetStyle = {
-  backgroundColor: 'rgba(255, 255, 255, 0.85)',
+  backgroundColor: '#FFFFFF',
 };
 
 const nfcOrb = require('@presentation/assets/nfc-orb.png');
+const successCheck = require('@presentation/assets/success-check.png');
 
 function PulseRing({ delay }: Readonly<{ delay: number }>) {
   const scale = useRef(new Animated.Value(1)).current;
@@ -67,7 +68,7 @@ export function NfcActionSheet({
   if (state.phase === 'scanning') {
     sheetTitle = 'Ready to Scan';
   } else if (state.phase === 'success') {
-    sheetTitle = '✓ Done';
+    sheetTitle = state.title ?? '✓ Done';
   } else if (state.phase === 'confirm') {
     sheetTitle = '⚠ Confirm';
   }
@@ -79,7 +80,7 @@ export function NfcActionSheet({
       onClose={onDismiss}
       style={sheetStyle}
     >
-      <View className="flex-1">
+      <View>
         {state.phase === 'scanning' && (
           <View className="items-center px-6 pt-2 pb-8 gap-5">
             <View className="w-[200px] h-[200px] items-center justify-center">
@@ -92,16 +93,16 @@ export function NfcActionSheet({
               />
             </View>
             <View className="gap-2">
-              <Text className="text-center text-[16px] font-bold text-[#111827]">
+              <Text className="text-center text-[16px] font-bold text-foreground">
                 {state.message ?? 'Tap your member card near the phone'}
               </Text>
-              <Text className="text-center text-[13px] text-[#6B7280]">
+              <Text className="text-center text-[13px] text-muted">
                 Keep the card close until the operation is detected.
               </Text>
             </View>
-            <View className="flex-row items-center gap-2 bg-[#FFF1F2] px-5 py-2.5 rounded-full border border-[#FFE4E8]">
+            <View className="flex-row items-center gap-2 bg-rose-50 px-5 py-2.5 rounded-full border border-pink-light">
               <View className="w-2.5 h-2.5 rounded-full bg-brand" />
-              <Text className="text-[13px] font-medium text-[#111827]">
+              <Text className="text-[13px] font-medium text-foreground">
                 Waiting for NFC card
               </Text>
             </View>
@@ -109,34 +110,48 @@ export function NfcActionSheet({
         )}
 
         {state.phase === 'success' && (
-          <View className="items-center gap-4 pb-6 px-6">
-            <View className="w-32 h-32 rounded-full bg-[#DCFCE7] border-[1.5px] border-[#16A34A] items-center justify-center">
-              <Text className="text-[48px] text-[#16A34A] font-bold">✓</Text>
+          <View className="items-center gap-5 pb-6 px-6">
+            <Image
+              source={successCheck}
+              className="w-[120px] h-[120px]"
+              resizeMode="contain"
+            />
+            <View className="w-full rounded-2xl p-4 bg-white/60 border border-white/80 flex-row items-center gap-3">
+              <View className="w-10 h-10 rounded-full bg-pink-light items-center justify-center">
+                <Text className="text-base">💳</Text>
+              </View>
+              <View className="flex-1">
+                <Text className="text-sm font-semibold text-foreground">
+                  {state.message}
+                </Text>
+                <Text className="mt-0.5 text-xs text-muted">
+                  You can close this sheet.
+                </Text>
+              </View>
             </View>
-            <View className="w-full rounded-xl p-4 bg-white/60 border border-white">
-              <Text className="text-[15px] font-semibold text-[#111827]">
-                {state.title}
-              </Text>
-              <Text className="mt-1 text-[13px] text-[#6B7280]">
-                {state.message}
-              </Text>
-            </View>
-            <View className="w-full">
+            <View className="w-full gap-3">
               <SignalButton label="Done" onPress={onDismiss} />
+              {state.onConfirm && (
+                <SignalButton
+                  label={state.confirmLabel ?? 'Continue'}
+                  variant="secondary"
+                  onPress={state.onConfirm}
+                />
+              )}
             </View>
           </View>
         )}
 
         {state.phase === 'error' && (
           <View className="items-center gap-4 pb-6 px-6">
-            <View className="w-32 h-32 rounded-full bg-[#FEE2E2] border-[1.5px] border-[#DC2626] items-center justify-center">
-              <Text className="text-[48px] text-[#DC2626] font-bold">✕</Text>
+            <View className="w-32 h-32 rounded-full bg-error-light border-[1.5px] border-error items-center justify-center">
+              <Text className="text-[48px] text-error font-bold">✕</Text>
             </View>
             <View className="w-full rounded-xl p-4 bg-white/60 border border-white">
-              <Text className="text-[15px] font-semibold text-[#111827]">
+              <Text className="text-[15px] font-semibold text-foreground">
                 {state.title}
               </Text>
-              <Text className="mt-1 text-[13px] text-[#6B7280]">
+              <Text className="mt-1 text-[13px] text-muted">
                 {state.message}
               </Text>
             </View>
@@ -148,14 +163,14 @@ export function NfcActionSheet({
 
         {state.phase === 'confirm' && (
           <View className="items-center gap-4 pb-6 px-6">
-            <View className="w-32 h-32 rounded-full bg-[#FEF3C7] border-[1.5px] border-[#D97706] items-center justify-center">
-              <Text className="text-[48px] text-[#D97706] font-bold">⚠</Text>
+            <View className="w-32 h-32 rounded-full bg-warning-light border-[1.5px] border-warning items-center justify-center">
+              <Text className="text-[48px] text-warning font-bold">⚠</Text>
             </View>
             <View className="w-full rounded-xl p-4 bg-white/60 border border-white">
-              <Text className="text-[15px] font-semibold text-[#111827]">
+              <Text className="text-[15px] font-semibold text-foreground">
                 {state.title}
               </Text>
-              <Text className="mt-1 text-[13px] text-[#6B7280]">
+              <Text className="mt-1 text-[13px] text-muted">
                 {state.message}
               </Text>
             </View>

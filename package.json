@@ -14,7 +14,10 @@
     "test": "jest --watchman=false",
     "test:ci": "jest --watchman=false --runInBand --coverage --ci --reporters=default --reporters=jest-junit",
     "test:coverage": "jest --watchman=false --runInBand --coverage",
-    "test:quality": "jest --watchman=false --runInBand --coverage --ci --reporters=default --reporters=jest-junit"
+    "test:quality": "jest --watchman=false --runInBand --coverage --ci --reporters=default --reporters=jest-junit",
+    "e2e:test": "maestro test .maestro/",
+    "e2e:happy-flow": "maestro test .maestro/full-parking-flow.yaml",
+    "e2e:bad-flow": "maestro test .maestro/full-parking-bad-flow.yaml"
   },
   "jest-junit": {
     "outputDirectory": "test-results/junit",
@@ -39,6 +42,7 @@
     "nativewind": "^4.2.3",
     "react": "19.2.3",
     "react-native": "0.85.2",
+    "react-native-bootsplash": "7.3.1",
     "react-native-linear-gradient": "2.8.3",
     "react-native-nfc-manager": "^3.17.2",
     "react-native-quick-crypto": "^0.7.11",
@@ -70,6 +74,7 @@
     "@types/react-native-vector-icons": "^6.4.18",
     "@types/react-test-renderer": "^19.1.0",
     "babel-plugin-module-resolver": "^5.0.3",
+    "babel-plugin-transform-inline-environment-variables": "^0.4.4",
     "eslint": "^8.19.0",
     "husky": "^9.1.7",
     "jest": "^30.3.0",

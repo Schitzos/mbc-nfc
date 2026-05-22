@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { ImageBackground, Text, View } from 'react-native';
+import { ImageBackground, Image, Text, View } from 'react-native';
 import Animated, {
   useSharedValue,
   useAnimatedStyle,
@@ -20,6 +20,7 @@ import { GenericFailureCard } from './fragments/GenericFailureCard';
 import { signalColorTokens } from '@presentation/theme/colors';
 
 const bgImage = require('@presentation/assets/bg-role-switcher.png');
+const gateIllustration = require('@presentation/assets/illustration-nfc-gate.png');
 
 export function TerminalScreen(): React.JSX.Element {
   const setSelectedRole = useAppStore(state => state.setSelectedRole);
@@ -67,16 +68,16 @@ export function TerminalScreen(): React.JSX.Element {
         {actions.latestResult?.isSimulation && actions.success && (
           <Animated.View
             testID="terminal-simulation-banner"
-            className="self-center bg-[#F59E0B] rounded-full px-3 py-1 mb-2"
+            className="self-center bg-simulation rounded-full px-3 py-1 mb-2"
             style={badgeStyle}
           >
             <Text className="text-xs font-bold text-white">⚠️ SIMULATION</Text>
           </Animated.View>
         )}
 
-        <View className="flex-1 justify-center items-center">
+        <View className="flex-1">
           {!actions.latestResult && (
-            <>
+            <View className="flex-1 justify-center items-center">
               <View className="absolute top-0 left-0 right-0">
                 <TariffPreviewCard />
               </View>
@@ -89,31 +90,51 @@ export function TerminalScreen(): React.JSX.Element {
                   void actions.handleCheckout();
                 }}
               />
-            </>
+            </View>
           )}
           {actions.latestResult && actions.success && (
-            <CheckoutSummaryCard
-              latestResult={actions.latestResult}
-              checkoutTime={actions.checkoutTime}
-              isSimulation={actions.latestResult.isSimulation}
-              onReset={actions.resetResult}
-            />
+            <View className="flex-1 justify-center items-center">
+              <CheckoutSummaryCard
+                latestResult={actions.latestResult}
+                checkoutTime={actions.checkoutTime}
+                isSimulation={actions.latestResult.isSimulation}
+                onReset={actions.resetResult}
+              />
+            </View>
           )}
           {actions.latestResult && actions.insufficient && (
-            <InsufficientBalanceCard
-              latestResult={actions.latestResult}
-              onRetry={() => {
-                void actions.handleCheckout();
-              }}
-            />
+            <View className="flex-1">
+              <InsufficientBalanceCard
+                latestResult={actions.latestResult}
+                onRetry={() => {
+                  void actions.handleCheckout();
+                }}
+              />
+              <View className="flex-1 items-center justify-center">
+                <Image
+                  source={gateIllustration}
+                  className="w-[480px] h-[430px] opacity-60"
+                  resizeMode="contain"
+                />
+              </View>
+            </View>
           )}
           {actions.latestResult &&
             !actions.success &&
             !actions.insufficient && (
-              <GenericFailureCard
-                latestResult={actions.latestResult}
-                onReset={actions.resetResult}
-              />
+              <View className="flex-1">
+                <GenericFailureCard
+                  latestResult={actions.latestResult}
+                  onReset={actions.resetResult}
+                />
+                <View className="flex-1 items-center justify-center">
+                  <Image
+                    source={gateIllustration}
+                    className="w-[480px] h-[430px] opacity-60"
+                    resizeMode="contain"
+                  />
+                </View>
+              </View>
             )}
         </View>
 

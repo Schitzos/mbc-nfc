@@ -76,3 +76,10 @@ vendor/bundle/
 **/fastlane/test_output
 
 .kiro/preferences/
+
+# Maestro E2E screenshots
+.maestro/screenshots/
+screenshots/
+
+# presentation
+outputs/

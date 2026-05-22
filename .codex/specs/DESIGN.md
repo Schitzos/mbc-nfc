@@ -134,20 +134,12 @@ src/
         index.tsx
         useScoutActions.ts
     components/
-      AppHeaderCard/
       NfcActionSheet/
       NfcLogPanel/
       RadarZone/
-      ScanningRings/
+      PulseRing (inline)/
       SignalButton/
-      SignalTextField/
-      SignalOptionCard/
       SignalBottomSheet/
-      SignalStatusBanner/
-      SignalSurfaceCard/
-      SignalJelajahCard/
-      SignalSkeleton/
-      BackgroundDecor/
       ScreenHeader/
       ErrorBoundary/
     assets/
@@ -404,7 +396,7 @@ The app starts with role selection and then shows the active role surface.
 
 Before any real card operation, the presentation layer checks NFC availability through the application use case. If NFC is unsupported or disabled, the role screen must show a clear message that real MBC card scan/read/write requires an NFC-capable device with NFC enabled.
 
-All role screens use `NfcActionSheet` — a bottom sheet component that provides scan/success/error feedback during NFC operations. The scanning phase uses `ScanningRings` animation (3 concentric pulsing rings + breathing center NFC icon) consistent with the RadarZone visual language.
+All role screens use `NfcActionSheet` — a bottom sheet component that provides scan/success/error feedback during NFC operations. The scanning phase uses `PulseRing (inline)` animation (3 concentric pulsing rings + breathing center NFC icon) consistent with the RadarZone visual language.
 
 All four role screens use `ScreenHeader` — a shared header component providing consistent role title, subtitle, and optional action elements across Station, Gate, Terminal, and Scout.
 
@@ -434,7 +426,7 @@ Presentation assets include: `bg-role-switcher.png` (role switcher background), 
 ## 11. Quality Strategy
 
 - Domain and application logic should be written for high automated testability.
-- The repository should target at least 90% automated unit-test coverage across the whole executable source base, excluding only pure type-only contract files and generated artifacts. Actual achievement: 100% line coverage (446+ tests, 66 suites; jest.config.js enforces 99% statements/lines/branches, 96% functions).
+- The repository should target at least 90% automated unit-test coverage across the whole executable source base, excluding only pure type-only contract files and generated artifacts. Actual achievement: 90%+ line coverage (477+ tests, 75 suites; jest.config.js enforces 99% statements/lines/branches, 96% functions).
 - SonarCloud should analyze the repository with coverage input, lint/test results where applicable, and a passing quality gate before submission.
 - Dependency changes should be followed by `npm audit`, and the working dependency set should remain at 0 known vulnerabilities.
 - Coverage and static-analysis targets should not encourage shallow tests; critical balance, status, tariff, codec, and ledger paths must be meaningfully asserted.

@@ -1,0 +1,35 @@
+appId: com.mbcnfc
+---
+# 01 - Role Switching
+# Verify all role options are visible and navigable
+
+- assertVisible: 'Select Operating Role'
+- takeScreenshot: '01-role-switcher-home'
+
+# Navigate to Station
+- tapOn: 'Station'
+- assertVisible: 'The Station'
+- takeScreenshot: '01-station-screen'
+- tapOn:
+    label: 'Go back'
+
+# Navigate to Gate
+- tapOn: 'Gate'
+- assertVisible: 'The Gate'
+- tapOn:
+    label: 'Go back'
+
+# Navigate to Terminal
+- tapOn: 'Terminal'
+- assertVisible: 'The Terminal'
+- tapOn:
+    label: 'Go back'
+
+# Navigate to Scout
+- tapOn: 'Scout'
+- assertVisible: 'The Scout'
+- takeScreenshot: '01-role-switching-complete'
+- tapOn:
+    label: 'Go back'
+
+- assertVisible: 'Select Operating Role'

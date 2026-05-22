@@ -152,7 +152,7 @@ describe('Gate screen', () => {
     await waitFor(() =>
       expect(mockCheckInActivityUseCase.execute).toHaveBeenCalled(),
     );
-    expect(screen.getByText('Blocked')).toBeTruthy();
+    expect(screen.getByText('ALREADY CHECKED IN')).toBeTruthy();
     expect(screen.getAllByText('Already checked in').length).toBeGreaterThan(0);
   });
 
@@ -190,7 +190,7 @@ describe('Gate screen', () => {
       expect(mockCheckInActivityUseCase.execute).toHaveBeenCalled(),
     );
 
-    expect(screen.getByText('Card cannot be processed')).toBeTruthy();
+    expect(screen.getByText('CARD CANNOT BE PROCESSED')).toBeTruthy();
   });
 
   it('Gate shows checkedInAt timestamp when present', async () => {

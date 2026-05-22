@@ -31,31 +31,31 @@ export function MemberCardInfo({
 
   return (
     <View className="rounded-[20px] p-4 bg-white/55 border border-white/70">
-      <Text className="text-sm font-bold text-[#111827]">
+      <Text className="text-sm font-bold text-foreground">
         Member Card Information
       </Text>
       <View className="mt-3 gap-2">
         <View className="flex-row justify-between items-center">
-          <Text className="text-xs text-[#6B7280]">ID</Text>
-          <Text className="text-xs font-semibold text-[#111827]">
+          <Text className="text-xs text-muted">ID</Text>
+          <Text className="text-xs font-semibold text-foreground">
             {card.maskedMemberReference ?? 'MBC-***'}
           </Text>
         </View>
         <View className="flex-row justify-between items-center">
-          <Text className="text-xs text-[#6B7280]">Balance</Text>
+          <Text className="text-xs text-muted">Balance</Text>
           <Text
-            className={`text-lg font-extrabold ${card.balance > 0 ? 'text-[#059669]' : 'text-[#DC2626]'}`}
+            className={`text-lg font-extrabold ${card.balance > 0 ? 'text-success' : 'text-error'}`}
           >
             Rp {card.balance.toLocaleString(LOCALE_ID)}
           </Text>
         </View>
         <View className="flex-row justify-between items-center">
-          <Text className="text-xs text-[#6B7280]">Status</Text>
+          <Text className="text-xs text-muted">Status</Text>
           <View
             className={`px-2.5 py-0.5 rounded-xl ${isCheckedIn ? 'bg-[rgba(5,150,105,0.15)]' : 'bg-[rgba(107,114,128,0.1)]'}`}
           >
             <Text
-              className={`text-xs font-semibold ${isCheckedIn ? 'text-[#059669]' : 'text-[#6B7280]'}`}
+              className={`text-xs font-semibold ${isCheckedIn ? 'text-success' : 'text-muted'}`}
             >
               {statusLabel}
             </Text>
@@ -63,8 +63,8 @@ export function MemberCardInfo({
         </View>
         {!!card.activeSession?.checkedInAt && (
           <View className="flex-row justify-between items-center">
-            <Text className="text-xs text-[#6B7280]">Since</Text>
-            <Text className="text-xs font-semibold text-[#111827]">
+            <Text className="text-xs text-muted">Since</Text>
+            <Text className="text-xs font-semibold text-foreground">
               {formatLogTime(card.activeSession.checkedInAt)}
             </Text>
           </View>

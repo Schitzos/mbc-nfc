@@ -30,7 +30,7 @@ Both Senior QA and Test Automation Engineer must maintain detailed E2E case docu
 
 Quality targets:
 
-- Automated unit-test coverage target across the whole executable repository source is at least 90%. Actual achievement: 100% line coverage (444+ tests, 65 suites; jest.config.js enforces 99% statements/lines/branches, 96% functions).
+- Automated unit-test coverage target across the whole executable repository source is at least 90%. Actual achievement: 90%+ line coverage (477+ tests, 75 suites; jest.config.js enforces 99% statements/lines/branches, 96% functions).
 - Coverage results should be exported in a format that can be consumed by SonarCloud.
 
 ## 3A. Changed-File Unit Test Policy
@@ -130,7 +130,7 @@ Must test:
 - Scout one-tap balance, status, and transaction log display.
 - Scout radar-hides-on-result and "Scan Another Card" reset behavior.
 - RadarZone renders with correct color per role screen.
-- ScanningRings animation renders in NfcActionSheet scanning phase.
+- PulseRing (inline) animation renders in NfcActionSheet scanning phase.
 - NFC loading, success, and error states.
 - Signal UI direction is applied consistently enough for assessment/demo review.
 
@@ -191,18 +191,57 @@ Must test:
 | SEC-013 | Capacity guard                | Oversized protected payload is rejected before write                                                                           |
 | SEC-014 | Local report scope            | Station summary reflects operations processed on this device                                                                   |
 
-## 11. Entry Criteria
+## 11. Autonomous E2E Testing — Maestro
+
+Maestro is the autonomous E2E testing tool for validating full user flows on Android without manual intervention.
+
+### Strategy
+
+- Maestro YAML flows exercise the complete parking MVP cycle through the UI layer.
+- A `MockMbcCardRepository` (in-memory singleton) replaces real NFC hardware during E2E runs, activated via `E2E_MODE` flag in `src/infrastructure/utils/e2e.config.ts`.
+- Tests run on Android emulator or real device without NFC dependency.
+
+### Covered Flows
+
+| Flow ID                | Scenario                      | Assertion                        |
+| ---------------------- | ----------------------------- | -------------------------------- |
+| maestro-role-switch    | Role switcher navigation      | All 4 roles accessible           |
+| maestro-register       | Station register card         | Success state shown              |
+| maestro-topup          | Station top-up Rp 50.000      | Balance updated                  |
+| maestro-checkin        | Gate check-in                 | Checked-in status                |
+| maestro-checkout       | Terminal check-out            | Fee calculated, balance deducted |
+| maestro-inspect        | Scout inspect                 | Balance, status, logs displayed  |
+| maestro-double-checkin | Gate double check-in          | Error rejected                   |
+| maestro-insufficient   | Terminal insufficient balance | Top-up guidance shown            |
+
+### Execution
+
+```bash
+npm run e2e           # Run all Maestro flows
+npm run e2e:record    # Run with screenshot capture
+```
+
+### Ownership
+
+| Role                     | Responsibility                                  |
+| ------------------------ | ----------------------------------------------- |
+| Test Automation Engineer | Maintain Maestro YAML flows and mock repository |
+| Senior QA                | Review E2E coverage and validate results        |
+| Demo/Release Engineer    | Include Maestro evidence in submission package  |
+
+## 12. Entry Criteria
 
 - Requirements match the MBC assessment brief.
 - Design has card repository, codec, use-case, and role boundaries.
 - Tasks are traceable to requirements.
 - NTAG215 tags/cards and real devices are available for device tests.
 
-## 12. Exit Criteria
+## 13. Exit Criteria
 
 - Unit tests pass.
 - Application tests pass.
 - Presentation tests pass for key screens.
+- Maestro autonomous E2E flows pass for the full parking MVP cycle.
 - Real NFC read/write demo succeeds where platform support allows.
 - Station, Gate, Terminal, and Scout flows are demo-ready.
 - Silent Shield security checklist passes production-grade assessment mode, including authenticated encryption and generic NFC reader validation.

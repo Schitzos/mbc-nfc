@@ -1,6 +1,7 @@
 module.exports = {
   preset: '@react-native/jest-preset',
   moduleNameMapper: {
+    'react-native-bootsplash': '<rootDir>/__mocks__/react-native-bootsplash.js',
     'react-native-reanimated': '<rootDir>/__mocks__/react-native-reanimated.js',
     'react-native-linear-gradient':
       '<rootDir>/__mocks__/react-native-linear-gradient.js',

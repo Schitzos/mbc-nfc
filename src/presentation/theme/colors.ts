@@ -1,3 +1,8 @@
+const tailwindColors = require('./color-tokens.js') as Record<string, string>;
+
+/** Tailwind-shared color tokens (single source of truth for NativeWind classes) */
+export const twColors = tailwindColors;
+
 export const signalColorTokens = {
   brand: {
     primary: '#FF0025',

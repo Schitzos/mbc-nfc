@@ -34,7 +34,9 @@ export function RoleSwitcherScreen({ navigation }: Props): React.JSX.Element {
     >
       <View style={{ paddingTop: insets.top + 24 }} className="px-6 pb-6">
         <View className="flex-row items-center justify-between">
-          <Text className="text-[28px] font-bold text-[#111827]">MBC Card</Text>
+          <Text className="text-[28px] font-bold text-foreground">
+            MBC Card
+          </Text>
           <View
             className="w-10 h-10 rounded-full bg-white items-center justify-center"
             style={s.infoButton}
@@ -46,9 +48,7 @@ export function RoleSwitcherScreen({ navigation }: Props): React.JSX.Element {
             />
           </View>
         </View>
-        <Text className="text-sm text-[#6B7280] mt-1">
-          Select Operating Role
-        </Text>
+        <Text className="text-sm text-muted mt-1">Select Operating Role</Text>
       </View>
 
       <View className="flex-1 px-4">

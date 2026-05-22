@@ -70,5 +70,19 @@ Supporting roles:
 - Buffer polyfill required in `index.js` for binary crypto operations.
 - Android NFC permissions and intent filters configured in AndroidManifest.xml.
 - `react-native-reanimated/plugin` added to `babel.config.js` for NfcActionSheet animations.
-- Current quality status: 444+ automated tests, 65 suites, 100% line coverage.
+- Current quality status: 477+ automated tests, 75 suites, 90%+ line coverage.
 - Simulation mode validated: Gate toggle + DateTimePicker writes `isSimulation` flag to card; Terminal reads flag and skips balance deduction. Dependency: `@react-native-community/datetimepicker@8.3.0`.
+
+## 7. Maestro Autonomous E2E Automation
+
+Maestro provides autonomous UI-level E2E testing that complements real-device NFC validation:
+
+| Aspect       | Detail                                                                                  |
+| ------------ | --------------------------------------------------------------------------------------- |
+| Tool         | Maestro (YAML-based mobile E2E)                                                         |
+| NFC Strategy | `MockMbcCardRepository` via `E2E_MODE` flag in `src/infrastructure/utils/e2e.config.ts` |
+| Target       | Android emulator or real device (no NFC required)                                       |
+| Flows        | Register, top-up, check-in, check-out, inspect, error cases                             |
+| Execution    | `npm run e2e` / `npm run e2e:record`                                                    |
+
+Maestro tests validate the full UI flow autonomously. Real-device NFC validation (§4–§5) remains required for hardware-level confidence.
