@@ -10,6 +10,7 @@ import { createSqliteLedgerRepository } from '@infrastructure/local-ledger/sqlit
 import { createDeviceNfcStatusRepository } from '@infrastructure/nfc/device-nfc-status.repository';
 import { createRealMbcCardRepository } from '@infrastructure/nfc/real-mbc-card.repository';
 import { createMockMbcCardRepository } from '@infrastructure/nfc/mock-mbc-card.repository';
+import { E2E_MODE } from '@infrastructure/utils/e2e.config';
 import type { AppServices } from '@app/services-contract';
 
 let cachedServices: AppServices | null = null;
@@ -18,12 +19,10 @@ export function createAppServices(): AppServices {
   if (cachedServices) {
     return cachedServices;
   }
-
   const db = open({ name: 'mbc-ledger.db', location: 'default' });
-  const cardRepository =
-    process.env.E2E === 'true'
-      ? createMockMbcCardRepository()
-      : createRealMbcCardRepository();
+  const cardRepository = E2E_MODE
+    ? createMockMbcCardRepository()
+    : createRealMbcCardRepository();
   const nfcStatusRepository = createDeviceNfcStatusRepository();
   const ledgerRepository = createSqliteLedgerRepository(db);
 
