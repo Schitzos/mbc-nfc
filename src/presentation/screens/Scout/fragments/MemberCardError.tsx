@@ -10,10 +10,10 @@ export function ScoutErrorCard({
 }: Readonly<ScoutErrorCardProps>): React.JSX.Element {
   return (
     <View className="rounded-[20px] p-4 border border-[rgba(255,82,82,0.4)] bg-[rgba(255,82,82,0.1)]">
-      <Text className="text-xs font-semibold text-[#DC2626] uppercase">
+      <Text className="text-xs font-semibold text-error uppercase">
         Card cannot be processed
       </Text>
-      <Text className="mt-1 text-sm font-semibold text-[#111827]">
+      <Text className="mt-1 text-sm font-semibold text-foreground">
         {message}
       </Text>
     </View>

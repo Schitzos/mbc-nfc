@@ -67,7 +67,7 @@ export function TerminalScreen(): React.JSX.Element {
         {actions.latestResult?.isSimulation && actions.success && (
           <Animated.View
             testID="terminal-simulation-banner"
-            className="self-center bg-[#F59E0B] rounded-full px-3 py-1 mb-2"
+            className="self-center bg-simulation rounded-full px-3 py-1 mb-2"
             style={badgeStyle}
           >
             <Text className="text-xs font-bold text-white">⚠️ SIMULATION</Text>

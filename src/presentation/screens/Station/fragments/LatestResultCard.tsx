@@ -19,7 +19,7 @@ export function LatestResultCard({
       <Text className="text-sm font-bold text-black">Latest result</Text>
       <Text
         className={`mt-1 text-xs font-semibold ${
-          latestResult.success ? 'text-[#00E676]' : 'text-[#FF5252]'
+          latestResult.success ? 'text-success' : 'text-error'
         }`}
       >
         {latestResult.success ? 'Success' : 'Unable to complete'}
@@ -62,7 +62,7 @@ export function LatestResultCard({
 
 function SuccessWrapper({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <View className="rounded-2xl p-4 bg-white/60 border-l-[3px] border-l-[#16A34A]">
+    <View className="rounded-2xl p-4 bg-white/60 border-l-[3px] border-l-success-border">
       {children}
     </View>
   );
@@ -70,7 +70,7 @@ function SuccessWrapper({ children }: Readonly<{ children: React.ReactNode }>) {
 
 function ErrorWrapper({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <View className="rounded-2xl p-4 bg-white/60 border-l-[3px] border-l-[#DC2626]">
+    <View className="rounded-2xl p-4 bg-white/60 border-l-[3px] border-l-error">
       {children}
     </View>
   );

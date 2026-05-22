@@ -57,7 +57,7 @@ export function SimulationModePanel({
           {enabled && (
             <Animated.View
               testID="simulation-pulse-dot"
-              className="w-2 h-2 rounded-full mr-1 bg-[#F59E0B]"
+              className="w-2 h-2 rounded-full mr-1 bg-simulation"
               style={dotStyle}
             />
           )}
@@ -68,7 +68,7 @@ export function SimulationModePanel({
         {enabled && (
           <Pressable
             testID="simulation-date-button"
-            className="rounded-full px-3 py-1 bg-[#F59E0B]"
+            className="rounded-full px-3 py-1 bg-simulation"
             onPress={() => setShowDatePicker(true)}
           >
             <Text className="text-xs font-medium text-white">

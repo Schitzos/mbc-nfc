@@ -3,6 +3,7 @@ import { Text, TouchableOpacity, View } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/MaterialIcons';
+import { twColors } from '@presentation/theme/colors';
 
 interface ScreenHeaderProps {
   title: string;
@@ -34,10 +35,10 @@ export function ScreenHeader({
               className="h-6 w-6 items-center justify-center"
               onPress={() => navigation.goBack()}
             >
-              <Icon name="arrow-back" size={20} color="#111827" />
+              <Icon name="arrow-back" size={20} color={twColors.foreground} />
             </TouchableOpacity>
           )}
-          <Text className="text-[24px] font-bold text-[#111827]">{title}</Text>
+          <Text className="text-[24px] font-bold text-foreground">{title}</Text>
         </View>
         <View
           className="px-4 py-1.5 rounded-full bg-white/50 flex-row items-center gap-1 border"
@@ -49,9 +50,7 @@ export function ScreenHeader({
           </Text>
         </View>
       </View>
-      <Text
-        className={`text-sm text-[#6B7280] mt-1 ${showBack ? 'ml-10' : ''}`}
-      >
+      <Text className={`text-sm text-muted mt-1 ${showBack ? 'ml-10' : ''}`}>
         {subtitle}
       </Text>
     </View>

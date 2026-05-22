@@ -92,16 +92,16 @@ export function NfcActionSheet({
               />
             </View>
             <View className="gap-2">
-              <Text className="text-center text-[16px] font-bold text-[#111827]">
+              <Text className="text-center text-[16px] font-bold text-foreground">
                 {state.message ?? 'Tap your member card near the phone'}
               </Text>
-              <Text className="text-center text-[13px] text-[#6B7280]">
+              <Text className="text-center text-[13px] text-muted">
                 Keep the card close until the operation is detected.
               </Text>
             </View>
-            <View className="flex-row items-center gap-2 bg-[#FFF1F2] px-5 py-2.5 rounded-full border border-[#FFE4E8]">
+            <View className="flex-row items-center gap-2 bg-rose-50 px-5 py-2.5 rounded-full border border-pink-light">
               <View className="w-2.5 h-2.5 rounded-full bg-brand" />
-              <Text className="text-[13px] font-medium text-[#111827]">
+              <Text className="text-[13px] font-medium text-foreground">
                 Waiting for NFC card
               </Text>
             </View>
@@ -110,14 +110,16 @@ export function NfcActionSheet({
 
         {state.phase === 'success' && (
           <View className="items-center gap-4 pb-6 px-6">
-            <View className="w-32 h-32 rounded-full bg-[#DCFCE7] border-[1.5px] border-[#16A34A] items-center justify-center">
-              <Text className="text-[48px] text-[#16A34A] font-bold">✓</Text>
+            <View className="w-32 h-32 rounded-full bg-success-light border-[1.5px] border-success-border items-center justify-center">
+              <Text className="text-[48px] text-success-border font-bold">
+                ✓
+              </Text>
             </View>
             <View className="w-full rounded-xl p-4 bg-white/60 border border-white">
-              <Text className="text-[15px] font-semibold text-[#111827]">
+              <Text className="text-[15px] font-semibold text-foreground">
                 {state.title}
               </Text>
-              <Text className="mt-1 text-[13px] text-[#6B7280]">
+              <Text className="mt-1 text-[13px] text-muted">
                 {state.message}
               </Text>
             </View>
@@ -129,14 +131,14 @@ export function NfcActionSheet({
 
         {state.phase === 'error' && (
           <View className="items-center gap-4 pb-6 px-6">
-            <View className="w-32 h-32 rounded-full bg-[#FEE2E2] border-[1.5px] border-[#DC2626] items-center justify-center">
-              <Text className="text-[48px] text-[#DC2626] font-bold">✕</Text>
+            <View className="w-32 h-32 rounded-full bg-error-light border-[1.5px] border-error items-center justify-center">
+              <Text className="text-[48px] text-error font-bold">✕</Text>
             </View>
             <View className="w-full rounded-xl p-4 bg-white/60 border border-white">
-              <Text className="text-[15px] font-semibold text-[#111827]">
+              <Text className="text-[15px] font-semibold text-foreground">
                 {state.title}
               </Text>
-              <Text className="mt-1 text-[13px] text-[#6B7280]">
+              <Text className="mt-1 text-[13px] text-muted">
                 {state.message}
               </Text>
             </View>
@@ -148,14 +150,14 @@ export function NfcActionSheet({
 
         {state.phase === 'confirm' && (
           <View className="items-center gap-4 pb-6 px-6">
-            <View className="w-32 h-32 rounded-full bg-[#FEF3C7] border-[1.5px] border-[#D97706] items-center justify-center">
-              <Text className="text-[48px] text-[#D97706] font-bold">⚠</Text>
+            <View className="w-32 h-32 rounded-full bg-warning-light border-[1.5px] border-warning items-center justify-center">
+              <Text className="text-[48px] text-warning font-bold">⚠</Text>
             </View>
             <View className="w-full rounded-xl p-4 bg-white/60 border border-white">
-              <Text className="text-[15px] font-semibold text-[#111827]">
+              <Text className="text-[15px] font-semibold text-foreground">
                 {state.title}
               </Text>
-              <Text className="mt-1 text-[13px] text-[#6B7280]">
+              <Text className="mt-1 text-[13px] text-muted">
                 {state.message}
               </Text>
             </View>

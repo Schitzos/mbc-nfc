@@ -1,6 +1,7 @@
 import React from 'react';
-import { Pressable, Text, View } from 'react-native';
+import { Text, View } from 'react-native';
 import dayjs from 'dayjs';
+import { SignalButton } from '@presentation/components/SignalButton';
 import type { RoleActionResultDto } from '@application/dto/role-action-result-dto';
 import { LOCALE_ID } from '@shared/constants';
 
@@ -30,46 +31,46 @@ export function CheckoutSummaryCard({
     : '-';
 
   return (
-    <View className="rounded-[20px] p-5 w-full bg-white/55 border border-white/70">
+    <View className="rounded-[20px] p-5 w-full bg-white/55 border border-white/70 gap-4">
       <View className="items-center">
         <View className="h-12 w-12 items-center justify-center rounded-full bg-[rgba(16,185,129,0.2)]">
-          <Text className="text-2xl text-[#059669]">✓</Text>
+          <Text className="text-2xl text-success">✓</Text>
         </View>
-        <Text className="mt-2 text-lg font-bold text-[#111827]">
+        <Text className="mt-2 text-lg font-bold text-foreground">
           Checkout Summary
         </Text>
-        <Text className="mt-1 text-3xl font-extrabold text-[#111827]">
+        <Text className="mt-1 text-3xl font-extrabold text-foreground">
           Rp {latestResult.card?.balance.toLocaleString(LOCALE_ID) ?? '0'}
           {isSimulation ? ' (unchanged)' : ''}
         </Text>
       </View>
       <View className="mt-4 gap-2">
         <View className="flex-row justify-between">
-          <Text className="text-xs text-[#6B7280]">Tap in at</Text>
-          <Text className="text-xs font-semibold text-[#111827]">
+          <Text className="text-xs text-muted">Tap in at</Text>
+          <Text className="text-xs font-semibold text-foreground">
             {checkinDisplay}
           </Text>
         </View>
         <View className="flex-row justify-between">
-          <Text className="text-xs text-[#6B7280]">Tap out at</Text>
-          <Text className="text-xs font-semibold text-[#111827]">
+          <Text className="text-xs text-muted">Tap out at</Text>
+          <Text className="text-xs font-semibold text-foreground">
             {checkoutTime}
           </Text>
         </View>
         <View className="flex-row justify-between">
-          <Text className="text-xs text-[#6B7280]">Duration</Text>
-          <Text className="text-xs font-semibold text-[#111827]">
+          <Text className="text-xs text-muted">Duration</Text>
+          <Text className="text-xs font-semibold text-foreground">
             {formatDuration(latestResult.durationMs ?? 0)}
           </Text>
         </View>
         <View className="flex-row justify-between">
-          <Text className="text-xs text-[#6B7280]">Charged Hours</Text>
-          <Text className="text-xs font-semibold text-[#111827]">
+          <Text className="text-xs text-muted">Charged Hours</Text>
+          <Text className="text-xs font-semibold text-foreground">
             {latestResult.chargedHours ?? 0}h
           </Text>
         </View>
         <View className="flex-row justify-between">
-          <Text className="text-xs text-[#6B7280]">Fee</Text>
+          <Text className="text-xs text-muted">Fee</Text>
           <Text className="text-xs font-bold text-brand">
             Rp {latestResult.chargedAmount?.toLocaleString(LOCALE_ID) ?? '0'}
             {isSimulation ? ' (not deducted)' : ''}
@@ -77,15 +78,12 @@ export function CheckoutSummaryCard({
         </View>
       </View>
       {onReset && (
-        <Pressable
+        <SignalButton
           testID="terminal-scan-another"
-          className="mt-4 items-center justify-center h-10 rounded-full bg-brand"
+          label="Scan Another Card"
+          variant="secondary"
           onPress={onReset}
-        >
-          <Text className="text-sm font-semibold text-white">
-            Scan Another Card
-          </Text>
-        </Pressable>
+        />
       )}
     </View>
   );
