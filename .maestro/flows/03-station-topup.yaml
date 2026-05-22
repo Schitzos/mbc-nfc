@@ -16,7 +16,7 @@ appId: com.mbcnfc
 
 # Tap RadarZone to top up
 - tapOn:
-    accessibilityLabel: 'Tap Card to Top Up'
+    label: 'Tap Card to Top Up'
 
 # Wait for success
 - extendedWaitUntil:

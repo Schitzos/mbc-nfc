@@ -12,7 +12,7 @@ appId: com.mbcnfc
 
 # Tap the RadarZone to register
 - tapOn:
-    accessibilityLabel: 'Tap Card to Register'
+    label: 'Tap Card to Register'
 
 # Wait for result
 - extendedWaitUntil:

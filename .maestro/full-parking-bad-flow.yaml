@@ -1,0 +1,160 @@
+appId: com.mbcnfc
+env:
+  MAESTRO_WAIT_TIMEOUT: 3000
+---
+# Bad Flow: All error scenarios for parking MVP
+
+- clearState
+- launchApp
+
+# ============================================================
+# ERROR 1: Checkout without any card (unregistered)
+# ============================================================
+- assertVisible: 'Select Operating Role'
+- takeScreenshot: '.maestro/screenshots/bad-01a-role-switcher'
+- tapOn: 'Terminal'
+- takeScreenshot: '.maestro/screenshots/bad-01b-terminal-screen'
+- tapOn: 'Tap Card to Check Out'
+- assertVisible: 'Checkout Failed'
+- takeScreenshot: '.maestro/screenshots/bad-01c-checkout-no-card'
+- tapOn: 'Dismiss'
+- takeScreenshot: '.maestro/screenshots/bad-01d-terminal-after-dismiss'
+
+# ============================================================
+# ERROR 2: Check-in without registration (unregistered card)
+# ============================================================
+- tapOn:
+    label: 'Go back'
+- assertVisible: 'Select Operating Role'
+- tapOn: 'Gate'
+- takeScreenshot: '.maestro/screenshots/bad-02a-gate-screen'
+- tapOn: 'Tap Card to Check In'
+- assertVisible: 'Check-In Failed'
+- takeScreenshot: '.maestro/screenshots/bad-02b-checkin-no-card'
+- tapOn: 'Dismiss'
+- takeScreenshot: '.maestro/screenshots/bad-02c-gate-after-dismiss'
+
+# ============================================================
+# ERROR 3: Scout inspect unregistered card
+# ============================================================
+- tapOn:
+    label: 'Go back'
+- assertVisible: 'Select Operating Role'
+- tapOn: 'Scout'
+- takeScreenshot: '.maestro/screenshots/bad-03a-scout-screen'
+- tapOn: 'Inspect'
+- assertVisible: 'Inspect Failed'
+- takeScreenshot: '.maestro/screenshots/bad-03b-scout-error-sheet'
+- tapOn: 'Dismiss'
+- assertVisible: 'Card cannot be processed'
+- takeScreenshot: '.maestro/screenshots/bad-03c-scout-error-result'
+
+# ============================================================
+# Register a card for remaining error tests
+# ============================================================
+- tapOn:
+    label: 'Go back'
+- assertVisible: 'Select Operating Role'
+- tapOn: 'Station'
+- tapOn: 'Register'
+- tapOn: 'Tap Card to Register'
+- assertVisible: 'Card Registered'
+- tapOn: 'Done'
+- takeScreenshot: '.maestro/screenshots/bad-04a-card-registered'
+
+# ============================================================
+# ERROR 4: Register same card again (already registered)
+# ============================================================
+- tapOn: 'Tap Card to Register'
+- assertVisible: 'Card Has Existing Data'
+- takeScreenshot: '.maestro/screenshots/bad-04b-register-duplicate'
+- tapOn: 'Skip'
+- takeScreenshot: '.maestro/screenshots/bad-04c-after-skip'
+
+# ============================================================
+# ERROR 5: Checkout without check-in (registered but not checked in)
+# ============================================================
+- tapOn:
+    label: 'Go back'
+- assertVisible: 'Select Operating Role'
+- tapOn: 'Terminal'
+- takeScreenshot: '.maestro/screenshots/bad-05a-terminal-screen'
+- tapOn: 'Tap Card to Check Out'
+- assertVisible: 'Checkout Failed'
+- takeScreenshot: '.maestro/screenshots/bad-05b-checkout-not-checked-in'
+- tapOn: 'Dismiss'
+- takeScreenshot: '.maestro/screenshots/bad-05c-terminal-after-dismiss'
+
+# ============================================================
+# ERROR 6: Insufficient balance (check-in then checkout with 0 balance)
+# ============================================================
+- tapOn:
+    label: 'Go back'
+- assertVisible: 'Select Operating Role'
+- tapOn: 'Gate'
+- tapOn: 'Tap Card to Check In'
+- assertVisible: 'Checked In'
+- takeScreenshot: '.maestro/screenshots/bad-06a-checkin-for-balance-test'
+- tapOn: 'Done'
+
+# Now try checkout — balance is 0, fee > 0
+- tapOn:
+    label: 'Go back'
+- assertVisible: 'Select Operating Role'
+- tapOn: 'Terminal'
+- tapOn: 'Tap Card to Check Out'
+- assertVisible: 'Checkout Failed'
+- takeScreenshot: '.maestro/screenshots/bad-06b-insufficient-balance-sheet'
+- tapOn: 'Dismiss'
+- assertVisible: 'Insufficient balance'
+- takeScreenshot: '.maestro/screenshots/bad-06c-insufficient-balance-detail'
+
+# ============================================================
+# ERROR 7: Double check-in
+# Top up first so we can checkout, then check-in again for double test
+# ============================================================
+- tapOn:
+    label: 'Go back'
+- assertVisible: 'Select Operating Role'
+- tapOn: 'Station'
+- tapOn: 'Top Up'
+- tapOn: '50k'
+- tapOn: 'Tap Card to Top Up'
+- assertVisible: 'Top-Up Complete'
+- tapOn: 'Done'
+
+# Checkout to clear checked-in state
+- tapOn:
+    label: 'Go back'
+- assertVisible: 'Select Operating Role'
+- tapOn: 'Terminal'
+- tapOn: 'Tap Card to Check Out'
+- assertVisible: 'Checkout Complete'
+- takeScreenshot: '.maestro/screenshots/bad-07a-checkout-to-reset'
+- tapOn: 'Done'
+
+# Check in
+- tapOn:
+    label: 'Go back'
+- assertVisible: 'Select Operating Role'
+- tapOn: 'Gate'
+- tapOn: 'Tap Card to Check In'
+- assertVisible: 'Checked In'
+- tapOn: 'Done'
+- takeScreenshot: '.maestro/screenshots/bad-07b-first-checkin'
+
+# Try double check-in
+- tapOn: 'Scan Another Card'
+- takeScreenshot: '.maestro/screenshots/bad-07c-gate-ready-for-double'
+- tapOn: 'Tap Card to Check In'
+- assertVisible: 'Check-In Failed'
+- takeScreenshot: '.maestro/screenshots/bad-07d-double-checkin-sheet'
+- tapOn: 'Dismiss'
+- assertVisible: 'Blocked'
+- takeScreenshot: '.maestro/screenshots/bad-07e-double-checkin-blocked'
+
+# === BACK TO ROLE SWITCHER ===
+- tapOn:
+    label: 'Go back'
+- assertVisible: 'Select Operating Role'
+- takeScreenshot: '.maestro/screenshots/bad-08-final-role-switcher'

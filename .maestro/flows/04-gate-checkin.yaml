@@ -4,14 +4,14 @@ appId: com.mbcnfc
 # Navigate to Gate, tap RadarZone, assert check-in success
 
 - tapOn:
-    accessibilityLabel: 'Go back'
+    label: 'Go back'
 - tapOn: 'Gate'
 - assertVisible: 'The Gate'
 - takeScreenshot: '04-gate-checkin-ready'
 
 # Tap RadarZone to check in
 - tapOn:
-    accessibilityLabel: 'Tap Card to Check In'
+    label: 'Tap Card to Check In'
 
 # Wait for success
 - extendedWaitUntil:

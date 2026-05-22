@@ -11,25 +11,25 @@ appId: com.mbcnfc
 - assertVisible: 'The Station'
 - takeScreenshot: '01-station-screen'
 - tapOn:
-    accessibilityLabel: 'Go back'
+    label: 'Go back'
 
 # Navigate to Gate
 - tapOn: 'Gate'
 - assertVisible: 'The Gate'
 - tapOn:
-    accessibilityLabel: 'Go back'
+    label: 'Go back'
 
 # Navigate to Terminal
 - tapOn: 'Terminal'
 - assertVisible: 'The Terminal'
 - tapOn:
-    accessibilityLabel: 'Go back'
+    label: 'Go back'
 
 # Navigate to Scout
 - tapOn: 'Scout'
 - assertVisible: 'The Scout'
 - takeScreenshot: '01-role-switching-complete'
 - tapOn:
-    accessibilityLabel: 'Go back'
+    label: 'Go back'
 
 - assertVisible: 'Select Operating Role'

@@ -1,65 +1,81 @@
 appId: com.mbcnfc
+env:
+  MAESTRO_WAIT_TIMEOUT: 3000
 ---
 # Full Parking Flow: Register → Top Up → Check In → Check Out → Inspect
 
+- clearState
+- launchApp
+
 # === REGISTER ===
 - assertVisible: 'Select Operating Role'
+- takeScreenshot: '.maestro/screenshots/01-role-switcher'
 - tapOn: 'Station'
-- assertVisible: 'The Station'
+- takeScreenshot: '.maestro/screenshots/02-station-screen'
 - tapOn: 'Register'
-- tapOn:
-    accessibilityLabel: 'Tap Card to Register'
-- extendedWaitUntil:
-    visible: 'Success'
-    timeout: 5000
-- takeScreenshot: 'full-01-registered'
+- takeScreenshot: '.maestro/screenshots/03-register-tab-selected'
+- tapOn: 'Tap Card to Register'
+- assertVisible: 'Card Registered'
+- takeScreenshot: '.maestro/screenshots/04-register-success-sheet'
+- tapOn: 'Done'
+- takeScreenshot: '.maestro/screenshots/05-register-result'
 
 # === TOP UP 50k ===
 - tapOn: 'Top Up'
+- takeScreenshot: '.maestro/screenshots/06-topup-tab-selected'
 - tapOn: '50k'
-- tapOn:
-    accessibilityLabel: 'Tap Card to Top Up'
-- extendedWaitUntil:
-    visible: 'Success'
-    timeout: 5000
-- takeScreenshot: 'full-02-topped-up'
+- takeScreenshot: '.maestro/screenshots/07-topup-amount-entered'
+- tapOn: 'Tap Card to Top Up'
+- assertVisible: 'Top-Up Complete'
+- takeScreenshot: '.maestro/screenshots/08-topup-success-sheet'
+- tapOn: 'Done'
+- takeScreenshot: '.maestro/screenshots/09-topup-result'
 
 # === CHECK IN ===
 - tapOn:
-    accessibilityLabel: 'Go back'
+    label: 'Go back'
+- assertVisible: 'Select Operating Role'
+- takeScreenshot: '.maestro/screenshots/10-back-to-role-switcher'
 - tapOn: 'Gate'
-- tapOn:
-    accessibilityLabel: 'Tap Card to Check In'
-- extendedWaitUntil:
-    visible: 'Check-in Successful'
-    timeout: 5000
-- takeScreenshot: 'full-03-checked-in'
+- assertVisible: 'Checking in for Parking'
+- takeScreenshot: '.maestro/screenshots/11-gate-screen'
+- tapOn: 'Tap Card to Check In'
+- assertVisible: 'Checked In'
+- takeScreenshot: '.maestro/screenshots/12-checkin-success-sheet'
+- tapOn: 'Done'
+- takeScreenshot: '.maestro/screenshots/13-checkin-result'
 
 # === CHECK OUT ===
 - tapOn:
-    id: 'gate-scan-another'
-- tapOn:
-    accessibilityLabel: 'Go back'
+    label: 'Go back'
+- assertVisible: 'Select Operating Role'
 - tapOn: 'Terminal'
-- tapOn:
-    accessibilityLabel: 'Tap Card to Check Out'
-- extendedWaitUntil:
-    visible: 'Checkout Summary'
-    timeout: 5000
-- assertVisible: 'Duration'
-- assertVisible: 'Fee'
-- takeScreenshot: 'full-04-checked-out'
+- assertVisible: 'Checking out for Parking'
+- takeScreenshot: '.maestro/screenshots/14-terminal-screen'
+- tapOn: 'Tap Card to Check Out'
+- assertVisible: 'Checkout Complete'
+- takeScreenshot: '.maestro/screenshots/15-checkout-success-sheet'
+- tapOn: 'Done'
+- assertVisible: 'Checkout Summary'
+- takeScreenshot: '.maestro/screenshots/16-checkout-summary'
 
 # === INSPECT ===
 - tapOn:
-    id: 'terminal-scan-another'
-- tapOn:
-    accessibilityLabel: 'Go back'
+    label: 'Go back'
+- assertVisible: 'Select Operating Role'
 - tapOn: 'Scout'
-- tapOn:
-    accessibilityLabel: 'Inspect'
-- extendedWaitUntil:
-    visible: 'Member Card Information'
-    timeout: 5000
+- assertVisible: 'Card Inspection and Member Info'
+- takeScreenshot: '.maestro/screenshots/17-scout-screen'
+- tapOn: 'Inspect'
+- assertVisible: 'Card Read'
+- takeScreenshot: '.maestro/screenshots/18-scout-success-sheet'
+- tapOn: 'Done'
+- assertVisible: 'Member Card Information'
 - assertVisible: 'Not checked in'
-- takeScreenshot: 'full-05-inspected'
+- takeScreenshot: '.maestro/screenshots/19-scout-inspect-result'
+
+# === BACK TO ROLE SWITCHER ===
+- tapOn:
+    label: 'Go back'
+- assertVisible: 'Select Operating Role'
+- takeScreenshot: '.maestro/screenshots/20-final-role-switcher'

@@ -4,14 +4,14 @@ appId: com.mbcnfc
 # Navigate to Scout, tap RadarZone, assert card info visible
 
 - tapOn:
-    accessibilityLabel: 'Go back'
+    label: 'Go back'
 - tapOn: 'Scout'
 - assertVisible: 'The Scout'
 - takeScreenshot: '06-scout-inspect-ready'
 
 # Tap RadarZone to inspect
 - tapOn:
-    accessibilityLabel: 'Inspect'
+    label: 'Inspect'
 
 # Wait for card info
 - extendedWaitUntil:

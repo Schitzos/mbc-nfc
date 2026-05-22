@@ -10,17 +10,17 @@ appId: com.mbcnfc
 - tapOn: 'Station'
 - tapOn: 'Register'
 - tapOn:
-    accessibilityLabel: 'Tap Card to Register'
+    label: 'Tap Card to Register'
 - extendedWaitUntil:
     visible: 'Success'
     timeout: 5000
 
 # Check in at Gate
 - tapOn:
-    accessibilityLabel: 'Go back'
+    label: 'Go back'
 - tapOn: 'Gate'
 - tapOn:
-    accessibilityLabel: 'Tap Card to Check In'
+    label: 'Tap Card to Check In'
 - extendedWaitUntil:
     visible: 'Check-in Successful'
     timeout: 5000
@@ -29,10 +29,10 @@ appId: com.mbcnfc
 - tapOn:
     id: 'gate-scan-another'
 - tapOn:
-    accessibilityLabel: 'Go back'
+    label: 'Go back'
 - tapOn: 'Terminal'
 - tapOn:
-    accessibilityLabel: 'Tap Card to Check Out'
+    label: 'Tap Card to Check Out'
 - extendedWaitUntil:
     visible: 'Insufficient balance'
     timeout: 5000
