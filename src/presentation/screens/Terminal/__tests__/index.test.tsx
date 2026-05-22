@@ -151,7 +151,7 @@ describe('Terminal screen', () => {
     await waitFor(() =>
       expect(mockCheckOutActivityUseCase.execute).toHaveBeenCalled(),
     );
-    expect(screen.getByText('Insufficient balance')).toBeTruthy();
+    expect(screen.getByText('INSUFFICIENT BALANCE')).toBeTruthy();
     expect(screen.getByText('Go to Station Top Up')).toBeTruthy();
   });
 
@@ -173,7 +173,7 @@ describe('Terminal screen', () => {
       expect(mockCheckOutActivityUseCase.execute).toHaveBeenCalled(),
     );
 
-    expect(screen.getByText('Card cannot be processed')).toBeTruthy();
+    expect(screen.getByText('CARD CANNOT BE PROCESSED')).toBeTruthy();
   });
 
   it('Terminal navigates to station on insufficient balance guidance', async () => {
@@ -297,7 +297,7 @@ describe('Terminal screen', () => {
     );
     fireEvent.press(screen.getByText('Dismiss'));
     await waitFor(() =>
-      expect(screen.getByText('Card cannot be processed')).toBeTruthy(),
+      expect(screen.getByText('CARD CANNOT BE PROCESSED')).toBeTruthy(),
     );
     expect(screen.getByText('Card tampered')).toBeTruthy();
   });
