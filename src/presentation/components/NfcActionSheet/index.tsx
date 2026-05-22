@@ -7,10 +7,11 @@ import type { NfcActionSheetProps } from './types';
 export type { NfcActionState, NfcActionSheetProps } from './types';
 
 const sheetStyle = {
-  backgroundColor: 'rgba(255, 255, 255, 0.85)',
+  backgroundColor: '#FFFFFF',
 };
 
 const nfcOrb = require('@presentation/assets/nfc-orb.png');
+const successCheck = require('@presentation/assets/success-check.png');
 
 function PulseRing({ delay }: Readonly<{ delay: number }>) {
   const scale = useRef(new Animated.Value(1)).current;
@@ -67,7 +68,7 @@ export function NfcActionSheet({
   if (state.phase === 'scanning') {
     sheetTitle = 'Ready to Scan';
   } else if (state.phase === 'success') {
-    sheetTitle = '✓ Done';
+    sheetTitle = state.title ?? '✓ Done';
   } else if (state.phase === 'confirm') {
     sheetTitle = '⚠ Confirm';
   }
@@ -79,7 +80,7 @@ export function NfcActionSheet({
       onClose={onDismiss}
       style={sheetStyle}
     >
-      <View className="flex-1">
+      <View>
         {state.phase === 'scanning' && (
           <View className="items-center px-6 pt-2 pb-8 gap-5">
             <View className="w-[200px] h-[200px] items-center justify-center">
@@ -109,22 +110,34 @@ export function NfcActionSheet({
         )}
 
         {state.phase === 'success' && (
-          <View className="items-center gap-4 pb-6 px-6">
-            <View className="w-32 h-32 rounded-full bg-success-light border-[1.5px] border-success-border items-center justify-center">
-              <Text className="text-[48px] text-success-border font-bold">
-                ✓
-              </Text>
+          <View className="items-center gap-5 pb-6 px-6">
+            <Image
+              source={successCheck}
+              className="w-[120px] h-[120px]"
+              resizeMode="contain"
+            />
+            <View className="w-full rounded-2xl p-4 bg-white/60 border border-white/80 flex-row items-center gap-3">
+              <View className="w-10 h-10 rounded-full bg-pink-light items-center justify-center">
+                <Text className="text-base">💳</Text>
+              </View>
+              <View className="flex-1">
+                <Text className="text-sm font-semibold text-foreground">
+                  {state.message}
+                </Text>
+                <Text className="mt-0.5 text-xs text-muted">
+                  You can close this sheet.
+                </Text>
+              </View>
             </View>
-            <View className="w-full rounded-xl p-4 bg-white/60 border border-white">
-              <Text className="text-[15px] font-semibold text-foreground">
-                {state.title}
-              </Text>
-              <Text className="mt-1 text-[13px] text-muted">
-                {state.message}
-              </Text>
-            </View>
-            <View className="w-full">
+            <View className="w-full gap-3">
               <SignalButton label="Done" onPress={onDismiss} />
+              {state.onConfirm && (
+                <SignalButton
+                  label={state.confirmLabel ?? 'Continue'}
+                  variant="secondary"
+                  onPress={state.onConfirm}
+                />
+              )}
             </View>
           </View>
         )}

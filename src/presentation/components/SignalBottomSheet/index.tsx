@@ -2,7 +2,6 @@ import React from 'react';
 import {
   ImageBackground,
   Pressable,
-  ScrollView,
   StyleSheet,
   Text,
   View,
@@ -46,12 +45,13 @@ export function SignalBottomSheet({
         style={styles.overlay}
         onPress={onClose}
       />
-      <ImageBackground
-        source={bgImage}
-        resizeMode="cover"
-        blurRadius={15}
-        style={[styles.sheet, style]}
-      >
+      <View style={[styles.sheet, style]}>
+        <ImageBackground
+          source={bgImage}
+          resizeMode="cover"
+          blurRadius={15}
+          style={StyleSheet.absoluteFill}
+        />
         <View style={styles.header}>
           {title ? (
             <Text numberOfLines={2} style={styles.title}>
@@ -70,9 +70,7 @@ export function SignalBottomSheet({
             </Pressable>
           )}
         </View>
-        <ScrollView style={styles.body} showsVerticalScrollIndicator={false}>
-          {children}
-        </ScrollView>
+        <View style={styles.body}>{children}</View>
         {stickyAction && (
           <View style={styles.sticky}>
             {caption && (
@@ -83,7 +81,7 @@ export function SignalBottomSheet({
             {stickyAction}
           </View>
         )}
-      </ImageBackground>
+      </View>
     </View>
   );
 }

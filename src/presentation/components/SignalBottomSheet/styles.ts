@@ -17,7 +17,7 @@ export const styles = StyleSheet.create({
     backgroundColor: 'rgba(0, 0, 0, 0.5)',
   },
   sheet: {
-    height: SCREEN_HEIGHT * 0.5,
+    maxHeight: SCREEN_HEIGHT * 0.85,
     backgroundColor: colors.surfaceDefault,
     borderTopLeftRadius: componentTokens.bottomSheet.topRadius,
     borderTopRightRadius: componentTokens.bottomSheet.topRadius,
@@ -49,8 +49,8 @@ export const styles = StyleSheet.create({
     color: signalColorTokens.text.primary,
   },
   body: {
-    flex: 1,
     paddingHorizontal: componentTokens.bottomSheet.horizontalPadding,
+    paddingBottom: 16,
     gap: componentTokens.bottomSheet.componentGap,
   },
   sticky: {
